@@ -33,6 +33,22 @@ const publicMessage = (io) => async ({ msg, room, from, color, bold }) => {
   }
 };
 
+const pokeMessage = (io, socket) => async ({from, to, room}, callback) => {
+  const toUser = await findUserByName(to);
+  console.log('poke message', from, to)
+  if(toUser) {
+    io.to(toUser._id).emit('poke message', {
+      type: 'poke',
+      room,
+      from,
+      to
+    });
+    callback('success');
+  } else {
+    callback('Can not find user')
+  }
+}
+
 const privateMessage = (io, socket) => async ({ msg, room, from, to, color, bold }) => {
   console.log('private')
   try {
@@ -51,20 +67,22 @@ const privateMessage = (io, socket) => async ({ msg, room, from, to, color, bold
 
     const toUser = await findUserByName(to);
     console.log('private', toUser._id)
+    if(toUser) {
+      io.to(toUser._id).emit('room messages', [
+        {
+          type: 'private',
+          room,
+          _id: newChat._id,
+          msg: newChat.msg,
+          from: newChat.from,
+          to: newChat.to,
+          color: newChat.color,
+          bold: newChat.bold,
+          date: newChat.date,
+        },
+      ]);
+    }
     
-    io.to(toUser._id).emit('room messages', [
-      {
-        type: 'private',
-        room,
-        _id: newChat._id,
-        msg: newChat.msg,
-        from: newChat.from,
-        to: newChat.to,
-        color: newChat.color,
-        bold: newChat.bold,
-        date: newChat.date,
-      },
-    ]);
 
     socket.emit('room messages', [
       {
@@ -84,4 +102,4 @@ const privateMessage = (io, socket) => async ({ msg, room, from, to, color, bold
   }
 };
 
-module.exports = { publicMessage, privateMessage };
+module.exports = { publicMessage, privateMessage, pokeMessage };

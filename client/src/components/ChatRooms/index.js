@@ -7,9 +7,9 @@ import {
 } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
 import MenuIcon from '@material-ui/icons/Menu';
+import { useSnackbar } from 'notistack';
 
 import SideBarLeft from '../SidebarLeft'
-
 import useStyles from './styles'
 import ChatRoomContent from '../ChatRoomContent';
 import AddRoomModal from '../AddRoomModal';
@@ -25,7 +25,7 @@ import {getPrivateMessages} from '../../utils';
 
 const socket = getSocket();
 
-export default function ChatRooms({room}) {
+const ChatRooms = ({room}) => {
     const classes = useStyles();
     const history= useHistory();
     const [mobileOpen, setMobileOpen] = useState(false);
@@ -49,7 +49,6 @@ export default function ChatRooms({room}) {
     const [newMessages, setNewMessages] = useState([]);
     // receive new infomation for rooms
     const [newInfo, setNewInfo] = useState(null);
-
     // private chat send message to this user
     const [privateTo, setPrivateTo] = useState(null);
     const [privateMessgaes, setPrivateMessages] = useState(null);
@@ -60,10 +59,13 @@ export default function ChatRooms({room}) {
 
     const [currentStreams, setCurrentStreams] = useState([]);
 
+    const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+
     const handleChangeRoom = (event, newValue) => {
         setRoomIndex(newValue);
     };
 
+    // mute or unmute user
     const changeMuteState = (roomName, usernameToMute) => {
         let room = roomsRef.current.find((item) => (item.name === roomName));
         console.log('find room', room, currentRoomName, usernameToMute);
@@ -75,7 +77,27 @@ export default function ChatRooms({room}) {
                 setCurrentRoomUsers([...room.users]);
             }
         }
-        
+    }
+
+    // send poke message
+    const sendPokeMessage = (roomName, userToSend) => {
+        socket.emit('poke message', {from: username, to: userToSend, room: roomName}, (response) => {
+            // this is callback function that can excute on server side
+            if(response !== 'success') {
+                console.log('poke err', response)
+                enqueueSnackbar('Error', {variant: 'error'});
+            }
+        });
+        let sameRoom = roomsRef.current.find((room) => (room.name) === roomName);
+            console.log('set current room messages due to poke', sameRoom)
+            if(sameRoom) {
+                let message = {
+                    type: 'poke',
+                    msg: 'You sent a rington to ' + userToSend,
+                }
+                sameRoom.messages = [...sameRoom.messages, message];
+                setCurrentRoomMessages([...sameRoom.messages]);
+            }
     }
 
  /*********************************  camera   ******************************************/
@@ -303,7 +325,6 @@ export default function ChatRooms({room}) {
         });
         socket.on('leave room', async ({room, onlineUsers, leavedUser}) => {
             // console.log('leave room', userId, currentRoom);
-            console.log('leavedUser', leavedUser)
             setNewInfo({type: 'leave room', payload: {room, onlineUsers, leavedUser}});
         })
         socket.on('init room', async ({room, onlineUsers, messages}) => {
@@ -318,6 +339,10 @@ export default function ChatRooms({room}) {
         socket.on('room messages', messages => {
             setNewMessages(messages);
         });
+
+        socket.on('poke message', payload => {
+            setNewInfo({type: 'poke', payload});
+        })
 
         socket.on('video signal', payload => {
             // console.log('receive new video');
@@ -442,8 +467,8 @@ export default function ChatRooms({room}) {
                         if(username && usernames.includes(username)) {
                             if(newInfo.payload.onlineUsers) {
                                 let leavedUser = newInfo.payload.leavedUser;
-                                let usersToSet = sameRoom.users.filter((user) => (user.username === leavedUser.username));
-                               sameRoom.users = usersToSet;
+                                let usersToSet = sameRoom.users.filter((user) => (user.username !== leavedUser.username));
+                                sameRoom.users = usersToSet;
                                 let message = {
                                     type: 'system',
                                     msg: leavedUser.username + ' leaved room' 
@@ -454,6 +479,21 @@ export default function ChatRooms({room}) {
                         if(sameRoom.name === currentRoomName) {
                             setCurrentRoomMessages([...sameRoom.messages]);
                             setCurrentRoomUsers([...sameRoom.users]);
+                        }
+                    }
+                }
+                break;
+            case 'poke':
+                if(roomsRef.current && newInfo.payload.room) {
+                    let sameRoom = await roomsRef.current.find((room) => (room.name === newInfo.payload.room));
+                    if(sameRoom) {
+                        let pokeMessage = newInfo.payload;
+                        if(pokeMessage.to === username) {
+                            let message = {
+                                type: 'poke',
+                                msg: pokeMessage.from + ' sent a rington to you' 
+                            }
+                            sameRoom.messages = [...sameRoom.messages, message];
                         }
                     }
                 }
@@ -521,7 +561,7 @@ export default function ChatRooms({room}) {
         if(roomsRef.current.length > 0 && roomsRef.current.length > roomIndex) {
             roomsRef.current[roomIndex].messages = [...roomsRef.current[roomIndex].messages, ...roomsRef.current[roomIndex].unReadMessages];
             roomsRef.current[roomIndex].unReadMessages = [];
-            console.log('set current room due to room index')
+            console.log('set current room due to room index', roomsRef.current[roomIndex].users)
             // setCurrentRoom({...roomsRef.current[roomIndex]});
             setCurrentRoomMessages([...roomsRef.current[roomIndex].messages]);
             setCurrentRoomUsers([...roomsRef.current[roomIndex].users]);
@@ -574,6 +614,7 @@ export default function ChatRooms({room}) {
                     <SideBarLeft
                         users={currentRoomUsers}
                         changeMuteState={changeMuteState}
+                        sendPokeMessage={sendPokeMessage}
                         // unReadInfo={currentRoom && currentRoom.private}
                         roomName={currentRoomName}
                         setOpenPrivate={setOpenPrivate}
@@ -647,6 +688,4 @@ export default function ChatRooms({room}) {
         </>
     );
 }
-
-
-
+export default ChatRooms;

@@ -33,7 +33,8 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 
-const SideBarLeft = ({ roomName, username, unReadInfo, changeMuteState, users, setOpenPrivate, setPrivateTo, cameraState, openCamera, closeCamera }) => {
+const SideBarLeft = ({ roomName, username, unReadInfo, changeMuteState, sendPokeMessage,
+     users, setOpenPrivate, setPrivateTo, cameraState, openCamera, closeCamera }) => {
     const classes = useStyles();
     return (
         <div className={classes.root}>
@@ -49,6 +50,7 @@ const SideBarLeft = ({ roomName, username, unReadInfo, changeMuteState, users, s
                                 user={user} key={index} setOpenPrivate={setOpenPrivate}
                                 setPrivateTo={setPrivateTo}
                                 changeMuteState={changeMuteState}
+                                sendPokeMessage={sendPokeMessage}
                                 // unRead={unReadInfo[user.username]}
                             />
                         ))

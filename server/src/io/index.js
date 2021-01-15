@@ -1,6 +1,6 @@
 const joinRoom = require('./joinRoom');
 const leaveRoom = require('./leaveRoom');
-const { publicMessage, privateMessage } = require('./msgHandler');
+const { publicMessage, privateMessage, pokeMessage } = require('./msgHandler');
 const {sendSignal, returnSignal} = require('./videoHandler');
 const socketDisconnect = require('./disconnect');
 
@@ -11,7 +11,7 @@ const ioHandler = (io) => (socket) => {
     // message events
     socket.on('public message', publicMessage(io));
     socket.on('private message', privateMessage(io, socket));
-
+    socket.on('poke message', pokeMessage(io, socket));
     // video events
     socket.on('sending video signal', sendSignal(io));
     socket.on('returning video signal', returnSignal(io));

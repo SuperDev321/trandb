@@ -1,25 +1,25 @@
 import React from 'react';
 import { makeStyles, withStyles } from '@material-ui/core/styles';
 import {
-    ListItem,
-    ListItemIcon,
-    ListItemText,
     Avatar,
-    Paper,
     Popover,
     Card,
-    CardActionArea,
     CardMedia,
-    CardActions,
-    CardContent,
-    Typography,
     Button,
     Divider,
     Badge,
-    Icon
 } from '@material-ui/core';
-import { deepOrange, pink } from '@material-ui/core/colors';
-import {QuestionAnswer, AccountCircleOutlined, Videocam} from '@material-ui/icons';
+import { deepOrange, pink, blue } from '@material-ui/core/colors';
+import {QuestionAnswer,
+    AccountCircleOutlined,
+    Videocam,
+    Block,
+    Check,
+    Notifications,
+} from '@material-ui/icons';
+import { getSocket } from '../../utils';
+
+const socket = getSocket();
 const useStyles = makeStyles((theme) => ({
     listItem: {
         display: 'flex',
@@ -42,16 +42,26 @@ const useStyles = makeStyles((theme) => ({
         fontSize: 15,
         marginRight: theme.spacing(0.5),
         color: theme.palette.getContrastText(deepOrange[500]),
-        backgroundColor: deepOrange[500],
+        backgroundColor: (props) => {
+            if(props.role === 'guest') {
+                return deepOrange[500];
+            } else {
+                return blue[500];
+            }
+        }
+        
     },
     avatar: {
         width: theme.spacing(2.5),
         height: theme.spacing(2.5),
-        marginRight: theme.spacing(0.5),
+        
         minWidth: 0
     },
     camera: {
         color: '#e6e6e6',
+    },
+    cardRoot: {
+        width: 200,
     },
     cardHeader: {
         display: 'flex',
@@ -76,25 +86,24 @@ const useStyles = makeStyles((theme) => ({
 const StyledBadge = withStyles((theme) => ({
     root: {
         display: 'flex',
-        width: '100%',
         justifyContent: 'center',
         alignItems: 'center',
+        marginRight: theme.spacing(0.5),
     },
     badge: {
-        top: 20,
-        right: 13
+        padding: 0,
+        color: pink[500],
+        transform: 'none'
     }
 }))((props) => (
     <Badge
         {...props}
-        anchorOrigin={{
-        vertical: 'top',
-        horizontal: 'right',
-        }}
     />
 ))
 
-const OnlineUser = ({roomName, username, user, changeMuteState, unRead, setOpenPrivate, setPrivateTo}) => {
+const OnlineUser = ({roomName, username, user,
+        changeMuteState, sendPokeMessage
+        , setOpenPrivate, setPrivateTo}) => {
     const classes = useStyles({role: user.role});
     const [anchorEl, setAnchorEl] = React.useState(null);
 
@@ -116,25 +125,34 @@ const OnlineUser = ({roomName, username, user, changeMuteState, unRead, setOpenP
     const handleClose = () => {
         setAnchorEl(null);
     };
+
+    const sendPoke = () => {
+        sendPokeMessage(roomName, user.username);
+        setAnchorEl(null);
+    }
+
     const open = Boolean(anchorEl);
     return (
         <div>
-            {/* <StyledBadge badgeContent={unRead && unRead} color="secondary"> */}
-                <div className={classes.listItem}
+            <div className={classes.listItem}
+            >
+                <Avatar className={classes.role}>{
+                    user.role === 'guest' ? 'G':
+                    <Check fontSize="small" />
+                }</Avatar>
+                <StyledBadge
+                    className={classes.avatarBadge}
+                    badgeContent={user.muted && <Block fontSize="small" />}
                 >
-                    <Avatar className={classes.role}>{
-                        user.role === 'guest' ? 'G':
-                        'U'
-                    }</Avatar>
                     <Avatar alt="Remy Sharp" src={
                             user.gender === 'male' ? '/img/male.png': '/img/female.png'
                         } 
                         className={classes.avatar}
                     />
-                    <Videocam className={classes.camera} />
-                    <div className={classes.username} onClick={handleClick}>{user.username}</div>
-                </div>
-            {/* </StyledBadge> */}
+                </StyledBadge>
+                <Videocam className={classes.camera} />
+                <div className={classes.username} onClick={handleClick}>{user.username}</div>
+            </div>
             <Popover
                 anchorOrigin={{
                     vertical: 'bottom',
@@ -148,13 +166,14 @@ const OnlineUser = ({roomName, username, user, changeMuteState, unRead, setOpenP
                 open={open}
                 onClose={handleClose}
             >
-                <Card className={classes.root}>
+                <Card className={classes.cardRoot}>
                     <CardMedia
                         className={classes.cardHeader}
-                        // image="/img/public_chat.png"
                     >
                         <Avatar alt="User Avatar" src={
-                            '/img/default_avatar.png'
+                            user.avatar
+                            ? user.avatar
+                            :'/img/default_avatar.png'
                         } />
                         <span>{user.gender}</span>
                     </CardMedia>
@@ -171,11 +190,18 @@ const OnlineUser = ({roomName, username, user, changeMuteState, unRead, setOpenP
                             className={classes.cardButton}
                             onClick={ handleClickPrivateChat}
                         >
-                        <QuestionAnswer />&nbsp;Private Chat
+                            <QuestionAnswer />&nbsp;Private Chat
                         </Button>
-                        </>
+                        <Button size="small" fullWidth
+                            color="primary"
+                            className={classes.cardButton}
+                            onClick={() => {sendPoke()}}
+                        >
+                            <Notifications />&nbsp;Poke Message
+                        </Button>
+                    </>
                     }
-                    <Button className={classes.mute}
+                    <Button size="small" className={classes.mute}
                         fullWidth onClick={() => { handleMute(user.username) }}
                         name={user.username}
                     >
