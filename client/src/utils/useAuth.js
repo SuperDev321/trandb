@@ -12,7 +12,7 @@ const useAuth = () => {
   useEffect(() => {
     (async () => {
       try {
-        const { data } = await axios.get('/api/checkToken');
+        const { data } = await axios.get('https://new.trandb.com:4000/api/checkToken');
         if (data === 'un-auth') {
           setLoading(false);
         } else {
