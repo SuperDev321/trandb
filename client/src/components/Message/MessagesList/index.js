@@ -51,9 +51,10 @@ const MessagesList = ({ messages }) => {
                         <ClientMessage key={_id? _id: index} message={{from, msg, date, color, bold}} font_size={10} />
                         }
                         {
-                        type === 'system' &&
+                        type ==='system' || type === 'poke' &&
                             <SystemMessage text={msg} />
                         }
+                        
                     </span>
                 ))
             }

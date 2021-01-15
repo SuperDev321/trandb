@@ -30,6 +30,7 @@
   },
   "homepage": "https://github.com/AhmedSafi97/chatapp#readme",
   "dependencies": {
-    "cross-env": "^7.0.2"
+    "cross-env": "^7.0.2",
+    "notistack": "^1.0.3"
   }
 }

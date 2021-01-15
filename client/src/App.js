@@ -9,6 +9,8 @@ import { Signup, Login, Rooms, ChattingRoom, Admin } from './pages';
 import { PublicRoute, PrivateRoute, Loading } from './components';
 import CreateRoom from './pages/CreateRoom';
 import BlockUsers from './pages/Admin/BlockUsers';
+import { SnackbarProvider } from 'notistack';
+import CloseIcon from '@material-ui/icons/Close';
 import './App.css';
 const App = () => {
     const { loading, auth, role, setAuth, setLoading, username, removeCurrentUser } = useAuth();
@@ -16,8 +18,25 @@ const App = () => {
     if (loading) {
         return <Loading />;
     }
+    const notistackRef = React.createRef();
+    const onClickDismiss = key => () => { 
+        notistackRef.current.closeSnackbar(key);
+    }
+
     return (
+        <SnackbarProvider
+            maxSnack={5}
+            ref={notistackRef}
+            anchorOrigin={{
+                vertical: 'top',
+                horizontal: 'center',
+            }}
+            action={(key) => (
+                <CloseIcon onClick={onClickDismiss(key)} />
+            )}
+        >
         <CustomThemeProvider>
+            
             <UserContext.Provider
                 value={{ auth, role, loading, setAuth, setLoading, username, removeCurrentUser }}
             >
@@ -55,6 +74,7 @@ const App = () => {
             </div>
             </UserContext.Provider>
         </CustomThemeProvider>
+        </SnackbarProvider>
     );
 };
 

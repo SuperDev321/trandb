@@ -40,7 +40,10 @@ const StyledTab = withStyles((theme) => ({
         minHeight: '10px',
         minWidth: '0px',
         padding: '0px',
-        overflow: 'visible'
+        overflow: 'visible',
+        borderRadius: 4,
+        paddingLeft: 10,
+        paddingRight: 10,
     },
     selected: {
         color: 'white',
