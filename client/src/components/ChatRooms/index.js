@@ -44,6 +44,7 @@ export default function ChatRooms({room}) {
     const [currentRoom, setCurrentRoom] = useState(null);
     const [currentRoomMessages, setCurrentRoomMessages] = useState([]);
     const [currentRoomUsers, setCurrentRoomUsers] = useState([]);
+    const [currentRoomName, setCurrentRoomsName] = useState(null);
     // receive new message
     const [newMessages, setNewMessages] = useState([]);
     // receive new infomation for rooms
@@ -260,6 +261,9 @@ export default function ChatRooms({room}) {
                         if(index === roomIndex) {
                             console.log('set current room due to new message')
                             setCurrentRoom({...room});
+                            setCurrentRoomsName(room.name);
+                            setCurrentRoomMessages([...room.messages]);
+                            setCurrentRoomUsers([...room.users]);
                         }
                     }
                 }
@@ -491,6 +495,7 @@ export default function ChatRooms({room}) {
             // setCurrentRoom({...roomsRef.current[roomIndex]});
             setCurrentRoomMessages([...roomsRef.current[roomIndex].messages]);
             setCurrentRoomUsers([...roomsRef.current[roomIndex].users]);
+            setCurrentRoomsName(roomsRef.current[roomIndex].name);
             let infos = roomsRef.current.map(({name, unReadMessages}) => ({name, unReadMessages}));
             setRoomsInfo(infos);
         }
@@ -593,6 +598,7 @@ export default function ChatRooms({room}) {
                     }
                     {/* { currentRoom && roomIndex !== null && */}
                         <ChatRoomContent
+                            roomName={currentRoomName}
                             username={username}
                             users={currentRoomUsers}
                             messages={currentRoomMessages}

@@ -16,7 +16,7 @@ emoji.replace_mode = 'img';// 'unified';
 emoji.use_sheet = true;
 
 
-const ChatForm = ({room, username, to}) => {
+const ChatForm = ({roomName, username, to}) => {
     const classes = useStyles();
     const [msg, setMsg] = useState('');
     const formRef = useRef(null);
@@ -37,10 +37,10 @@ const ChatForm = ({room, username, to}) => {
             const date = Date.now();
             if(to) {
                 // console.log(username, to);
-                socket.emit('private message', { msg: realMsg, room: room.name, from: username, to, date, color, bold });
+                socket.emit('private message', { msg: realMsg, room: roomName, from: username, to, date, color, bold });
             } else{
                 // console.log(username, room.name, to);
-                socket.emit('public message', { msg: realMsg, room: room.name, from: username, date, color, bold });
+                socket.emit('public message', { msg: realMsg, room: roomName, from: username, date, color, bold });
             }
             
             setMsg('');
