@@ -44,7 +44,7 @@ export default function ChatRooms({room}) {
     const [currentRoom, setCurrentRoom] = useState(null);
     const [currentRoomMessages, setCurrentRoomMessages] = useState([]);
     const [currentRoomUsers, setCurrentRoomUsers] = useState([]);
-    const [currentRoomName, setCurrentRoomsName] = useState(null);
+    const [currentRoomName, setCurrentRoomName] = useState(null);
     // receive new message
     const [newMessages, setNewMessages] = useState([]);
     // receive new infomation for rooms
@@ -64,6 +64,21 @@ export default function ChatRooms({room}) {
         setRoomIndex(newValue);
     };
 
+    const changeMuteState = (roomName, usernameToMute) => {
+        let room = roomsRef.current.find((item) => (item.name === roomName));
+        console.log('find room', room, currentRoomName, usernameToMute);
+        if(room) {
+            let user = room.users.find((item) => (item.username === usernameToMute));
+            user.muted = !user.muted;
+            if(room.name === currentRoomName) {
+                console.log('set users due to mute')
+                setCurrentRoomUsers([...room.users]);
+            }
+        }
+        
+    }
+
+ /*********************************  camera   ******************************************/
     const createPeer = (userToSignal, callerID, room, stream) => {
         const peer = new Peer({
             initiator: true,
@@ -213,6 +228,7 @@ export default function ChatRooms({room}) {
             // console.log('set current room to close room', roomObject);
         }
     }
+/*************************************************************** */
     // useEffect(() => {
     //     if(room) {
     //         setRoomIndex(0);
@@ -260,8 +276,8 @@ export default function ChatRooms({room}) {
 
                         if(index === roomIndex) {
                             console.log('set current room due to new message')
-                            setCurrentRoom({...room});
-                            setCurrentRoomsName(room.name);
+                            // setCurrentRoom({...room});
+                            setCurrentRoomName(room.name);
                             setCurrentRoomMessages([...room.messages]);
                             setCurrentRoomUsers([...room.users]);
                         }
@@ -411,6 +427,10 @@ export default function ChatRooms({room}) {
                                 // setRooms([...rooms]);
                             }
                         }
+                        if(sameRoom.name === currentRoomName) {
+                            setCurrentRoomMessages([...sameRoom.messages]);
+                            setCurrentRoomUsers([...sameRoom.users]);
+                        }
                     }
                 }
                 break;
@@ -430,6 +450,10 @@ export default function ChatRooms({room}) {
                                 }
                                 sameRoom.messages = [...sameRoom.messages, message];
                             }
+                        }
+                        if(sameRoom.name === currentRoomName) {
+                            setCurrentRoomMessages([...sameRoom.messages]);
+                            setCurrentRoomUsers([...sameRoom.users]);
                         }
                     }
                 }
@@ -482,7 +506,13 @@ export default function ChatRooms({room}) {
             history.push('/');
         } else {
             console.log('set current room due to rooms info');
-            setCurrentRoom({...roomsRef.current[roomIndex]});
+            if(roomsRef.current[roomIndex]) {
+                setCurrentRoomUsers([...roomsRef.current[roomIndex].users]);
+                setCurrentRoomMessages([...roomsRef.current[roomIndex].messages]);
+                setCurrentRoomName(roomsRef.current[roomIndex].name);
+            }
+            
+            // setCurrentRoom({...roomsRef.current[roomIndex]});
         }
         
     }, [roomsInfo])
@@ -495,7 +525,7 @@ export default function ChatRooms({room}) {
             // setCurrentRoom({...roomsRef.current[roomIndex]});
             setCurrentRoomMessages([...roomsRef.current[roomIndex].messages]);
             setCurrentRoomUsers([...roomsRef.current[roomIndex].users]);
-            setCurrentRoomsName(roomsRef.current[roomIndex].name);
+            setCurrentRoomName(roomsRef.current[roomIndex].name);
             let infos = roomsRef.current.map(({name, unReadMessages}) => ({name, unReadMessages}));
             setRoomsInfo(infos);
         }
@@ -542,8 +572,10 @@ export default function ChatRooms({room}) {
             <Hidden xsDown implementation="css" className={classes.drawerWrapper}>
                 <div className={classes.drawer}>
                     <SideBarLeft
-                        users={currentRoom && currentRoom.users && currentRoom.users}
-                        unReadInfo={currentRoom && currentRoom.private}
+                        users={currentRoomUsers}
+                        changeMuteState={changeMuteState}
+                        // unReadInfo={currentRoom && currentRoom.private}
+                        roomName={currentRoomName}
                         setOpenPrivate={setOpenPrivate}
                         setPrivateTo={setPrivateTo}
                         cameraState={currentRoom && currentRoom.cameraState}

@@ -94,8 +94,8 @@ const StyledBadge = withStyles((theme) => ({
     />
 ))
 
-const OnlineUser = ({username, user, unRead, setOpenPrivate, setPrivateTo}) => {
-    const classes = useStyles();
+const OnlineUser = ({roomName, username, user, changeMuteState, unRead, setOpenPrivate, setPrivateTo}) => {
+    const classes = useStyles({role: user.role});
     const [anchorEl, setAnchorEl] = React.useState(null);
 
     const handleClick = (event) => {
@@ -110,7 +110,8 @@ const OnlineUser = ({username, user, unRead, setOpenPrivate, setPrivateTo}) => {
         setAnchorEl(null);
     }
     const handleMute = (username) => {
-        console.log(username)
+        changeMuteState(roomName, username);
+        setAnchorEl(null);
     }
     const handleClose = () => {
         setAnchorEl(null);
@@ -118,7 +119,7 @@ const OnlineUser = ({username, user, unRead, setOpenPrivate, setPrivateTo}) => {
     const open = Boolean(anchorEl);
     return (
         <div>
-            <StyledBadge badgeContent={unRead && unRead} color="secondary">
+            {/* <StyledBadge badgeContent={unRead && unRead} color="secondary"> */}
                 <div className={classes.listItem}
                 >
                     <Avatar className={classes.role}>{
@@ -133,7 +134,7 @@ const OnlineUser = ({username, user, unRead, setOpenPrivate, setPrivateTo}) => {
                     <Videocam className={classes.camera} />
                     <div className={classes.username} onClick={handleClick}>{user.username}</div>
                 </div>
-            </StyledBadge>
+            {/* </StyledBadge> */}
             <Popover
                 anchorOrigin={{
                     vertical: 'bottom',

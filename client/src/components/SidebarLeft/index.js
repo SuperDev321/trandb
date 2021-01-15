@@ -33,7 +33,7 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 
-const SideBarLeft = ({ username, unReadInfo, users, setOpenPrivate, setPrivateTo, cameraState, openCamera, closeCamera }) => {
+const SideBarLeft = ({ roomName, username, unReadInfo, changeMuteState, users, setOpenPrivate, setPrivateTo, cameraState, openCamera, closeCamera }) => {
     const classes = useStyles();
     return (
         <div className={classes.root}>
@@ -43,8 +43,14 @@ const SideBarLeft = ({ username, unReadInfo, users, setOpenPrivate, setPrivateTo
             component="nav" aria-label="main mailbox folders" className={classes.list}>
                 { users &&
                         users.map((user, index)=>(
-                            <OnlineUser username={username} user={user} key={index} setOpenPrivate={setOpenPrivate}
-                                setPrivateTo={setPrivateTo} unRead={unReadInfo[user.username]}/>
+                            <OnlineUser
+                                roomName={roomName}
+                                username={username}
+                                user={user} key={index} setOpenPrivate={setOpenPrivate}
+                                setPrivateTo={setPrivateTo}
+                                changeMuteState={changeMuteState}
+                                // unRead={unReadInfo[user.username]}
+                            />
                         ))
                 }
                 
