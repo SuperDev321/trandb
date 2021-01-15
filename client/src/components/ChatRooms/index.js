@@ -303,7 +303,6 @@ export default function ChatRooms({room}) {
         });
         socket.on('leave room', async ({room, onlineUsers, leavedUser}) => {
             // console.log('leave room', userId, currentRoom);
-            console.log('leavedUser', leavedUser)
             setNewInfo({type: 'leave room', payload: {room, onlineUsers, leavedUser}});
         })
         socket.on('init room', async ({room, onlineUsers, messages}) => {
@@ -442,8 +441,8 @@ export default function ChatRooms({room}) {
                         if(username && usernames.includes(username)) {
                             if(newInfo.payload.onlineUsers) {
                                 let leavedUser = newInfo.payload.leavedUser;
-                                let usersToSet = sameRoom.users.filter((user) => (user.username === leavedUser.username));
-                               sameRoom.users = usersToSet;
+                                let usersToSet = sameRoom.users.filter((user) => (user.username !== leavedUser.username));
+                                sameRoom.users = usersToSet;
                                 let message = {
                                     type: 'system',
                                     msg: leavedUser.username + ' leaved room' 

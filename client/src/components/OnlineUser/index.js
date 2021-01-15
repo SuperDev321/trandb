@@ -16,10 +16,9 @@ import {
     Button,
     Divider,
     Badge,
-    Icon
 } from '@material-ui/core';
-import { deepOrange, pink } from '@material-ui/core/colors';
-import {QuestionAnswer, AccountCircleOutlined, Videocam} from '@material-ui/icons';
+import { deepOrange, pink, blue } from '@material-ui/core/colors';
+import {QuestionAnswer, AccountCircleOutlined, Videocam, Block, Check} from '@material-ui/icons';
 const useStyles = makeStyles((theme) => ({
     listItem: {
         display: 'flex',
@@ -42,12 +41,19 @@ const useStyles = makeStyles((theme) => ({
         fontSize: 15,
         marginRight: theme.spacing(0.5),
         color: theme.palette.getContrastText(deepOrange[500]),
-        backgroundColor: deepOrange[500],
+        backgroundColor: (props) => {
+            if(props.role === 'guest') {
+                return deepOrange[500];
+            } else {
+                return blue[500];
+            }
+        }
+        
     },
     avatar: {
         width: theme.spacing(2.5),
         height: theme.spacing(2.5),
-        marginRight: theme.spacing(0.5),
+        
         minWidth: 0
     },
     camera: {
@@ -76,21 +82,18 @@ const useStyles = makeStyles((theme) => ({
 const StyledBadge = withStyles((theme) => ({
     root: {
         display: 'flex',
-        width: '100%',
         justifyContent: 'center',
         alignItems: 'center',
+        marginRight: theme.spacing(0.5),
     },
     badge: {
-        top: 20,
-        right: 13
+        padding: 0,
+        color: pink[500],
+        transform: 'none'
     }
 }))((props) => (
     <Badge
         {...props}
-        anchorOrigin={{
-        vertical: 'top',
-        horizontal: 'right',
-        }}
     />
 ))
 
@@ -124,13 +127,18 @@ const OnlineUser = ({roomName, username, user, changeMuteState, unRead, setOpenP
                 >
                     <Avatar className={classes.role}>{
                         user.role === 'guest' ? 'G':
-                        'U'
+                        <Check fontSize="small" />
                     }</Avatar>
-                    <Avatar alt="Remy Sharp" src={
-                            user.gender === 'male' ? '/img/male.png': '/img/female.png'
-                        } 
-                        className={classes.avatar}
-                    />
+                    <StyledBadge
+                        className={classes.avatarBadge}
+                        badgeContent={user.muted && <Block fontSize="small" />}
+                    >
+                        <Avatar alt="Remy Sharp" src={
+                                user.gender === 'male' ? '/img/male.png': '/img/female.png'
+                            } 
+                            className={classes.avatar}
+                        />
+                    </StyledBadge>
                     <Videocam className={classes.camera} />
                     <div className={classes.username} onClick={handleClick}>{user.username}</div>
                 </div>
