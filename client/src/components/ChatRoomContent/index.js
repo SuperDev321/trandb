@@ -1,4 +1,4 @@
-import React, { useContext, useState, useRef } from 'react';
+import React, { useContext, useState, useRef, useEffect } from 'react';
 import io from 'socket.io-client';
 import ChatForm from '../ChatForm';
 import UserContext from '../../context';
@@ -35,29 +35,22 @@ const useStyles = makeStyles((theme) => ({
     },
 }))
 
-const ChatRoom = ({room}) => {
+const ChatRoom = ({room, users, messages}) => {
     const classes = useStyles();
     const { username } = useContext(UserContext);
-    const [users, setUsers] = useState(null);
-    const [msg, setMsg] = useState('');
-    const [open, setOpen] = React.useState(false);
+    console.log('room users', users);
+    const [messagesToShow, setmMssagesToShow] = useState([]);
 
-    const onFinish = (e) => {
-        e.preventDefault();
-        let realMsg = msg.trim();
-        if (realMsg) {
-            const date = Date.now();
-            socket.emit('msg', { type: 'public', msg: realMsg, room, username, date });
-            setMsg('');
-        }
-    };
-
-    // if (!users) return <Spin className="chatting__spinner" />;
-
+    useEffect(() => {
+        let mutedUsers = users.filter((user) => (user.muted));
+        let mutedUserNames = mutedUsers.map(({username}) => (username));
+        let unMutedMessages = messages.filter(({from}) => (!((from) && (mutedUserNames.includes(from)))));
+        setmMssagesToShow(unMutedMessages);
+    }, [messages, users])
     return (
         <div className={classes.root}>
             <div className={classes.content}>
-                <MessagesList messages={room && room.messages} className={classes.messageArea} />
+                <MessagesList messages={messagesToShow} className={classes.messageArea} />
             </div>
             <ChatForm username={username} room={room} />
         </div>

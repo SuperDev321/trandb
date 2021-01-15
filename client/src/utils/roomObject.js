@@ -1,7 +1,7 @@
 import Peer from 'simple-peer';
 import { getSocket } from '../utils';
 class RoomObject  {
-    constructor(name, messages,users) {
+    constructor(name, messages, users) {
         this.name = name;
         if(messages) {
             this.messages = messages;
@@ -9,7 +9,8 @@ class RoomObject  {
             this.messages = [];
         }
         if(users) {
-            this.users = users;
+            let roomUsers = users.map((user) => ({...user, muted: false}));
+            this.users = roomUsers;
         } else {
             this.users = null;
         }

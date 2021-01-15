@@ -19,7 +19,6 @@ const chatSchema = new Schema({
   },
   room: {
     type: String,
-    required: true,
   },
   color: {
     type: String,

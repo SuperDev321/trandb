@@ -15,18 +15,43 @@ import {
     Typography,
     Button,
     Divider,
-    Badge
+    Badge,
+    Icon
 } from '@material-ui/core';
-import QuestionAnswerIcon from '@material-ui/icons/QuestionAnswer';
-import AccountCircleOutlinedIcon from '@material-ui/icons/AccountCircleOutlined';
+import { deepOrange, pink } from '@material-ui/core/colors';
+import {QuestionAnswer, AccountCircleOutlined, Videocam} from '@material-ui/icons';
 const useStyles = makeStyles((theme) => ({
     listItem: {
-        paddingTop: theme.spacing(0.5),
-        paddingBottom: theme.spacing(0.5)
+        display: 'flex',
+        flexWrap: 'wrap',
+        paddingTop: theme.spacing(0),
+        paddingBottom: theme.spacing(0),
+        justifyContent: 'flex-start',
+        alignItems: 'center',
+        margin: '2px 15px 2px 15px',
+        width: '100%',
+    },
+    username: {
+        font: 'bold 14px sans-serif',
+        cursor: 'pointer',
+        flexGrow: 1
+    },
+    role: {
+        width: theme.spacing(2.5),
+        height: theme.spacing(2.5),
+        fontSize: 15,
+        marginRight: theme.spacing(0.5),
+        color: theme.palette.getContrastText(deepOrange[500]),
+        backgroundColor: deepOrange[500],
     },
     avatar: {
-        width: theme.spacing(3),
-        height: theme.spacing(3),
+        width: theme.spacing(2.5),
+        height: theme.spacing(2.5),
+        marginRight: theme.spacing(0.5),
+        minWidth: 0
+    },
+    camera: {
+        color: '#e6e6e6',
     },
     cardHeader: {
         display: 'flex',
@@ -40,6 +65,10 @@ const useStyles = makeStyles((theme) => ({
     cardButton: {
         borderRadius: '0',
         height: 40,
+        textTransform: 'none',
+    },
+    mute: {
+        color: pink[500],
         textTransform: 'none',
     }
 }))
@@ -80,7 +109,9 @@ const OnlineUser = ({username, user, unRead, setOpenPrivate, setPrivateTo}) => {
         setOpenPrivate(true);
         setAnchorEl(null);
     }
-
+    const handleMute = (username) => {
+        console.log(username)
+    }
     const handleClose = () => {
         setAnchorEl(null);
     };
@@ -88,22 +119,20 @@ const OnlineUser = ({username, user, unRead, setOpenPrivate, setPrivateTo}) => {
     return (
         <div>
             <StyledBadge badgeContent={unRead && unRead} color="secondary">
-            <ListItem button
-                className={classes.listItem}
-                onClick={handleClick}
-            >
-                <ListItemIcon>
+                <div className={classes.listItem}
+                >
+                    <Avatar className={classes.role}>{
+                        user.role === 'guest' ? 'G':
+                        'U'
+                    }</Avatar>
                     <Avatar alt="Remy Sharp" src={
                             user.gender === 'male' ? '/img/male.png': '/img/female.png'
                         } 
                         className={classes.avatar}
                     />
-                </ListItemIcon>
-                
-                <ListItemText primary={user.username}/>
-                
-                
-            </ListItem>
+                    <Videocam className={classes.camera} />
+                    <div className={classes.username} onClick={handleClick}>{user.username}</div>
+                </div>
             </StyledBadge>
             <Popover
                 anchorOrigin={{
@@ -130,7 +159,7 @@ const OnlineUser = ({username, user, unRead, setOpenPrivate, setPrivateTo}) => {
                     </CardMedia>
                     <Divider />
                     <Button size="small" color="primary" fullWidth className={classes.cardButton}>
-                    <AccountCircleOutlinedIcon />&nbsp;Profile
+                    <AccountCircleOutlined />&nbsp;Profile
                     </Button>
                     { user.username != username &&
                         <>
@@ -141,11 +170,20 @@ const OnlineUser = ({username, user, unRead, setOpenPrivate, setPrivateTo}) => {
                             className={classes.cardButton}
                             onClick={ handleClickPrivateChat}
                         >
-                        <QuestionAnswerIcon />&nbsp;Private Chat
+                        <QuestionAnswer />&nbsp;Private Chat
                         </Button>
                         </>
                     }
-                        
+                    <Button className={classes.mute}
+                        fullWidth onClick={() => { handleMute(user.username) }}
+                        name={user.username}
+                    >
+                    {
+                        user.muted
+                        ? 'Silence / Ignorance'
+                        : 'Unmute / Ignore'
+                    }
+                    </Button>
                 </Card>
             </Popover>
         </div>

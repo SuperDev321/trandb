@@ -42,6 +42,8 @@ export default function ChatRooms({room}) {
 
     const [roomsInfo, setRoomsInfo] = useState([]);
     const [currentRoom, setCurrentRoom] = useState(null);
+    const [currentRoomMessages, setCurrentRoomMessages] = useState([]);
+    const [currentRoomUsers, setCurrentRoomUsers] = useState([]);
     // receive new message
     const [newMessages, setNewMessages] = useState([]);
     // receive new infomation for rooms
@@ -362,7 +364,8 @@ export default function ChatRooms({room}) {
                         let usernames = await newInfo.payload.onlineUsers.map((item) => (item.username));
                         if(username && usernames.includes(username)) {
                             if(newInfo.payload.onlineUsers) {
-                                sameRoom.users = newInfo.payload.onlineUsers;
+                                let users = newInfo.payload.onlineUsers.map((user) => ({...user, muted: false}))
+                                sameRoom.users = users;
                                 // setRooms([...rooms]);
                             }
                             if(newInfo.payload.messages) {
@@ -383,16 +386,19 @@ export default function ChatRooms({room}) {
                     if(sameRoom) {
                         let usernames = await newInfo.payload.onlineUsers.map((item) => (item.username));
                         if(username && usernames.includes(username)) {
-                            if(newInfo.payload.onlineUsers) {
-                                sameRoom.users = newInfo.payload.onlineUsers;
+                            if(newInfo.payload.onlineUsers && newInfo.payload.joinedUser) {
+                                // sameRoom.users = [...newInfo.payload.onlineUsers];
+                                let currentUserNames = sameRoom.users.map(({username}) => (username));
                                 let joinedUser = newInfo.payload.joinedUser;
+                                if(!currentUserNames.includes(joinedUser.username)) {
+                                    sameRoom.users = [...sameRoom.users, {...joinedUser, muted: false}];
+                                }
                                 let tmpName = '';
                                 if(username === joinedUser.username) {
                                     tmpName = 'you';
                                 } else {
                                     tmpName = joinedUser.username;
                                 }
-
                                 let sysMsg = {
                                     type: 'system',
                                     msg: tmpName + ' joined room'
@@ -411,9 +417,9 @@ export default function ChatRooms({room}) {
                         let usernames = await newInfo.payload.onlineUsers.map((item) => (item.username));
                         if(username && usernames.includes(username)) {
                             if(newInfo.payload.onlineUsers) {
-                                sameRoom.users = newInfo.payload.onlineUsers;
-                                // console.log
                                 let leavedUser = newInfo.payload.leavedUser;
+                                let usersToSet = sameRoom.users.filter((user) => (user.username === leavedUser.username));
+                               sameRoom.users = usersToSet;
                                 let message = {
                                     type: 'system',
                                     msg: leavedUser.username + ' leaved room' 
@@ -445,7 +451,9 @@ export default function ChatRooms({room}) {
                 break;
         }
         console.log('set current room for init room');
-        setCurrentRoom({...roomsRef.current[roomIndex]});
+        // setCurrentRoom({...roomsRef.current[roomIndex]});
+        // setCurrentRoomMessages([...roomsRef.current[roomIndex].messages]);
+        // setCurrentRoomUsers([...roomsRef.current[roomIndex].users]);
         let infos = roomsRef.current.map(({name, unReadMessages}) => ({name, unReadMessages}));
         setRoomsInfo(infos); 
     }
@@ -480,7 +488,9 @@ export default function ChatRooms({room}) {
             roomsRef.current[roomIndex].messages = [...roomsRef.current[roomIndex].messages, ...roomsRef.current[roomIndex].unReadMessages];
             roomsRef.current[roomIndex].unReadMessages = [];
             console.log('set current room due to room index')
-            setCurrentRoom({...roomsRef.current[roomIndex]});
+            // setCurrentRoom({...roomsRef.current[roomIndex]});
+            setCurrentRoomMessages([...roomsRef.current[roomIndex].messages]);
+            setCurrentRoomUsers([...roomsRef.current[roomIndex].users]);
             let infos = roomsRef.current.map(({name, unReadMessages}) => ({name, unReadMessages}));
             setRoomsInfo(infos);
         }
@@ -582,7 +592,11 @@ export default function ChatRooms({room}) {
                         <VideoList streams={currentStreams}/>
                     }
                     {/* { currentRoom && roomIndex !== null && */}
-                        <ChatRoomContent room={currentRoom} username={username}></ChatRoomContent>
+                        <ChatRoomContent
+                            username={username}
+                            users={currentRoomUsers}
+                            messages={currentRoomMessages}
+                        />
                     {/* } */}
                     </div>
                 </main>
