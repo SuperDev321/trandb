@@ -11,8 +11,10 @@ import CreateRoom from './pages/CreateRoom';
 import BlockUsers from './pages/Admin/BlockUsers';
 import { SnackbarProvider } from 'notistack';
 import CloseIcon from '@material-ui/icons/Close';
+import {useAudio} from 'react-use';
 import './App.css';
 const App = () => {
+    
     const { loading, auth, role, setAuth, setLoading, username, removeCurrentUser } = useAuth();
 
     if (loading) {

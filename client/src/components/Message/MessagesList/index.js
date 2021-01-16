@@ -51,10 +51,9 @@ const MessagesList = ({ messages }) => {
                         <ClientMessage key={_id? _id: index} message={{from, msg, date, color, bold}} font_size={10} />
                         }
                         {
-                        type ==='system' || type === 'poke' &&
+                        (type ==='system' || type === 'poke') &&
                             <SystemMessage text={msg} />
                         }
-                        
                     </span>
                 ))
             }
@@ -65,7 +64,8 @@ const MessagesList = ({ messages }) => {
 MessagesList.propTypes = {
   messages: propTypes.arrayOf(
     propTypes.shape({
-      msg: propTypes.string.isRequired,
+        type: propTypes.string.isRequired,
+        msg: propTypes.string.isRequired,
     })
   ),
 };

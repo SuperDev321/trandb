@@ -1,7 +1,7 @@
 const { Chats } = require('../database/models');
 const { findRoomUsers, findUserByName } = require('../utils');
 
-const publicMessage = (io) => async ({ msg, room, from, color, bold }) => {
+const publicMessage = (io, socket) => async ({ msg, room, from, color, bold }) => {
   try {
     const date = Date.now();
     
@@ -15,7 +15,7 @@ const publicMessage = (io) => async ({ msg, room, from, color, bold }) => {
       date,
     });
     
-    io.to(room).emit('room messages', [
+    socket.to(room).emit('room messages', [
       {
         type: 'public',
         room,
@@ -68,7 +68,7 @@ const privateMessage = (io, socket) => async ({ msg, room, from, to, color, bold
     const toUser = await findUserByName(to);
     console.log('private', toUser._id)
     if(toUser) {
-      io.to(toUser._id).emit('room messages', [
+      socket.to(toUser._id).emit('room messages', [
         {
           type: 'private',
           room,
@@ -84,18 +84,18 @@ const privateMessage = (io, socket) => async ({ msg, room, from, to, color, bold
     }
     
 
-    socket.emit('room messages', [
-      {
-        type: 'private',
-        room,
-        _id: newChat._id,
-        msg: newChat.msg,
-        from: newChat.from,
-        to: newChat.to,
-        date: newChat.date,
-        color: newChat.color,
-      }
-    ])
+    // socket.emit('room messages', [
+    //   {
+    //     type: 'private',
+    //     room,
+    //     _id: newChat._id,
+    //     msg: newChat.msg,
+    //     from: newChat.from,
+    //     to: newChat.to,
+    //     date: newChat.date,
+    //     color: newChat.color,
+    //   }
+    // ])
     console.log(msg, room, from, newChat.msg)
   } catch (err) {
     console.log(err);

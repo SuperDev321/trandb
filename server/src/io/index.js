@@ -9,7 +9,7 @@ const ioHandler = (io) => (socket) => {
     socket.on('leave room', leaveRoom(io, socket));
 
     // message events
-    socket.on('public message', publicMessage(io));
+    socket.on('public message', publicMessage(io, socket));
     socket.on('private message', privateMessage(io, socket));
     socket.on('poke message', pokeMessage(io, socket));
     // video events

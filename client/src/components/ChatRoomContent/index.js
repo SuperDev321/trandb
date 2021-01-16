@@ -35,10 +35,9 @@ const useStyles = makeStyles((theme) => ({
     },
 }))
 
-const ChatRoom = ({roomName, users, messages}) => {
+const ChatRoom = ({roomName, users, messages, sendMessage}) => {
     const classes = useStyles();
     const { username } = useContext(UserContext);
-    console.log('room users', users);
     const [messagesToShow, setmMssagesToShow] = useState([]);
 
     useEffect(() => {
@@ -52,7 +51,7 @@ const ChatRoom = ({roomName, users, messages}) => {
             <div className={classes.content}>
                 <MessagesList messages={messagesToShow} className={classes.messageArea} />
             </div>
-            <ChatForm username={username} roomName={roomName} />
+            <ChatForm username={username} roomName={roomName} sendMessage={sendMessage}/>
         </div>
     );
 };

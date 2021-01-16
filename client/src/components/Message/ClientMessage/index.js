@@ -174,16 +174,16 @@ const MyMessage = ({message, font_size}) => {
     );
 }
 
-MyMessage.propTypes = {
-  message: PropTypes.shape({
-    sender: PropTypes.shape.isRequired,
-    msg: PropTypes.string.isRequired,
-    // message_type: PropTypes.string.isRequired,
-    // color: PropTypes.string.isRequired,
-    date: PropTypes.string.isRequired,
-  }).isRequired,
-//   onActionOnMessage: PropTypes.func.isRequired,
-  font_size: PropTypes.number.isRequired,
-};
+// MyMessage.propTypes = {
+//   message: PropTypes.shape({
+//     sender: PropTypes.shape.isRequired,
+//     msg: PropTypes.string.isRequired,
+//     // message_type: PropTypes.string.isRequired,
+//     // color: PropTypes.string.isRequired,
+//     date: PropTypes.string.isRequired,
+//   }).isRequired,
+// //   onActionOnMessage: PropTypes.func.isRequired,
+//   font_size: PropTypes.number.isRequired,
+// };
 
 export default MyMessage;
