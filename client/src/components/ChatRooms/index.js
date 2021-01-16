@@ -8,7 +8,6 @@ import {
 import { useHistory } from 'react-router-dom';
 import MenuIcon from '@material-ui/icons/Menu';
 import { useSnackbar } from 'notistack';
-
 import SideBarLeft from '../SidebarLeft'
 import useStyles from './styles'
 import ChatRoomContent from '../ChatRoomContent';
@@ -22,6 +21,7 @@ import RoomObject from '../../utils/roomObject';
 import UserContext from '../../context';
 import { getSocket } from '../../utils';
 import {getPrivateMessages} from '../../utils';
+import {useAudio} from 'react-use';
 
 const socket = getSocket();
 
@@ -53,6 +53,17 @@ const ChatRooms = ({room}) => {
     const [privateTo, setPrivateTo] = useState(null);
     const [privateMessgaes, setPrivateMessages] = useState(null);
 
+
+    // const audio = new Audio('/media/poke.mp3');
+    // const audio = new Audio('/media/new_message.mp3');
+    const [pokeAudio, pokeAudioState, pokeAudioControls] = useAudio({
+        src: '/media/poke.mp3',
+        autoPlay: false ,
+    });
+    const [messageAudio, messageAudioState, messageAudioControls] = useAudio({
+        src: '/media/new_message.mp3',
+        autoPlay: false ,
+    });
     const peersRef = useRef([]);
 
     // video stream objects
@@ -68,36 +79,65 @@ const ChatRooms = ({room}) => {
     // mute or unmute user
     const changeMuteState = (roomName, usernameToMute) => {
         let room = roomsRef.current.find((item) => (item.name === roomName));
-        console.log('find room', room, currentRoomName, usernameToMute);
         if(room) {
             let user = room.users.find((item) => (item.username === usernameToMute));
             user.muted = !user.muted;
             if(room.name === currentRoomName) {
-                console.log('set users due to mute')
                 setCurrentRoomUsers([...room.users]);
             }
         }
     }
-
+    // send message
+    const sendMessage = (roomName, to, color, msg, bold) => {
+        if (msg) {
+            const date = Date.now();
+            let sameRoom = roomsRef.current.find((room) => (room.name) === roomName);
+            let type = null;
+            if(to) {
+                socket.emit('private message', { msg, room: roomName, from: username, to, date, color, bold });
+                type = 'private';
+                
+            } else{
+                socket.emit('public message', { msg, room: roomName, from: username, date, color, bold });
+                type = 'public';
+            }
+            if(sameRoom) {
+                let message = {
+                    type,
+                    msg,
+                    from: username,
+                    to,
+                    date
+                }
+                sameRoom.messages = [...sameRoom.messages, message];
+                if(sameRoom.name === currentRoomName) {
+                    setCurrentRoomMessages([...sameRoom.messages]);
+                }
+            }
+        }
+        
+        
+    }
     // send poke message
     const sendPokeMessage = (roomName, userToSend) => {
         socket.emit('poke message', {from: username, to: userToSend, room: roomName}, (response) => {
             // this is callback function that can excute on server side
             if(response !== 'success') {
-                console.log('poke err', response)
                 enqueueSnackbar('Error', {variant: 'error'});
             }
         });
         let sameRoom = roomsRef.current.find((room) => (room.name) === roomName);
-            console.log('set current room messages due to poke', sameRoom)
-            if(sameRoom) {
-                let message = {
-                    type: 'poke',
-                    msg: 'You sent a rington to ' + userToSend,
-                }
-                sameRoom.messages = [...sameRoom.messages, message];
+        if(sameRoom) {
+            let message = {
+                type: 'poke',
+                msg: 'You sent a rington to ' + userToSend,
+            }
+            sameRoom.messages = [...sameRoom.messages, message];
+            if(sameRoom.name === currentRoomName) {
                 setCurrentRoomMessages([...sameRoom.messages]);
             }
+            
+        }
     }
 
  /*********************************  camera   ******************************************/
@@ -114,17 +154,14 @@ const ChatRooms = ({room}) => {
         });
 
         peer.on('signal', signal => {
-            // console.log('sending signal');
             socket.emit('sending video signal', { from: callerID, to: userToSignal, room, signal });
         })
 
         peer.on('close', () => {
-            // console.log('close video');
             removeMyStream(room.name);
         })
 
         peer.on('error', (err) => {
-            // console.log('peer error', err);
             removeMyStream(room.name);
         })
         return peer;
@@ -170,7 +207,6 @@ const ChatRooms = ({room}) => {
         let room = roomsRef.current.find((item) => (item.name === roomName));
         room.remoteStreams.push({streamID: callerID, stream});
         if(roomName === currentRoom.name) {
-            console.log('set current rooom due to add stream')
             setCurrentRoom({...room});
         }
     }
@@ -180,7 +216,6 @@ const ChatRooms = ({room}) => {
         const newStreams = room.remoteStreams.filter((item) => (item.streamID !== streamID));
         room.remoteStreams = newStreams;
         if(roomName === currentRoom.name) {
-            console.log('set current rooom due to remove stream')
             setCurrentRoom({...room});
         }
     }
@@ -190,7 +225,6 @@ const ChatRooms = ({room}) => {
             room.myStream = null;
             room.cameraState = false;
             if(roomName === currentRoom.name) {
-                console.log('set current rooom due to remove my stream')
                 setCurrentRoom({...room});
             }
         }
@@ -266,7 +300,12 @@ const ChatRooms = ({room}) => {
                     const newMessage = newMessages[msgIndex];
                     // if message is for this room
                     if(newMessage.room === room.name) {
-                        if(newMessage.type==='public' && newMessage.msg) {
+                        if(newMessage.type === 'public' && newMessage.msg) {
+                            let userToReceive = room.users.find((item) => (item.username === newMessage.from));
+                            if(userToReceive && !userToReceive.muted) {
+                                messageAudioControls.seek(0);
+                                messageAudioControls.play();
+                            }
                             if(index !== roomIndex) {
                                 room.unReadMessages = [...room.unReadMessages,...newMessages];
                             } else {
@@ -411,17 +450,14 @@ const ChatRooms = ({room}) => {
                             if(newInfo.payload.onlineUsers) {
                                 let users = newInfo.payload.onlineUsers.map((user) => ({...user, muted: false}))
                                 sameRoom.users = users;
-                                // setRooms([...rooms]);
                             }
                             if(newInfo.payload.messages) {
                                 sameRoom.messages = newInfo.payload.messages;
                             }
                         } else {
                             let newRooms = await(roomsRef.current.filter((room) => (room.name !==newInfo.payload.room)));
-                            // console.log('remove me from server', newInfo.payload);
                             roomsRef.current = newRooms;
                         }
-                        
                     }
                 }
                 break;
@@ -435,6 +471,7 @@ const ChatRooms = ({room}) => {
                                 // sameRoom.users = [...newInfo.payload.onlineUsers];
                                 let currentUserNames = sameRoom.users.map(({username}) => (username));
                                 let joinedUser = newInfo.payload.joinedUser;
+                                console.log('join', joinedUser, currentUserNames)
                                 if(!currentUserNames.includes(joinedUser.username)) {
                                     sameRoom.users = [...sameRoom.users, {...joinedUser, muted: false}];
                                 }
@@ -449,7 +486,7 @@ const ChatRooms = ({room}) => {
                                     msg: tmpName + ' joined room'
                                 }
                                 sameRoom.messages = [...sameRoom.messages, sysMsg];
-                                // setRooms([...rooms]);
+                                console.log(sameRoom.messages)
                             }
                         }
                         if(sameRoom.name === currentRoomName) {
@@ -491,9 +528,15 @@ const ChatRooms = ({room}) => {
                         if(pokeMessage.to === username) {
                             let message = {
                                 type: 'poke',
+                                from: pokeMessage.from,
                                 msg: pokeMessage.from + ' sent a rington to you' 
                             }
                             sameRoom.messages = [...sameRoom.messages, message];
+                            let userToReceive = sameRoom.users.find((item) => (item.username === pokeMessage.from));
+                            if(userToReceive && !userToReceive.muted) {
+                                pokeAudioControls.seek(0);
+                                pokeAudioControls.play()
+                            }
                         }
                     }
                 }
@@ -518,7 +561,6 @@ const ChatRooms = ({room}) => {
             default:
                 break;
         }
-        console.log('set current room for init room');
         // setCurrentRoom({...roomsRef.current[roomIndex]});
         // setCurrentRoomMessages([...roomsRef.current[roomIndex].messages]);
         // setCurrentRoomUsers([...roomsRef.current[roomIndex].users]);
@@ -540,19 +582,13 @@ const ChatRooms = ({room}) => {
         if(roomsRef.current.length > 0 && roomsRef.current.length < roomIndex + 1) {
             setRoomIndex(roomsRef.current.length - 1)
         } else if( roomsRef.current.length === 0 && roomIndex !== null) {
-            // console.log(roomsRef.current);
-            // console.log('go to home!');
-            // console.log('roomIndex', roomIndex);
             history.push('/');
         } else {
-            console.log('set current room due to rooms info');
             if(roomsRef.current[roomIndex]) {
                 setCurrentRoomUsers([...roomsRef.current[roomIndex].users]);
                 setCurrentRoomMessages([...roomsRef.current[roomIndex].messages]);
                 setCurrentRoomName(roomsRef.current[roomIndex].name);
             }
-            
-            // setCurrentRoom({...roomsRef.current[roomIndex]});
         }
         
     }, [roomsInfo])
@@ -561,8 +597,6 @@ const ChatRooms = ({room}) => {
         if(roomsRef.current.length > 0 && roomsRef.current.length > roomIndex) {
             roomsRef.current[roomIndex].messages = [...roomsRef.current[roomIndex].messages, ...roomsRef.current[roomIndex].unReadMessages];
             roomsRef.current[roomIndex].unReadMessages = [];
-            console.log('set current room due to room index', roomsRef.current[roomIndex].users)
-            // setCurrentRoom({...roomsRef.current[roomIndex]});
             setCurrentRoomMessages([...roomsRef.current[roomIndex].messages]);
             setCurrentRoomUsers([...roomsRef.current[roomIndex].users]);
             setCurrentRoomName(roomsRef.current[roomIndex].name);
@@ -599,7 +633,6 @@ const ChatRooms = ({room}) => {
                 if(currentRoom.private[privateTo.username]) {
                     let room = roomsRef.current[roomIndex];
                     room.private[privateTo.username] = 0;
-                    console.log('set current room due to private chat')
                     setCurrentRoom({...room});
                 }
             }
@@ -608,6 +641,7 @@ const ChatRooms = ({room}) => {
 
     return (
         <>
+        
         <div className={classes.root} color="primary">
             <Hidden xsDown implementation="css" className={classes.drawerWrapper}>
                 <div className={classes.drawer}>
@@ -675,6 +709,7 @@ const ChatRooms = ({room}) => {
                             username={username}
                             users={currentRoomUsers}
                             messages={currentRoomMessages}
+                            sendMessage={sendMessage}
                         />
                     {/* } */}
                     </div>
@@ -684,7 +719,8 @@ const ChatRooms = ({room}) => {
             <PrivateChat open={openPrivate} setOpen={setOpenPrivate}
                 me={{username, avatar, gender}} to={privateTo} room={currentRoom} messages={privateMessgaes}
             />
-        
+        <div>{pokeAudio}</div>
+        <div>{messageAudio}</div>
         </>
     );
 }

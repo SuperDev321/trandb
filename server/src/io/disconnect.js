@@ -17,10 +17,10 @@ const socketDisconnect = (io, socket) => async () => {
                 io.to(room).emit('leave room', {room, onlineUsers: usersInfo, leavedUser: user});
             }
         }
-        for (let index = 2; index < rooms.length; index++) {
-            const room = rooms[index];
-            socket.leave(room);
-        }
+        // for (let index = 2; index < rooms.length; index++) {
+        //     const room = rooms[index];
+        //     socket.leave(room);
+        // }
         
     } catch (err) {
         console.log(err);

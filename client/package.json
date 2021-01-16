@@ -16,6 +16,7 @@
     "html-react-parser": "^1.1.1",
     "jss-rtl": "^0.3.0",
     "moment": "^2.26.0",
+    "notistack": "^1.0.3",
     "parsehtml": "^1.0.0",
     "prop-types": "^15.7.2",
     "randomstring": "^1.1.5",
@@ -27,11 +28,13 @@
     "react-google-login": "^5.1.19",
     "react-router-dom": "^5.2.0",
     "react-scripts": "^3.4.3",
+    "react-use": "^15.3.8",
     "react-window": "^1.8.6",
     "sass-loader": "^10.1.0",
     "simple-peer": "^9.9.3",
     "socket.io-client": "^2.3.0",
     "styled-components": "^5.2.1",
+    "use-sound": "^2.0.1",
     "yup": "^0.32.8"
   },
   "scripts": {
