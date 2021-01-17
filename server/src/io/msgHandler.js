@@ -49,7 +49,7 @@ const pokeMessage = (io, socket) => async ({from, to, room}, callback) => {
   }
 }
 
-const privateMessage = (io, socket) => async ({ msg, room, from, to, color, bold }) => {
+const privateMessage = (io, socket) => async ({ msg, from, to, color, bold }) => {
   console.log('private')
   try {
     const date = Date.now();
@@ -59,7 +59,6 @@ const privateMessage = (io, socket) => async ({ msg, room, from, to, color, bold
       type: 'private',
       from,
       to,
-      room,
       date,
       color,
       bold
@@ -71,7 +70,6 @@ const privateMessage = (io, socket) => async ({ msg, room, from, to, color, bold
       socket.to(toUser._id).emit('room messages', [
         {
           type: 'private',
-          room,
           _id: newChat._id,
           msg: newChat.msg,
           from: newChat.from,

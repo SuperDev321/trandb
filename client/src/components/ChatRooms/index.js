@@ -12,7 +12,7 @@ import SideBarLeft from '../SidebarLeft'
 import useStyles from './styles'
 import ChatRoomContent from '../ChatRoomContent';
 import AddRoomModal from '../AddRoomModal';
-
+import PrivateChatList from '../PrivateChat/PrivateChatList'
 import VideoList from '../VideoList';
 import Peer from 'simple-peer';
 import {StyledTab , StyledTabs} from '../StyledTab';
@@ -23,7 +23,7 @@ import { getSocket } from '../../utils';
 import {getPrivateMessages} from '../../utils';
 import {useAudio} from 'react-use';
 
-const socket = getSocket();
+
 
 const ChatRooms = ({room}) => {
     const classes = useStyles();
@@ -34,7 +34,7 @@ const ChatRooms = ({room}) => {
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
     };
-
+    const socket = getSocket();
     // roomObject array
     const roomsRef = useRef([]);
     // current room index
@@ -52,17 +52,17 @@ const ChatRooms = ({room}) => {
     // private chat send message to this user
     const [privateTo, setPrivateTo] = useState(null);
     const [privateMessgaes, setPrivateMessages] = useState(null);
-
+    const privateListRef = useRef();
 
     // const audio = new Audio('/media/poke.mp3');
     // const audio = new Audio('/media/new_message.mp3');
     const [pokeAudio, pokeAudioState, pokeAudioControls] = useAudio({
         src: '/media/poke.mp3',
-        autoPlay: false ,
+        autoPlay: true ,
     });
     const [messageAudio, messageAudioState, messageAudioControls] = useAudio({
         src: '/media/new_message.mp3',
-        autoPlay: false ,
+        autoPlay: true ,
     });
     const peersRef = useRef([]);
 
@@ -75,6 +75,10 @@ const ChatRooms = ({room}) => {
     const handleChangeRoom = (event, newValue) => {
         setRoomIndex(newValue);
     };
+    // add a private modal to private list
+    const addOrOpenPrivate = (to) => {
+        privateListRef.current.addChat({me: {username, avatar, gender}, to});
+    }
 
     // mute or unmute user
     const changeMuteState = (roomName, usernameToMute) => {
@@ -93,8 +97,9 @@ const ChatRooms = ({room}) => {
             const date = Date.now();
             let sameRoom = roomsRef.current.find((room) => (room.name) === roomName);
             let type = null;
+            console.log('send message', roomName, to)
             if(to) {
-                socket.emit('private message', { msg, room: roomName, from: username, to, date, color, bold });
+                socket.emit('private message', { msg, from: username, to, date, color, bold });
                 type = 'private';
                 
             } else{
@@ -394,7 +399,7 @@ const ChatRooms = ({room}) => {
 
         return () => {
             socket.removeAllListeners();
-            socket.close();
+            socket.disconnect();
         };
     }, []);
 
@@ -471,7 +476,6 @@ const ChatRooms = ({room}) => {
                                 // sameRoom.users = [...newInfo.payload.onlineUsers];
                                 let currentUserNames = sameRoom.users.map(({username}) => (username));
                                 let joinedUser = newInfo.payload.joinedUser;
-                                console.log('join', joinedUser, currentUserNames)
                                 if(!currentUserNames.includes(joinedUser.username)) {
                                     sameRoom.users = [...sameRoom.users, {...joinedUser, muted: false}];
                                 }
@@ -486,7 +490,6 @@ const ChatRooms = ({room}) => {
                                     msg: tmpName + ' joined room'
                                 }
                                 sameRoom.messages = [...sameRoom.messages, sysMsg];
-                                console.log(sameRoom.messages)
                             }
                         }
                         if(sameRoom.name === currentRoomName) {
@@ -651,8 +654,9 @@ const ChatRooms = ({room}) => {
                         sendPokeMessage={sendPokeMessage}
                         // unReadInfo={currentRoom && currentRoom.private}
                         roomName={currentRoomName}
-                        setOpenPrivate={setOpenPrivate}
-                        setPrivateTo={setPrivateTo}
+                        // setOpenPrivate={setOpenPrivate}
+                        // setPrivateTo={setPrivateTo}
+                        addOrOpenPrivate={addOrOpenPrivate}
                         cameraState={currentRoom && currentRoom.cameraState}
                         openCamera = {openCamera}
                         closeCamera = {closeCamera}
@@ -716,9 +720,10 @@ const ChatRooms = ({room}) => {
                 </main>
             </div>
         </div>
-            <PrivateChat open={openPrivate} setOpen={setOpenPrivate}
+            {/* <PrivateChat open={openPrivate} setOpen={setOpenPrivate}
                 me={{username, avatar, gender}} to={privateTo} room={currentRoom} messages={privateMessgaes}
-            />
+            /> */}
+        <PrivateChatList ref={privateListRef} sendMessage={sendMessage}/>
         <div>{pokeAudio}</div>
         <div>{messageAudio}</div>
         </>

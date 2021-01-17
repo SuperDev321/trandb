@@ -24,11 +24,11 @@ const useStyles = makeStyles((theme) => ({
     listItem: {
         display: 'flex',
         flexWrap: 'wrap',
-        paddingTop: theme.spacing(0),
-        paddingBottom: theme.spacing(0),
+        // paddingTop: theme.spacing(0),
+        // paddingBottom: theme.spacing(0),
         justifyContent: 'flex-start',
         alignItems: 'center',
-        margin: '2px 15px 2px 15px',
+        padding: '2px 15px 2px 15px',
         width: '100%',
     },
     username: {
@@ -68,7 +68,7 @@ const useStyles = makeStyles((theme) => ({
         justifyContent: 'center',
         alignItems: 'center',
         flexDirection: 'column',
-        height: 140,
+        height: 100,
         width: 200,
         backgroundImage: '/img/public_chat.png',
     },
@@ -102,8 +102,10 @@ const StyledBadge = withStyles((theme) => ({
 ))
 
 const OnlineUser = ({roomName, username, user,
-        changeMuteState, sendPokeMessage
-        , setOpenPrivate, setPrivateTo}) => {
+        changeMuteState, sendPokeMessage,
+        // , setOpenPrivate, setPrivateTo
+        addOrOpenPrivate,
+    }) => {
     const classes = useStyles({role: user.role});
     const [anchorEl, setAnchorEl] = React.useState(null);
 
@@ -113,22 +115,30 @@ const OnlineUser = ({roomName, username, user,
     };
 
     const handleClickPrivateChat = (event) => {
-        event.preventDefault();
-        setPrivateTo(user);
-        setOpenPrivate(true);
         setAnchorEl(null);
+        event.preventDefault();
+        setTimeout(() => {
+            // setOpenPrivate(true);
+            // setPrivateTo(user);
+            addOrOpenPrivate(user);
+        }, 0);
     }
     const handleMute = (username) => {
-        changeMuteState(roomName, username);
         setAnchorEl(null);
+        setTimeout(() => {
+            changeMuteState(roomName, username);
+        }, 0)
     }
     const handleClose = () => {
         setAnchorEl(null);
     };
 
     const sendPoke = () => {
-        sendPokeMessage(roomName, user.username);
         setAnchorEl(null);
+        setTimeout(() => {
+            sendPokeMessage(roomName, user.username);
+        }, 0)
+        
     }
 
     const open = Boolean(anchorEl);
@@ -201,7 +211,8 @@ const OnlineUser = ({roomName, username, user,
                         </Button>
                     </>
                     }
-                    <Button size="small" className={classes.mute}
+                    <Button size="small"
+                        className={`${classes.cardButton} ${classes.mute}`}
                         fullWidth onClick={() => { handleMute(user.username) }}
                         name={user.username}
                     >

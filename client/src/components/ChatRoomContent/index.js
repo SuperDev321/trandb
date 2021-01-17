@@ -1,4 +1,4 @@
-import React, { useContext, useState, useRef, useEffect } from 'react';
+import React, { useContext, useState, useRef, useEffect, memo } from 'react';
 import io from 'socket.io-client';
 import ChatForm from '../ChatForm';
 import UserContext from '../../context';
@@ -39,7 +39,6 @@ const ChatRoom = ({roomName, users, messages, sendMessage}) => {
     const classes = useStyles();
     const { username } = useContext(UserContext);
     const [messagesToShow, setmMssagesToShow] = useState([]);
-
     useEffect(() => {
         let mutedUsers = users.filter((user) => (user.muted));
         let mutedUserNames = mutedUsers.map(({username}) => (username));
@@ -56,4 +55,4 @@ const ChatRoom = ({roomName, users, messages, sendMessage}) => {
     );
 };
 
-export default ChatRoom;
+export default memo(ChatRoom);

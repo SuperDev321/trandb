@@ -24,7 +24,7 @@ const useStyles = makeStyles((theme) => ({
     list: {
         padding: '0',
         flexGrow: 1,
-        
+        overflow: 'auto',
     },
     listItem: {
         paddingTop: theme.spacing(0.5),
@@ -34,7 +34,10 @@ const useStyles = makeStyles((theme) => ({
 
 
 const SideBarLeft = ({ roomName, username, unReadInfo, changeMuteState, sendPokeMessage,
-     users, setOpenPrivate, setPrivateTo, cameraState, openCamera, closeCamera }) => {
+     users, 
+    //  setOpenPrivate, setPrivateTo,
+    addOrOpenPrivate,
+     cameraState, openCamera, closeCamera }) => {
     const classes = useStyles();
     return (
         <div className={classes.root}>
@@ -47,8 +50,10 @@ const SideBarLeft = ({ roomName, username, unReadInfo, changeMuteState, sendPoke
                             <OnlineUser
                                 roomName={roomName}
                                 username={username}
-                                user={user} key={index} setOpenPrivate={setOpenPrivate}
-                                setPrivateTo={setPrivateTo}
+                                user={user} key={index}
+                                // setOpenPrivate={setOpenPrivate}
+                                // setPrivateTo={setPrivateTo}
+                                addOrOpenPrivate={addOrOpenPrivate}
                                 changeMuteState={changeMuteState}
                                 sendPokeMessage={sendPokeMessage}
                                 // unRead={unReadInfo[user.username]}
