@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const handleCreateRoom = async (data, successCallback, errCallback) => {
   try {
-    await axios.post('https://new.trandb.com:4000/api/room', data);
+    await axios.post('/api/room', data);
     successCallback();
   } catch (err) {
     let errMessage;
