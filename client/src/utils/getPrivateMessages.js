@@ -1,10 +1,11 @@
 import axios from 'axios';
 
-const getPrivateMessages = async ({room, from, to}, successCallback, errCallback) => {
+const getPrivateMessages = async ({from, to}, successCallback, errCallback) => {
     try {
         const {
             data: { data },
-        } = await axios.post('https://new.trandb.com:4000/api/messages/private', {room, from, to});
+        } = await axios.post('https://new.trandb.com:4000/api/messages/private', {from, to});
+
         // setLoading(false);
         // setRooms(data);
         successCallback(data);

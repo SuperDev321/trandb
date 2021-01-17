@@ -5,10 +5,10 @@ import { makeStyles } from '@material-ui/core/styles';
 const useStyles = makeStyles((theme) => ({
     root: {
         position: 'absolute',
-        top: 0,
-        left: 0,
-        width: '100%',
-        height: '100%',
+        bottom: 0,
+        right: 0,
+        width: 0,
+        height: 0,
     }
 }))
 const PrivateChatList = ({sendMessage}, ref) => {
@@ -25,10 +25,13 @@ const PrivateChatList = ({sendMessage}, ref) => {
     useImperativeHandle(ref, () => ({
         addChat: (chatInfo) => {
             addNewChat(chatInfo);
+        },
+        addMessage: (message) => {
+
         }
     }));
     return (
-        <div className={classes.root}>
+        <>
             {chatList.map((item, index) => 
                 <PrivateChatContent key={index}
                     messages={item.messages} me={item.me} to={item.to}
@@ -36,7 +39,7 @@ const PrivateChatList = ({sendMessage}, ref) => {
                 />
             )
             }
-        </div>
+        </>
     )
 }
 

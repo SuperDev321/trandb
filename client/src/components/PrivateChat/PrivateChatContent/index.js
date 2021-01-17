@@ -1,4 +1,4 @@
-import React, { memo, useEffect } from 'react';
+import React, { memo, useState, useEffect, useImperativeHandle } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import {
     Avatar,
@@ -10,14 +10,15 @@ import CloseIcon from '@material-ui/icons/Close';
 import ChatForm from '../../ChatForm';
 import Draggable from 'react-draggable';
 import PrivateMessageList from '../../PrivateMessageList';
-import { getSocket } from '../../../utils';
+import {getPrivateMessages} from '../../../utils';
+import { ref } from 'yup';
 
 const useStyles = makeStyles((theme) => ({
     root: {
         position: 'absolute',
         right: 0,
         bottom: 0,
-        zIndex: 2000,
+        zIndex: 200,
         width: 400,
         height: 350,
         display: 'flex',
@@ -55,22 +56,43 @@ const useStyles = makeStyles((theme) => ({
         width: '100%',
         overflow: 'auto',
         flexGrow: 1,
+    },
+    hide: {
+        display: 'none',
     }
 }));
 
-const PrivateChat = ({ messages, me, to, sendMessage}) => {
+const PrivateChat = ({ me, to, sendMessage }) => {
     const classes = useStyles();
+    const [messages, setMessages] = useState([]);
+    const [hide, setHide] = useState(false);
+
+    // useImperativeHandle(ref, () => {
+    //     show: () => {
+    //         setHide(false);
+    //     }
+    // })
+    useEffect(() => {
+        getPrivateMessages({from: me.username, to: to.username} ,
+            (data) => {
+                setMessages(data);
+            },
+            (err) => {
+                console.log(err);
+            }
+        );
+    }, [me, to])
     return (
         <Draggable bounds="parent" handle='#private-header' scale={1} grid={[5, 5]}
         >
-            <Paper className={classes.root}>
+            <Paper className={`${classes.root} ${hide&&classes.hide}`} >
                 <div className={classes.header} >
                     <Avatar className={classes.smallAvatar}
                         src='/img/default_avatar.png'
                     />
                     <div id="private-header" className={classes.headerContent}>{to.username}</div>
                     <IconButton color='inherit' size='small'
-                        // onClick={()=>{console.log('set false');setOpen(false)}}
+                        onClick={()=>{setHide(true)}}
                     >
                         <CloseIcon />
                     </IconButton>
