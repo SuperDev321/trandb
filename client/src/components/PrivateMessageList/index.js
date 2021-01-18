@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import propTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
+import StyledMessage from '../Message/StyledMessage'
 import moment from 'moment';
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -50,25 +51,6 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const StyledMessage = ({message, mine}) => {
-    const classes = useStyles({mine});
-
-    return (
-        <div className={classes.root}>
-            { !mine &&
-                <span className={classes.author}>{message.from}</span>
-            }
-            
-            <div className={classes.content}>
-                <div  className={classes.message}>
-                    {message.msg}
-                </div>
-                <div className={classes.date}>{moment(message.date).format('hh:mm')}</div>
-            </div>
-        </div>
-    )
-}
-
 const useListStyles = makeStyles((theme) => ({
     root: {
         display: 'flex',
@@ -101,6 +83,7 @@ const PrivateMessageList = ({messages, me}) => {
         if (listRef.current) {
             listRef.current.scrollTop = listRef.current.scrollHeight;
         }
+        console.log(messages)
     }, [messages]);
     return (
         <div className={classes.root} ref={listRef}>

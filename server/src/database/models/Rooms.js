@@ -25,6 +25,12 @@ const roomSchema = new Schema({
             ref: 'Users',
         },
     ],
+    moderators: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: 'Users',
+        },
+    ],
 });
 
 const Rooms = model('Rooms', roomSchema);

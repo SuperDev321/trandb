@@ -1,21 +1,22 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import {EmojiConvertor} from 'emoji-js';
 import parseHTML from 'parsehtml';
 import moment from 'moment';
 import randomstring from "randomstring";
 import useStyles from './styles';
-
+let emoji = new EmojiConvertor();
+emoji.img_set = 'apple';
+emoji.img_sets.apple.path = 'https://cdn.jsdelivr.net/gh/iamcal/emoji-data@master/img-apple-64/';
+emoji.use_sheet = true;
+emoji.init_env();
+emoji.supports_css = false;
+emoji.allow_native = false;
+emoji.replace_mode = 'img';// 'unified';
+emoji.use_sheet = true;
 const MyMessage = ({message, font_size}) => {
-    let emoji = new EmojiConvertor();
-    emoji.img_set = 'apple';
-    emoji.img_sets.apple.path = 'https://cdn.jsdelivr.net/gh/iamcal/emoji-data@master/img-apple-64/';
-    emoji.use_sheet = true;
-    emoji.init_env();
-    emoji.supports_css = false;
-    emoji.allow_native = false;
-    emoji.replace_mode = 'img';// 'unified';
-    emoji.use_sheet = true;
+    
+    
     const classes = useStyles({color: message.color, bold: message.bold})
     const urlify = (text) => {
         let urlRegex = /(https?:\/\/[^\s]+)/g;
@@ -25,11 +26,7 @@ const MyMessage = ({message, font_size}) => {
     }
 
   const emojiConverter = (text) => {
-    // console.log('text', emoji.replace_unified(text))
     return emoji.replace_unified(text);
-    // let emojiEl = <Emojify>{text}</Emojify>;
-    // console.log('emoji', emojiEl);
-    // return reactElementToJSXString(emojiEl);
   }
 
   const convertHTML = (text) => {
@@ -163,10 +160,9 @@ const MyMessage = ({message, font_size}) => {
         <div className={classes.messageContent}>
             <span className={classes.sender}><strong>{message.from}</strong>:&nbsp;</span>
                 <span
-                className={classes.text + ' ' + classes.size10}>
-                {
-                  convertHTML(emojiConverter(urlify(sanitarize(message.msg))))
-                }
+                className={classes.text + ' ' + classes.size10}
+                dangerouslySetInnerHTML={{__html: emojiConverter(message.msg)}}
+                >
             </span>
         </div>
         <span className={classes.time}>{moment(message.date).format('HH:mm')}</span>

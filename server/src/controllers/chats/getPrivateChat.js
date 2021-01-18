@@ -6,11 +6,12 @@ const getPrivateChat = async (req, res, next) => {
         let {from, to} = req.body;
         console.log(from, to);
         const chats = await Chats.find({
-            $or: [ 
+            $or: [
                 {$and: [{from} , {to}]},
                 {$and: [{from: to}, {to: from}]}
             ]
         });
+
         let chatInfos = chats.map(({msg, from, to, date}) => ({msg, from, to, date}));
         return res.json({
             statusCode: 200,

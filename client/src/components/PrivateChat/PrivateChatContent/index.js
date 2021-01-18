@@ -1,4 +1,4 @@
-import React, { memo, useState, useEffect, useImperativeHandle } from 'react';
+import React, { memo, useState, useEffect, useImperativeHandle, forwardRef } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import {
     Avatar,
@@ -59,21 +59,30 @@ const useStyles = makeStyles((theme) => ({
     },
     hide: {
         display: 'none',
+    },
+    active: {
+        zIndex: 201
     }
 }));
 
-const PrivateChat = ({ me, to, sendMessage }) => {
+const PrivateChat = ({ me, to, sendMessage, active, setActive }, ref) => {
     const classes = useStyles();
     const [messages, setMessages] = useState([]);
     const [hide, setHide] = useState(false);
 
-    // useImperativeHandle(ref, () => {
-    //     show: () => {
-    //         setHide(false);
-    //     }
-    // })
+    useImperativeHandle(ref, () => ({
+        show: () => {
+            setHide(false);
+        },
+        isShow: () => {
+            return !hide;
+        },
+        addMessage: (message) => {
+            setMessages([...messages, message])
+        }
+    }));
     useEffect(() => {
-        getPrivateMessages({from: me.username, to: to.username} ,
+        getPrivateMessages({from: me.username, to: to.username},
             (data) => {
                 setMessages(data);
             },
@@ -83,16 +92,16 @@ const PrivateChat = ({ me, to, sendMessage }) => {
         );
     }, [me, to])
     return (
-        <Draggable bounds="parent" handle='#private-header' scale={1} grid={[5, 5]}
+        <Draggable bounds="parent" handle='#private-header' scale={1} onMouseDown={() => {setActive(to.username)}}
         >
-            <Paper className={`${classes.root} ${hide&&classes.hide}`} >
+            <Paper className={`${classes.root} ${hide&&classes.hide} ${active&&classes.active}`} >
                 <div className={classes.header} >
                     <Avatar className={classes.smallAvatar}
                         src='/img/default_avatar.png'
                     />
                     <div id="private-header" className={classes.headerContent}>{to.username}</div>
                     <IconButton color='inherit' size='small'
-                        onClick={()=>{setHide(true)}}
+                        onClick={()=>{setHide(true);}}
                     >
                         <CloseIcon />
                     </IconButton>
@@ -106,4 +115,5 @@ const PrivateChat = ({ me, to, sendMessage }) => {
     );
 }
 
-export default memo(PrivateChat);
+const PrivateChatWithRef = forwardRef(PrivateChat);
+export default memo(PrivateChatWithRef);
