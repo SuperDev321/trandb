@@ -55,6 +55,7 @@ io.use(async (socket, next) => {
         socket.join(decoded._id);
         next();
     } catch (err) {
+        console.log(err)
         next(new Error('Authentication error'));
     }
 }).on('connection', ioHandler(io));

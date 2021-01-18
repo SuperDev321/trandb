@@ -29,7 +29,6 @@ const ChatRooms = ({room}) => {
     const classes = useStyles();
     const history= useHistory();
     const [mobileOpen, setMobileOpen] = useState(false);
-    const [openPrivate, setOpenPrivate] = useState(false);
     const { username, avatar, gender } = useContext(UserContext);
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
@@ -246,9 +245,6 @@ const ChatRooms = ({room}) => {
             }
         }
     }
-    function hasGetUserMedia() {
-        return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
-    }
     // open my camera
     const openCamera = async () => {
         // console.log('open camera');
@@ -353,51 +349,55 @@ const ChatRooms = ({room}) => {
 
     // socket events
     useEffect(() => {
-        // console.log('username', username)
-        // console.log('socket opening')
-        socket.open();
-        // console.log('joining to', { room });
-        socket.emit('join room', { room });
-        socket.on('joined room',async ({room, onlineUsers, joinedUser}) => {
-            // console.log('user joined', room, onlineUsers);
-            // console.log('new info for user join')
-            setNewInfo({type: 'joined room', payload: {room, onlineUsers, joinedUser}});
-        });
-        socket.on('leave room', async ({room, onlineUsers, leavedUser}) => {
-            // console.log('leave room', userId, currentRoom);
-            setNewInfo({type: 'leave room', payload: {room, onlineUsers, leavedUser}});
-        })
-        socket.on('init room', async ({room, onlineUsers, messages}) => {
+        if(username && socket) {
+
+            let result = socket.open();
+            socket.emit('join room', { room });
+            socket.on('connect_error', (err) => {
+                console.log(err)
+            })
+
+            socket.on('init room', async ({room, onlineUsers, messages}, fn) => {
+                fn('success');
+                let usernames = await onlineUsers.map((item) => (item.username));
+                if(usernames.includes(username)) {
+                    // console.log('username: ', username);
+                    setNewInfo({ type: 'init room', payload: { room, onlineUsers, messages}});
+                }
+            });
+            socket.on('joined room',async ({room, onlineUsers, joinedUser}) => {
+                // console.log('user joined', room, onlineUsers);
+                // console.log('new info for user join')
+                setNewInfo({type: 'joined room', payload: {room, onlineUsers, joinedUser}});
+            });
+            socket.on('leave room', async ({room, onlineUsers, leavedUser}) => {
+                // console.log('leave room', userId, currentRoom);
+                setNewInfo({type: 'leave room', payload: {room, onlineUsers, leavedUser}});
+            })
             
-            let usernames = await onlineUsers.map((item) => (item.username));
-            if(usernames.includes(username)) {
-                // console.log('socket init room', room, onlineUsers, messages);
-                // console.log('username: ', username);
-                setNewInfo({ type: 'init room', payload: { room, onlineUsers, messages}});
-            }
-        });
-        socket.on('room messages', messages => {
-            setNewMessages(messages);
-        });
+            socket.on('room messages', messages => {
+                setNewMessages(messages);
+            });
 
-        socket.on('poke message', payload => {
-            setNewInfo({type: 'poke', payload});
-        })
+            socket.on('poke message', payload => {
+                setNewInfo({type: 'poke', payload});
+            })
 
-        socket.on('video signal', payload => {
-            // console.log('receive new video');
-            setNewInfo({ type: 'video', payload});
-        });
+            socket.on('video signal', payload => {
+                // console.log('receive new video');
+                setNewInfo({ type: 'video', payload});
+            });
 
-        socket.on('return video signal', payload => {
-            setNewInfo({type: 'return video', payload});
-        })
+            socket.on('return video signal', payload => {
+                setNewInfo({type: 'return video', payload});
+            })
 
-        return () => {
-            socket.removeAllListeners();
-            socket.disconnect();
-        };
-    }, []);
+            return () => {
+                socket.removeAllListeners();
+                socket.disconnect();
+            };
+        }
+    }, [socket, username]);
 
     // add a new room to chat area
     const addRoom = async (room, callback) => {
@@ -426,7 +426,6 @@ const ChatRooms = ({room}) => {
     }
 
     const receiveNewInfo = async (newInfo) => {
-        // console.log('new info for room', newInfo)
         switch(newInfo.type) {
             case 'init room':
                 if(roomsRef.current && newInfo.payload.room) {
@@ -689,10 +688,19 @@ const ChatRooms = ({room}) => {
                 <Hidden smUp implementation="css">
                     { mobileOpen &&
                         <Card className={classes.modbileDrawer}>
-                            <SideBarLeft users={roomIndex !== null && currentRoom && currentRoom.users && currentRoom.users}
-                                setOpenPrivate={setOpenPrivate}
-                                setPrivateTo={setPrivateTo}
-                                username={username}
+                            <SideBarLeft 
+                            users={currentRoomUsers}
+                            changeMuteState={changeMuteState}
+                            sendPokeMessage={sendPokeMessage}
+                            // unReadInfo={currentRoom && currentRoom.private}
+                            roomName={currentRoomName}
+                            // setOpenPrivate={setOpenPrivate}
+                            // setPrivateTo={setPrivateTo}
+                            addOrOpenPrivate={addOrOpenPrivate}
+                            cameraState={currentRoom && currentRoom.cameraState}
+                            openCamera = {openCamera}
+                            closeCamera = {closeCamera}
+                            username={username} 
                             />
                         </Card>
                     }

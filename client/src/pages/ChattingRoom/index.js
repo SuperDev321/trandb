@@ -1,8 +1,6 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 
-import RoomsContext from '../../contexts/roomContext';
-import { useRooms } from '../../utils';
 import { HomeLayout } from '../../components';
 // import { makeStyles } from '@material-ui/styles';
 import {
@@ -70,10 +68,8 @@ import ChatRooms from '../../components/ChatRooms';
 
 
 const ChattingRoom = () => {
-    const { rooms, setRooms } = useRooms();
-    
     const { room } = useParams();
-
+    console.log(room)
     return (
         <HomeLayout>
             <CssBaseline />

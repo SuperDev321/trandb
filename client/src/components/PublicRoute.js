@@ -6,9 +6,8 @@ import UserContext from '../context';
 
 const PublicRoute = ({ children, path }) => {
   const { auth } = useContext(UserContext);
-
   return (
-    <Route path={path}>{auth ? <Redirect to="/rooms" /> : children}</Route>
+    <Route path={path}>{children}</Route>
   );
 };
 

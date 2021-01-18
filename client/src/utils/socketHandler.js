@@ -1,7 +1,7 @@
 import io from 'socket.io-client';
-
+console.log('socket handler')
 const socket = io({
-    autoConnect: true,
+    autoConnect: false,
 });
 
 

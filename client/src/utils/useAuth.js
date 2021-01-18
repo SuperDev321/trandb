@@ -8,6 +8,7 @@ const useAuth = () => {
   const [gender, setGender] = useState(null);
   const [avatar, setAvatar] = useState(null);
   const [role, setRole] = useState('user');
+  const [prevUrl, setPrevUrl] = useState(null);
 
   useEffect(() => {
     (async () => {
@@ -37,7 +38,7 @@ const useAuth = () => {
     setRole('user');
   };
 
-  return { auth, setAuth, gender, avatar, username, role, loading, setLoading, removeCurrentUser };
+  return { auth, setAuth, gender, avatar, username, role, loading, setLoading, removeCurrentUser, prevUrl, setPrevUrl };
 };
 
 export default useAuth;

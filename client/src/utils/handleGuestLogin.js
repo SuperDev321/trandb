@@ -5,6 +5,7 @@ const handleLogin = async (credentials, successCallback, errCallback) => {
     await axios.post('https://new.trandb.com:4000/api/login/guest', credentials);
     successCallback();
   } catch (err) {
+    console.log(err)
     let errMessage;
 
     if (err.response.status) {

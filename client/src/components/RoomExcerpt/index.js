@@ -39,7 +39,7 @@ const RoomExcerpt = ({ name, users }) => {
                 <div className={classes.connect}>
                     <Button
                         variant="contained"
-                        onClick={() => history.push(`/rooms/${name}`)}
+                        onClick={() =>{history.push(`/rooms/${name}`)}}
                     >
                         Connect
                     </Button>

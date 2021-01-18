@@ -17,9 +17,6 @@ import {QuestionAnswer,
     Check,
     Notifications,
 } from '@material-ui/icons';
-import { getSocket } from '../../utils';
-
-const socket = getSocket();
 const useStyles = makeStyles((theme) => ({
     listItem: {
         display: 'flex',

@@ -14,10 +14,14 @@ const joinRoom = (io, socket) => async ({ room }) => {
         const messages = await Chats.find({ room, type: 'public' });
         const usersInfo = await findRoomUsers(room);
 
-        socket.emit('init room', {messages, onlineUsers: usersInfo, room});
+        socket.emit('init room', {messages, onlineUsers: usersInfo, room}, (data)=> {
+            if(data === 'success') {
+                io.to(room).emit('joined room', {room, onlineUsers: usersInfo, joinedUser: user});
+                console.log('joined room', room, usersInfo);
+            }
+        });
 
-        io.to(room).emit('joined room', {room, onlineUsers: usersInfo, joinedUser: user});
-        console.log('joined room', room, usersInfo);
+        
     } catch (err) {
         console.log(err);
     }

@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation, Redirect } from 'react-router-dom';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import {
@@ -113,12 +113,16 @@ const RedRadio = withStyles({
 
 
 const Login = () => {
+    
+    const { state } = useLocation();
+    const { from } = state || { from: { pathname: "/" } };
     const history = useHistory();
     const { setAuth } = useContext(UserContext);
     const classes = useStyles();
     const [selected, setSelected] = useState(false);
     const [guest, setGuest] = useState(false);
     const [error, setError] = useState();
+    const [redirectToReferrer, setRedirectToReferrer] = useState(false);
 
     const handleSelectMode = (isGuest) => {
         if(isGuest) {
@@ -137,7 +141,7 @@ const Login = () => {
         validationSchema: loginValidationSchema,
         onSubmit: (values) => {
             // alert(JSON.stringify(values, null, 2));
-            handleLogin(values, () => setAuth(true), (msg) => { setError(msg) } );
+            handleLogin(values, () => {setAuth(true);setRedirectToReferrer(true);}, (msg) => { setError(msg) } );
         },
     });
 
@@ -148,11 +152,14 @@ const Login = () => {
         },
         validationSchema: guestValidationSchema,
         onSubmit: (values) => {
-            // alert(JSON.stringify(values, null, 2));
-            handleGuestLogin(values,() => setAuth(true), (msg) => { setError(msg)} );
+            handleGuestLogin(values,() => {setAuth(true);setRedirectToReferrer(true);}, (msg) => { setError(msg)} );
         },
     });
 
+    if (redirectToReferrer) {
+        console.log(from)
+        return <Redirect to={from} />;
+    }
     return (
         <Container component="main" className={classes.root} maxWidth="xs">
             { !selected ?
