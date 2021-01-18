@@ -66,21 +66,21 @@ export default function BroadcastSetting({users}) {
     }
 
     useEffect(() => {
-        let devices = getDevices();
+        // let devices = getDevices();
         let audioDevices = [];
         let videoDevices = [];
-        if(devices && devices.length) {
-            for (let index = 0; index < devices.length; index++) {
-                const element = devices[index];
-                if (element.deviceId != "default" && element.deviceId != "communications") {
-                    if (element.kind == "audioinput") {
-                      audioDevices.push({deviceId: element.deviceId, label: element.label, groupId: element.groupId});
-                    } else if (element.kind == "videoinput") {
-                      videoDevices.push({deviceId: element.deviceId, label: element.label, groupId: element.groupId});
-                    }
-                }
-            }
-        }
+        // if(devices && devices.length) {
+        //     for (let index = 0; index < devices.length; index++) {
+        //         const element = devices[index];
+        //         if (element.deviceId != "default" && element.deviceId != "communications") {
+        //             if (element.kind == "audioinput") {
+        //               audioDevices.push({deviceId: element.deviceId, label: element.label, groupId: element.groupId});
+        //             } else if (element.kind == "videoinput") {
+        //               videoDevices.push({deviceId: element.deviceId, label: element.label, groupId: element.groupId});
+        //             }
+        //         }
+        //     }
+        // }
         // console.log(audioDevices);
         // console.log(videoDevices);
     })

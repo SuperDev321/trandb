@@ -21,6 +21,10 @@ const ioHandler = (io) => (socket) => {
     });
 
     socket.on('disconnecting', socketDisconnect(io, socket));
+    socket.on('disconnect', (reason) => {
+      console.log(reason)
+
+    })
 };
 
 module.exports = ioHandler;
