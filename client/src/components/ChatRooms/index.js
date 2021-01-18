@@ -79,7 +79,6 @@ const ChatRooms = ({room}) => {
     const addOrOpenPrivate = (to) => {
         privateListRef.current.addChat({me: {username, avatar, gender}, to});
     }
-
     // mute or unmute user
     const changeMuteState = (roomName, usernameToMute) => {
         let room = roomsRef.current.find((item) => (item.name === roomName));
@@ -622,25 +621,25 @@ const ChatRooms = ({room}) => {
         }
     }, [currentRoom])
 
-    useEffect(() => {
-        if(openPrivate) {
-            if(privateTo && currentRoom && roomIndex !==null) {
-                getPrivateMessages({room: currentRoom.name, from: username, to: privateTo.username} ,
-                    (data) => {
-                        setPrivateMessages(data);
-                    },
-                    (err) => {
-                        console.log(err);
-                    }
-                );
-                if(currentRoom.private[privateTo.username]) {
-                    let room = roomsRef.current[roomIndex];
-                    room.private[privateTo.username] = 0;
-                    setCurrentRoom({...room});
-                }
-            }
-        }
-    }, [openPrivate, privateTo])
+    // useEffect(() => {
+    //     if(openPrivate) {
+    //         if(privateTo && currentRoom && roomIndex !==null) {
+    //             getPrivateMessages({room: currentRoom.name, from: username, to: privateTo.username} ,
+    //                 (data) => {
+    //                     setPrivateMessages(data);
+    //                 },
+    //                 (err) => {
+    //                     console.log(err);
+    //                 }
+    //             );
+    //             if(currentRoom.private[privateTo.username]) {
+    //                 let room = roomsRef.current[roomIndex];
+    //                 room.private[privateTo.username] = 0;
+    //                 setCurrentRoom({...room});
+    //             }
+    //         }
+    //     }
+    // }, [openPrivate, privateTo])
 
     return (
         <>

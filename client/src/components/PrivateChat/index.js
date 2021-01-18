@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import {
     Avatar,
@@ -17,7 +17,6 @@ const useStyles = makeStyles((theme) => ({
         position: 'absolute',
         right: 0,
         bottom: 0,
-        zIndex: 2000,
         width: 400,
         height: 350,
         display: 'flex',
