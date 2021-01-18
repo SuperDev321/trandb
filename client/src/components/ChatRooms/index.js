@@ -20,7 +20,7 @@ import PrivateChat from '../PrivateChat';
 import RoomObject from '../../utils/roomObject';
 import UserContext from '../../context';
 import { getSocket } from '../../utils';
-import {getPrivateMessages} from '../../utils';
+
 import {useAudio} from 'react-use';
 
 
@@ -58,11 +58,11 @@ const ChatRooms = ({room}) => {
     // const audio = new Audio('/media/new_message.mp3');
     const [pokeAudio, pokeAudioState, pokeAudioControls] = useAudio({
         src: '/media/poke.mp3',
-        autoPlay: true ,
+        autoPlay: false ,
     });
     const [messageAudio, messageAudioState, messageAudioControls] = useAudio({
         src: '/media/new_message.mp3',
-        autoPlay: true ,
+        autoPlay: false ,
     });
     const peersRef = useRef([]);
 
@@ -94,30 +94,43 @@ const ChatRooms = ({room}) => {
     const sendMessage = (roomName, to, color, msg, bold) => {
         if (msg) {
             const date = Date.now();
-            let sameRoom = roomsRef.current.find((room) => (room.name) === roomName);
+            
             let type = null;
             console.log('send message', roomName, to)
             if(to) {
                 socket.emit('private message', { msg, from: username, to, date, color, bold });
                 type = 'private';
-                
-            } else{
-                socket.emit('public message', { msg, room: roomName, from: username, date, color, bold });
-                type = 'public';
-            }
-            if(sameRoom) {
                 let message = {
                     type,
                     msg,
                     from: username,
                     to,
-                    date
-                }
-                sameRoom.messages = [...sameRoom.messages, message];
-                if(sameRoom.name === currentRoomName) {
-                    setCurrentRoomMessages([...sameRoom.messages]);
+                    date,
+                    color,
+                    bold
+                };
+                privateListRef.current.addMessage(message);
+            } else{
+                socket.emit('public message', { msg, room: roomName, from: username, date, color, bold });
+                let sameRoom = roomsRef.current.find((room) => (room.name) === roomName);
+                type = 'public';
+                if(sameRoom) {
+                    let message = {
+                        type,
+                        msg,
+                        from: username,
+                        to,
+                        date,
+                        color,
+                        bold,
+                    }
+                    sameRoom.messages = [...sameRoom.messages, message];
+                    if(sameRoom.name === currentRoomName) {
+                        setCurrentRoomMessages([...sameRoom.messages]);
+                    }
                 }
             }
+            
         }
         
         
@@ -297,56 +310,40 @@ const ChatRooms = ({room}) => {
 
     // receive new message
     useEffect(() => {
-        if( roomsRef.current.length && roomIndex !== null && newMessages && newMessages.length) {
-            for (let index = 0; index < roomsRef.current.length; index++) {
-                let room = roomsRef.current[index];
-                for (let msgIndex = 0; msgIndex < newMessages.length; msgIndex++) {
-                    const newMessage = newMessages[msgIndex];
-                    // if message is for this room
-                    if(newMessage.room === room.name) {
-                        if(newMessage.type === 'public' && newMessage.msg) {
+        if( roomIndex !== null && newMessages && newMessages.length) {
+            for (let msgIndex = 0; msgIndex < newMessages.length; msgIndex++) {   
+                const newMessage = newMessages[msgIndex]; 
+                if(newMessage.type === 'public') {
+                    let room = roomsRef.current.find((item) => (item.name === newMessage.room))
+                    if(room && newMessage.msg) {
+                        if(newMessage.msg) {
                             let userToReceive = room.users.find((item) => (item.username === newMessage.from));
                             if(userToReceive && !userToReceive.muted) {
                                 messageAudioControls.seek(0);
                                 messageAudioControls.play();
                             }
-                            if(index !== roomIndex) {
+                            if(currentRoomName !== room.name) {
                                 room.unReadMessages = [...room.unReadMessages,...newMessages];
                             } else {
                                 room.messages = [...room.messages, newMessage];
-                            }
-                        } else if(newMessage.type==='private' && newMessage.msg && newMessage.to && newMessage.from) {
-                            // private message
-                            if(index === roomIndex) {
-                                let otherUser = null;
-                                if(newMessage.from === username) {
-                                    otherUser = newMessage.to;
-                                } else if(newMessage.to === username) {
-                                    otherUser = newMessage.from;
-                                }  
-                                if(otherUser && openPrivate && privateTo.username === otherUser) {
-                                    // set private message to private message content
-                                    setPrivateMessages([...privateMessgaes, newMessage])
-                                } else {
-                                    if(!room.private[otherUser]) {
-                                        room.private[otherUser] = 0;
-                                    }
-                                    room.private[otherUser] ++;
-                                }
                             }
                         }
                         if(newMessage.onlineUsers) {
                             room.users = [...newMessage.onlineUsers];
                         }
-
-                        if(index === roomIndex) {
+                        if(currentRoomName === room.name) {
                             console.log('set current room due to new message')
                             // setCurrentRoom({...room});
                             setCurrentRoomName(room.name);
                             setCurrentRoomMessages([...room.messages]);
                             setCurrentRoomUsers([...room.users]);
                         }
-                    }
+                    } 
+                    
+                } else if(newMessage.type==='private' && newMessage.msg && newMessage.to) {
+                    privateListRef.current.addMessage(newMessage);
+                    messageAudioControls.seek(0);
+                    messageAudioControls.play();
                 }
             }
             let infos = roomsRef.current.map(({name, unReadMessages}) => ({name, unReadMessages}));
