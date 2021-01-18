@@ -94,7 +94,6 @@ const privateMessage = (io, socket) => async ({ msg, from, to, color, bold }) =>
     //     color: newChat.color,
     //   }
     // ])
-    console.log(msg, room, from, newChat.msg)
   } catch (err) {
     console.log(err);
   }
