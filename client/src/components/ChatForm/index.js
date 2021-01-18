@@ -16,7 +16,6 @@ const ChatForm = ({roomName, to, sendMessage}) => {
     const [bold, setBold] = useState(false);
     const emoji = new EmojiConvertor();
     
-    const socket = getSocket();
     const onFinish = (e) => {
         e.preventDefault();
         // sendMessage();

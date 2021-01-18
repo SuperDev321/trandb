@@ -59,7 +59,6 @@ const useStyles = makeStyles((theme) => ({
 
 const PrivateChat = ({open, setOpen, room, messages, me, to}) => {
     const classes = useStyles();
-    const socket = getSocket();
     return (
     <>
     { open &&
@@ -84,7 +83,7 @@ const PrivateChat = ({open, setOpen, room, messages, me, to}) => {
                     } */}
                     <PrivateMessageList messages={messages} me={me}/>
                 </div>
-                <ChatForm socket={socket} to={to.username} username={me.username} room={room}/>
+                <ChatForm to={to.username} username={me.username} room={room}/>
             </Paper>
         </Draggable>
     }
