@@ -30,7 +30,7 @@ const useStyles =  makeStyles((theme) => ({
 }));
 
 
-const MessagesList = ({ messages }) => {
+const MessagesList = ({ messages, userAction }) => {
     const messagesRef = useRef();
     const classes = useStyles();
 
@@ -48,7 +48,8 @@ const MessagesList = ({ messages }) => {
                     // <Message key={_id} text={msg} from={from} date={date} />
                     <span key={index}>
                         { type==='public' &&
-                        <ClientMessage key={_id? _id: index} message={{from, msg, date, color, bold}} font_size={10} />
+                        <ClientMessage key={_id? _id: index} userAction={userAction}
+                            message={{from, msg, date, color, bold}} font_size={10} />
                         }
                         {
                         (type ==='system' || type === 'poke') &&

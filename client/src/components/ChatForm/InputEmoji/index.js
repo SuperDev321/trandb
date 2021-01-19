@@ -38,6 +38,7 @@ function InputEmoji ({
     const textInputRef = useRef(null)
     const cleanedTextRef = useRef('')
     const placeholderRef = useRef(null);
+    const [load, setLoad] = useState(false);
 
     const onSend = () => {
         // replaceAllTextEmojiToString()
@@ -74,6 +75,13 @@ function InputEmoji ({
         placeholderRef.current.style.opacity = 1
         }
     }, [value])
+
+    useEffect(() => {
+        if(showPicker) {
+            setLoad(true);
+        } 
+        
+    }, [showPicker])
 
     const replaceAllTextEmojis = useCallback((text) => {
         let allEmojis = getAllEmojisFromText(text)
@@ -347,9 +355,9 @@ function InputEmoji ({
                     showPicker ? ' react-emoji-picker__show' : ''
                 }`
                 }
-            >
-                <Picker onEmojiClick={handleSelectEmoji} preload={true} />
-               
+            >{
+                showPicker && <Picker onEmojiClick={handleSelectEmoji} preload={true} />
+            }
             </div>
             </div>
         </div>
