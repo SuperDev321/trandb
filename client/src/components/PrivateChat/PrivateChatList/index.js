@@ -2,36 +2,48 @@ import React, { useState, useEffect, useCallback, useImperativeHandle, forwardRe
 import PrivateChatContent from '../PrivateChatContent';
 import { makeStyles } from '@material-ui/core/styles';
 
-const PrivateChatList = ({sendMessage}, ref) => {
+const PrivateChatList = ({sendMessage, readMsg ,me}, ref) => {
     const [chatList, setChatList] = useState([]);
     const [activeChat, setActiveChat] = useState(null);
     const elRefs = useRef([]);
     const setActive = (username) => {
         setActiveChat(username);
     }
-    const addNewChat = useCallback((chatInfo) => {
-        let privateChat = chatList.find((item) => (item.to.username === chatInfo.to.username));
+    const addNewChat = useCallback((to) => {
+        
+        let privateChat = chatList.find((item) => (item.to.username === to.username));
         if(!privateChat) {
             let ref = createRef();
-            elRefs.current.push({key: chatInfo.to.username, ref});
+            elRefs.current.push({key: to.username, ref});
+            let chatInfo = {
+                to,
+                me,
+            }
             setChatList([...chatList, chatInfo]);
-            setActiveChat(chatInfo.to.username);
+            setActiveChat(to.username);
         }
         else {
             let ref = elRefs.current.find((item) => (item.key === privateChat.to.username));
-            if(ref) ref.ref.current.show();
+            if(ref) {
+                ref.ref.current.show();
+                setActiveChat(privateChat.to.username);
+            }
         }
+        readMsg(to.username);
     }, )
     useImperativeHandle(ref, () => ({
         addChat: (chatInfo) => {
             addNewChat(chatInfo);
         },
         addMessage: (message) => {
-            console.log('new private message', message)
             let ref = elRefs.current.find((item) => (item.key === message.from || item.key === message.to));
             if(ref) {
                 ref.ref.current.addMessage(message);
+                if(ref.ref.current.isShow()) {
+                    return true;
+                }
             }
+            return false;
         }
     }));
     return (
@@ -39,7 +51,7 @@ const PrivateChatList = ({sendMessage}, ref) => {
             {chatList.map((item, index) =>
                 <PrivateChatContent key={index}
                     ref={elRefs.current[index].ref}
-                    me={item.me} to={item.to}
+                    me={me} to={item.to}
                     sendMessage={sendMessage}
                     active={item.to.username === activeChat}
                     setActive={setActive}

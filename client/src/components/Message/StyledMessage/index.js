@@ -30,14 +30,15 @@ const useStyles = makeStyles((theme) => ({
             : 'flex-end'
     },
     message: {
-        background: (props) => 
-        props.mine
-        ?blue[800]
-        :grey[200],
+        background: grey[100],
         color: (props) => 
-        props.mine
-        ?theme.palette.getContrastText(blue[800])
-        :theme.palette.getContrastText(grey[200]),
+        props.color
+        ?props.color
+        :theme.palette.getContrastText(grey[100]),
+        fontWeight: (props) =>
+        props.bold
+        ? 'bold'
+        : 200,
         padding: 5,
         borderRadius: 5,
         borderTopLeftRadius: (props) => 
@@ -46,9 +47,11 @@ const useStyles = makeStyles((theme) => ({
         props.mine && 0,
         maxWidth: '200px',
         '& img': {
-            width: 22,
-            height: 22,
-        }
+            width: 20,
+            height: 20,
+            verticalAlign: 'bottom'
+        },
+        boxShadow: '0 0 6px 1px #00000052',
     },
     date: {
         fontSize: 12
@@ -66,7 +69,7 @@ emoji.replace_mode = 'img';// 'unified';
 emoji.use_sheet = true;
 
 const StyledMessage = ({message, mine}) => {
-    const classes = useStyles({mine});
+    const classes = useStyles({mine, color: message.color, bold: message.bold});
     const emojiConverter = (text) => {
         return emoji.replace_unified(text);
     }

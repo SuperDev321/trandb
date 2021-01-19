@@ -115,8 +115,6 @@ const OnlineUser = ({roomName, username, user,
         setAnchorEl(null);
         event.preventDefault();
         setTimeout(() => {
-            // setOpenPrivate(true);
-            // setPrivateTo(user);
             addOrOpenPrivate(user);
         }, 0);
     }
@@ -158,7 +156,10 @@ const OnlineUser = ({roomName, username, user,
                     />
                 </StyledBadge>
                 <Videocam className={classes.camera} />
-                <div className={classes.username} onClick={handleClick}>{user.username}</div>
+                <div className={classes.username} onClick={handleClick}>
+                    {user.username}
+                    {username===user.username && ' (you)'}
+                </div>
             </div>
             <Popover
                 anchorOrigin={{
@@ -190,35 +191,35 @@ const OnlineUser = ({roomName, username, user,
                     </Button>
                     { user.username != username &&
                         <>
-                        <Divider />
-                        <Button size="small"
-                            color="primary"
-                            fullWidth
-                            className={classes.cardButton}
-                            onClick={ handleClickPrivateChat}
-                        >
-                            <QuestionAnswer />&nbsp;Private Chat
-                        </Button>
-                        <Button size="small" fullWidth
-                            color="primary"
-                            className={classes.cardButton}
-                            onClick={() => {sendPoke()}}
-                        >
-                            <Notifications />&nbsp;Poke Message
-                        </Button>
-                    </>
+                            <Divider />
+                            <Button size="small"
+                                color="primary"
+                                fullWidth
+                                className={classes.cardButton}
+                                onClick={ handleClickPrivateChat}
+                            >
+                                <QuestionAnswer />&nbsp;Private Chat
+                            </Button>
+                            <Button size="small" fullWidth
+                                color="primary"
+                                className={classes.cardButton}
+                                onClick={() => {sendPoke()}}
+                            >
+                                <Notifications />&nbsp;Poke Message
+                            </Button>
+                            <Button size="small"
+                                className={`${classes.cardButton} ${classes.mute}`}
+                                fullWidth onClick={() => { handleMute(user.username) }}
+                                name={user.username}
+                            >
+                            {
+                                user.muted
+                                ? 'Silence / Ignorance'
+                                : 'Unmute / Ignore'
+                            }
+                            </Button>
+                        </>
                     }
-                    <Button size="small"
-                        className={`${classes.cardButton} ${classes.mute}`}
-                        fullWidth onClick={() => { handleMute(user.username) }}
-                        name={user.username}
-                    >
-                    {
-                        user.muted
-                        ? 'Silence / Ignorance'
-                        : 'Unmute / Ignore'
-                    }
-                    </Button>
                 </Card>
             </Popover>
         </div>

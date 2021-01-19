@@ -4,7 +4,7 @@ const guestLogin = require('./guestLogin');
 const googleLogin = require('./googleLogin');
 const checkToken = require('./checkToken');
 const logout = require('./logout');
-
+const getUser = require('./getUser');
 module.exports = {
   signup,
   login,
@@ -12,4 +12,5 @@ module.exports = {
   googleLogin,
   checkToken,
   logout,
+  getUser
 };

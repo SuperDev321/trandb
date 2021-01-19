@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useRef } from 'react';
+import React, { useState, useEffect, useContext, useRef, forwardRef, useImperativeHandle } from 'react';
 import {
     AppBar,
     Card,
@@ -16,16 +16,12 @@ import PrivateChatList from '../PrivateChat/PrivateChatList'
 import VideoList from '../VideoList';
 import Peer from 'simple-peer';
 import {StyledTab , StyledTabs} from '../StyledTab';
-import PrivateChat from '../PrivateChat';
 import RoomObject from '../../utils/roomObject';
 import UserContext from '../../context';
 import { getSocket } from '../../utils';
-
 import {useAudio} from 'react-use';
 
-
-
-const ChatRooms = ({room}) => {
+const ChatRooms = ({room, addUnReadMsg, readMsg}, ref) => {
     const classes = useStyles();
     const history= useHistory();
     const [mobileOpen, setMobileOpen] = useState(false);
@@ -64,19 +60,23 @@ const ChatRooms = ({room}) => {
         autoPlay: false ,
     });
     const peersRef = useRef([]);
-
     // video stream objects
-
     const [currentStreams, setCurrentStreams] = useState([]);
-
     const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+    
+    useImperativeHandle(ref, () => ({
+        openPrivate: (userToChat) => {
+            addOrOpenPrivate(userToChat);
+        }
+    }));
+
 
     const handleChangeRoom = (event, newValue) => {
         setRoomIndex(newValue);
     };
     // add a private modal to private list
     const addOrOpenPrivate = (to) => {
-        privateListRef.current.addChat({me: {username, avatar, gender}, to});
+        privateListRef.current.addChat(to);
     }
     // mute or unmute user
     const changeMuteState = (roomName, usernameToMute) => {
@@ -129,10 +129,7 @@ const ChatRooms = ({room}) => {
                     }
                 }
             }
-            
         }
-        
-        
     }
     // send poke message
     const sendPokeMessage = (roomName, userToSend) => {
@@ -152,10 +149,8 @@ const ChatRooms = ({room}) => {
             if(sameRoom.name === currentRoomName) {
                 setCurrentRoomMessages([...sameRoom.messages]);
             }
-            
         }
     }
-
  /*********************************  camera   ******************************************/
     const createPeer = (userToSignal, callerID, room, stream) => {
         const peer = new Peer({
@@ -337,7 +332,9 @@ const ChatRooms = ({room}) => {
                     } 
                     
                 } else if(newMessage.type==='private' && newMessage.msg && newMessage.to) {
-                    privateListRef.current.addMessage(newMessage);
+                    if(!privateListRef.current.addMessage(newMessage)) {
+                        addUnReadMsg(newMessage);
+                    }
                     messageAudioControls.seek(0);
                     messageAudioControls.play();
                 }
@@ -727,10 +724,11 @@ const ChatRooms = ({room}) => {
             {/* <PrivateChat open={openPrivate} setOpen={setOpenPrivate}
                 me={{username, avatar, gender}} to={privateTo} room={currentRoom} messages={privateMessgaes}
             /> */}
-        <PrivateChatList ref={privateListRef} sendMessage={sendMessage}/>
+        <PrivateChatList ref={privateListRef} sendMessage={sendMessage} readMsg={readMsg}
+            me={{username, avatar, gender}} />
         <div>{pokeAudio}</div>
         <div>{messageAudio}</div>
         </>
     );
 }
-export default ChatRooms;
+export default forwardRef(ChatRooms);

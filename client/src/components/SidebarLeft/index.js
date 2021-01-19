@@ -34,7 +34,7 @@ const useStyles = makeStyles((theme) => ({
 
 
 const SideBarLeft = ({ roomName, username, unReadInfo, changeMuteState, sendPokeMessage,
-     users, 
+    users, 
     //  setOpenPrivate, setPrivateTo,
     addOrOpenPrivate,
      cameraState, openCamera, closeCamera }) => {
