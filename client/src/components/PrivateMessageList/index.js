@@ -83,7 +83,6 @@ const PrivateMessageList = ({messages, me}) => {
         if (listRef.current) {
             listRef.current.scrollTop = listRef.current.scrollHeight;
         }
-        console.log(messages)
     }, [messages]);
     return (
         <div className={classes.root} ref={listRef}>

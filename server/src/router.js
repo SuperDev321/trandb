@@ -11,7 +11,8 @@ const {
   logout,
   getRooms,
   addRoom,
-  getPrivateChat
+  getPrivateChat,
+  getUser,
 } = require('./controllers');
 
 const { withAuth } = require('./middleware');
@@ -28,6 +29,8 @@ router.post('/login/guest', guestLogin);
 router.post('/login/google', googleLogin);
 
 router.post('/messages/private', getPrivateChat);
+
+router.get('/users/:username', getUser);
 
 router.use(clientError);
 router.use(serverError);

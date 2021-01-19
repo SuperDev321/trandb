@@ -1,10 +1,19 @@
 import React from 'react';
 import { useHistory } from 'react-router-dom';
-import { AppBar,
-    Toolbar
+import {
+    AppBar,
+    Toolbar,
+    IconButton,
+    Badge,
 } from "@material-ui/core";
+import {
+    Mail,
+    Settings,
+    AccountCircle
+} from '@material-ui/icons'
 import AppMenu from '../AppMenu';
 import { makeStyles } from '@material-ui/core/styles';
+import PrivateMails from './PrivateMails';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -21,10 +30,28 @@ const useStyles = makeStyles((theme) => ({
         minHeight: '50px'
     },
     logo : {
-        cursor: 'pointer'
-    }
+        cursor: 'pointer',
+        [theme.breakpoints.down('xs')]: {
+            display: 'none',
+        },
+    },
+    grow: {
+        flexGrow: 1,
+    },
+    sectionDesktop: {
+        display: 'flex',
+        [theme.breakpoints.up('sm')]: {
+          display: 'flex',
+        },
+      },
+      sectionMobile: {
+        display: 'flex',
+        [theme.breakpoints.up('sm')]: {
+          display: 'none',
+        },
+    },
 }));
-const HomeLayout = (props) => {
+const HomeLayout = ({children, unReadMsgs, openPrivate}) => {
     const classes = useStyles();
     const history = useHistory();
     
@@ -38,10 +65,23 @@ const HomeLayout = (props) => {
                     className={classes.logo}
                     onClick={()=>history.push('/')}
                 />
+                <div className={classes.grow} />
+                <div className={classes.sectionDesktop}>
+                    <IconButton aria-label="show 17 new notifications" color="inherit">
+                        <Settings />
+                    </IconButton>
+                    <PrivateMails unReadMsgs={unReadMsgs} openPrivate={openPrivate} />
+                    {/* <IconButton aria-label="show 4 new mails" color="inherit">
+                        <Badge badgeContent={unReadMsgs.length} color="secondary">
+                            <Mail />
+                        </Badge>
+                    </IconButton> */}
+                </div>
+                <AppMenu />
             </Toolbar>
-            <AppMenu />
+            
         </AppBar>
-        {props.children}
+        {children}
     </div>
     )
 }

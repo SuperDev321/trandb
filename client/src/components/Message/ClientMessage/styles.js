@@ -49,10 +49,11 @@ const useStyles = makeStyles((theme) => ({
           width:' auto !important',
           height: 'auto !important',
         },
-        display: 'flex',
-        alignItems: 'center',
         fontWeight: (props) =>
             props.bold? 'bold' : '',
+        '& img.emoji': {
+            verticalAlign: 'bottom'
+        }
     },
     url_underline: {
         cursor: 'pointer',
