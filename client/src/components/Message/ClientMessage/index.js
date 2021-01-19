@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import PropTypes from 'prop-types';
+import PropTypes, { element } from 'prop-types';
 import {EmojiConvertor} from 'emoji-js';
 import parseHTML from 'parsehtml';
 import moment from 'moment';
@@ -14,91 +14,94 @@ emoji.supports_css = false;
 emoji.allow_native = false;
 emoji.replace_mode = 'img';// 'unified';
 emoji.use_sheet = true;
-const MyMessage = ({message, font_size}) => {
+
+const MyMessage = ({message, font_size, userAction}) => {
     
-    
-    const classes = useStyles({color: message.color, bold: message.bold})
-    const urlify = (text) => {
-        let urlRegex = /(https?:\/\/[^\s]+)/g;
-        return text.replace(urlRegex, (url) => {
-        return `<a href="${url}" target="_blank">${url}</a>`;
-        });
+  const classes = useStyles({color: message.color, bold: message.bold});
+  const urlify = (text) => {
+    let urlRegex = /(https?:\/\/[^\s]+)/g;
+    let arr = text.split(urlRegex);
+    let noRepeatArr = [...new Set(arr)];
+    console.log(noRepeatArr);
+    for (let index = 0; index < noRepeatArr.length; index++) {
+      const element = noRepeatArr[index];
+      if(new RegExp("(https?:\/\/[^\s]+)").test(element)) {
+        text = text.replace(element, `<a href="${element}" target="_blank"></a>`);
+      } else {
+        text = text.replace(element, `<span>${element}</span>`);
+      }
     }
+    return text;
+    // or alternatively
+    // return text.replace(urlRegex, '<a href="$1">$1</a>')
+  }
+  const makeTag = (emojiText) => {
+    let arr = emojiText.split(/<img .*?>/g);
+    let urlRegex = /(https?:\/\/[^\s]+)/g;
+    let noRepeatArr = [...new Set(arr)];
+    let urlText = emojiText;
+    if(noRepeatArr && noRepeatArr.length) {
+      for (let index = 0; index < noRepeatArr.length; index++) {
+        const element = noRepeatArr[index];
+        if(new RegExp("(https?:\/\/[^\s]+)").test(element)) {
+          urlText = urlText.replace(element, urlify(element));
+        }
+        else {
+          urlText = urlText.replace(element, `<span>${element}</span>`);
+        }
+      }
+    }
+    return urlText
+  }
 
   const emojiConverter = (text) => {
-    return emoji.replace_unified(text);
+    let emojiText =  emoji.replace_unified(text);
+    return emojiText;
+    
   }
 
   const convertHTML = (text) => {
     //   console.log('convertHTML',text)
     // console.log(text) 
     text = text.split('\" />').join('\">');
-    // console.log(text)
     let result = [];
     var html = parseHTML(text);
     // console.log(text)
-    // console.log(html.length)
+
     if (html.children.length > 0) {
       for (let k = 0; k < html.children.length; k++) {
-        let temp = text.split(html.children[k].outerHTML);
-        // console.log(text)
+        const element = html.children[k];
         let key = randomstring.generate(8);
-        result.push(<span key={key}>{desanitarize(temp[0])}</span>)
-        if (html.children[k].tagName == "IMG") {
+        if (element.tagName == "IMG") {
           key = randomstring.generate(8)
-          result.push(<img key={key} src={html.children[k].attributes[0].nodeValue}
-                           className={html.children[k].attributes[1].nodeValue}
-                           data-codepoints={html.children[k].attributes[2].nodeValue}/>)
-        }
-        if (html.children[k].tagName == "A") {
-          key = randomstring.generate(8)
-          let url = html.children[k].href
-          let host = html.children[k].host
+          result.push(<img key={key} src={element.attributes[0].nodeValue}
+                           className={element.attributes[1].nodeValue}
+                           data-codepoints={element.attributes[2].nodeValue}/>)
+        } else if (element.tagName === "A") {
+          let url = element.href
+          let host = element.host
+          console.log(host)
           result.push(<span key={key} className={classes.url_underline}
-                            onClick={() =>{} }>{url}</span>)
+                            onClick={() => userAction('show_link', {url})}>{url}</span>)
+        } else{
+          element.setAttribute('key', key);
+          result.push(<span key={key}>{element.innerHTML}</span>)
         }
-        if (temp[1] !== undefined) {
-          // console.log('temp1', temp[1])
-          if (k == html.children.length-1) {
-            let key = randomstring.generate(8)
-            result.push(<span key={key}>{desanitarize(temp[1])}</span>)
-          } else {
-            text = temp[1]
-          }
-        }
-      }
-    } else if (html.tagName !== undefined && html.tagName != "") {
-      // only one tag
-      let temp = text.split(html.outerHTML)
-      // console.log(temp)
-      let key = randomstring.generate(8)
-      result.push(<span key={key}>{desanitarize(temp[0])}</span>)
-      if (html.tagName == "IMG") {
-        key = randomstring.generate(8)
-        result.push(<img key={key} src={html.attributes[0].nodeValue} className={html.attributes[1].nodeValue}
-                         data-codepoints={html.attributes[2].nodeValue}/>)
-      }
-      if (html.tagName == "A") {
-        key = randomstring.generate(8)
-        let url = html.href
-        let host = html.host
-        // console.log(url)
-        // console.log(host)
-        result.push(<span key={key} className={classes.url_underline}
-                          onClick={() => {}}>{url}</span>)
-      }
-      if (temp[1] !== undefined) {
-        let key = randomstring.generate(8)
-        // console.log(temp[1])
-        // console.log(desanitarize(temp[1]))
-        result.push(<span key={key}>{desanitarize(temp[1])}</span>)
       }
     } else {
-      // only text
-      let key = randomstring.generate(8)
-      result.push(<span key={key}>{desanitarize(text)}</span>)
+        let key = randomstring.generate(8);
+        if (html.tagName == "IMG") {
+          result.push(<img key={key} src={html.attributes[0].nodeValue}
+                           className={html.attributes[1].nodeValue}
+                           data-codepoints={html.attributes[2].nodeValue}/>)
+        } else if (html.tagName === "A") {
+          let url = html.href
+          result.push(<span key={key} className={classes.url_underline}
+                            onClick={() =>{userAction('show_link', {url})} }>{url}</span>)
+        } else{
+          result.push(<span key={key}>{html.innerHTML}</span>)
+        }
     }
-    // console.log('result', result)
     return result
   }
 
@@ -161,8 +164,11 @@ const MyMessage = ({message, font_size}) => {
             <span className={classes.sender}><strong>{message.from}</strong>:&nbsp;</span>
                 <span
                 className={classes.text + ' ' + classes.size10}
-                dangerouslySetInnerHTML={{__html: emojiConverter(message.msg)}}
+                // dangerouslySetInnerHTML={{__html: makeTag(emojiConverter(message.msg))}}
                 >
+                  {
+                    convertHTML(makeTag(emojiConverter(message.msg)))
+                  }
             </span>
         </div>
         <span className={classes.time}>{moment(message.date).format('HH:mm')}</span>
