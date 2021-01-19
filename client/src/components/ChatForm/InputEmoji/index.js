@@ -252,6 +252,66 @@ function InputEmoji ({
         }
     }, [])
 
+    useEffect(() => {
+        function handleCopy (e) {
+          const selectedText = window.getSelection()
+    
+          let container = document.createElement('div')
+    
+          for (let i = 0, len = selectedText.rangeCount; i < len; ++i) {
+            container.appendChild(selectedText.getRangeAt(i).cloneContents())
+          }
+    
+          container = replaceEmojiToString(container)
+    
+          e.clipboardData.setData('text', container.innerText)
+          e.preventDefault()
+    
+          function replaceEmojiToString (container) {
+            const images = Array.prototype.slice.call(container.querySelectorAll('img'))
+    
+            images.forEach(image => {
+              image.outerHTML = image.dataset.emoji
+            })
+    
+            return container
+          }
+        }
+    
+        function handlePaste (e) {
+          e.preventDefault()
+          let content
+          if (window.clipboardData) {
+            content = window.clipboardData.getData('Text')
+            content = replaceAllTextEmojis(content)
+            if (window.getSelection) {
+              var selObj = window.getSelection()
+              var selRange = selObj.getRangeAt(0)
+              selRange.deleteContents()
+              selRange.insertNode(document.createTextNode(content))
+            }
+          } else if (e.clipboardData) {
+            content = e.clipboardData.getData('text/plain')
+            content = replaceAllTextEmojis(content)
+            document.execCommand('insertHTML', false, content)
+          }
+        }
+    
+        const inputEl = textInputRef.current
+    
+        const handleContentEditableInputCopyAndPaste = () => {
+          inputEl.addEventListener('copy', handleCopy)
+          inputEl.addEventListener('paste', handlePaste)
+        }
+    
+        handleContentEditableInputCopyAndPaste()
+    
+        return () => {
+          inputEl.removeEventListener('copy', handleCopy)
+          inputEl.removeEventListener('paste', handlePaste)
+        }
+      }, [replaceAllTextEmojis])
+
 
     function setValue (value) {
         updateHTML(value)
