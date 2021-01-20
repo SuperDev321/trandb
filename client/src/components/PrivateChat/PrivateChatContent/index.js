@@ -20,8 +20,8 @@ import {ReactComponent as Restore} from './restore.svg'
 const useStyles = makeStyles((theme) => ({
     root: {
         position: 'absolute',
-        right: 0,
-        bottom: 0,
+        right: 'calc(50% - 200px)',
+        top: 200,
         zIndex: 200,
         width: 400,
         display: 'flex',
@@ -84,6 +84,8 @@ const useStyles = makeStyles((theme) => ({
         transform: 'none !important',
         top: 0,
         left: 0,
+        right: 0,
+        bottom: 0,
         minWidth: '100%',
     },
     icon: {
@@ -93,8 +95,8 @@ const useStyles = makeStyles((theme) => ({
     },
     badge: {
         '& span.MuiBadge-badge': {
-           top: 4,
-            left: 4 
+            top: 5,
+            left: 10 
         }
     }
 }));

@@ -426,13 +426,23 @@ const ChatRooms = ({room, addUnReadMsg, readMsg}, ref) => {
         switch(newInfo.type) {
             case 'init room':
                 if(roomsRef.current && newInfo.payload.room) {
-                    
-                    let sameRoom = await roomsRef.current.find((room) => (room.name === newInfo.payload.room));
+                    let sameRoom = await roomsRef.current.find((room) => (room.name === newInfo.payload.room.name));
                     if(!sameRoom) {
                         let usernames = await newInfo.payload.onlineUsers.map((item) => (item.username));
                         if(username && usernames.includes(username)) {
                             // console.log('init room messages',newInfo.payload)
-                            let newRoomObject = new RoomObject(newInfo.payload.room,newInfo.payload.messages, newInfo.payload.onlineUsers);
+                            let messages = newInfo.payload.messages;
+                            console.log(newInfo.payload.room)
+                            if(newInfo.payload.room.welcomeMessage) {
+                                console.log('welcomeMessage')
+                                let wcMsg = {
+                                    type: 'system',
+                                    msg: newInfo.payload.room.welcomeMessage
+                                };
+                                messages = [...messages, wcMsg];
+                            }
+                            
+                            let newRoomObject = new RoomObject(newInfo.payload.room.name, messages, newInfo.payload.onlineUsers);
                             roomsRef.current.push(newRoomObject);
                             setRoomIndex(roomsRef.current.length-1);
                             return;
@@ -479,7 +489,7 @@ const ChatRooms = ({room, addUnReadMsg, readMsg}, ref) => {
                                 }
                                 let sysMsg = {
                                     type: 'system',
-                                    msg: tmpName + ' joined room'
+                                    msg: tmpName + ' joined the room'
                                 }
                                 sameRoom.messages = [...sameRoom.messages, sysMsg];
                             }
