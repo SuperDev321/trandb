@@ -20,7 +20,7 @@ import {QuestionAnswer,
 const useStyles = makeStyles((theme) => ({
     listItem: {
         display: 'flex',
-        flexWrap: 'wrap',
+        // flexWrap: 'wrap'
         // paddingTop: theme.spacing(0),
         // paddingBottom: theme.spacing(0),
         justifyContent: 'flex-start',
@@ -31,7 +31,8 @@ const useStyles = makeStyles((theme) => ({
     username: {
         font: 'bold 14px sans-serif',
         cursor: 'pointer',
-        flexGrow: 1
+        flexGrow: 1,
+        overflow: 'hidden',
     },
     role: {
         width: theme.spacing(2.5),

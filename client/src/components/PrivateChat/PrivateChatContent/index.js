@@ -3,9 +3,8 @@ import { makeStyles } from '@material-ui/core/styles';
 import {
     Avatar,
     Paper,
-    Box,
-    IconButton,
-    SvgIcon
+    SvgIcon,
+    Badge
 } from '@material-ui/core';
 import {
     Close,
@@ -50,7 +49,8 @@ const useStyles = makeStyles((theme) => ({
         paddingLeft: '10px',
         fontWeight: 700,
         fontSize: 18,
-        lineHeight: 1
+        lineHeight: 1,
+        overflow: 'hidden',
     },
     smallAvatar: {
         width: theme.spacing(4),
@@ -90,35 +90,44 @@ const useStyles = makeStyles((theme) => ({
         lineHeight: 0,
         padding: '4px',
         cursor: 'pointer'
+    },
+    badge: {
+        '& span.MuiBadge-badge': {
+           top: 4,
+            left: 4 
+        }
     }
-    // svg: {
-    //     fill: theme.palette.getContrastText(theme.palette.primary),
-    //     padding: 5
-    // }
 }));
 
-const PrivateChat = ({ me, to, sendMessage, active, setActive }, ref) => {
+const PrivateChat = ({ me, to, sendMessage, active, setActive, initVal }, ref) => {
     const winRef = useRef();
     const [messages, setMessages] = useState([]);
     const [hide, setHide] = useState(false);
     const [min, setMin] = useState(false);
     const [max, setMax] = useState(false);
+    const [unRead, setUnRead] = useState(0);
     const classes = useStyles({max});
 
     const handleMinimize = () => {
-        if(min) {
-            setMin(false);
-        } else {
-            setMax(false);
-            setMin(true);
-        }
+        // if(min) {
+        //     setMin(false);
+        // } else {
+        //     setMax(false);
+        //     setMin(true);
+        // }
+        setHide(true);
     }
     const handleMaximize = () => {
         if(max) {
             setMax(false);
         } else {
+            setMin(false)
             setMax(true);
         }
+    }
+
+    const onFocus = () => {
+        setUnRead(0)
     }
 
     useImperativeHandle(ref, () => ({
@@ -130,11 +139,13 @@ const PrivateChat = ({ me, to, sendMessage, active, setActive }, ref) => {
         },
         addMessage: (message) => {
             setMessages([...messages, message]);
+            if(message.from!==me.username)
+                setUnRead(unRead+1);
         }
     }));
 
     useEffect(() => {
-        getPrivateMessages({from: me.username, to: to.username},
+        getPrivateMessages({from: me.username, to},
             (data) => {
                 setMessages(data);
             },
@@ -143,6 +154,18 @@ const PrivateChat = ({ me, to, sendMessage, active, setActive }, ref) => {
             }
         );
     }, [me, to])
+
+    useEffect(() => {
+        if(initVal) {
+            setUnRead(initVal)
+        }
+    }, [initVal])
+
+    // useEffect(() => {
+    //     if(active) {
+    //         setUnRead(0);
+    //     }
+    // }, [active])
     return (
         <Draggable bounds="parent" disabled={max}
             handle='#private-header' scale={1} onMouseDown={() => {setActive(to.username)}}
@@ -151,10 +174,18 @@ const PrivateChat = ({ me, to, sendMessage, active, setActive }, ref) => {
                 className={`${classes.root} ${hide&&classes.hide} ${active&&classes.active} ${max && classes.max} ${min && classes.min}`}
             >
                 <div className={classes.header} >
-                    <Avatar className={classes.smallAvatar}
-                        src='/img/default_avatar.png'
-                    />
-                    <div id="private-header" className={classes.headerContent}>{to.username}</div>
+                    <Badge badgeContent={unRead> 9? '9+': unRead} color="secondary"
+                        anchorOrigin={{
+                            vertical: 'top',
+                            horizontal: 'left',
+                        }}
+                        className={classes.badge}
+                    >
+                        <Avatar className={classes.smallAvatar}
+                            src='/img/default_avatar.png'
+                        />
+                    </Badge>
+                    <div id="private-header" className={classes.headerContent}>{to}</div>
                     <div className={classes.icon}
                         onClick={handleMinimize}
                         style={{marginBottom: 3}}
@@ -176,7 +207,7 @@ const PrivateChat = ({ me, to, sendMessage, active, setActive }, ref) => {
                     <div className={classes.content}>
                         <PrivateMessageList messages={messages} me={me}/>
                     </div>
-                    <ChatForm to={to.username} sendMessage={sendMessage}/>
+                    <ChatForm to={to} sendMessage={sendMessage} onFocus={onFocus}/>
                 </div>
                 
             </Paper>

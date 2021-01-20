@@ -17,7 +17,6 @@ const joinRoom = (io, socket) => async ({ room }) => {
         socket.emit('init room', {messages, onlineUsers: usersInfo, room}, (data)=> {
             if(data === 'success') {
                 io.to(room).emit('joined room', {room, onlineUsers: usersInfo, joinedUser: user});
-                console.log('joined room', room, usersInfo);
             }
         });
 

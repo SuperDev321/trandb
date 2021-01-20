@@ -27,7 +27,9 @@ const serverHttp = http.createServer(app);
 const server = https.createServer(options, app);
 
 const io = socketIO(server);
+const initRooms = require('./utils/room/initRooms')
 
+initRooms();
 app.disabled('x-powered-by');
 // app.enable('trust proxy');
 app.use(cookieParser());

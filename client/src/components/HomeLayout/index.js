@@ -70,7 +70,7 @@ const HomeLayout = ({children, unReadMsgs, openPrivate}) => {
                     <IconButton aria-label="show 17 new notifications" color="inherit">
                         <Settings />
                     </IconButton>
-                    <PrivateMails unReadMsgs={unReadMsgs} openPrivate={openPrivate} />
+                    {/* <PrivateMails unReadMsgs={unReadMsgs} openPrivate={openPrivate} /> */}
                     {/* <IconButton aria-label="show 4 new mails" color="inherit">
                         <Badge badgeContent={unReadMsgs.length} color="secondary">
                             <Mail />

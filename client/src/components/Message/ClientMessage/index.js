@@ -22,7 +22,6 @@ const MyMessage = ({message, font_size, userAction}) => {
     let urlRegex = /(https?:\/\/[^\s]+)/g;
     let arr = text.split(urlRegex);
     let noRepeatArr = [...new Set(arr)];
-    console.log(noRepeatArr);
     for (let index = 0; index < noRepeatArr.length; index++) {
       const element = noRepeatArr[index];
       if(new RegExp("(https?:\/\/[^\s]+)").test(element)) {
@@ -80,7 +79,6 @@ const MyMessage = ({message, font_size, userAction}) => {
         } else if (element.tagName === "A") {
           let url = element.href
           let host = element.host
-          console.log(host)
           result.push(<span key={key} className={classes.url_underline}
                             onClick={() => userAction('show_link', {url, host})}>{url}</span>)
         } else{
