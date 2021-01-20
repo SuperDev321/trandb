@@ -82,7 +82,7 @@ const MyMessage = ({message, font_size, userAction}) => {
           let host = element.host
           console.log(host)
           result.push(<span key={key} className={classes.url_underline}
-                            onClick={() => userAction('show_link', {url})}>{url}</span>)
+                            onClick={() => userAction('show_link', {url, host})}>{url}</span>)
         } else{
           element.setAttribute('key', key);
           result.push(<span key={key}>{element.innerHTML}</span>)

@@ -64,8 +64,12 @@ const ChatRoom = ({roomName, users, messages, sendMessage}) => {
             console.log('youtub')
             let url = payload.url;
             if(url) {
-                setYoutubeUrl(url)
-                setYoutubeShow(true)
+                if(payload.host === 'youtube.com' || payload.host === 'www.youtube.com' ) {
+                    setYoutubeUrl(url)
+                    setYoutubeShow(true)
+                } else {
+                    window.open(url, '_blank');
+                }
             }
         }
     }
