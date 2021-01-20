@@ -8,7 +8,7 @@ import { getSocket } from '../../utils';
 
 
 
-const ChatForm = ({roomName, to, sendMessage}) => {
+const ChatForm = ({roomName, to, sendMessage, onFocus}) => {
     const classes = useStyles();
     const [msg, setMsg] = useState('');
     const formRef = useRef(null);
@@ -85,6 +85,7 @@ const ChatForm = ({roomName, to, sendMessage}) => {
                     value={msg}
                     onChange={setMsg}
                     cleanOnEnter
+                    onFocus={onFocus}
                     onEnter={handleOnEnter}
                     color={userColor ? userColor: 'black'}
                     fontWeight={bold?'bold': 'inherit'}

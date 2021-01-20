@@ -17,7 +17,9 @@ const cors = require('cors');
 const app = express();
 const server = http.createServer(app);
 const io = socketIO(server);
+const initRooms = require('./utils/room/initRooms')
 
+initRooms();
 app.disabled('x-powered-by');
 // app.enable('trust proxy');
 app.use(cookieParser());
