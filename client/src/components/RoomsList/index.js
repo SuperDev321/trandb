@@ -19,7 +19,13 @@ const RoomsList = ({ rooms, showEmpty }) => {
                 {rooms.map((room, index) => (
                     (room.users || showEmpty)&&
                     <Grid item xs={12} sm={4} md={3}  key={index}>
-                        <RoomExcerpt name={room.name} users={room.users} />
+                        <RoomExcerpt
+                            name={room.name}
+                            users={room.users}
+                            cover={room.cover}
+                            owner={room.owner}
+                            description={room.description}
+                        />
                     </Grid >
                 ))}
             </Grid>

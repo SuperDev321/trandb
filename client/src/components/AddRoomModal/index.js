@@ -22,6 +22,7 @@ import { getRooms } from '../../utils';
 const useStyles = makeStyles((theme) => ({
     root: {
       width: '100%',
+      minWidth: 400,
       padding: '0 10px',
       backgroundColor: theme.palette.background.paper,
     },
@@ -29,7 +30,7 @@ const useStyles = makeStyles((theme) => ({
         margin: '0 10px',
         // borderRadius: '0',
         height: '30px'
-    }
+    },
 }));
 
 export default function AddRoomModal({addRoom}) {
@@ -37,7 +38,7 @@ export default function AddRoomModal({addRoom}) {
     const [open, setOpen] = useState(false);
     const [rooms, setRooms] = useState(null);
     const theme = useTheme();
-    const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
+    const fullScreen = useMediaQuery(theme.breakpoints.down('xs'));
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -85,7 +86,7 @@ export default function AddRoomModal({addRoom}) {
             onClose={handleClose}
             aria-labelledby="responsive-dialog-title"
         >
-            <DialogTitle id="responsive-dialog-title">{"Add a room or rooms to chat?"}</DialogTitle>
+            <DialogTitle id="responsive-dialog-title">{"Add a room"}</DialogTitle>
             <DialogContent>
             <List dense className={classes.root}>
             {rooms && rooms.map((room, index) => {
@@ -104,14 +105,14 @@ export default function AddRoomModal({addRoom}) {
             })}
             </List>
             </DialogContent>
-            <DialogActions>
+            {/* <DialogActions>
             <Button autoFocus onClick={handleClose} color="primary">
                 Cancel
             </Button>
             <Button onClick={handleClose} color="primary" autoFocus>
                 Add
             </Button>
-            </DialogActions>
+            </DialogActions> */}
         </Dialog>
         </>
     );

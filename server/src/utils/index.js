@@ -8,6 +8,7 @@ const verifyToken = require('./user/verifyToken');
 const roomValidation = require('./room/roomValidation');
 const findRoomUsers = require('./user/findRoomUsers');
 const findUserByName = require('./user/findUserByName');
+const findUserById = require('./user/findUserById');
 const isNewEmail = require('./user/isNewEmail');
 const isNewUsername = require('./user/isNewUsername');
 const createUser = require('./user/createUser');
@@ -31,6 +32,7 @@ module.exports = {
   roomValidation,
   findRoomUsers,
   findUserByName,
+  findUserById,
   isNewEmail,
   isNewUsername,
   createUser,

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { useHistory } from 'react-router-dom';
 import { message } from 'antd';
 import { useFormik } from 'formik';
@@ -14,7 +14,7 @@ import {
     MenuItem
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-
+import { FileUploader } from '../../components'
 import { handleCreateRoom } from '../../utils';
 
 const categorys = [
@@ -26,6 +26,18 @@ const categorys = [
     'Teen',
     'Other',
 ];
+
+const maxUsers = [
+    {title: 'Unlimited', value: 9999},
+    {title: '5', value: 5},
+    {title: '10', value: 10},
+    {title: '15', value: 15},
+    {title: '25', value: 25},
+    {title: '50', value: 50},
+    {title: '100', value: 100},
+    {title: '150', value: 150},
+    {title: '200', value: 200},
+]
 
 const validationSchema = yup.object({
     name: yup
@@ -80,18 +92,23 @@ const useStyles = makeStyles((theme) => ({
 const CreateRoom = () => {
     const history = useHistory();
     const classes = useStyles();
+
+    const [coverFile, setCoverFile] = useState(null);
    
     const formik = useFormik({
         initialValues: {
             name: '',
             category: 'Comedy',
-            maxUsers: 100,
+            maxUsers: 9999,
             password: '',
-            descirption: '',
-            welcomeMessage: ''
+            description: '',
+            welcomeMessage: '',
+            cover: null,
+            icon: null,
         },
         validationSchema: validationSchema,
         onSubmit: (values) => {
+           console.log(values);
             handleCreateRoom(values, () => history.push('/rooms'), message.error);
         },
     });
@@ -115,18 +132,8 @@ const CreateRoom = () => {
                         required
                         fullWidth
                         id="name"
-                        label="Room name"
+                        label="Name of Room"
                         className={classes.textField}
-                        // InputProps={{
-                        //     className: classes.input,
-                        //     disableUnderline: false
-                        // }}
-                        // FormHelperTextProps={{
-                        //     className: classes.input
-                        // }}
-                        // InputLabelProps={{
-                        //     className: classes.label,
-                        // }}
                         value={formik.values.name}
                         onBlur={formik.handleBlur}
                         onChange={formik.handleChange}
@@ -140,6 +147,7 @@ const CreateRoom = () => {
                             name="maxUsers"
                             required
                             fullWidth
+                            select
                             id="maxUsers"
                             type="number"
                             label="Room maxUsers"
@@ -152,7 +160,13 @@ const CreateRoom = () => {
                             onChange={formik.handleChange}
                             error={formik.touched.maxUsers && Boolean(formik.errors.maxUsers)}
                             helperText={formik.touched.maxUsers && formik.errors.maxUsers}
-                        />
+                        >
+                            {maxUsers.map((item) => (
+                                <MenuItem key={item.title} value={item.value}>
+                                    {item.title}
+                                </MenuItem>
+                            ))}
+                        </TextField>
                     </Grid>
                     <Grid item xs={12} sm={6}>
                         <TextField
@@ -212,17 +226,36 @@ const CreateRoom = () => {
                         required
                         fullWidth
                         multiline
-                        name="descirption"
-                        label="Descirption"
-                        type="descirption"
-                        id="descirption"
-                        autoComplete="current-descirption"
-                        value={formik.values.descirption}
+                        name="description"
+                        label="Description"
+                        type="description"
+                        id="description"
+                        autoComplete="current-description"
+                        value={formik.values.description}
                         onBlur={formik.handleBlur}
                         onChange={formik.handleChange}
-                        error={formik.touched.descirption && Boolean(formik.errors.descirption)}
-                        helperText={formik.touched.descirption && formik.errors.descirption}
+                        error={formik.touched.description && Boolean(formik.errors.description)}
+                        helperText={formik.touched.description && formik.errors.description}
                     />
+                    </Grid>
+                    <Grid item xs={12}>
+                    <FileUploader title='cover' value={formik.values.cover}
+                    handleFile={(file) => {console.log('cover set', {file});formik.setFieldValue('cover', file, false)}}/>
+                    <FileUploader title='icon' handleFile={()=>console.log('uploaded')}/>
+                    {/* <TextField
+                        required
+                        fullWidth
+                        name="cover"
+                        label="description"
+                        type="file"
+                        id="description"
+                        autoComplete="current-description"
+                        value={formik.values.description}
+                        onBlur={formik.handleBlur}
+                        onChange={formik.handleChange}
+                        error={formik.touched.description && Boolean(formik.errors.description)}
+                        helperText={formik.touched.description && formik.errors.description}
+                    /> */}
                     </Grid>
                     {/* <Grid item xs={12}>
                     <FormControlLabel

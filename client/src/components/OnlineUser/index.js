@@ -16,6 +16,7 @@ import {QuestionAnswer,
     Block,
     Check,
     Notifications,
+    StarRounded
 } from '@material-ui/icons';
 const useStyles = makeStyles((theme) => ({
     listItem: {
@@ -33,6 +34,8 @@ const useStyles = makeStyles((theme) => ({
         cursor: 'pointer',
         flexGrow: 1,
         overflow: 'hidden',
+        display: 'flex',
+        alignItems: 'center',
     },
     role: {
         width: theme.spacing(2.5),
@@ -78,6 +81,15 @@ const useStyles = makeStyles((theme) => ({
     mute: {
         color: pink[500],
         textTransform: 'none',
+    },
+    adminStar: {
+        color: pink[500]
+    },
+    ownerStar: {
+        color: blue[600]
+    },
+    moderatorStar: {
+        color: blue[300]
     }
 }))
 
@@ -158,8 +170,17 @@ const OnlineUser = ({roomName, username, user,
                 </StyledBadge>
                 <Videocam className={classes.camera} />
                 <div className={classes.username} onClick={handleClick}>
-                    {user.username}
-                    {username===user.username && ' (you)'}
+                    <span>{user.username}</span>
+                    <span>{username===user.username && ' (you)'}</span>
+                    { user.role === 'admin' &&
+                        <StarRounded className={classes.adminStar} />
+                    }
+                    { user.role === 'owner' &&
+                        <StarRounded className={classes.ownerStar} />
+                    }
+                    { user.role === 'moderator' &&
+                        <StarRounded className={classes.moderatorStar} />
+                    }
                 </div>
             </div>
             <Popover

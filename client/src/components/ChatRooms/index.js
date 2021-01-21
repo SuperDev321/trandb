@@ -72,6 +72,7 @@ const ChatRooms = ({room, addUnReadMsg, readMsg}, ref) => {
 
 
     const handleChangeRoom = (event, newValue) => {
+        console.log(newValue)
         setRoomIndex(newValue);
     };
     // add a private modal to private list
@@ -359,6 +360,7 @@ const ChatRooms = ({room, addUnReadMsg, readMsg}, ref) => {
                 let usernames = await onlineUsers.map((item) => (item.username));
                 if(usernames.includes(username)) {
                     // console.log('username: ', username);
+                    console.log(onlineUsers)
                     setNewInfo({ type: 'init room', payload: { room, onlineUsers, messages}});
                 }
             });
@@ -678,11 +680,11 @@ const ChatRooms = ({room, addUnReadMsg, readMsg}, ref) => {
                     >
                         <MenuIcon />
                     </IconButton>
-                    <StyledTabs value={roomIndex} onChange={handleChangeRoom}>
+                    <StyledTabs value={roomIndex && roomsInfo.length > roomIndex && roomIndex} variant="scrollable" onChange={handleChangeRoom}>
                         { roomsInfo.length>0 &&
                             roomsInfo.map((item, index) => (
                                 <StyledTab
-                                    key={index} label={<span>{item.name}</span>} 
+                                    key={index} label={<span>{item.name}</span>}
                                     unRead={item.unReadMessages.length}
                                     onClose={roomsInfo.length < 2 ? null: () => removeRoom(item.name)}
                                 />

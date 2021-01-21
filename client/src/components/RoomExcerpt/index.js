@@ -15,12 +15,28 @@ const useStyles = makeStyles((theme) => ({
         backgroundSize: '100% 100%'
 
     },
+    content: {
+        minHeight: 100
+    },
     connect: {
         margin: 'auto'
+    },
+    name: {
+        fontWeight: 'bold',
+        fontSize: 25,
+        padding: 5
+    },
+    owner: {
+        fontWeight: 400,
+        display: 'flex',
+        padding: 5
+    },
+    description: {
+        padding: 5
     }
 }))
 
-const RoomExcerpt = ({ name, users }) => {
+const RoomExcerpt = ({ name, owner, icon, cover ,description, users }) => {
     const history = useHistory();
     const classes = useStyles();
     return (
@@ -29,11 +45,12 @@ const RoomExcerpt = ({ name, users }) => {
         >
             <CardMedia
                 className={classes.media}
-                image="/img/public_chat.png"
+                image={cover? "/img/rooms/"+cover: "/img/public_chat.png"}
             />
-            <CardContent>
-                <h2>{name}</h2>
-                <p>{users} online</p>
+            <CardContent className={classes.content}>
+                <div className={classes.name}>{name}</div>
+                <div className={classes.description}>{description}</div>
+                <div className={classes.owner}><strong>Admin:&nbsp;</strong><span>{owner}</span></div>
             </CardContent>
             <CardActions>
                 <div className={classes.connect}>

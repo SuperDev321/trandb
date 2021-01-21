@@ -8,7 +8,7 @@ const express = require('express');
 const socketIO = require('socket.io');
 const compression = require('compression');
 const cookieParser = require('cookie-parser');
-
+const bodyParser = require('body-parser');
 const dbConnection = require('./database/dbConnection');
 const router = require('./router');
 const ioHandler = require('./io');
@@ -18,14 +18,19 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIO(server);
 const initRooms = require('./utils/room/initRooms')
-
+const fileUpload = require('express-fileupload');
 initRooms();
 app.disabled('x-powered-by');
 // app.enable('trust proxy');
 app.use(cookieParser());
 app.use(compression());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// app.use(express.json());
+// app.use(express.urlencoded({ extended: true }));
+app.use(bodyParser.json());       // to support JSON-encoded bodies
+app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
+  extended: true
+}));
+app.use(fileUpload({limits: {fileSize: 50 * 1024 * 1024, preserveExtension: true}}));
 app.use(cors());
 app.use('/api', router);
 

@@ -6,9 +6,11 @@ const useStyles = makeStyles((theme) => ({
     root: {
         display: 'flex',
         flexGrow: '1',
+        width: '100%'
     },
     mainWrapper: {
-        width: '100%',
+        flexGrow: 1,
+        overflow: 'hidden',
         margin: '2px',
         marginBottom: 0,
         marginRight: 0,
