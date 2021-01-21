@@ -1,5 +1,6 @@
 const { Schema, model } = require('mongoose');
 
+
 const roomSchema = new Schema({
     name: {
         type: String,
@@ -16,14 +17,20 @@ const roomSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Users',
     },
+    description: String,
     password: String,
     welcomeMessage: String,
     maxUsers: Number,
-    users: [
-        {
+    cover: String,
+    icon: String,
+    users: [ 
+    {
+        _id: {
             type: Schema.Types.ObjectId,
             ref: 'Users',
         },
+        ip: String
+    }
     ],
     moderators: [
         {

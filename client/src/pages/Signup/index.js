@@ -123,7 +123,7 @@ const SignUp = () => {
         },
         validationSchema: validationSchema,
         onSubmit: (values) => {
-            handleSignup(values, () => setAuth(true), message.error);
+            handleSignup(values, () => {setAuth(true); history.push('/')}, message.error);
         },
     });
 

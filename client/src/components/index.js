@@ -10,3 +10,4 @@ export { default as PublicRoute } from './PublicRoute';
 export { default as PrivateRoute } from './PrivateRoute';
 export { default as CustomTextField } from './CustomTextField';
 export { default as ChatRoomContent } from './ChatRoomContent';
+export { default as FileUploader } from './FileUploader';

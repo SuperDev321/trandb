@@ -2,7 +2,6 @@ const { verifyToken, createError } = require('../utils');
 
 const withAuth = async (req, res, next) => {
   try {
-    console.log(req.ip);
     const { token } = req.cookies;
     const userData = await verifyToken(token);
     req.userData = userData;

@@ -85,7 +85,8 @@ const StyledTabs = withStyles({
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        overflow: 'visible'
+        overflow: 'visible',
+        maxWidth: 'calc(100% - 100px)'
     },
     scroller: {
         height: '100%',

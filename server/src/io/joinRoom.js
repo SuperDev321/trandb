@@ -9,7 +9,7 @@ const joinRoom = (io, socket) => async ({ room }) => {
         socket.join(room);
         // console.log(io)
         let user = await Users.findOne({_id});
-        await Rooms.updateOne({ name: room }, { $addToSet: { users: [_id] } });
+        await Rooms.updateOne({ name: room }, { $addToSet: { users: [{_id, ip: null}] } });
         
         let {welcomeMessage} = await Rooms.findOne({name: room});
         const messages = await Chats.find({ room, type: 'public' });

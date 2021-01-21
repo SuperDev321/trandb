@@ -84,11 +84,10 @@ const useStyles = makeStyles((theme) => ({
 
 const SideBarLeft = ({ roomName, username, unReadInfo, changeMuteState, sendPokeMessage,
     users, 
-    //  setOpenPrivate, setPrivateTo,
     addOrOpenPrivate,
      cameraState, openCamera, closeCamera }) => {
     const classes = useStyles();
-    const [searchText, setSearchText] = useState(null);
+    const [searchText, setSearchText] = useState('');
     const [sideUsers, setSideUsers] = useState([]);
 
     useEffect(() => {
@@ -117,12 +116,9 @@ const SideBarLeft = ({ roomName, username, unReadInfo, changeMuteState, sendPoke
                                 roomName={roomName}
                                 username={username}
                                 user={user} key={index}
-                                // setOpenPrivate={setOpenPrivate}
-                                // setPrivateTo={setPrivateTo}
                                 addOrOpenPrivate={addOrOpenPrivate}
                                 changeMuteState={changeMuteState}
                                 sendPokeMessage={sendPokeMessage}
-                                // unRead={unReadInfo[user.username]}
                             />
                         ))
                 }
