@@ -17,7 +17,7 @@ const dbConnection = require('./database/dbConnection');
 const router = require('./router');
 const ioHandler = require('./io');
 const { verifyToken } = require('./utils');
-
+const cors = require('cors');
 const options = {
   key: fs.readFileSync(config.ssl_key),
   cert: fs.readFileSync(config.ssl_cert)
