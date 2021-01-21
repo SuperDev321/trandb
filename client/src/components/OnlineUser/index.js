@@ -82,6 +82,10 @@ const useStyles = makeStyles((theme) => ({
         color: pink[500],
         textTransform: 'none',
     },
+    kick: {
+        color: pink[500],
+        textTransform: 'none',
+    },
     adminStar: {
         color: pink[500]
     },
@@ -111,8 +115,8 @@ const StyledBadge = withStyles((theme) => ({
     />
 ))
 
-const OnlineUser = ({roomName, username, user,
-        changeMuteState, sendPokeMessage,
+const OnlineUser = ({roomName, username, user, role,
+        changeMuteState, sendPokeMessage, kickUser, banUser,
         // , setOpenPrivate, setPrivateTo
         addOrOpenPrivate,
     }) => {
@@ -121,7 +125,6 @@ const OnlineUser = ({roomName, username, user,
 
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
-        
     };
 
     const handleClickPrivateChat = (event) => {
@@ -136,6 +139,19 @@ const OnlineUser = ({roomName, username, user,
         setTimeout(() => {
             changeMuteState(roomName, username);
         }, 0)
+    }
+    const handleKick = (username) => {
+        setAnchorEl(null);
+        setTimeout(() => {
+            kickUser(roomName, username);
+        }, 0)
+    }
+    const handleBan = (username) => {
+        setAnchorEl(null);
+        setTimeout(() => {
+            if(role)
+            banUser(roomName, username);
+        }, 0);
     }
     const handleClose = () => {
         setAnchorEl(null);
@@ -229,6 +245,26 @@ const OnlineUser = ({roomName, username, user,
                             >
                                 <Notifications />&nbsp;Poke Message
                             </Button>
+                            <Divider />
+                            { (role === 'admin' || role === 'owner' || role === 'moderator')
+                                && (user.role !== 'admin') && (user.role !== 'owner') &&
+                                <>
+                                <Button size="small"
+                                    className={`${classes.cardButton} ${classes.kick}`}
+                                    fullWidth onClick={() => { handleKick(user.username) }}
+                                    name={user.username}
+                                >
+                                    Kick
+                                </Button>
+                                <Button size="small"
+                                    className={`${classes.cardButton} ${classes.kick}`}
+                                    fullWidth onClick={() => { handleBan(user.username) }}
+                                    name={user.username}
+                                >
+                                    Ban/Block
+                                </Button>
+                                </>
+                            }
                             <Button size="small"
                                 className={`${classes.cardButton} ${classes.mute}`}
                                 fullWidth onClick={() => { handleMute(user.username) }}

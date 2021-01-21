@@ -1,16 +1,24 @@
 const { Rooms, Chats, Users } = require('../database/models');
-const { findRoomUsers } = require('../utils');
+const { findRoomUsers, checkBan } = require('../utils');
 
 const joinRoom = (io, socket) => async ({ room }) => {
     try {
         const { _id } = socket.decoded;
         // console.log(socket.rooms);
         // console.log('joining room:', room, _id);
-        socket.join(room);
+        
+        
         // console.log(io)
+
         let user = await Users.findOne({_id});
+        let isBan = await checkBan(room, user.username);
+        if(isBan) {
+            socket.emit('join error', 'You are banned from this room.');
+            return;
+        }
         await Rooms.updateOne({ name: room }, { $addToSet: { users: [{_id, ip: null}] } });
         
+        socket.join(room);
         let {welcomeMessage} = await Rooms.findOne({name: room});
         const messages = await Chats.find({ room, type: 'public' });
         const usersInfo = await findRoomUsers(room);

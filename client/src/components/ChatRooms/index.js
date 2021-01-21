@@ -90,7 +90,24 @@ const ChatRooms = ({room, addUnReadMsg, readMsg}, ref) => {
             }
         }
     }
+    // kick a user from room
+    const kickUser = (roomName, usernameToKick) => {
+        socket.emit('kick user', {room: roomName, to: usernameToKick});
+    }
+    const banUser = (roomName, usernameToBan) => {
+        socket.emit('ban user', {room: roomName, to: usernameToBan});
+    }
+    // remove a room
+    // const removeRoom = (roomName) => {
+    //     const rooms = roomsRef.current.filter((item) => (item.name))
+    // }
     // send message
+    const joinErrorHandler = (error) => {
+        enqueueSnackbar(error, {variant: 'error'});
+        if(roomIndex === null) {
+            setRoomIndex(0);
+        }
+    }
     const sendMessage = (roomName, to, color, msg, bold) => {
         if (msg) {
             const date = Date.now();
@@ -303,6 +320,7 @@ const ChatRooms = ({room, addUnReadMsg, readMsg}, ref) => {
     // receive new message
     useEffect(() => {
         if( roomIndex !== null && newMessages && newMessages.length) {
+            console.log('new message')
             for (let msgIndex = 0; msgIndex < newMessages.length; msgIndex++) {   
                 const newMessage = newMessages[msgIndex]; 
                 if(newMessage.type === 'public') {
@@ -372,7 +390,14 @@ const ChatRooms = ({room, addUnReadMsg, readMsg}, ref) => {
             socket.on('leave room', async ({room, onlineUsers, leavedUser}) => {
                 // console.log('leave room', userId, currentRoom);
                 setNewInfo({type: 'leave room', payload: {room, onlineUsers, leavedUser}});
-            })
+            });
+            socket.on('kicked user', async ({room, kickedUserName}) => {
+                setNewInfo({type: 'kicked', payload: {room, kickedUserName, type: 'kick'}});
+            });
+            socket.on('banned user', async ({room, kickedUserName}) => {
+                console.log('ban');
+                setNewInfo({type: 'kicked', payload: {room, kickedUserName, type: 'ban'}}); 
+            });
             
             socket.on('room messages', messages => {
                 setNewMessages(messages);
@@ -389,6 +414,10 @@ const ChatRooms = ({room, addUnReadMsg, readMsg}, ref) => {
 
             socket.on('return video signal', payload => {
                 setNewInfo({type: 'return video', payload});
+            });
+
+            socket.on('join error', payload => {
+               joinErrorHandler(payload);
             })
 
             return () => {
@@ -412,7 +441,6 @@ const ChatRooms = ({room, addUnReadMsg, readMsg}, ref) => {
     const removeRoom = async (room, callback) => {
         let roomNames = await roomsRef.current.map((oneRoom) => (oneRoom.name));
         if(room && roomNames && roomNames.length > 0 && roomNames.includes(room)) {
-            socket.emit('leave room', {room});
             let newRooms = await(roomsRef.current.filter((oneRoom) => (oneRoom.name !==room)));
             roomsRef.current = newRooms;
             // console.log('remove a room');
@@ -422,6 +450,14 @@ const ChatRooms = ({room, addUnReadMsg, readMsg}, ref) => {
         } else {
             if(callback) callback(false);
         }
+    }
+    // leave room by you
+    const leaveRoomByUser = (room) => {
+        removeRoom(room, (result) => {
+            if(result) {
+                socket.emit('leave room', {room});
+            }
+        })
     }
 
     const receiveNewInfo = async (newInfo) => {
@@ -507,10 +543,10 @@ const ChatRooms = ({room, addUnReadMsg, readMsg}, ref) => {
                 if(roomsRef.current && newInfo.payload.room) {
                     let sameRoom = await roomsRef.current.find((room) => (room.name === newInfo.payload.room));
                     if(sameRoom) {
+                        let leavedUser = newInfo.payload.leavedUser;
                         let usernames = await newInfo.payload.onlineUsers.map((item) => (item.username));
-                        if(username && usernames.includes(username)) {
+                        if(username && usernames.includes(username) && username !== leavedUser.username) {
                             if(newInfo.payload.onlineUsers) {
-                                let leavedUser = newInfo.payload.leavedUser;
                                 let usersToSet = sameRoom.users.filter((user) => (user.username !== leavedUser.username));
                                 sameRoom.users = usersToSet;
                                 let message = {
@@ -519,11 +555,50 @@ const ChatRooms = ({room, addUnReadMsg, readMsg}, ref) => {
                                 }
                                 sameRoom.messages = [...sameRoom.messages, message];
                             }
+                        } else {
+                            //you leaved from room by server
                         }
                         if(sameRoom.name === currentRoomName) {
                             setCurrentRoomMessages([...sameRoom.messages]);
                             setCurrentRoomUsers([...sameRoom.users]);
                         }
+                    }
+                }
+                break;
+            case 'kicked':
+                if(roomsRef.current && newInfo.payload.room) {
+                    let sameRoom = await roomsRef.current.find((room) => (room.name === newInfo.payload.room));
+                    if(sameRoom) {
+
+                        if(username !== newInfo.payload.kickedUserName) { // kick other
+                            console.log('kick other')
+                            let usersToSet = sameRoom.users.filter((user) => (user.username !== newInfo.payload.kickedUserName));
+                            sameRoom.users = usersToSet;
+                            let type = newInfo.payload.type;
+                            let msg = (type === 'kick') 
+                                ? newInfo.payload.kickedUserName + ' kicked from room'
+                                : newInfo.payload.kickedUserName + ' baned from room';
+                            let message = {
+                                type: 'system',
+                                msg
+                            }
+                            sameRoom.messages = [...sameRoom.messages, message];
+                            if(sameRoom.name === currentRoomName) {
+                                setCurrentRoomMessages([...sameRoom.messages]);
+                                setCurrentRoomUsers([...sameRoom.users]);
+                            }
+                        } else { // kick you
+                            removeRoom(newInfo.payload.room, (result) => {
+                                if(result) {
+                                    let alertText = (newInfo.payload.type === 'kick') 
+                                        ?'You kicked from '+newInfo.payload.room
+                                        :'You baned from '+newInfo.payload.room;
+                                    enqueueSnackbar(alertText, {variant: 'error'});
+                                }
+                                
+                            })
+                        }
+                        
                     }
                 }
                 break;
@@ -598,7 +673,7 @@ const ChatRooms = ({room, addUnReadMsg, readMsg}, ref) => {
             }
         }
         
-    }, [roomsInfo])
+    }, [roomsInfo, roomIndex])
 
     useEffect(() => {
         if(roomsRef.current.length > 0 && roomsRef.current.length > roomIndex) {
@@ -656,6 +731,8 @@ const ChatRooms = ({room, addUnReadMsg, readMsg}, ref) => {
                         users={currentRoomUsers}
                         changeMuteState={changeMuteState}
                         sendPokeMessage={sendPokeMessage}
+                        kickUser={kickUser}
+                        banUser={banUser}
                         // unReadInfo={currentRoom && currentRoom.private}
                         roomName={currentRoomName}
                         // setOpenPrivate={setOpenPrivate}
@@ -686,7 +763,7 @@ const ChatRooms = ({room, addUnReadMsg, readMsg}, ref) => {
                                 <StyledTab
                                     key={index} label={<span>{item.name}</span>}
                                     unRead={item.unReadMessages.length}
-                                    onClose={roomsInfo.length < 2 ? null: () => removeRoom(item.name)}
+                                    onClose={roomsInfo.length < 2 ? null: () => leaveRoomByUser(item.name)}
                                 />
                             ))
                         }

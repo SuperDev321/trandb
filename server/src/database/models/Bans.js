@@ -1,11 +1,11 @@
 const { Schema, model } = require('mongoose');
 
 const banSchema = new Schema({
-  username: { String },
-  room: { String, required },
-  ip: { String },
-  startIp: String,
-  endIp: String,
+  username: { type: String },
+  room: { type: String},
+  ip: Number,
+  startIp: Number,
+  endIp: Number,
 });
 
 const Bans = model('Bans', banSchema);
