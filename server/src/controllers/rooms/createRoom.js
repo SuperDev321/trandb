@@ -34,7 +34,7 @@ const addRoom = async (req, res, next) => {
       if(coverImage) {
         let newCoverFileName = getFileName("icon_", coverImage.name);
         console.log('ok', newCoverFileName, coverImage);
-        let r_upload = await coverImage.mv(path.join(__dirname, 'client', 'public/img/rooms/',newCoverFileName));
+        let r_upload = await coverImage.mv(path.join(__dirname, '..', '..', '..', '..', 'client', 'public/img/rooms/',newCoverFileName));
         console.log(r_upload)
         let r_save_icon = await Rooms.updateOne({name}, {cover: newCoverFileName});
         // let photo_url = "img/rooms/" + newCoverFileName;
