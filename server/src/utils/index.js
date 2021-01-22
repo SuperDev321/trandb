@@ -19,7 +19,9 @@ const validateRoomName = require('./room/roomValidation');
 const isNewRoom = require('./room/isNewRoom');
 const createRoom = require('./room/createRoom');
 const getGuest = require('./user/getGuest');
-
+const getRoomPermission = require('./user/getRoomPermission');
+const banByName = require('./ban/banByName');
+const checkBan = require('./ban/checkBan');
 
 module.exports = {
   createError,
@@ -42,5 +44,8 @@ module.exports = {
   validateRoomName,
   isNewRoom,
   createRoom,
-  getGuest
+  getGuest,
+  getRoomPermission,
+  banByName,
+  checkBan,
 };

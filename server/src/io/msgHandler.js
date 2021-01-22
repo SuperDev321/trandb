@@ -35,9 +35,9 @@ const publicMessage = (io, socket) => async ({ msg, room, from, color, bold }) =
 
 const pokeMessage = (io, socket) => async ({from, to, room}, callback) => {
   const toUser = await findUserByName(to);
-  console.log('poke message', from, to)
+  console.log('poke message', from, to, toUser)
   if(toUser) {
-    io.to(toUser._id).emit('poke message', {
+    io.to(toUser._id.toString()).emit('poke message', {
       type: 'poke',
       room,
       from,
@@ -67,7 +67,7 @@ const privateMessage = (io, socket) => async ({ msg, from, to, color, bold }) =>
     const toUser = await findUserByName(to);
     console.log('private', toUser._id)
     if(toUser) {
-      socket.to(toUser._id).emit('room messages', [
+      socket.to(toUser._id.toString()).emit('room messages', [
         {
           type: 'private',
           _id: newChat._id,

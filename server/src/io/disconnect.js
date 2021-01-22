@@ -5,7 +5,8 @@ const socketDisconnect = (io, socket) => async (reason) => {
     try {
         console.log('user disconnect', reason);
         if(reason === 'client namespace disconnect') {
-            const rooms = Object.keys(socket.rooms);
+            const rooms = [...socket.rooms];
+            console.log(socket.rooms, rooms)
             // socket.rooms returns an object where key and value are the same
             // first key is socket id, second key is rooms name
             const { _id } = socket.decoded;
@@ -13,7 +14,7 @@ const socketDisconnect = (io, socket) => async (reason) => {
             for (let index = 2; index < rooms.length; index++) {
                 const room = rooms[index];
                 if(room) {
-                    await Rooms.updateOne({ name: room }, { $pullAll: { users: [_id] } });
+                    await Rooms.updateOne({ name: room }, { $pull: { users: {_id} } });
                     const usersInfo = await findRoomUsers(room);
                     io.to(room).emit('leave room', {room, onlineUsers: usersInfo, leavedUser: user});
                 }

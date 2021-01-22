@@ -64,6 +64,7 @@ io.use(async (socket, next) => {
         socket.decoded = decoded;
         console.log('decoded', decoded);
         socket.join(decoded._id);
+        console.log(decoded._id, await io.in(decoded._id).allSockets())
         next();
     } catch (err) {
         console.log(err)
