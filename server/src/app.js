@@ -26,6 +26,7 @@ const io = socketIO(server);
 const initRooms = require('./utils/room/initRooms')
 const fileUpload = require('express-fileupload');
 const cookie = require('cookie');
+const createAdminUser = require('./utils/user/createAdminUser');
 initRooms();
 app.disabled('x-powered-by');
 // app.enable('trust proxy');
