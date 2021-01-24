@@ -11,7 +11,7 @@ const guestLogin = async (req, res, next) => {
         if(!user)
             user = await createUser({ username: nickname, role: 'guest', gender });
             console.log('created token')
-        const token = await createToken(user._id, user.role);
+        const token = await createToken(user._id, 'guest');
         console.log('created token', token)
 
         res

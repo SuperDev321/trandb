@@ -378,25 +378,25 @@ const ChatRooms = ({room, addUnReadMsg, readMsg}, ref) => {
                 let usernames = await onlineUsers.map((item) => (item.username));
                 if(usernames.includes(username)) {
                     // console.log('username: ', username);
-                    console.log(onlineUsers)
                     setNewInfo({ type: 'init room', payload: { room, onlineUsers, messages}});
                 }
             });
             socket.on('joined room',async ({room, onlineUsers, joinedUser}) => {
-                // console.log('user joined', room, onlineUsers);
                 // console.log('new info for user join')
                 setNewInfo({type: 'joined room', payload: {room, onlineUsers, joinedUser}});
             });
             socket.on('leave room', async ({room, onlineUsers, leavedUser}) => {
-                // console.log('leave room', userId, currentRoom);
+                console.log('leave room');
                 setNewInfo({type: 'leave room', payload: {room, onlineUsers, leavedUser}});
             });
             socket.on('kicked user', async ({room, kickedUserName}) => {
                 setNewInfo({type: 'kicked', payload: {room, kickedUserName, type: 'kick'}});
             });
             socket.on('banned user', async ({room, kickedUserName}) => {
-                console.log('ban');
                 setNewInfo({type: 'kicked', payload: {room, kickedUserName, type: 'ban'}}); 
+            });
+            socket.on('global banned user', async ({kickedUserName}) => {
+                setNewInfo({type: 'kicked', payload: { kickedUserName, type: 'global ban'}}); 
             });
             
             socket.on('room messages', messages => {
@@ -422,7 +422,7 @@ const ChatRooms = ({room, addUnReadMsg, readMsg}, ref) => {
 
             return () => {
                 socket.removeAllListeners();
-                socket.disconnect();
+                socket.close();
             };
         }
     }, [socket, username]);
@@ -470,9 +470,7 @@ const ChatRooms = ({room, addUnReadMsg, readMsg}, ref) => {
                         if(username && usernames.includes(username)) {
                             // console.log('init room messages',newInfo.payload)
                             let messages = newInfo.payload.messages;
-                            console.log(newInfo.payload.room)
                             if(newInfo.payload.room.welcomeMessage) {
-                                console.log('welcomeMessage')
                                 let wcMsg = {
                                     type: 'system',
                                     msg: newInfo.payload.room.welcomeMessage
@@ -599,6 +597,33 @@ const ChatRooms = ({room, addUnReadMsg, readMsg}, ref) => {
                             })
                         }
                         
+                    }
+                } else if(roomsRef.current.length && newInfo.payload.type === 'global ban') {
+                    if(username !== newInfo.payload.kickedUserName) {
+                        roomsRef.current.map((roomRef) => {
+                         // kick other
+                            let usersToSet = roomRef.users.filter((user) => (user.username !== newInfo.payload.kickedUserName));
+                            roomRef.users = usersToSet;
+                            let type = newInfo.payload.type;
+                            let msg = newInfo.payload.kickedUserName + ' baned from room';
+                            let message = {
+                                type: 'system',
+                                msg
+                            }
+                            roomRef.messages = [...roomRef.messages, message];
+                            if(roomRef.name === currentRoomName) {
+                                setCurrentRoomMessages([...roomRef.messages]);
+                                setCurrentRoomUsers([...roomRef.users]);
+                            }
+                        
+                        })
+                    }
+                    else { // kick you
+                        // remove all room
+                        roomsRef.current = [];
+                        setRoomsInfo([]);
+                        let alertText = 'You baned globally';
+                        enqueueSnackbar(alertText, {variant: 'error'});
                     }
                 }
                 break;

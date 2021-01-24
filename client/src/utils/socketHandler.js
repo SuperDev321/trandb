@@ -1,10 +1,11 @@
 import io from 'socket.io-client';
-console.log('socket handler')
 const socket = io({
     autoConnect: false,
 });
 
-
+// const adminSocket = io({
+//     autoConnect: false,
+// })
 // const socketOn = {
 
 //     // when other user joined to room
