@@ -11,9 +11,15 @@ const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const dbConnection = require('./database/dbConnection');
 const router = require('./router');
+
 const {ioHandler, adminIoHandler} = require('./io');
 const { verifyToken, findUserById } = require('./utils');
 const cors = require('cors');
+const options = {
+  key: fs.readFileSync(config.ssl_key),
+  cert: fs.readFileSync(config.ssl_cert)
+};
+
 const app = express();
 const server = http.createServer(app);
 const io = socketIO(server);
