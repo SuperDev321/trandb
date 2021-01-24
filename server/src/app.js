@@ -1,5 +1,5 @@
 require('dotenv').config();
-
+const config = require('./config');
 const http = require('http');
 const https = require("https");
 const { join } = require('path');
@@ -21,7 +21,7 @@ const options = {
 };
 
 const app = express();
-const server = http.createServer(app);
+const server = https.createServer(options, app);
 const io = socketIO(server);
 const initRooms = require('./utils/room/initRooms')
 const fileUpload = require('express-fileupload');
