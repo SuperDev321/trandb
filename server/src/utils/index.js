@@ -21,6 +21,7 @@ const createRoom = require('./room/createRoom');
 const getGuest = require('./user/getGuest');
 const getRoomPermission = require('./user/getRoomPermission');
 const banByName = require('./ban/banByName');
+const banByNameAndIp = require('./ban/banByNameAndIp');
 const checkBan = require('./ban/checkBan');
 
 module.exports = {
@@ -47,5 +48,6 @@ module.exports = {
   getGuest,
   getRoomPermission,
   banByName,
+  banByNameAndIp,
   checkBan,
 };

@@ -3,29 +3,39 @@ const { findRoomUsers, checkBan } = require('../utils');
 
 const joinRoom = (io, socket) => async ({ room }) => {
     try {
-        const { _id } = socket.decoded;
+        const { _id, role } = socket.decoded;
+        let ip = socket.handshake.address;
+        if (ip.substr(0, 7) === '::ffff:') {
+            ip = ip.substr(7);
+        }
+        console.log(ip, role)
         // console.log(socket.rooms);
         // console.log('joining room:', room, _id);
-        
-        
         // console.log(io)
 
         let user = await Users.findOne({_id});
-        let isBan = await checkBan(room, user.username);
+        let isBan = await checkBan(room, user.username, ip);
         if(isBan) {
             socket.emit('join error', 'You are banned from this room.');
             return;
         }
-        await Rooms.updateOne({ name: room }, { $addToSet: { users: [{_id, ip: null}] } });
+        await Rooms.updateOne({ name: room }, { $addToSet: { users: [{_id, ip}] } });
         
         socket.join(room);
         let {welcomeMessage} = await Rooms.findOne({name: room});
         const messages = await Chats.find({ room, type: 'public' });
-        const usersInfo = await findRoomUsers(room);
-
+        const usersInfo = await findRoomUsers(room, user.role);
         socket.emit('init room', {messages, onlineUsers: usersInfo, room: {name: room, welcomeMessage}}, (data)=> {
             if(data === 'success') {
-                io.to(room).emit('joined room', {room, onlineUsers: usersInfo, joinedUser: user});
+                console.log(user)
+                io.to(room).emit('joined room', {room, onlineUsers: usersInfo,
+                    joinedUser: {
+                        _id: user._id,
+                        username: user.username,
+                        role: user.role,
+                        gender: user.gender,
+                        ip
+                    }});
             }
         });
 

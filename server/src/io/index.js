@@ -1,7 +1,7 @@
 const joinRoom = require('./joinRoom');
 const leaveRoom = require('./leaveRoom');
 const { publicMessage, privateMessage, pokeMessage } = require('./msgHandler');
-const { kickUser, banUser } = require('./userHandler');
+const { kickUser, banUser, banUserByAdmin } = require('./userHandler');
 const {sendSignal, returnSignal} = require('./videoHandler');
 const socketDisconnect = require('./disconnect');
 
@@ -29,4 +29,8 @@ const ioHandler = (io) => (socket) => {
     })
 };
 
-module.exports = ioHandler;
+const adminIoHandler = (io) => (socket) => {
+    io.on('ban user', banUserByAdmin(io, socket));
+}
+
+module.exports = {ioHandler, adminIoHandler};

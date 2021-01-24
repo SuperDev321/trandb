@@ -4,8 +4,8 @@ const banSchema = new Schema({
   username: { type: String },
   room: { type: String},
   ip: Number,
-  startIp: Number,
-  endIp: Number,
+  fromIp: Number,
+  toIp: Number,
 });
 
 const Bans = model('Bans', banSchema);

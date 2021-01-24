@@ -83,7 +83,7 @@ const useStyles = makeStyles((theme) => ({
 
 
 const SideBarLeft = ({ roomName, username, unReadInfo, changeMuteState, sendPokeMessage, kickUser, banUser,
-    users, 
+    users,
     addOrOpenPrivate,
      cameraState, openCamera, closeCamera }) => {
     const classes = useStyles();

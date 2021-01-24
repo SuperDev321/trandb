@@ -36,7 +36,6 @@ const RoomsList = ({ rooms, showEmpty }) => {
 RoomsList.propTypes = {
   rooms: propTypes.arrayOf(
     propTypes.shape({
-      _id: propTypes.string.isRequired,
       name: propTypes.string.isRequired,
     })
   ).isRequired,

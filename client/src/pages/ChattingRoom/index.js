@@ -12,7 +12,6 @@ const ChattingRoom = () => {
     const { room } = useParams();
     const [unReadMsgs, setUnReadMsgs] = useState([]);
     const chatRef = useRef();
-    console.log(room)
     const addUnReadMsg = ({from, msg}) => {
         let msgInfo = {
             from,

@@ -30,7 +30,6 @@ const ChatForm = ({roomName, to, sendMessage, onFocus}) => {
         emoji.allow_native = false;
         emoji.replace_mode = 'img';// 'unified';
         emoji.use_sheet = true;
-        console.log('chat form to', to)
     }, [])
 
 
@@ -56,7 +55,6 @@ const ChatForm = ({roomName, to, sendMessage, onFocus}) => {
 
     const handleOnEnter = () => {
         let realMsg = msg.trim();
-        // console.log('realMsg', realMsg);
         let color = userColor? userColor: 'black';
         if(realMsg) {
             setTimeout(() => {sendMessage(roomName, to, color, realMsg, bold);}, 0);

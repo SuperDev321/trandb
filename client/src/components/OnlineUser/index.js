@@ -18,6 +18,7 @@ import {QuestionAnswer,
     Notifications,
     StarRounded
 } from '@material-ui/icons';
+import BanModal from '../BanModal';
 const useStyles = makeStyles((theme) => ({
     listItem: {
         display: 'flex',
@@ -122,6 +123,7 @@ const OnlineUser = ({roomName, username, user, role,
     }) => {
     const classes = useStyles({role: user.role});
     const [anchorEl, setAnchorEl] = React.useState(null);
+    const [openBan, setOpenBan] = React.useState(false);
 
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
@@ -148,10 +150,14 @@ const OnlineUser = ({roomName, username, user, role,
     }
     const handleBan = (username) => {
         setAnchorEl(null);
-        setTimeout(() => {
-            if(role)
-            banUser(roomName, username);
-        }, 0);
+        if(role === 'admin') {
+            setOpenBan(true);
+        } else {
+            setTimeout(() => {
+                if(role)
+                banUser(roomName, username);
+            }, 0);
+        }
     }
     const handleClose = () => {
         setAnchorEl(null);
@@ -251,17 +257,17 @@ const OnlineUser = ({roomName, username, user, role,
                                 <>
                                 <Button size="small"
                                     className={`${classes.cardButton} ${classes.kick}`}
-                                    fullWidth onClick={() => { handleKick(user.username) }}
-                                    name={user.username}
-                                >
-                                    Kick
-                                </Button>
-                                <Button size="small"
-                                    className={`${classes.cardButton} ${classes.kick}`}
                                     fullWidth onClick={() => { handleBan(user.username) }}
                                     name={user.username}
                                 >
                                     Ban/Block
+                                </Button>
+                                <Button size="small"
+                                        className={`${classes.cardButton} ${classes.kick}`}
+                                        fullWidth onClick={() => { handleKick(user.username) }}
+                                        name={user.username}
+                                    >
+                                        Kick
                                 </Button>
                                 </>
                             }
@@ -280,6 +286,9 @@ const OnlineUser = ({roomName, username, user, role,
                     }
                 </Card>
             </Popover>
+            <BanModal open={openBan} setOpen={setOpenBan} initVal={{name: user.username, ip: user.ip}} 
+                roomName={roomName}
+            />
         </div>
     );
 }

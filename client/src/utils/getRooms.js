@@ -4,7 +4,7 @@ const getRooms = async (successCallback, errCallback) => {
     try {
         const {
             data: { data },
-        } = await axios({url: 'https://new.trandb.com:4000/api/rooms', method: 'GET'});
+        } = await axios({url: '/api/rooms', method: 'GET'});
         // setLoading(false);
         // setRooms(data);
         successCallback(data);
