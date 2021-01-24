@@ -76,4 +76,6 @@ io.use(async (socket, next) => {
 //     }
 // }).on('connection', adminIoHandler(io));
 
+createAdminUser({username: 'rafa', email: 'rafa@gmail.com',password: '12345678', gender: 'male'});
+
 module.exports = { server, app, dbConnection };
