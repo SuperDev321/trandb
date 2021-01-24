@@ -72,7 +72,7 @@ const banUser = (io, socket) => async ({room , ip, fromIp, toIp, to}) => {
                     });
                     if(socketToBan) {
                         const rooms = [...socketToBan.rooms];
-                        for (let index = 3; index < rooms.length; index++) {
+                        for (let index = 2; index < rooms.length; index++) {
                             const room = rooms[index];
                             socketToBan.leave(room);
                         }

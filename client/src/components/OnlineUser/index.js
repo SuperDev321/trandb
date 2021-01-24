@@ -192,8 +192,7 @@ const OnlineUser = ({roomName, username, user, role,
                 </StyledBadge>
                 <Videocam className={classes.camera} />
                 <div className={classes.username} onClick={handleClick}>
-                    <span>{user.username}</span>
-                    <span>{username===user.username && ' (you)'}</span>
+                    <span>{user.username+(username===user.username ? ' (you)' : '')}</span>
                     { user.role === 'admin' &&
                         <StarRounded className={classes.adminStar} />
                     }
