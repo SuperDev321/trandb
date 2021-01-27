@@ -3,7 +3,7 @@ require('dotenv').config();
 const http = require('http');
 const https = require("https");
 const { join } = require('path');
-
+const fs = require('fs');
 const express = require('express');
 const socketIO = require('socket.io');
 const compression = require('compression');
@@ -15,10 +15,10 @@ const router = require('./router');
 const {ioHandler, adminIoHandler} = require('./io');
 const { verifyToken, findUserById } = require('./utils');
 const cors = require('cors');
-const options = {
-  key: fs.readFileSync(config.ssl_key),
-  cert: fs.readFileSync(config.ssl_cert)
-};
+// const options = {
+//   key: fs.readFileSync(config.ssl_key),
+//   cert: fs.readFileSync(config.ssl_cert)
+// };
 
 const app = express();
 const server = http.createServer(app);
@@ -26,6 +26,7 @@ const io = socketIO(server);
 const initRooms = require('./utils/room/initRooms')
 const fileUpload = require('express-fileupload');
 const cookie = require('cookie');
+const createAdminUser = require('./utils/user/createAdminUser');
 initRooms();
 app.disabled('x-powered-by');
 // app.enable('trust proxy');
@@ -75,5 +76,7 @@ io.use(async (socket, next) => {
 //         next(new Error('forbidden'));
 //     }
 // }).on('connection', adminIoHandler(io));
+
+createAdminUser({username: 'rafa', email: 'rafa@gmail.com',password: '12345678', gender: 'male'});
 
 module.exports = { server, app, dbConnection };
