@@ -15,10 +15,10 @@ const router = require('./router');
 const {ioHandler, adminIoHandler} = require('./io');
 const { verifyToken, findUserById } = require('./utils');
 const cors = require('cors');
-const options = {
-  key: fs.readFileSync(config.ssl_key),
-  cert: fs.readFileSync(config.ssl_cert)
-};
+// const options = {
+//   key: fs.readFileSync(config.ssl_key),
+//   cert: fs.readFileSync(config.ssl_cert)
+// };
 
 const app = express();
 const server = https.createServer(options, app);
