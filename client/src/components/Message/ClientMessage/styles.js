@@ -3,7 +3,7 @@ import { makeStyles } from '@material-ui/core/styles';
 const useStyles = makeStyles((theme) => ({
     message: {
         display: 'flex',
-        padding: '0.3rem 0.3rem',
+        padding: '0.1rem 0.1rem',
         height: 'auto',
         alignItems: 'flex-end',
         marginBottom: 3,
@@ -53,7 +53,8 @@ const useStyles = makeStyles((theme) => ({
             props.bold? 'bold' : '',
         '& img.emoji': {
             verticalAlign: 'bottom'
-        }
+        },
+        fontSize: '0.95rem',
     },
     url_underline: {
         cursor: 'pointer',

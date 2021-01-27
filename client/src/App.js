@@ -13,6 +13,7 @@ import { SnackbarProvider } from 'notistack';
 import CloseIcon from '@material-ui/icons/Close';
 import {useAudio} from 'react-use';
 import './App.css';
+import Profile from './components/Profile';
 const App = () => {
     
     const { loading, auth, role, setAuth, setLoading, username, removeCurrentUser } = useAuth();
@@ -46,6 +47,9 @@ const App = () => {
                 <Switch>
                     <PublicRoute exact path="/">
                         <Rooms />
+                    </PublicRoute>
+                    <PublicRoute exact path="/profile">
+                        <Profile />
                     </PublicRoute>
                     <PublicRoute path="/signup">
                         <Signup />

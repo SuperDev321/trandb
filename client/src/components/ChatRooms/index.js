@@ -604,7 +604,6 @@ const ChatRooms = ({room, addUnReadMsg, readMsg}, ref) => {
                          // kick other
                             let usersToSet = roomRef.users.filter((user) => (user.username !== newInfo.payload.kickedUserName));
                             roomRef.users = usersToSet;
-                            let type = newInfo.payload.type;
                             let msg = newInfo.payload.kickedUserName + ' baned from room';
                             let message = {
                                 type: 'system',

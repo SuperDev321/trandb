@@ -70,7 +70,7 @@ const PrivateChat = ({open, setOpen, room, messages, me, to}) => {
                         src='/img/default_avatar.png'
                     />
                     <div id="private-header" className={classes.headerContent}>{to.username}</div>
-                    <IconButton color='inherit' size='small' onClick={()=>{console.log('set false');setOpen(false)}}>
+                    <IconButton color='inherit' size='small' onClick={()=>{setOpen(false)}}>
                         <CloseIcon />
                     </IconButton>
                     
