@@ -11,6 +11,7 @@ import {
     Minimize
 } from '@material-ui/icons';
 import ChatForm from '../../ChatForm';
+import { Rnd } from "react-rnd";
 import Draggable from 'react-draggable';
 import PrivateMessageList from '../../PrivateMessageList';
 import {getPrivateMessages} from '../../../utils';
@@ -18,18 +19,23 @@ import {ReactComponent as Maximium} from './square.svg'
 import {ReactComponent as Restore} from './restore.svg'
 
 const useStyles = makeStyles((theme) => ({
-    root: {
-        position: 'absolute',
-        right: 'calc(50% - 200px)',
-        top: 200,
+    rnd: {
         zIndex: 200,
-        width: 400,
+        
+    },
+    root: {
+        // position: 'absolute',
+        // right: 'calc(50% - 200px)',
+        // top: 200,
+        zIndex: 200,
+        height: '100%',
+        // width: 400,
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
     },
     header: {
-        height: 45,
+        height: 40,
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
@@ -62,7 +68,8 @@ const useStyles = makeStyles((theme) => ({
         display: 'flex',
         flexDirection: 'column',
         width: '100%',
-        height: 300,
+        overflow: 'auto'
+        // height: 300,
     },
     content: {
         width: '100%',
@@ -76,7 +83,7 @@ const useStyles = makeStyles((theme) => ({
         zIndex: 201
     },
     min: {
-        maxHeight: 45,
+        maxHeight: 40,
         width: '200px !important',
         transform: 'none !important',
     },
@@ -86,7 +93,8 @@ const useStyles = makeStyles((theme) => ({
         left: 0,
         right: 0,
         bottom: 0,
-        minWidth: '100%',
+        width: '100% !important',
+        height: '100% !important'
     },
     icon: {
         lineHeight: 0,
@@ -102,29 +110,47 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const PrivateChat = ({ me, to, sendMessage, active, setActive, initVal }, ref) => {
-    const winRef = useRef();
+    const rndRef = useRef(null);
+    const winRef = useRef(null);
     const [messages, setMessages] = useState([]);
     const [hide, setHide] = useState(false);
     const [min, setMin] = useState(false);
     const [max, setMax] = useState(false);
     const [unRead, setUnRead] = useState(0);
+    const [rndWidth, setRndWidth] = useState(400);
+    const [rndHeight, setRndHeight] = useState(350);
     const classes = useStyles({max});
 
     const handleMinimize = () => {
-        // if(min) {
-        //     setMin(false);
-        // } else {
-        //     setMax(false);
-        //     setMin(true);
-        // }
-        setHide(true);
+        let top = winRef.current.getBoundingClientRect().top;
+        let width = winRef.current.getBoundingClientRect().width;
+        let height = winRef.current.getBoundingClientRect().height;
+        if(width>400) width = 400;
+        console.log('client top react', top)
+        if(min) {
+            setMin(false);
+            rndRef.current.updateSize({width, height: 350});
+            if(top > 310)
+                rndRef.current.updatePosition({y: top-310});
+            // setRndHeight(0);
+        } else {
+            setMax(false);
+            setMin(true);
+            rndRef.current.updateSize({width, height: 40});
+            if(window.innerHeight - top > height-40)
+                rndRef.current.updatePosition({y: top+height-40});
+            // setRndHeight(40);
+        }
+        // setHide(true);
     }
     const handleMaximize = () => {
         if(max) {
             setMax(false);
+            // rndRef.current.updateSize({width: 400, height: 350});
         } else {
-            setMin(false)
+            // setMin(false)
             setMax(true);
+            // rndRef.current.updateSize({width: window.innerWidth, height: window.innerHeight});
         }
     }
 
@@ -169,11 +195,37 @@ const PrivateChat = ({ me, to, sendMessage, active, setActive, initVal }, ref) =
     //     }
     // }, [active])
     return (
-        <Draggable bounds="parent" disabled={max}
-            handle='#private-header' scale={1} onMouseDown={() => {setActive(to.username)}}
+        <Rnd
+            default={{
+                x: window.innerWidth/2 - 200,
+                y: 200,
+                width: 400,
+                height: 350,
+            }}
+            minHeight={min?40:300}
+            minWidth={300}
+            // maxHeight={rndHeight ? rndHeight: null}
+            dragHandleClassName="private-header"
+            bounds="body"
+            className={`${classes.rnd} ${max&&classes.max}`}
+            ref={rndRef}
+            disableDragging={max}
+            enableResizing={!max?{
+                bottom: true,
+                bottomLeft: false,
+                bottomRight: true,
+                left: false,
+                right: true,
+                top: false,
+                topLeft: false,
+                topRight: false,
+            }: false}
         >
+        {/* // <Draggable bounds="parent" disabled={max}
+        //     handle='#private-header' scale={1} onMouseDown={() => {setActive(to.username)}}
+        // > */}
             <Paper ref={winRef}
-                className={`${classes.root} ${hide&&classes.hide} ${active&&classes.active} ${max && classes.max} ${min && classes.min}`}
+                className={`${classes.root} ${hide&&classes.hide} ${active&&classes.active}`}
             >
                 <div className={classes.header} >
                     <Badge badgeContent={unRead> 9? '9+': unRead} color="secondary"
@@ -187,7 +239,7 @@ const PrivateChat = ({ me, to, sendMessage, active, setActive, initVal }, ref) =
                             src='/img/default_avatar.png'
                         />
                     </Badge>
-                    <div id="private-header" className={classes.headerContent}>{to}</div>
+                    <div id="private-header" className={`private-header ${classes.headerContent}`} >{to}</div>
                     <div className={classes.icon}
                         onClick={handleMinimize}
                         style={{marginBottom: 3}}
@@ -213,7 +265,8 @@ const PrivateChat = ({ me, to, sendMessage, active, setActive, initVal }, ref) =
                 </div>
                 
             </Paper>
-        </Draggable>
+        {/* </Draggable> */}
+        </Rnd>
     );
 }
 

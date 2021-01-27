@@ -35,6 +35,7 @@ const useStyles = makeStyles((theme) => ({
         props.color
         ?props.color
         :theme.palette.getContrastText(grey[100]),
+        fontSize: '0.9rem',
         fontWeight: (props) =>
         props.bold
         ? 'bold'

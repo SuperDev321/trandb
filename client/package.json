@@ -28,6 +28,7 @@
     "react-element-to-jsx-string": "^14.3.2",
     "react-google-login": "^5.1.19",
     "react-player": "^2.7.2",
+    "react-rnd": "^10.2.4",
     "react-router-dom": "^5.2.0",
     "react-scripts": "^3.4.3",
     "react-text-mask": "^5.4.3",
