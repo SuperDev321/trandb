@@ -523,17 +523,13 @@ const ChatRooms = ({room, addUnReadMsg, readMsg}, ref) => {
                             if(newInfo.payload.onlineUsers && newInfo.payload.joinedUser) {
                                 let joinedUser = newInfo.payload.joinedUser;
                                 sameRoom.addOnlineUser(joinedUser);
-                                let tmpName = '';
-                                if(username === joinedUser.username) {
-                                    tmpName = 'you';
-                                } else {
-                                    tmpName = joinedUser.username;
+                                if(username !== joinedUser.username) {
+                                    let sysMsg = {
+                                        type: 'system',
+                                        msg: joinedUser.username + ' joined the room'
+                                    }
+                                    sameRoom.messages = [...sameRoom.messages, sysMsg];
                                 }
-                                let sysMsg = {
-                                    type: 'system',
-                                    msg: tmpName + ' joined the room'
-                                }
-                                sameRoom.messages = [...sameRoom.messages, sysMsg];
                             }
                         }
                         if(sameRoom.name === currentRoomName) {

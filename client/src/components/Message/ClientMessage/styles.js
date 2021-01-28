@@ -54,7 +54,7 @@ const useStyles = makeStyles((theme) => ({
         '& img.emoji': {
             verticalAlign: 'bottom'
         },
-        fontSize: '0.95rem',
+        fontSize: '1rem',
     },
     url_underline: {
         cursor: 'pointer',
