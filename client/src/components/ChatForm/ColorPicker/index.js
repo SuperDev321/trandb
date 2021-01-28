@@ -44,7 +44,12 @@ const ColorPicker = ({userColor, setUserColor}) => {
     
     // end
     useEffect(() => {
-        setUserColor(colorPanels[0]);
+        let colorMem = localStorage.getItem('input_color');
+        if(colorMem) {
+            setUserColor(colorMem);
+        } else {
+            setUserColor(colorPanels[0]);
+        }
     }, [])
     // my code start
     const openColorArea = () => {
@@ -53,6 +58,7 @@ const ColorPicker = ({userColor, setUserColor}) => {
 
     const onSelectColor = (color) => {
         setUserColor(color);
+        localStorage.setItem('input_color', color);
     };
     // end
 

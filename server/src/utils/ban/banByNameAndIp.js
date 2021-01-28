@@ -8,29 +8,29 @@ const banByNameAndIp = async (room, username, ip, fromIp, toIp) => {
         if(room) { // room ban
             if(ip) {
                 let ipNum = ipInt(ip).toInt();
-                ban = await Bans.findOne({room, username, ip: ipNum});
+                ban = await Bans.findOne({room, username, ip: ipNum, type: 'ip'});
                 if(!ban)
-                    ban = await Bans.create({room, username, ip: ipNum});
+                    ban = await Bans.create({room, username, ip: ipNum, type: 'ip'});
             } else if(fromIp && toIp) {
                 let ipFromNum = ipInt(fromIp).toInt();
                 let ipToNum = ipInt(toIp).toInt();
-                ban = await Bans.findOne({room, username, fromIp: ipFromNum, toIp: ipToNum});
+                ban = await Bans.findOne({room, username, fromIp: ipFromNum, toIp: ipToNum, type: 'range'});
                 if(!ban)
-                    ban = await Bans.create({room, username, fromIp: ipFromNum, toIp: ipToNum});
+                    ban = await Bans.create({room, username, fromIp: ipFromNum, toIp: ipToNum, type: 'range'});
             }
         } else { // global ban
             if(ip) {
                 let ipNum = ipInt(ip).toInt();
-                ban = await Bans.findOne({ username, ip: ipNum, room: undefined});
+                ban = await Bans.findOne({ username, ip: ipNum, room: undefined, type: 'ip'});
                 console.log('global ban find', ban)
                 if(!ban)
-                    ban = await Bans.create({ username, ip: ipNum});
+                    ban = await Bans.create({ username, ip: ipNum, type: 'ip'});
             } else if(fromIp && toIp) {
                 let ipFromNum = ipInt(fromIp).toInt();
                 let ipToNum = ipInt(toIp).toInt();
-                ban = await Bans.findOne({ username, fromIp: ipFromNum, toIp: ipToNum, room: undefined});
+                ban = await Bans.findOne({ username, fromIp: ipFromNum, toIp: ipToNum, room: undefined, type: 'range'});
                 if(!ban)
-                    ban = await Bans.create({ username, fromIp: ipFromNum, toIp: ipToNum});
+                    ban = await Bans.create({ username, fromIp: ipFromNum, toIp: ipToNum, type: 'range'});
             }
         }
         return true;

@@ -18,7 +18,7 @@ import Peer from 'simple-peer';
 import {StyledTab , StyledTabs} from '../StyledTab';
 import RoomObject from '../../utils/roomObject';
 import UserContext from '../../context';
-import { getSocket } from '../../utils';
+import { getSocket, useLocalStorage } from '../../utils';
 import {useAudio} from 'react-use';
 
 const ChatRooms = ({room, addUnReadMsg, readMsg}, ref) => {
@@ -26,6 +26,7 @@ const ChatRooms = ({room, addUnReadMsg, readMsg}, ref) => {
     const history= useHistory();
     const [mobileOpen, setMobileOpen] = useState(false);
     const { username, avatar, gender } = useContext(UserContext);
+    const [mutes, setMutes] = useLocalStorage('mutes', []);
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
     };
@@ -88,7 +89,16 @@ const ChatRooms = ({room, addUnReadMsg, readMsg}, ref) => {
             if(room.name === currentRoomName) {
                 setCurrentRoomUsers([...room.users]);
             }
+            let localMute = mutes.find((item) => (item.room === roomName && item.user === usernameToMute))
+            if(localMute && !user.muted) {
+                let newMutes = mutes.filter((item) => (item.room !== roomName || item.user !== usernameToMute));
+                setMutes(newMutes);
+            } else if(!localMute && user.muted) {
+                let newMutes = [...mutes, {room: roomName, user: usernameToMute}];
+                setMutes(newMutes);
+            }
         }
+
     }
     // kick a user from room
     const kickUser = (roomName, usernameToKick) => {
@@ -511,12 +521,8 @@ const ChatRooms = ({room, addUnReadMsg, readMsg}, ref) => {
                         let usernames = await newInfo.payload.onlineUsers.map((item) => (item.username));
                         if(username && usernames.includes(username)) {
                             if(newInfo.payload.onlineUsers && newInfo.payload.joinedUser) {
-                                // sameRoom.users = [...newInfo.payload.onlineUsers];
-                                let currentUserNames = sameRoom.users.map(({username}) => (username));
                                 let joinedUser = newInfo.payload.joinedUser;
-                                if(!currentUserNames.includes(joinedUser.username)) {
-                                    sameRoom.users = [...sameRoom.users, {...joinedUser, muted: false}];
-                                }
+                                sameRoom.addOnlineUser(joinedUser);
                                 let tmpName = '';
                                 if(username === joinedUser.username) {
                                     tmpName = 'you';

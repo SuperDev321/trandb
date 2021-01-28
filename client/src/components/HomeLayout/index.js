@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useLayoutEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import {
     AppBar,
@@ -37,6 +37,12 @@ const useStyles = makeStyles((theme) => ({
     },
     grow: {
         flexGrow: 1,
+        padding: '0px 10px',
+        display: 'flex',
+        alignItems: 'center',
+        borderRadius: 5,
+        overflow: 'hidden'
+
     },
     sectionDesktop: {
         display: 'flex',
@@ -54,6 +60,11 @@ const useStyles = makeStyles((theme) => ({
 const HomeLayout = ({children, unReadMsgs, openPrivate}) => {
     const classes = useStyles();
     const history = useHistory();
+    const [frameShow, setFrameShow] = useState(false);
+
+    useLayoutEffect(() => {
+        setFrameShow(true)
+    }, [])
     
     return (
     <div>
@@ -65,7 +76,11 @@ const HomeLayout = ({children, unReadMsgs, openPrivate}) => {
                     className={classes.logo}
                     onClick={()=>history.push('/')}
                 />
-                <div className={classes.grow} />
+                <div className={classes.grow} >{ frameShow ?
+                    <iframe src="https://widget.walla.co.il/fxp4" height="40px" width="100%" frameborder={0} scrolling="no" />
+                    :<span />
+                }
+                </div>
                 <div className={classes.sectionDesktop}>
                     <IconButton aria-label="show 17 new notifications" color="inherit">
                         <Settings />

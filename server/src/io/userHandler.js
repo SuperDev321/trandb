@@ -1,5 +1,6 @@
 const { Rooms, Users } = require('../database/models');
-const { getRoomPermission, findUserByName, banByName, banByNameAndIp, checkBan } = require("../utils");
+const { getRoomPermission, findUserByName, banByUser, banByNameAndIp, checkBan } = require("../utils");
+const getUserIp = require('../utils/user/getUserIp');
 const kickUser = (io, socket) => async ({room, to}) => {
     console.log('kick')
     try {
@@ -28,19 +29,20 @@ const kickUser = (io, socket) => async ({room, to}) => {
     }
 }
 
-const banUser = (io, socket) => async ({room , ip, fromIp, toIp, to}) => {
+const banUser = (io, socket) => async ({room , ip, to}) => {
     try {
         const { _id } = socket.decoded;
         const role = await getRoomPermission(room, _id);
         const userToBan = await findUserByName(to);
         if(role) {
             let res = null;
-            console.log(role)
-            if(role === 'admin' && (ip || (fromIp && toIp))) {
-                res = await banByNameAndIp(room, to, ip, fromIp, toIp);
+            let userIp = await getUserIp(room, userToBan._id);
+            console.log('user ip', userIp);
+            if(role === 'admin' && ip) {
+                res = await banByNameAndIp(room, to, ip);
                 console.log('admin ban', res)
             } else {
-                res = await banByName(room, to);
+                res = await banByUser(room, to, userIp);
             }
             
             if(res) {

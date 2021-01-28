@@ -35,7 +35,7 @@ const useStyles = makeStyles((theme) => ({
         overflow: 'hidden',
     },
     header: {
-        height: 40,
+        height: 30,
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
@@ -59,8 +59,8 @@ const useStyles = makeStyles((theme) => ({
         overflow: 'hidden',
     },
     smallAvatar: {
-        width: theme.spacing(4),
-        height: theme.spacing(4),
+        width: theme.spacing(3),
+        height: theme.spacing(3),
         marginLeft: 10,
     },
     main: {
@@ -77,7 +77,7 @@ const useStyles = makeStyles((theme) => ({
         flexGrow: 1,
     },
     hide: {
-        display: 'none',
+        display: 'none !important',
     },
     active: {
         zIndex: 201
@@ -117,6 +117,7 @@ const PrivateChat = ({ me, to, sendMessage, active, setActive, initVal }, ref) =
     const [min, setMin] = useState(false);
     const [max, setMax] = useState(false);
     const [unRead, setUnRead] = useState(0);
+    const [isFocus, setIsFocus] = useState(false);
     const [rndWidth, setRndWidth] = useState(400);
     const [rndHeight, setRndHeight] = useState(350);
     const classes = useStyles({max});
@@ -130,15 +131,15 @@ const PrivateChat = ({ me, to, sendMessage, active, setActive, initVal }, ref) =
         if(min) {
             setMin(false);
             rndRef.current.updateSize({width, height: 350});
-            if(top > 310)
-                rndRef.current.updatePosition({y: top-310});
+            if(window.innerHeight-top<350)
+                rndRef.current.updatePosition({y: window.innerHeight-350});
             // setRndHeight(0);
         } else {
             setMax(false);
             setMin(true);
-            rndRef.current.updateSize({width, height: 40});
-            if(window.innerHeight - top > height-40)
-                rndRef.current.updatePosition({y: top+height-40});
+            rndRef.current.updateSize({width, height: 30});
+            // if(window.innerHeight - top > height-40)
+            //     rndRef.current.updatePosition({y: top+height-40});
             // setRndHeight(40);
         }
         // setHide(true);
@@ -155,7 +156,11 @@ const PrivateChat = ({ me, to, sendMessage, active, setActive, initVal }, ref) =
     }
 
     const onFocus = () => {
+        setIsFocus(true);
         setUnRead(0)
+    }
+    const onBlur = () => {
+        setIsFocus(false);
     }
 
     useImperativeHandle(ref, () => ({
@@ -167,8 +172,9 @@ const PrivateChat = ({ me, to, sendMessage, active, setActive, initVal }, ref) =
         },
         addMessage: (message) => {
             setMessages([...messages, message]);
-            if(message.from!==me.username)
+            if(message.from!==me.username && !isFocus) {
                 setUnRead(unRead+1);
+            }
         }
     }));
 
@@ -202,15 +208,15 @@ const PrivateChat = ({ me, to, sendMessage, active, setActive, initVal }, ref) =
                 width: 400,
                 height: 350,
             }}
-            minHeight={min?40:300}
+            minHeight={30}
             minWidth={300}
             // maxHeight={rndHeight ? rndHeight: null}
             dragHandleClassName="private-header"
             bounds="body"
-            className={`${classes.rnd} ${max&&classes.max}`}
+            className={`${classes.rnd} ${max&&classes.max}  ${active&&classes.active} ${hide&&classes.hide}`}
             ref={rndRef}
             disableDragging={max}
-            enableResizing={!max?{
+            enableResizing={!(max||min)?{
                 bottom: true,
                 bottomLeft: false,
                 bottomRight: true,
@@ -225,7 +231,7 @@ const PrivateChat = ({ me, to, sendMessage, active, setActive, initVal }, ref) =
         //     handle='#private-header' scale={1} onMouseDown={() => {setActive(to.username)}}
         // > */}
             <Paper ref={winRef}
-                className={`${classes.root} ${hide&&classes.hide} ${active&&classes.active}`}
+                className={`${classes.root}`}
             >
                 <div className={classes.header} >
                     <Badge badgeContent={unRead> 9? '9+': unRead} color="secondary"
@@ -261,7 +267,7 @@ const PrivateChat = ({ me, to, sendMessage, active, setActive, initVal }, ref) =
                     <div className={classes.content}>
                         <PrivateMessageList messages={messages} me={me}/>
                     </div>
-                    <ChatForm to={to} sendMessage={sendMessage} onFocus={onFocus}/>
+                    <ChatForm to={to} sendMessage={sendMessage} onFocus={onFocus} onBlur={onBlur} />
                 </div>
                 
             </Paper>
