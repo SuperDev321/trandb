@@ -23,9 +23,9 @@ export default function BanModal({open, setOpen, initVal, roomName}) {
     const name = initVal.name?initVal.name: '';
     const [type, setType] = useState('all');
     const [ip, setIp] = useState(initVal.ip?initVal.ip: '');
-    const [toIp, setToIp] = useState(initVal.ip?initVal.ip: '');
-    const [fromIp, setFromIp] = useState(initVal.ip?initVal.ip: ''); 
-    const [ipSel, setIpSel] = useState(true);
+    // const [toIp, setToIp] = useState(initVal.ip?initVal.ip: '');
+    // const [fromIp, setFromIp] = useState(initVal.ip?initVal.ip: ''); 
+    // const [ipSel, setIpSel] = useState(true);
     const socket = getSocket();
     const handleClose = () => {
         setOpen(false);
@@ -36,16 +36,16 @@ export default function BanModal({open, setOpen, initVal, roomName}) {
             setIp(e.target.value); console.log(ip)
         }
     }
-    const handleFromIpChange = (e) => {
-        if(e.target.value) {
-            setFromIp(e.target.value); console.log(ip)
-        }
-    }
-    const handleToIpChange = (e) => {
-        if(e.target.value) {
-            setToIp(e.target.value); console.log(ip)
-        }
-    }
+    // const handleFromIpChange = (e) => {
+    //     if(e.target.value) {
+    //         setFromIp(e.target.value); console.log(ip)
+    //     }
+    // }
+    // const handleToIpChange = (e) => {
+    //     if(e.target.value) {
+    //         setToIp(e.target.value); console.log(ip)
+    //     }
+    // }
 
     const handleBan = () => {
         
@@ -53,12 +53,12 @@ export default function BanModal({open, setOpen, initVal, roomName}) {
         if(type === 'this' && roomName) {
             payload.room = roomName;
         }
-        if(ipSel) {
-            payload.ip = ip;
-        } else if(fromIp && toIp){
-            payload.fromIp = fromIp;
-            payload.toIp = toIp
-        }
+        // if(ipSel) {
+        payload.ip = ip;
+        // } else if(fromIp && toIp){
+        //     payload.fromIp = fromIp;
+        //     payload.toIp = toIp
+        // }
         payload.to = name;
         console.log(payload)
         socket.emit('ban user', payload);
@@ -106,7 +106,7 @@ export default function BanModal({open, setOpen, initVal, roomName}) {
                     This Room
                 </MenuItem>
             </CustomTextField>
-            <Grid component="label" container alignItems="center" spacing={1}>
+            {/* <Grid component="label" container alignItems="center" spacing={1}>
                 <Grid item>Range</Grid>
                 <Grid item>
                     <Switch
@@ -118,12 +118,12 @@ export default function BanModal({open, setOpen, initVal, roomName}) {
                     />
                 </Grid>
                 <Grid item>IP</Grid>
-            </Grid>
+            </Grid> */}
             <Grid component="label" container alignItems="center" spacing={1}>
-                { ipSel &&
+                {/* { ipSel && */}
                     <Grid  item xs={12} sm={12} >
                         <CustomTextField className={classes.ipField}
-                            label=" "
+                            label='IP'
                             value={ip}
                             fullWidth
                             onChange={handleIpChange}
@@ -134,11 +134,11 @@ export default function BanModal({open, setOpen, initVal, roomName}) {
                             }}
                     />
                     </Grid>
-                }
+                {/* } */}
                 
-                { !ipSel &&
-                <>
-                <Grid  item xs={12} sm={6} >
+                {/* { !ipSel &&
+                <> */}
+                {/* <Grid  item xs={12} sm={6} >
                 <CustomTextField className={classes.ipField}
                     label="From"
                     value={fromIp}
@@ -150,8 +150,8 @@ export default function BanModal({open, setOpen, initVal, roomName}) {
                         inputComponent: IpMaskInput,
                     }}
                 />
-                </Grid>
-                <Grid  item xs={12} sm={6} >
+                </Grid> */}
+                {/* <Grid  item xs={12} sm={6} >
                 <CustomTextField  className={classes.ipField}
                     label="To"
                     value={toIp}
@@ -164,7 +164,7 @@ export default function BanModal({open, setOpen, initVal, roomName}) {
                 />
                 </Grid>
                 </>
-                }
+                } */}
             </Grid>
             
             </DialogContent>

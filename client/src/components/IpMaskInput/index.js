@@ -10,6 +10,7 @@ const IpMaskInput = ({ inputRef, ...other }) => {
     }}
     // 192.168.1.1
     mask= {value => {
+      console.log('mask value', value)
       let result = [];
       const chunks = value.split(".");
       for (let i = 0; i < 4; ++i) {
@@ -45,22 +46,27 @@ const IpMaskInput = ({ inputRef, ...other }) => {
         }
       }
       result = result.slice(0, -1);
+      console.log('mask result', result);
       return result;
     }
   }
     // ensures that every subsection of the ip address is greater than 0 and lower than 256
     pipe ={value => {
+      value = value.replace('_', '');
+      console.log('pip value', value)
       if (value === "." || value.endsWith("..")) return false;
   
       const parts = value.split(".");
+      console.log(parts)
   
       if (
         parts.length > 4 ||
-        parts.some(part => part === "00" || part < 0 || part > 255)
+        parts.some(part => part === "00"||part < 0 || part > 255)
       ) {
+        console.log('return false')
         return false;
       }
-  
+      
       return value;
     }}
     guide={true}

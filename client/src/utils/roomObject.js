@@ -9,8 +9,9 @@ class RoomObject  {
             this.messages = [];
         }
         if(users) {
-            let roomUsers = users.map((user) => ({...user, muted: false}));
-            this.users = roomUsers;
+            // let roomUsers = users.map((user) => ({...user, muted: false}));
+            // this.users = roomUsers;
+            this.setOnlinUsers(name, users);
         } else {
             this.users = null;
         }
@@ -29,6 +30,38 @@ class RoomObject  {
     addMessages(messages) {
         // console.log('set message to room object', messages);
         this.messages = [...this.messages, ...messages];
+    }
+
+    setOnlinUsers(roomName, users) {
+        let mutes = null;
+        let item = window.localStorage.getItem('mutes');
+        if(item) mutes = JSON.parse(item);
+        if(!Array.isArray(mutes)) mutes = null;
+        let roomUsers = users.map((item) => {
+            let muted = false
+            if(mutes) {
+                let mute = mutes.find((value) => (value.room === this.name && value.user === item.username));
+                if(mute) muted = true;
+            }
+            return {...item, muted}
+        });
+        
+        this.users = roomUsers;
+    }
+    addOnlineUser(user) {
+        let mutes = null;
+        let item = window.localStorage.getItem('mutes');
+        if(item) mutes = JSON.parse(item);
+        if(!Array.isArray(mutes)) mutes = null;
+        let muted = false
+        if(mutes) {
+            let mute = mutes.find((value) => (value.room === this.name && value.user === user.username));
+            if(mute) muted = true;
+        }
+        let currentUserNames = this.users.map(({username}) => (username));
+        if(!currentUserNames.includes(user.username)) {
+            this.users = [...this.users, {...user, muted}];
+        }
     }
 
     openCamera = async () => {

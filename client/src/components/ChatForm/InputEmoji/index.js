@@ -16,6 +16,7 @@ function InputEmoji ({
     onResize,
     onClick,
     onFocus,
+    onBlur,
     maxLength,
     keepOpenend,
     onKeyDown,
@@ -223,15 +224,22 @@ function InputEmoji ({
                 onFocus()
             }
         }
+        function handleBlur() {
+            if (typeof onBlur === 'function') {
+                onBlur()
+            }
+        }
 
         const inputEl = textInputRef.current
 
         inputEl.addEventListener('focus', handleFocus)
+        inputEl.addEventListener('blur', handleBlur)
 
         return () => {
-        inputEl.removeEventListener('focus', handleFocus)
+            inputEl.removeEventListener('focus', handleFocus)
+            inputEl.removeEventListener('blur', handleBlur)
         }
-    }, [onFocus])
+    }, [onFocus, onBlur])
 
     function totalCharacters () {
         const text = textInputRef.current.innerText
