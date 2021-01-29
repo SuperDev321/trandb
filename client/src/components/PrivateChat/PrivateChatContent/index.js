@@ -16,7 +16,10 @@ import Draggable from 'react-draggable';
 import PrivateMessageList from '../../PrivateMessageList';
 import {getPrivateMessages} from '../../../utils';
 import {ReactComponent as Maximium} from './square.svg'
-import {ReactComponent as Restore} from './restore.svg'
+import {ReactComponent as Restore} from './restore.svg';
+
+const defaultHeight = 300;
+const defaultWidth = 400;
 
 const useStyles = makeStyles((theme) => ({
     rnd: {
@@ -118,8 +121,8 @@ const PrivateChat = ({ me, to, sendMessage, active, setActive, initVal }, ref) =
     const [max, setMax] = useState(false);
     const [unRead, setUnRead] = useState(0);
     const [isFocus, setIsFocus] = useState(false);
-    const [rndWidth, setRndWidth] = useState(400);
-    const [rndHeight, setRndHeight] = useState(350);
+    const [rndWidth, setRndWidth] = useState(defaultWidth);
+    const [rndHeight, setRndHeight] = useState(defaultHeight);
     const classes = useStyles({max});
 
     const handleMinimize = () => {
@@ -130,9 +133,9 @@ const PrivateChat = ({ me, to, sendMessage, active, setActive, initVal }, ref) =
         console.log('client top react', top)
         if(min) {
             setMin(false);
-            rndRef.current.updateSize({width, height: 350});
-            if(window.innerHeight-top<350)
-                rndRef.current.updatePosition({y: window.innerHeight-350});
+            rndRef.current.updateSize({width, height: defaultHeight});
+            if(window.innerHeight-top<defaultHeight)
+                rndRef.current.updatePosition({y: window.innerHeight-defaultHeight});
             // setRndHeight(0);
         } else {
             setMax(false);
@@ -206,7 +209,7 @@ const PrivateChat = ({ me, to, sendMessage, active, setActive, initVal }, ref) =
                 x: window.innerWidth/2 - 200,
                 y: 200,
                 width: 400,
-                height: 350,
+                height: 300,
             }}
             minHeight={30}
             minWidth={300}
