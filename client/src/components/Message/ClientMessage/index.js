@@ -19,12 +19,14 @@ const MyMessage = ({message, font_size, userAction}) => {
     
   const classes = useStyles({color: message.color, bold: message.bold});
   const urlify = (text) => {
+    
     let urlRegex = /(https?:\/\/[^\s]+)/g;
     let arr = text.split(urlRegex);
     let noRepeatArr = [...new Set(arr)];
     for (let index = 0; index < noRepeatArr.length; index++) {
       const element = noRepeatArr[index];
-      if(new RegExp("(https?:\/\/[^\s]+)").test(element)) {
+      
+      if(new RegExp("([a-zA-Z0-9]+://)?([a-zA-Z0-9_]+:[a-zA-Z0-9_]+@)?([a-zA-Z0-9.-]+\\.[A-Za-z]{2,4})(:[0-9]+)?(/.*)?").test(element)) {
         text = text.replace(element, `<a href="${element}" target="_blank"></a>`);
       } else {
         text = text.replace(element, `<span>${element}</span>`);
@@ -42,7 +44,8 @@ const MyMessage = ({message, font_size, userAction}) => {
     if(noRepeatArr && noRepeatArr.length) {
       for (let index = 0; index < noRepeatArr.length; index++) {
         const element = noRepeatArr[index];
-        if(new RegExp("(https?:\/\/[^\s]+)").test(element)) {
+        console.log('test url', element)
+        if(new RegExp("([a-zA-Z0-9]+://)?([a-zA-Z0-9_]+:[a-zA-Z0-9_]+@)?([a-zA-Z0-9.-]+\\.[A-Za-z]{2,4})(:[0-9]+)?(/.*)?").test(element)) {
           urlText = urlText.replace(element, urlify(element));
         }
         else {
