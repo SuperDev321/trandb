@@ -3,20 +3,20 @@ import PrivateChatContent from '../PrivateChatContent';
 import { makeStyles } from '@material-ui/core/styles';
 // import getUser from '../../utils/getUser';
 
-const PrivateChatList = ({sendMessage, readMsg ,me}, ref) => {
+const PrivateChatList = ({sendMessage, leaveFromPrivate, readMsg ,me}, ref) => {
     const [chatList, setChatList] = useState([]);
     const [activeChat, setActiveChat] = useState(null);
     const elRefs = useRef([]);
     const setActive = (username) => {
         setActiveChat(username);
     }
-    const addNewChat = useCallback((toUsername, unRead) => {
+    const addNewChat = useCallback((toUsername, unReadMsg, roomName) => {
         
         let privateChat = chatList.find((item) => (item.to === toUsername));
         if(!privateChat) {
             let ref = createRef();
             elRefs.current.push({key: toUsername, ref});
-            let chatInfo = {to: toUsername, initVal: unRead};
+            let chatInfo = {to: toUsername, initVal: {messages: unReadMsg, roomName}};
             setChatList([...chatList, chatInfo]);
             setActiveChat(toUsername);
         }
@@ -30,13 +30,20 @@ const PrivateChatList = ({sendMessage, readMsg ,me}, ref) => {
         }
         readMsg(toUsername);
     }, )
+    const deleteChat = useCallback((toUsername, roomName) => {
+        let newChats = chatList.filter((item) => (item.to.username !== toUsername));
+        let newRefs = elRefs.current.filter((item) => (item.key !== toUsername));
+        elRefs.current = newRefs;
+        setChatList(newChats);
+        leaveFromPrivate(roomName);
+    })
     useImperativeHandle(ref, () => ({
-        addChat: (to) => {
-            addNewChat(to.username, 0);
+        addChat: (to, roomName) => {
+            addNewChat(to.username, [], roomName);
         },
-        addMessage: (message) => {
+        addMessage: (message, roomName) => {
             let ref = elRefs.current.find((item) => (item.key === message.from || item.key === message.to));
-            if(ref) {
+            if(ref && ref.ref.current) {
                 ref.ref.current.addMessage(message);
                 if(ref.ref.current.isShow()) {
                     return true;
@@ -45,7 +52,8 @@ const PrivateChatList = ({sendMessage, readMsg ,me}, ref) => {
                     return false;
                 }
             } else {
-                addNewChat(message.from, 1);
+                console.log('add new chat', message.from, roomName)
+                addNewChat(message.from, [message], roomName);
             }
             return false;
         }
@@ -53,13 +61,15 @@ const PrivateChatList = ({sendMessage, readMsg ,me}, ref) => {
     return (
         <>
             {chatList.map((item, index) =>
-                <PrivateChatContent key={index}
+                <PrivateChatContent key={item.to.username}
                     ref={elRefs.current[index].ref}
                     me={me} to={item.to}
-                    initVal={item.initVal}
+                    initMessages={item.initVal.messages}
                     sendMessage={sendMessage}
+                    deleteChat={deleteChat}
                     active={item.to === activeChat}
                     setActive={setActive}
+                    roomName={item.initVal.roomName}
                 />
             )
             }

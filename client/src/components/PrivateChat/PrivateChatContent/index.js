@@ -12,7 +12,7 @@ import {
 } from '@material-ui/icons';
 import ChatForm from '../../ChatForm';
 import { Rnd } from "react-rnd";
-import Draggable from 'react-draggable';
+import randomstring from "randomstring";
 import PrivateMessageList from '../../PrivateMessageList';
 import {getPrivateMessages} from '../../../utils';
 import {ReactComponent as Maximium} from './square.svg'
@@ -112,7 +112,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const PrivateChat = ({ me, to, sendMessage, active, setActive, initVal }, ref) => {
+const PrivateChat = ({ me, to, sendMessage, active, setActive, initMessages, deleteChat, roomName }, ref) => {
     const rndRef = useRef(null);
     const winRef = useRef(null);
     const [messages, setMessages] = useState([]);
@@ -121,6 +121,7 @@ const PrivateChat = ({ me, to, sendMessage, active, setActive, initVal }, ref) =
     const [max, setMax] = useState(false);
     const [unRead, setUnRead] = useState(0);
     const [isFocus, setIsFocus] = useState(false);
+    const [privateKey, setPrivateKey] = useState(null);
     const [rndWidth, setRndWidth] = useState(defaultWidth);
     const [rndHeight, setRndHeight] = useState(defaultHeight);
     const classes = useStyles({max});
@@ -181,22 +182,28 @@ const PrivateChat = ({ me, to, sendMessage, active, setActive, initVal }, ref) =
         }
     }));
 
-    useEffect(() => {
-        getPrivateMessages({from: me.username, to},
-            (data) => {
-                setMessages(data);
-            },
-            (err) => {
-                console.log(err);
-            }
-        );
-    }, [me, to])
+    // useEffect(() => {
+    //     let key = randomstring.generate(8);
+    //     setPrivateKey(key);
+    // })
+
+    // useEffect(() => {
+    //     getPrivateMessages({from: me.username, to},
+    //         (data) => {
+    //             setMessages(data);
+    //         },
+    //         (err) => {
+    //             console.log(err);
+    //         }
+    //     );
+    // }, [me, to])
 
     useEffect(() => {
-        if(initVal) {
-            setUnRead(initVal)
+        if(initMessages.length) {
+            setUnRead(initMessages.length)
         }
-    }, [initVal])
+        setMessages(initMessages)
+    }, [initMessages])
 
     // useEffect(() => {
     //     if(active) {
@@ -261,7 +268,7 @@ const PrivateChat = ({ me, to, sendMessage, active, setActive, initVal }, ref) =
                         <SvgIcon style={{fontSize: '1.3em'}} component={max? Restore: Maximium} viewBox="0 0 600 476.6" />
                     </div>
                     <div className={classes.icon}
-                        onClick={()=>{setHide(true);}}
+                        onClick={()=>{deleteChat(to.username, roomName);}}
                     >
                         <Close />
                     </div>
@@ -270,7 +277,9 @@ const PrivateChat = ({ me, to, sendMessage, active, setActive, initVal }, ref) =
                     <div className={classes.content}>
                         <PrivateMessageList messages={messages} me={me}/>
                     </div>
-                    <ChatForm to={to} sendMessage={sendMessage} onFocus={onFocus} onBlur={onBlur} />
+                    <ChatForm to={to} sendMessage={sendMessage} onFocus={onFocus} onBlur={onBlur} roomName={roomName}
+                        type={'private'}
+                    />
                 </div>
                 
             </Paper>

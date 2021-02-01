@@ -15,8 +15,7 @@ const publicMessage = (io, socket) => async ({ msg, room, from, color, bold }) =
       date,
     });
     
-    socket.to(room).emit('room messages', [
-      {
+    socket.to(room).emit('room message', {
         type: 'public',
         room,
         _id: newChat._id,
@@ -25,8 +24,7 @@ const publicMessage = (io, socket) => async ({ msg, room, from, color, bold }) =
         date: newChat.date,
         color: newChat.color,
         bold: newChat.bold
-      },
-    ]);
+    });
     console.log('color', newChat.color);
   } catch (err) {
     console.log(err);
@@ -49,7 +47,7 @@ const pokeMessage = (io, socket) => async ({from, to, room}, callback) => {
   }
 }
 
-const privateMessage = (io, socket) => async ({ msg, from, to, color, bold }) => {
+const privateMessage = (io, socket) => async ({ roomName, msg, from, to, color, bold }, fn) => {
   console.log('private')
   try {
     const date = Date.now();
@@ -65,20 +63,49 @@ const privateMessage = (io, socket) => async ({ msg, from, to, color, bold }) =>
     });
 
     const toUser = await findUserByName(to);
-    console.log('private', toUser._id)
+    console.log('private', toUser._id, roomName)
     if(toUser) {
-      socket.to(toUser._id.toString()).emit('room messages', [
-        {
-          type: 'private',
-          _id: newChat._id,
-          msg: newChat.msg,
-          from: newChat.from,
-          to: newChat.to,
-          color: newChat.color,
-          bold: newChat.bold,
-          date: newChat.date,
-        },
-      ]);
+      let socketIds = await io.of('/').in(roomName).allSockets();
+      console.log(socketIds)
+      socketIdArr = Array.from(socketIds);
+      if(socketIdArr.length < 2) {
+        console.log('other leaved');
+        fn(false);
+        socket.leave(roomName);
+        return;
+      }
+      let socketToPrivate = null;
+      for (let index = 0; index < socketIdArr.length; index++) {
+        const element = socketIdArr[index];
+        let socket = io.sockets.sockets.get(element);
+        if(toUser._id.equals(socket.decoded._id)) {
+          socketToPrivate = socket;
+        }
+      }
+      // let it = socketIds.values();
+      // let first = it.next();
+      // let id = first.value;
+      // let socketToPrivate = io.sockets.sockets.get(id);
+      if(socketToPrivate) {
+        socketToPrivate.emit('room message',
+          {
+            type: 'private',
+            _id: newChat._id,
+            msg: newChat.msg,
+            from: newChat.from,
+            to: newChat.to,
+            color: newChat.color,
+            bold: newChat.bold,
+            date: newChat.date,
+            roomName
+          }, (res) => {
+            if(res)
+              fn(newChat);
+        });
+      } else {
+        console.log('no user to receive private')
+        fn(false);
+      }
     }
     
 

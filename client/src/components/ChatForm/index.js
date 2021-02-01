@@ -8,7 +8,7 @@ import { getSocket } from '../../utils';
 
 
 
-const ChatForm = ({roomName, to, sendMessage, onFocus, onBlur}) => {
+const ChatForm = ({roomName, to, sendMessage, onFocus, onBlur, type}) => {
     const classes = useStyles();
     const [msg, setMsg] = useState('');
     const formRef = useRef(null);
@@ -33,31 +33,11 @@ const ChatForm = ({roomName, to, sendMessage, onFocus, onBlur}) => {
     }, [])
 
 
-    // const sendMessage = () => {
-    //     let realMsg = msg.trim();
-    //     // console.log('realMsg', realMsg);
-    //     let color = userColor? userColor: 'black';
-
-
-    //     if (realMsg) {
-    //         const date = Date.now();
-    //         if(to) {
-    //             // console.log(username, to);
-    //             socket.emit('private message', { msg: realMsg, room: roomName, from: username, to, date, color, bold });
-    //         } else{
-    //             // console.log(username, room.name, to);
-    //             socket.emit('public message', { msg: realMsg, room: roomName, from: username, date, color, bold });
-    //         }
-            
-    //         setMsg('');
-    //     }
-    // }
-
     const handleOnEnter = () => {
         let realMsg = msg.trim();
         let color = userColor? userColor: 'black';
         if(realMsg) {
-            setTimeout(() => {sendMessage(roomName, to, color, realMsg, bold);}, 0);
+            setTimeout(() => {sendMessage(roomName, to, color, realMsg, bold, type);}, 0);
             setMsg('');
         }
         

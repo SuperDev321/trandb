@@ -1,5 +1,7 @@
 const joinRoom = require('./joinRoom');
 const leaveRoom = require('./leaveRoom');
+const addPrivate = require('./addPrivate');
+const leavePrivate = require('./leavePrivate');
 const { publicMessage, privateMessage, pokeMessage } = require('./msgHandler');
 const { kickUser, banUser, banUserByAdmin } = require('./userHandler');
 const {sendSignal, returnSignal} = require('./videoHandler');
@@ -12,6 +14,9 @@ const ioHandler = (io) => (socket) => {
     // message events
     socket.on('public message', publicMessage(io, socket));
     socket.on('private message', privateMessage(io, socket));
+
+    socket.on('open private', addPrivate(io, socket))
+    socket.on('leave private', leavePrivate(socket))
     socket.on('poke message', pokeMessage(io, socket));
     socket.on('kick user', kickUser(io, socket));
     socket.on('ban user', banUser(io, socket));
