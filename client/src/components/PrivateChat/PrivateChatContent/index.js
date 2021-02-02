@@ -10,6 +10,7 @@ import {
     Close,
     Minimize
 } from '@material-ui/icons';
+import {red} from '@material-ui/core/colors'
 import ChatForm from '../../ChatForm';
 import { Rnd } from "react-rnd";
 import randomstring from "randomstring";
@@ -78,6 +79,7 @@ const useStyles = makeStyles((theme) => ({
         width: '100%',
         overflow: 'auto',
         flexGrow: 1,
+        position: 'relative',
     },
     hide: {
         display: 'none !important',
@@ -109,6 +111,20 @@ const useStyles = makeStyles((theme) => ({
             top: 5,
             left: 10 
         }
+    },
+    errorContent: {
+        position: 'absolute',
+        bottom: 0,
+        color: red[300],
+        backgroundColor: red[50],
+        width: '100%',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        textAlign: 'center',
+        fontSize: 17,
+        paddingTop: 7,
+        paddingBottom: 7
     }
 }));
 
@@ -121,6 +137,7 @@ const PrivateChat = ({ me, to, sendMessage, active, setActive, initMessages, del
     const [max, setMax] = useState(false);
     const [unRead, setUnRead] = useState(0);
     const [isFocus, setIsFocus] = useState(false);
+    const [error, setError] = useState(false);
     const [privateKey, setPrivateKey] = useState(null);
     const [rndWidth, setRndWidth] = useState(defaultWidth);
     const [rndHeight, setRndHeight] = useState(defaultHeight);
@@ -174,11 +191,15 @@ const PrivateChat = ({ me, to, sendMessage, active, setActive, initMessages, del
         isShow: () => {
             return !hide;
         },
-        addMessage: (message) => {
+        addMessage: (message, roomName) => {
             setMessages([...messages, message]);
             if(message.from!==me.username && !isFocus) {
                 setUnRead(unRead+1);
             }
+        },
+        addErrorMessage: () => {
+            console.log('private error set')
+            setError(true);
         }
     }));
 
@@ -242,6 +263,7 @@ const PrivateChat = ({ me, to, sendMessage, active, setActive, initMessages, del
         // > */}
             <Paper ref={winRef}
                 className={`${classes.root}`}
+                onMouseDown={() => {setActive(roomName)}}
             >
                 <div className={classes.header} >
                     <Badge badgeContent={unRead> 9? '9+': unRead} color="secondary"
@@ -268,7 +290,10 @@ const PrivateChat = ({ me, to, sendMessage, active, setActive, initMessages, del
                         <SvgIcon style={{fontSize: '1.3em'}} component={max? Restore: Maximium} viewBox="0 0 600 476.6" />
                     </div>
                     <div className={classes.icon}
-                        onClick={()=>{deleteChat(to.username, roomName);}}
+                        onClick={()=>{
+                            setHide(true);
+                            // deleteChat(to.username, roomName);
+                        }}
                     >
                         <Close />
                     </div>
@@ -276,6 +301,9 @@ const PrivateChat = ({ me, to, sendMessage, active, setActive, initMessages, del
                 <div className={classes.main}>
                     <div className={classes.content}>
                         <PrivateMessageList messages={messages} me={me}/>
+                        { error &&
+                            <div className={classes.errorContent}>This user logged out, message delivery failed.Please close this chat.</div>
+                        }
                     </div>
                     <ChatForm to={to} sendMessage={sendMessage} onFocus={onFocus} onBlur={onBlur} roomName={roomName}
                         type={'private'}

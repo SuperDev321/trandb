@@ -19,17 +19,19 @@ const ChattingRoom = () => {
         }
         setUnReadMsgs([...unReadMsgs, msgInfo]);
     }
-    const readMsg = (from) => {
-        let msgs = unReadMsgs.filter((item) => (item.from !== from));
-        setUnReadMsgs(msgs)
-    }
+    // const readMsg = (from) => {
+    //     let msgs = unReadMsgs.filter((item) => (item.from !== from));
+    //     setUnReadMsgs(msgs)
+    // }
     const openPrivate = (user) => {
         chatRef.current.openPrivate(user);
     }
     return (
         <HomeLayout unReadMsgs={unReadMsgs} openPrivate={openPrivate}>
             <CssBaseline />
-            <ChatRooms ref={chatRef} room={room} addUnReadMsg={addUnReadMsg} readMsg={readMsg}/>
+            <ChatRooms ref={chatRef} room={room} addUnReadMsg={addUnReadMsg}
+            //  readMsg={readMsg}
+            />
         </HomeLayout>
     );
 };
