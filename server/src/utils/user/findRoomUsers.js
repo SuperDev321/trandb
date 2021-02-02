@@ -2,9 +2,9 @@ const { Rooms, Users } = require('../../database/models');
 
 const findRoomUsers = async (room, myRole) => {
     const roomInfo = await Rooms.findOne({ name: room });
-    const owner = roomInfo.owner;
-    const moderators = roomInfo.moderators;
     if(roomInfo) {
+        const owner = roomInfo.owner;
+        const moderators = roomInfo.moderators;
         let liveUserIds = roomInfo.users.map((item) => (item._id));
         const roomUsers = await Users.find({ _id: { $in: liveUserIds? liveUserIds: []  } });
         const usersInfo = roomUsers.map(({ _id, username, gender, role, avatar }) =>{

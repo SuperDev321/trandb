@@ -21,7 +21,7 @@ import UserContext from '../../context';
 import { getSocket, useLocalStorage } from '../../utils';
 import {useAudio} from 'react-use';
 
-const ChatRooms = ({room, addUnReadMsg, readMsg}, ref) => {
+const ChatRooms = ({room, addUnReadMsg}, ref) => {
     const classes = useStyles();
     const history= useHistory();
     const [mobileOpen, setMobileOpen] = useState(false);
@@ -140,7 +140,8 @@ const ChatRooms = ({room, addUnReadMsg, readMsg}, ref) => {
                             let message = data;
                             privateListRef.current.addMessage(message, roomName);
                         } else {
-                            enqueueSnackbar('The message was not delivered. Please close this private chat.', {variant: 'error'});
+                            // enqueueSnackbar(to + ' was out of chat. Please close the private chat with '+ to +'.', {variant: 'error'});
+                            privateListRef.current.addErrorMessage(roomName);
                         }
                         
                     }
@@ -861,7 +862,7 @@ const ChatRooms = ({room, addUnReadMsg, readMsg}, ref) => {
                 me={{username, avatar, gender}} to={privateTo} room={currentRoom} messages={privateMessgaes}
             /> */}
         <PrivateChatList ref={privateListRef}
-            sendMessage={sendMessage} readMsg={readMsg}
+            sendMessage={sendMessage}
             leaveFromPrivate={leaveFromPrivate}
             me={{username, avatar, gender}} />
         <div>{pokeAudio}</div>

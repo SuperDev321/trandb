@@ -44,7 +44,6 @@ const MyMessage = ({message, font_size, userAction}) => {
     if(noRepeatArr && noRepeatArr.length) {
       for (let index = 0; index < noRepeatArr.length; index++) {
         const element = noRepeatArr[index];
-        console.log('test url', element)
         if(new RegExp("([a-zA-Z0-9]+://)?([a-zA-Z0-9_]+:[a-zA-Z0-9_]+@)?([a-zA-Z0-9.-]+\\.[A-Za-z]{2,4})(:[0-9]+)?(/.*)?").test(element)) {
           urlText = urlText.replace(element, urlify(element));
         }
