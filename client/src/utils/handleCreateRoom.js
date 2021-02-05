@@ -12,7 +12,7 @@ const handleCreateRoom = async (data, successCallback, errCallback) => {
     formData.append('cover', data.cover);
     formData.append('icon', data.icon);
     console.log('axios data', data)
-    await axios.post('/api/room', formData, {
+    await axios.post('https://new.trandb.com:4000/api/room', formData, {
       headers: {'Content-type': 'multipart/form-data'}
     });
     successCallback();

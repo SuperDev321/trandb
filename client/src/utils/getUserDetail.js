@@ -3,12 +3,12 @@ import axios from 'axios';
 const getUserDetail = async (username, successCallback, errCallback) => {
     
     try {console.log('get room detail', username)
-        let result = await axios.get('/api/user/'+username);
+        let result = await axios.get('https://new.trandb.com:4000/api/user/'+username);
         console.log(result)
         const userInfo = result.data;
         
 
-        const {data: {data}} = await axios({url: '/api/users/'+userInfo._id + '/rooms'})
+        const {data: {data}} = await axios({url: 'https://new.trandb.com:4000/api/users/'+userInfo._id + '/rooms'})
         console.log(userInfo, data);
         userInfo.rooms = data
         // setLoading(false);
