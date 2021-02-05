@@ -356,9 +356,9 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                                 messageAudioControls.play();
                             }
                             if(currentRoomName !== room.name) {
-                                room.unReadMessages = [...room.unReadMessages,...newMessage.message];
+                                room.unReadMessages = [newMessage.message, ...room.unReadMessages];
                             } else {
-                                room.messages = [...room.messages, newMessage.message];
+                                room.messages = [ newMessage.message, ...room.messages];
                             }
                         }
                         if(newMessage.message.onlineUsers) {
@@ -507,7 +507,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                                     type: 'system',
                                     msg: newInfo.payload.room.welcomeMessage
                                 };
-                                messages = [...messages, wcMsg];
+                                messages = [wcMsg, ...messages];
                             }
                             
                             let newRoomObject = new RoomObject(newInfo.payload.room.name, messages, newInfo.payload.onlineUsers);
@@ -550,7 +550,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                                         type: 'system',
                                         msg: joinedUser.username + ' joined the room'
                                     }
-                                    sameRoom.messages = [...sameRoom.messages, sysMsg];
+                                    sameRoom.messages = [sysMsg, ...sameRoom.messages];
                                 }
                             }
                         }
@@ -575,7 +575,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                                     type: 'system',
                                     msg: leavedUser.username + ' leaved room' 
                                 }
-                                sameRoom.messages = [...sameRoom.messages, message];
+                                sameRoom.messages = [message, ...sameRoom.messages];
                             }
                         } else {
                             //you leaved from room by server
@@ -604,7 +604,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                                 type: 'system',
                                 msg
                             }
-                            sameRoom.messages = [...sameRoom.messages, message];
+                            sameRoom.messages = [message, ...sameRoom.messages];
                             if(sameRoom.name === currentRoomName) {
                                 setCurrentRoomMessages([...sameRoom.messages]);
                                 setCurrentRoomUsers([...sameRoom.users]);
@@ -633,7 +633,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                                 type: 'system',
                                 msg
                             }
-                            roomRef.messages = [...roomRef.messages, message];
+                            roomRef.messages = [message, ...roomRef.messages];
                             if(roomRef.name === currentRoomName) {
                                 setCurrentRoomMessages([...roomRef.messages]);
                                 setCurrentRoomUsers([...roomRef.users]);
@@ -661,7 +661,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                                 from: pokeMessage.from,
                                 msg: pokeMessage.from + ' sent a rington to you' 
                             }
-                            sameRoom.messages = [...sameRoom.messages, message];
+                            sameRoom.messages = [message, ...sameRoom.messages];
                             let userToReceive = sameRoom.users.find((item) => (item.username === pokeMessage.from));
                             if(userToReceive && !userToReceive.muted) {
                                 pokeAudioControls.seek(0);
@@ -725,7 +725,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
 
     useEffect(() => {
         if(roomsRef.current.length > 0 && roomsRef.current.length > roomIndex) {
-            roomsRef.current[roomIndex].messages = [...roomsRef.current[roomIndex].messages, ...roomsRef.current[roomIndex].unReadMessages];
+            roomsRef.current[roomIndex].messages = [ ...roomsRef.current[roomIndex].unReadMessages, ...roomsRef.current[roomIndex].messages];
             roomsRef.current[roomIndex].unReadMessages = [];
             setCurrentRoomMessages([...roomsRef.current[roomIndex].messages]);
             setCurrentRoomUsers([...roomsRef.current[roomIndex].users]);
