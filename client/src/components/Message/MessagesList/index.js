@@ -1,10 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import propTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
-import useInfiniteScroll from 'react-infinite-scroll-hook';
 import ClientMessage from '../ClientMessage';
 import SystemMessage from '../SystemMessage';
-import { message } from 'antd';
 
 
 const useStyles =  makeStyles((theme) => ({
