@@ -11,7 +11,7 @@ const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const dbConnection = require('./database/dbConnection');
 const router = require('./router');
-
+const { RateLimiterMemory } = require('rate-limiter-flexible');
 const {ioHandler, adminIoHandler} = require('./io');
 const { verifyToken, findUserById } = require('./utils');
 const cors = require('cors');
@@ -48,9 +48,15 @@ if (process.env.NODE_ENV === 'production') {
         res.sendFile(join(__dirname, '..', '..', 'client', 'build', 'index.html'))
     );
 }
+const rateLimiter = new RateLimiterMemory({
+    points: 6,
+    duration: 1,
+});
 io.use(async (socket, next) => {
     try {
         // const token = (socket.request.headers.cookie + ';').match(/(?<=token=)(.*?)(?=;)/)[0];
+        console.log('socket connect')
+        await rateLimiter.consume(socket.handshake.address)
         const cookies = cookie.parse(socket.request.headers.cookie || '');
         const token = (cookies&&cookies.token)?cookies.token:'ok';
         // const token = cookies.token
@@ -65,6 +71,7 @@ io.use(async (socket, next) => {
     }
 }).on('connection', ioHandler(io));
 
+
 // io.of('/admin').use(async (socket, next) => {
 //     const cookies = cookie.parse(socket.request.headers.cookie || '');
 //     const token = (cookies&&cookies.token)?cookies.token:'ok';
@@ -78,5 +85,23 @@ io.use(async (socket, next) => {
 // }).on('connection', adminIoHandler(io));
 
 createAdminUser({username: 'rafa', email: 'rafa@gmail.com',password: '12345678', gender: 'male'});
+let listeners = app.listeners('');
+// io.removeAllListeners('request');
+// io.use(async (err, req, res, next) => {
+//     console.log('mid')
+//     if(req.socket)
+//     console.log('ip',req.connection.remoteAddress);
+//     res.statusCode = 429;
+//     res.end('Too many requst');
+// })
+
+// listeners.map((listener) => {
+    
+//     app.on('request', listener);
+// })
+// let newlisteners = server.listeners('request');
+console.log(listeners)
+
+
 
 module.exports = { server, app, dbConnection };

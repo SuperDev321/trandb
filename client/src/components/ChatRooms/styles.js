@@ -11,7 +11,7 @@ const useStyles = makeStyles((theme) => ({
     mainWrapper: {
         flexGrow: 1,
         overflow: 'hidden',
-        margin: '2px',
+        margin: '1px',
         marginBottom: 0,
         marginRight: 0,
         position: 'relative',
@@ -28,7 +28,7 @@ const useStyles = makeStyles((theme) => ({
         height: `calc(100vh - 52px)`,
         background: 'transparent',
         borderRadius: '0px',
-        margin: '2px 0 0 0',
+        margin: '1px 0 0 0',
     },
     drawerWrapper: {
         zIndex: '100',

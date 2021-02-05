@@ -9,10 +9,14 @@ const {
   googleLogin,
   checkToken,
   logout,
+  getRoomDetail,
   getRooms,
   addRoom,
   getPrivateChat,
-  getUser,
+  getUserByName,
+  getUserDetail,
+  deleteBan,
+  getUserRooms,
 } = require('./controllers');
 
 const { withAuth } = require('./middleware');
@@ -23,6 +27,7 @@ router.get('/checkToken', checkToken);
 router.get('/logout', logout);
 router.get('/rooms', getRooms);
 router.post('/room', withAuth, addRoom);
+router.get('/rooms/:roomName', withAuth, getRoomDetail);
 router.post('/signup', signup);
 router.post('/login', login);
 router.post('/login/guest', guestLogin);
@@ -30,7 +35,11 @@ router.post('/login/google', googleLogin);
 
 router.post('/messages/private', getPrivateChat);
 
-router.get('/users/:username', getUser);
+router.get('/user/:username', getUserByName);
+router.get('/users/:userId/rooms', withAuth, getUserRooms);
+router.get('/users/:userId', getUserDetail);
+
+router.delete('/bans/:banId', deleteBan)
 
 router.use(clientError);
 router.use(serverError);

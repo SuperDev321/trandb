@@ -1,9 +1,9 @@
-const getBans = require('./getRooms');
-const addBan = require('./createBan');
+// const getBans = require('./getRooms');
+const deleteBan = require('./deleteBan');
 
 module.exports = {
-    addBan,
+    // addBan,
     deleteBan,
-    getBans,
-    updateBan
+    // getBans,
+    // updateBan
 };

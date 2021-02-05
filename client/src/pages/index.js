@@ -4,3 +4,5 @@ export { default as Login } from './Login';
 export { default as Rooms } from './Rooms';
 export { default as ChattingRoom } from './ChattingRoom';
 export { default as BlockUsers } from './Admin/BlockUsers';
+export { default as RoomSetting } from './RoomSetting';
+export { default as Profile } from './Profile';

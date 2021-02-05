@@ -31,6 +31,7 @@ const useStyles = makeStyles((theme) => ({
         display: 'flex',
         justifyContent: 'start',
         alignContent: 'baseline',
+        
     },
     sender: {
         margin: 0,

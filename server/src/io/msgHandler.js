@@ -33,7 +33,6 @@ const publicMessage = (io, socket) => async ({ msg, room, from, color, bold }) =
 
 const pokeMessage = (io, socket) => async ({from, to, room}, callback) => {
   const toUser = await findUserByName(to);
-  console.log('poke message', from, to, toUser)
   if(toUser) {
     io.to(toUser._id.toString()).emit('poke message', {
       type: 'poke',
@@ -48,7 +47,6 @@ const pokeMessage = (io, socket) => async ({from, to, room}, callback) => {
 }
 
 const privateMessage = (io, socket) => async ({ roomName, msg, from, to, color, bold }, fn) => {
-  console.log('private')
   try {
     const date = Date.now();
     
@@ -63,13 +61,10 @@ const privateMessage = (io, socket) => async ({ roomName, msg, from, to, color, 
     });
 
     const toUser = await findUserByName(to);
-    console.log('private', toUser._id, roomName)
     if(toUser) {
       let socketIds = await io.of('/').in(roomName).allSockets();
-      console.log(socketIds)
       socketIdArr = Array.from(socketIds);
       if(socketIdArr.length < 2) {
-        console.log('other leaved');
         fn(false);
         socket.leave(roomName);
         return;

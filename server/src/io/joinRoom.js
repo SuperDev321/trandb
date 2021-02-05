@@ -8,7 +8,6 @@ const joinRoom = (io, socket) => async ({ room }) => {
         if (ip.substr(0, 7) === '::ffff:') {
             ip = ip.substr(7);
         }
-        console.log(ip, role)
         // console.log(socket.rooms);
         // console.log('joining room:', room, _id);
         // console.log(io)
@@ -23,11 +22,10 @@ const joinRoom = (io, socket) => async ({ room }) => {
         
         socket.join(room);
         let {welcomeMessage} = await Rooms.findOne({name: room});
-        const messages = await Chats.find({ room, type: 'public' });
+        const messages = await Chats.find({ room, type: 'public' }).sort({date: -1});
         const usersInfo = await findRoomUsers(room, user.role);
         socket.emit('init room', {messages, onlineUsers: usersInfo, room: {name: room, welcomeMessage}}, (data)=> {
             if(data === 'success') {
-                console.log(user)
                 io.to(room).emit('joined room', {room, onlineUsers: usersInfo,
                     joinedUser: {
                         _id: user._id,
