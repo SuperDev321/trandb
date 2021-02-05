@@ -40,7 +40,6 @@ const banUser = (io, socket) => async ({room , ip, to}) => {
             console.log('user ip', userIp);
             if(role === 'admin' && ip) {
                 res = await banByNameAndIp(room, to, ip);
-                console.log('admin ban', res)
             } else {
                 res = await banByUser(room, to, userIp);
             }
@@ -48,7 +47,6 @@ const banUser = (io, socket) => async ({room , ip, to}) => {
             if(res) {
                 if(room) {
                     await Rooms.updateOne({ name: room }, { $pull: { users: {_id: userToBan._id} } });
-                    console.log('room update', room, userToBan)
                     let socketIds = await io.of('/').in(userToBan._id.toString()).allSockets();
                     let it = socketIds.values();
                     let first = it.next();
@@ -63,7 +61,6 @@ const banUser = (io, socket) => async ({room , ip, to}) => {
                     }
                 } else {
                     await Rooms.updateMany({}, { $pull: { users: {_id: userToBan._id} } });
-                    console.log('room update', userToBan)
                     let socketIds = await io.of('/').in(userToBan._id.toString()).allSockets();
                     let it = socketIds.values();
                     let first = it.next();

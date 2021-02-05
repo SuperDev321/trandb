@@ -1,7 +1,8 @@
 const { clientError, serverError } = require('./errorHandlers');
-const { signup, login, guestLogin, googleLogin, checkToken, logout, getUser } = require('./users');
-const { getRooms, addRoom } = require('./rooms');
+const { signup, login, guestLogin, googleLogin, checkToken, logout, getUserByName, getUserDetail } = require('./users');
+const { getRooms, addRoom, getRoomDetail, getUserRooms } = require('./rooms');
 const { getPrivateChat } = require('./chats');
+const {deleteBan} = require('./bans')
 
 module.exports = {
   clientError,
@@ -12,8 +13,12 @@ module.exports = {
   googleLogin,
   checkToken,
   logout,
-  getUser,
+  getUserByName,
+  getUserDetail,
   getRooms,
   addRoom,
-  getPrivateChat
+  getRoomDetail,
+  getPrivateChat,
+  deleteBan,
+  getUserRooms
 };

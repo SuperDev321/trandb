@@ -11,6 +11,42 @@ const useStyles = makeStyles((theme) => ({
     textAlign: 'center !important',
   },
 
+  about: {
+    padding: theme.spacing(2),
+    marginTop: '25px',
+  },
+
+  aboutTitle: {
+    marginTop: '20px',
+    fontWeight: '700',
+    fontSize: '18px',
+  },
+
+  title: {
+    fontWeight: '700',
+    fontSize: '18px',
+    margin: 0
+  },
+
+  aboutBody: {
+    marginTop: '15px',
+    display: 'flex',
+  },
+
+  rightSide: {
+    padding: theme.spacing(2),
+    '& > *': {
+      marginTop: '20px',
+      marginBottom: '20px',
+    },
+  },
+
+  titleName: {
+    fontSize: '30px',
+    fontWeight: '600',
+  },
+
+
   roundedCircle: {
     borderRadius: '50%',
     marginTop: '10px',
@@ -35,11 +71,7 @@ const useStyles = makeStyles((theme) => ({
     },
   },
 
-  formControl: {
-    minWidth: 120,
-  },
-
-  media: {
+  room: {
     padding: theme.spacing(3),
     marginTop: '25px',
     PaddingLeft: '2%',
@@ -49,22 +81,12 @@ const useStyles = makeStyles((theme) => ({
     },
   },
 
-  mediaImage: {
-    borderRadius: '50%',
-    marginTop: '40px',
+  roomBody: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    paddingTop: 10
   },
 
-  fileupload: {
-    marginTop: '20px',
-    fontSize: '13px',
-    color: 'gray',
-  },
-
-  button: {
-    width:'auto', 
-    marginTop: '20px', 
-    textTransform: 'none',
-  },
 
 }));
 

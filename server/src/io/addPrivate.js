@@ -10,7 +10,7 @@ const addPrivate = (io, socket) => async ({ from, to }, callback) => {
             letters: true,
             special: false
         });
-        newPrivateRoomName += from + to;
+        newPrivateRoomName += '_' + from + '_' + to;
         console.log('private',to)
         const toUser = await findUserByName(to);
         let socketIds = await io.of('/').in(toUser._id.toString()).allSockets();

@@ -6,9 +6,6 @@ const roomSchema = new Schema({
         type: String,
         required: true,
     },
-    user_id: {
-        type: Schema.Types.ObjectId
-    },
     category: {
         type: String,
         required: true

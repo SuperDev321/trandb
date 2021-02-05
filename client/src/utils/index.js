@@ -10,5 +10,8 @@ export { default as RoomObject } from './roomObject';
 export { default as handleCreateRoom } from './handleCreateRoom';
 export { default as getPrivateMessages } from './getPrivateMessages';
 export { getSocket } from './socketHandler';
+export { default as getRoomDetail } from './getRoomDetail';
+export { default as getUserDetail } from './getUserDetail';
+export { default as deleteBan } from './deleteBan';
 
 

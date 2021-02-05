@@ -1,17 +1,18 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import propTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
-
-// import Message from '../../OldMessage';
+import useInfiniteScroll from 'react-infinite-scroll-hook';
 import ClientMessage from '../ClientMessage';
 import SystemMessage from '../SystemMessage';
+import { message } from 'antd';
+
 
 const useStyles =  makeStyles((theme) => ({
     root: {
         display: 'flex',
-        flexDirection: 'column',
+        flexDirection: 'column-reverse',
         overflow: 'auto',
-        height: '100%',
+        maxHeight: '100%',
         flex: '1',
         width: '100%',
         wordBreak: 'break-word',
@@ -26,29 +27,77 @@ const useStyles =  makeStyles((theme) => ({
             outline: 'none',
             borderRadius: '5px',
         }
+    },
+    loading: {
+        width: '100%',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        fontSize: 18,
+        color: '#237edc'
     }
 }));
 
+
+const itemUnit = 50;
 
 const MessagesList = ({ messages, userAction }) => {
     const messagesRef = useRef();
     const classes = useStyles();
 
-    useEffect(() => {
-        if (messagesRef.current) {
-            messagesRef.current.scrollTop = messagesRef.current.scrollHeight;
+    const [currentItems, setCurrentItems] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    const [count, setCount] = useState({
+        prev: 0,
+        next: itemUnit
+    });
+
+    const addItems = () => {
+        if(currentItems.length === messages.length) {
+            return;
         }
+        setLoading(true);
+        setTimeout(() => {
+            let newItems = currentItems.concat(messages.slice(count.prev + itemUnit, count.next + itemUnit));
+            setCurrentItems(newItems)
+            setCount((prevState) => ({ prev: prevState.prev + itemUnit, next: prevState.next + itemUnit }))
+            setLoading(false);
+        }, 1000);
+    }
+
+    useEffect(() => {
+        const handleScroll = () => {
+            if(messagesRef.current.scrollHeight + messagesRef.current.scrollTop - messagesRef.current.clientHeight <= 2) {
+                addItems();
+            }
+        }
+        messagesRef.current.addEventListener('scroll', handleScroll)
+        return () => messagesRef.current.removeEventListener('scroll', handleScroll)
+    }, [currentItems])
+
+    useEffect(() => {
+        if(messages.length) {
+            setCount({prev: 0, next: itemUnit})
+            setCurrentItems(messages.slice(0, count.next));
+            setLoading(false);
+        }
+        
+        // if (messagesRef.current) {
+        //     messagesRef.current.scrollTop = messagesRef.current.scrollHeight;
+        // }
         // console.log(messages);
     }, [messages]);
 
     return (
+        <>
         <div ref={messagesRef} className={classes.root}>
-            { messages &&
-                messages.map(({ _id, from, msg, date, type, color, bold }, index) => (
+            { currentItems &&
+                currentItems.map(({ _id, from, msg, date, type, color, bold }, index) => (
                     // <Message key={_id} text={msg} from={from} date={date} />
-                    <span key={index}>
+                    <span key={_id? _id: index}>
                         { type==='public' &&
-                        <ClientMessage key={_id? _id: index} userAction={userAction}
+                        <ClientMessage userAction={userAction}
                             message={{from, msg, date, color, bold}} font_size={10} />
                         }
                         {
@@ -58,7 +107,34 @@ const MessagesList = ({ messages, userAction }) => {
                     </span>
                 ))
             }
+            { loading &&
+                <span className={classes.loading}>Loading ...</span>
+            }
         </div>
+        {/* <div ref={messagesRef} className={classes.root} id="scrollableDiv"></div>
+        <InfiniteScroll
+            dataLength={current.length}
+            next={getMoreData}
+            hasMore={true}
+            loader={<h4>Loading...</h4>}
+        >
+            { current &&
+                current.map(({ _id, from, msg, date, type, color, bold }, index) => (
+                    // <Message key={_id} text={msg} from={from} date={date} />
+                    <span key={_id? _id: index}>
+                        { type==='public' &&
+                        <ClientMessage userAction={userAction}
+                            message={{from, msg, date, color, bold}} font_size={10} />
+                        }
+                        {
+                        (type ==='system' || type === 'poke') &&
+                            <SystemMessage text={msg} />
+                        }
+                    </span>
+                ))
+            }
+        </InfiniteScroll> */}
+      </>
     );
 };
 

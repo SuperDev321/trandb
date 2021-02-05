@@ -77,7 +77,7 @@ const HomeLayout = ({children, unReadMsgs, openPrivate}) => {
                     onClick={()=>history.push('/')}
                 />
                 <div className={classes.grow} >{ frameShow ?
-                    <iframe src="https://widget.walla.co.il/fxp4" height="40px" width="100%" frameborder={0} scrolling="no" />
+                    <iframe src="https://widget.walla.co.il/fxp4" height="40px" width="100%" frameBorder={0} scrolling="no" />
                     :<span />
                 }
                 </div>

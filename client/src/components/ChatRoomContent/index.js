@@ -86,7 +86,10 @@ const ChatRoom = ({roomName, users, messages, sendMessage}) => {
     return (
         <div className={classes.root}>
             <div className={classes.content}>
-                <MessagesList messages={messagesToShow} className={classes.messageArea} userAction={userAction} />
+                {messagesToShow.length ?
+                    <MessagesList messages={messagesToShow} className={classes.messageArea} userAction={userAction} />
+                    : <div></div>
+                }
                 <div className={classes.youtube}>
                     { youtubeUrl &&
                     <>

@@ -5,7 +5,7 @@ import { Spin } from 'antd';
 import UserContext from './context';
 import CustomThemeProvider from './themes/cutomThemeProvider'
 import { useAuth } from './utils';
-import { Signup, Login, Rooms, ChattingRoom, Admin } from './pages';
+import { Signup, Login, Rooms, ChattingRoom, Admin, RoomSetting, Profile } from './pages';
 import { PublicRoute, PrivateRoute, Loading } from './components';
 import CreateRoom from './pages/CreateRoom';
 import BlockUsers from './pages/Admin/BlockUsers';
@@ -13,7 +13,6 @@ import { SnackbarProvider } from 'notistack';
 import CloseIcon from '@material-ui/icons/Close';
 import {useAudio} from 'react-use';
 import './App.css';
-import Profile from './components/Profile';
 const App = () => {
     
     const { loading, auth, role, setAuth, setLoading, username, removeCurrentUser } = useAuth();
@@ -48,7 +47,10 @@ const App = () => {
                     <PublicRoute exact path="/">
                         <Rooms />
                     </PublicRoute>
-                    <PublicRoute exact path="/profile">
+                    <PublicRoute path="/setting/room/:room">
+                        <RoomSetting />
+                    </PublicRoute>
+                    <PublicRoute path="/profile/:username">
                         <Profile />
                     </PublicRoute>
                     <PublicRoute path="/signup">

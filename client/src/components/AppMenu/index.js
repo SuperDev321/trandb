@@ -62,6 +62,7 @@ export default function AppMenu() {
 
         setOpen(false);
     };
+    
 
     function handleListKeyDown(event) {
         if (event.key === 'Tab') {
@@ -71,6 +72,13 @@ export default function AppMenu() {
     }
 
     const { removeCurrentUser, avatar, username } = useContext(UserContext);
+
+    const handleClickProfile = () => {
+        if(username) {
+            window.open('/profile/'+username);
+        }
+        setOpen(false);
+    }
 
     const logout = async () => {
         try {
@@ -114,7 +122,7 @@ export default function AppMenu() {
                             id="menu-list-grow"
                             onKeyDown={handleListKeyDown}
                         >
-                            <MenuItem onClick={handleClose}>Profile</MenuItem>
+                            <MenuItem onClick={handleClickProfile}>Profile</MenuItem>
                             <MenuItem onClick={logout}>Log out</MenuItem>
                         </MenuList>
                     </ClickAwayListener>
