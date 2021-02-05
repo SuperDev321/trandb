@@ -130,7 +130,6 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
     const sendMessage = (roomName, to, color, msg, bold, type) => {
         if (msg) {
             const date = Date.now();
-            console.log('send message', roomName, to)
             if(type === 'private') {
                 socket.emit('private message',
                     { roomName, msg, from: username, to, date, color, bold },
@@ -150,17 +149,18 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
             } else{
                 socket.emit('public message', { msg, room: roomName, from: username, date, color, bold });
                 let sameRoom = roomsRef.current.find((room) => (room.name) === roomName);
+                
                 if(sameRoom) {
+                    
                     let message = {
                         type : 'public',
                         msg,
                         from: username,
-                        to,
                         date,
                         color,
                         bold,
                     }
-                    sameRoom.messages = [...sameRoom.messages, message];
+                    sameRoom.messages = [ message, ...sameRoom.messages,];
                     if(sameRoom.name === currentRoomName) {
                         setCurrentRoomMessages([...sameRoom.messages]);
                     }
