@@ -1,5 +1,6 @@
 import io from 'socket.io-client';
-const socket = io({
+import config from '../config'
+const socket = io(`${config.server_url}`,{
     autoConnect: false,
 });
 

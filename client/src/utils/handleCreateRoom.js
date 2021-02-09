@@ -1,5 +1,5 @@
 import axios from 'axios';
-
+import config from '../config'
 const handleCreateRoom = async (data, successCallback, errCallback) => {
   try {
 
@@ -13,7 +13,7 @@ const handleCreateRoom = async (data, successCallback, errCallback) => {
     formData.append('cover', data.cover);
     formData.append('icon', data.icon);
     console.log('axios data', data)
-    await axios.post('https://new.trandb.com:4000/api/room', formData, {
+    await axios.post(`${config.server_url}/api/room`, formData, {
       headers: {'Content-type': 'multipart/form-data'}
     });
     successCallback();

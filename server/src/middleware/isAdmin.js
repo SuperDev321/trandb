@@ -2,7 +2,7 @@ const { createError } = require('../utils');
 
 const isAdmin = async (req, res, next) => {
     let user = req.userData;
-    if(user && user.role === 'admin') {
+    if(user && (user.role === 'admin' || user.role === 'super_admin')) {
         return next();
     } else {
         const errResponse = createError(

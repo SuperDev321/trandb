@@ -1,10 +1,10 @@
 import axios from 'axios';
-
+import config from '../config'
 const handleCreateRoom = async (data, successCallback, errCallback) => {
   try {
 
     console.log('axios data', data)
-    await axios.put('https://new.trandb.com:4000/api/room/general', data);
+    await axios.put(`${config.server_url}/api/room/general`, data);
     successCallback();
   } catch (err) {
     let errMessage;

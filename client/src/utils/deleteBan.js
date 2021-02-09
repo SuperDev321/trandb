@@ -1,8 +1,8 @@
 import axios from 'axios';
-
+import config from '../config'
 const deleteBan = async (banId ,successCallback, errCallback) => {
     try {
-        const {status} = await axios.delete('https://new.trandb.com:4000/api/bans/'+banId);
+        const {status} = await axios.delete(`${config.server_url}/api/bans/`+banId);
         if(status === 204)
             successCallback(true);
     } catch (err) {

@@ -1,8 +1,8 @@
 import axios from 'axios';
-
+import config from '../config'
 const handleLogin = async (credentials, successCallback, errCallback) => {
   try {
-    await axios.post('https://new.trandb.com:4000/api/login/guest', credentials);
+    await axios.post(`${config.server_url}/api/login/guest`, credentials);
     successCallback();
   } catch (err) {
     console.log(err)

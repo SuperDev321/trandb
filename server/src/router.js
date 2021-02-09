@@ -16,13 +16,16 @@ const {
   getPrivateChat,
   getUserByName,
   getUserDetail,
+  addBan,
   deleteBan,
+  getBans,
   getUserRooms,
   addModerator,
   deleteModerator
 } = require('./controllers');
 
 const { withAuth } = require('./middleware');
+const isAdmin = require('./middleware/isAdmin');
 
 const router = express.Router();
 
@@ -44,7 +47,9 @@ router.get('/user/:username', getUserByName);
 router.get('/users/:userId/rooms', withAuth, getUserRooms);
 router.get('/users/:userId', getUserDetail);
 
-router.delete('/bans/:banId', deleteBan);
+router.delete('/bans/:banId', withAuth, deleteBan);
+router.post('/bans', withAuth, isAdmin, addBan);
+router.get('/bans', withAuth, isAdmin, getBans);
 
 router.post('/moderators', withAuth, addModerator)
 router.post('/moderators/delete', withAuth, deleteModerator)
