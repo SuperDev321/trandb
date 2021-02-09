@@ -96,10 +96,10 @@ export default function AddRoomModal({addRoom}) {
                     <ListItemAvatar>
                     <Avatar
                         alt='room avatar'
-                        src={`/img/public_chat.png`}
+                        src={room.icon? `/img/${room.icon}`: `/img/public_chat.png`}
                     />
                     </ListItemAvatar>
-                    <ListItemText id={labelId} primary={room.name} />
+                    <ListItemText id={labelId} primary={`(${room.users}) ${room.name}`} />
                 </ListItem>
                 );
             })}
