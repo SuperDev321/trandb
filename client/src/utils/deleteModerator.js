@@ -1,8 +1,8 @@
 import axios from 'axios';
-
+import config from '../config'
 const deleteModerator = async (roomId, moderatorId ,successCallback, errCallback) => {
     try {
-        const {status} = await axios.post('https://new.trandb.com:4000/api/moderators/delete', {moderatorId, roomId});
+        const {status} = await axios.post(`${config.server_url}/api/moderators/delete`, {moderatorId, roomId});
         if(status === 204)
             successCallback(true);
     } catch (err) {

@@ -1,7 +1,8 @@
 import axios from 'axios';
+import config from '../config'
 
 const addModerator = async (roomId, moderatorName, successCallback, errCallback) => {
-    axios.post('https://new.trandb.com:4000/api/moderators', {roomId,username: moderatorName})
+    axios.post(`${config.server_url}/api/moderators`, {roomId,username: moderatorName})
     .then((response) => {
         console.log(response)
         if(response.status === 200) {

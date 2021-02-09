@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-
+import config from '../config'
 const useAuth = () => {
   const [auth, setAuth] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -13,7 +13,9 @@ const useAuth = () => {
   useEffect(() => {
     (async () => {
       try {
-        const { data } = await axios.get('https://new.trandb.com:4000/api/checkToken');
+        const { data } = await axios.get(`${config.server_url}/api/checkToken`, {
+          withCredentials: true
+        });
         if (data === 'un-auth') {
           setLoading(false);
         } else {

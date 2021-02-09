@@ -1,11 +1,12 @@
 import axios from 'axios';
-
+import config from '../config'
 const getRoomDetail = async (roomName, successCallback, errCallback) => {
     console.log('get room detail')
     try {
         const {
             data: { data, statusCode, error },
-        } = await axios({url: 'https://new.trandb.com:4000/api/rooms/' + roomName,
+
+        } = await axios({url: `${config.server_url}/api/rooms/` + roomName,
             method: 'GET'
         });
         // setLoading(false);

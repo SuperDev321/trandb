@@ -1,5 +1,5 @@
 import axios from 'axios';
-
+import config from '../config'
 const updateRoomMedia = async (data, successCallback, errCallback) => {
   try {
     let formData = new FormData();
@@ -7,7 +7,7 @@ const updateRoomMedia = async (data, successCallback, errCallback) => {
     formData.append('_id', data._id);
     formData.append('cover', data.cover);
     formData.append('icon', data.icon);
-    await axios.put('https://new.trandb.com:4000/api/room/media', formData, {
+    await axios.put(`${config.server_url}/api/room/media`, formData, {
         headers: {'Content-type': 'multipart/form-data'}
     });
     successCallback();
