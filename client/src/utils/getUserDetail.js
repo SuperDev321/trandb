@@ -8,7 +8,7 @@ const getUserDetail = async (username, successCallback, errCallback) => {
         const userInfo = result.data;
         
 
-        const {data: {data}} = await axios({url: `${config.server_url}/api/user/`+username/api/users/`+userInfo._id + '/rooms'})
+        const {data: {data}} = await axios({url: `${config.server_url}/api/users/`+userInfo._id + '/rooms'})
         console.log(userInfo, data);
         userInfo.rooms = data
         // setLoading(false);
