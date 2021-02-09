@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const handleLogin = async (credentials, successCallback, errCallback) => {
   try {
-    await axios.post('/api/login', credentials);
+    await axios.post('https://new.trandb.com:4000/api/login', credentials);
     successCallback();
   } catch (err) {
     let errMessage;
