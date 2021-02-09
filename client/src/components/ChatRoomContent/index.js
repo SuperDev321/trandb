@@ -50,10 +50,11 @@ const useStyles = makeStyles((theme) => ({
     }
 }))
 
-const ChatRoom = ({roomName, users, messages, sendMessage}) => {
+const ChatRoom = ({roomName, users, messages, sendMessage, changeMuteState, sendPokeMessage, kickUser, banUser,
+    addOrOpenPrivate}) => {
     const classes = useStyles();
     const { username } = useContext(UserContext);
-    const [messagesToShow, setmMssagesToShow] = useState([]);
+    const [messagesToShow, setMessagesToShow] = useState([]);
     const [youtubeUrl, setYoutubeUrl] = useState(null);
     const [youtubeShow, setYoutubeShow] = useState(false)
     const closeYoutube = () => {
@@ -81,13 +82,20 @@ const ChatRoom = ({roomName, users, messages, sendMessage}) => {
         let mutedUsers = users.filter((user) => (user.muted));
         let mutedUserNames = mutedUsers.map(({username}) => (username));
         let unMutedMessages = messages.filter(({from}) => (!((from) && (mutedUserNames.includes(from)))));
-        setmMssagesToShow(unMutedMessages);
+        setMessagesToShow(unMutedMessages);
     }, [messages, users])
     return (
         <div className={classes.root}>
             <div className={classes.content}>
                 {messagesToShow.length ?
-                    <MessagesList messages={messagesToShow} className={classes.messageArea} userAction={userAction} />
+                    <MessagesList
+                        users={users}
+                        messages={messagesToShow}
+                        changeMuteState={changeMuteState}
+                        sendPokeMessage={sendPokeMessage}
+                        kickUser={kickUser}
+                        banUser={banUser}
+                        className={classes.messageArea} userAction={userAction} />
                     : <div></div>
                 }
                 <div className={classes.youtube}>

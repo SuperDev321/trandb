@@ -78,16 +78,15 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
     };
     // add a private modal to private list
     const addOrOpenPrivate = (to) => {
-        socket.emit('open private', {from: username, to: to.username}, (roomName) => {
-            console.log('private callback', roomName)
-            if(roomName) {
-                privateListRef.current.addChat(to, roomName);
-            } else {
-                console.log('private chat error');
-            }
-        });
-        
-        
+        if(!privateListRef.current.openChat(to)) {
+            socket.emit('open private', {from: username, to: to.username}, (roomName) => {
+                if(roomName) {
+                    privateListRef.current.addChat(to, roomName);
+                } else {
+                    console.log('private chat error');
+                }
+            });
+        }
     }
     // mute or unmute user
     const changeMuteState = (roomName, usernameToMute) => {
@@ -849,9 +848,17 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                         <ChatRoomContent
                             roomName={currentRoomName}
                             username={username}
-                            users={currentRoomUsers}
                             messages={currentRoomMessages}
                             sendMessage={sendMessage}
+                            users={currentRoomUsers}
+                            changeMuteState={changeMuteState}
+                            sendPokeMessage={sendPokeMessage}
+                            kickUser={kickUser}
+                            banUser={banUser}
+                            // unReadInfo={currentRoom && currentRoom.private}
+                            // setOpenPrivate={setOpenPrivate}
+                            // setPrivateTo={setPrivateTo}
+                            addOrOpenPrivate={addOrOpenPrivate}
                         />
                     {/* } */}
                     </div>

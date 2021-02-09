@@ -19,7 +19,7 @@ function getFileName(prefix, filename) {
 const addRoom = async (req, res, next) => {
   try {
     const { name, category, description, welcomeMessage, password, maxUsers} = req.body;
-    console.log(description, welcomeMessage);
+    console.log(description, welcomeMessage, password);
     const user = req.userData;
     let user_id = user._id;
     let role = user.role;

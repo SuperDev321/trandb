@@ -6,6 +6,7 @@ const handleCreateRoom = async (data, successCallback, errCallback) => {
     let formData = new FormData();
     formData.append('name', data.name);
     formData.append('category', data.category);
+    formData.append('password', data.password);
     formData.append('maxUsers', data.maxUsers);
     formData.append('description', data.description);
     formData.append('welcomeMessage', data.welcomeMessage);

@@ -27,9 +27,10 @@ import {
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 import DeleteIcon from '@material-ui/icons/Delete';
 import useStyles from './styles'
-import { getRoomDetail, deleteBan } from "../../utils";
+import { getRoomDetail, deleteBan, addModerator, deleteModerator, updateRoomGeneral, updateRoomMedia } from "../../utils";
 import { Loading } from "../../components";
 import { useSnackbar } from 'notistack';
+import ImageUploader from 'react-images-upload';
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -55,21 +56,48 @@ export default function RoomSetting() {
   const { room } = useParams();
   const classes = useStyles();
   const [loading, setLoading] = useState(true);
+  const [roomId, setRoomId] = useState(null);
+  const [roomName, setRoomName] = useState('');
   const [category, setCategory] = useState('');
   const [description, setDescription] = useState('');
   const [message, setMessage] = useState('');
   const [userNum, setUserNum] = useState('');
   const [password, setPassword] = useState('');
-  const [moderator, setModerator] = useState('');
+  const [moderators, setModerators] = useState('');
   const [owner, setOwner] = useState(null);
-  const [bans, setBans] = useState([])
+  const [cover, setCover] = useState(null);
+  const [icon, setIcon] = useState(null);
+  const [bans, setBans] = useState([]);
+
   const [tab, setTab] = useState(0);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+
+
+  const [moderator, setModerator] = useState('');
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
+
+  const handleGeneralSubmit = () => {
+    updateRoomGeneral({_id: roomId, category, description, welcomeMessage: message, maxUsers: userNum, password},
+    () => {
+      enqueueSnackbar('Successfully updated', {variant: 'success'});
+      setPassword('');
+    }, (err) => {
+      enqueueSnackbar(err, {variant: 'error'});
+      setPassword('');
+    })
+  }
+  const handleMediaSubmit = () => {
+    updateRoomMedia({_id: roomId, cover, icon},
+    () => {
+      enqueueSnackbar('Successfully updated', {variant: 'success'});
+    }, (err) => {
+      enqueueSnackbar(err, {variant: 'error'});
+    })
+  }
 
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
@@ -83,24 +111,62 @@ export default function RoomSetting() {
         setBans(newBans);
       }
     }, (err) => {
+      enqueueSnackbar('Can not delete this ban', {variant: 'error'});
       console.log(err)
     })
+  }
+  const addNewModerator = () => {
+    if(moderator && moderator !== '') {
+      addModerator(roomId, moderator, ({_id, username}) => {
+        setModerators([...moderators, {_id, username}]);
+        setModerator('');
+        enqueueSnackbar('Successfully added', {variant: 'success'});
+      }, (err) => {
+        enqueueSnackbar(err, {variant: 'error'});
+        setModerator('');
+      })
+    }
+  }
+  const handleDeleteModerator = (_id) => {
+    deleteModerator(roomId, _id, (result) => {
+      if(result) {
+        enqueueSnackbar('Successfully deleted', {variant: 'success'});
+        let newModerators = moderators.filter((item) => (item._id !== _id));
+        setModerators(newModerators);
+      }
+    }, (err) => {
+      enqueueSnackbar('Can not delete this moderator', {variant: 'error'});
+      console.log(err)
+    })
+  }
+  const handleChangeCover = (picture) => {
+    setCover(picture[0]);
+  }
+  const handleChangeIcon = (picture) => {
+    setIcon(picture[0]);
   }
   useEffect(() => {
     if(room)
       getRoomDetail(room, (data) => {
-        const {_id, name, category, description, welcomeMessage, maxUsers, owner, bans, moderators} = data;
+        console.log(data)
+        const {_id, name, category, description, welcomeMessage, maxUsers, owner, bans, moderators, cover, icon} = data;
+        setRoomId(_id);
+        setRoomName(name);
         setCategory(category);
         setDescription(description);
         setMessage(welcomeMessage);
         setUserNum(maxUsers);
         setOwner(owner);
         setBans(bans);
+        setModerators(moderators);
+        // if(owner.username ===)
         setTimeout(() => {
           setLoading(false); 
         }, 1000)
         
-      }, () => {
+      }, (error) => {
+        enqueueSnackbar('Can not access this setting.', {variant: 'error'});
+        
       })
   }, []);
 
@@ -124,7 +190,7 @@ export default function RoomSetting() {
           </Paper>
         </Grid>
         <Grid item xs={12} sm={9}>
-          <h2>Room - testroom</h2>
+          <h2>Room - {roomName}</h2>
           <Paper elevation={3} className={classes.general}>
             <Tabs
               value={tab}
@@ -173,7 +239,6 @@ export default function RoomSetting() {
               <TextField fullWidth
                 id="outlined-multiline-static"
                 label="Welcome Message"
-                multiline
                 rows={2}
                 defaultValue={message}
                 onChange={(e) => setMessage(e.target.value)}
@@ -192,7 +257,7 @@ export default function RoomSetting() {
                     id: 'userNum',
                   }}
                 >
-                  <option value="- Unlimited -">- Unlimited -</option>
+                  <option value="9999">- Unlimited -</option>
                   <option value="5">5</option>
                   <option value="10">10</option>
                   <option value="15">15</option>
@@ -212,19 +277,39 @@ export default function RoomSetting() {
                 style={{marginTop: '40px', marginBottom: '25px'}} 
               />
               <div >
-                <Button variant="contained" color="primary" >
+                <Button variant="contained" color="primary" onClick={handleGeneralSubmit}>
                   Save Changes
                 </Button>
               </div>
               </form>
             </TabPanel>
             <TabPanel value={tab} index={1}>
-              <div>
-                <img className={classes.mediaImage} width="100px" src="/img/avatars/default_avatar.png" alt="Card img cap" />
+              {/* <div>
+                <img className={classes.mediaImage} width="100px" src="/img/default_avatar.png" alt="Card img cap" />
                 <p>Upload a room icon</p>
-              </div>
+              </div> */}
               <div className={classes.fileupload}>
-                <TextField
+              <ImageUploader
+                withLabel={true}
+                withPreview={true}
+                singleImage={true}
+                withIcon={false}
+                buttonText='Choose cover image'
+                onChange={handleChangeCover}
+                imgExtension={['.jpg', '.gif', '.png', '.gif']}
+                maxFileSize={5242880}
+              />
+              <ImageUploader
+                withLabel={true}
+                withPreview={true}
+                singleImage={true}
+                withIcon={false}
+                buttonText='Choose icon image'
+                onChange={handleChangeIcon}
+                imgExtension={['.jpg', '.gif', '.png', '.gif']}
+                maxFileSize={5242880}
+              />
+                {/* <TextField
                   fullWidth
                   name="upload-photo"
                   type="file"
@@ -244,28 +329,34 @@ export default function RoomSetting() {
                   This image will show up at the top of your chat room page. <strong>800x200 is the recommended size for this image.</strong>
                 </p>
               </div>
-              <div >
-                <Button variant="contained" color="primary" >
+              <div > */}
+                <Button variant="contained" color="primary" onClick={handleMediaSubmit}>
                   Save Changes
                 </Button>
               </div>
             </TabPanel>
             <TabPanel value={tab} index={2}>
-              <TextField 
-                fullWidth
-                id="outlined-moderator" 
-                label="Add Moderator" 
-                variant="outlined" 
-                value={moderator}
-                onChange={(e) => setModerator(e.target.value)}
-                style={{marginTop: '30px'}} 
-              />
-              <Button variant="contained" color="primary" className={classes.button} >
-                <AddCircleIcon />
-                &nbsp; Add
-              </Button>
-            </TabPanel>
-            <TabPanel value={tab} index={3}>
+              <div style={{display:'flex', width: '100%', alignItems: 'center', paddingTop: 15, paddingBottom: 15}}>
+                <div style={{width: 300}}>
+                  <TextField 
+                    fullWidth
+                    id="outlined-moderator" 
+                    label="Add Moderator"
+                    variant="outlined"
+                    value={moderator}
+                    onChange={(e) => {setModerator(e.target.value)}}
+                  />
+                </div>
+                <div style={{flexGrow: 1}}></div>
+                <div>
+                  <Button variant="contained" color="primary" size="large" onClick={() => {addNewModerator()}}>
+                    <AddCircleIcon />
+                    &nbsp; Add
+                  </Button>
+                </div>
+              </div>
+              { (moderators && moderators.length)?
+              <>
               <TableContainer style={{marginTop: '25px'}}>
               <Table className={classes.table} size="small" aria-label="a ban table">
                 <TableHead>
@@ -275,7 +366,46 @@ export default function RoomSetting() {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {bans && bans.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
+                  {moderators.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
+                    <TableRow key={row._id}>
+                      <TableCell>{row.username}</TableCell>
+                      <TableCell>
+                        <IconButton color="primary" aria-label="delete" onClick={() => {handleDeleteModerator(row._id)}}>
+                          <DeleteIcon />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+              </TableContainer>
+              <TablePagination
+                rowsPerPageOptions={[5, 10, 25]}
+                component="div"
+                count={bans.length}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                onChangePage={handleChangePage}
+                onChangeRowsPerPage={handleChangeRowsPerPage}
+              />
+              </>
+              :
+              (null)
+              }
+            </TabPanel>
+            <TabPanel value={tab} index={3}>
+              { (bans && bans.length)?
+              <>
+              <TableContainer style={{marginTop: '25px'}}>
+              <Table className={classes.table} size="small" aria-label="a ban table">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Username</TableCell>
+                    <TableCell >Action</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {bans.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
                     <TableRow key={row._id}>
                       <TableCell>{row.username}</TableCell>
                       <TableCell>
@@ -297,6 +427,10 @@ export default function RoomSetting() {
                 onChangePage={handleChangePage}
                 onChangeRowsPerPage={handleChangeRowsPerPage}
               />
+              </>
+              :
+              (null)
+              }
             </TabPanel>
             
             

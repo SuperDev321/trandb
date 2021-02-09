@@ -65,6 +65,9 @@ const useStyles = makeStyles((theme) => ({
     marginTop: '20px',
     fontSize: '13px',
     color: 'gray',
+    '& > img': {
+      borderRadius: '50%'
+    }
   },
 
   button: {

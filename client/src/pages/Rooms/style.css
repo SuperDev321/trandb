@@ -1,7 +1,10 @@
 .rooms__wrapper {
-  padding: 2rem 0;
-  width: min(100vw - 1rem, 24rem);
-  margin: auto;
+  height: 100%;
+  overflow: auto;
+}
+
+.rooms__wrapper::-webkit-scrollbar {
+  display: 'none'
 }
 
 .rooms__error {

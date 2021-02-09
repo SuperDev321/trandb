@@ -11,7 +11,6 @@ const PrivateChatList = ({sendMessage, readMsg ,me}, ref) => {
         setActiveChat(roomName);
     }
     const addNewChat = useCallback((toUsername, unReadMsg, roomName) => {
-        
         let privateChat = chatList.find((item) => (item.roomName === roomName));
         if(!privateChat) {
             let ref = createRef();
@@ -29,6 +28,19 @@ const PrivateChatList = ({sendMessage, readMsg ,me}, ref) => {
             }
         }
     }, )
+
+    const openChat = (toUsername) => {
+        let chatInfo = chatList.find((item) => (item.to === toUsername));
+        if(chatInfo) {
+            let ref = elRefs.current.find((item) => (item.key === chatInfo.roomName));
+            if(ref) {
+                ref.ref.current.show();
+                setActiveChat(chatInfo.roomName);
+                return true;
+            }
+        }
+        return false;
+    }
     const deleteChat = useCallback((toUsername, roomName) => {
         let newChats = chatList.filter((item) => (item.roomName !== roomName));
         let newRefs = elRefs.current.filter((item) => (item.key !== roomName));
@@ -39,6 +51,9 @@ const PrivateChatList = ({sendMessage, readMsg ,me}, ref) => {
     useImperativeHandle(ref, () => ({
         addChat: (to, roomName) => {
             addNewChat(to.username, [], roomName);
+        },
+        openChat: (to) => {
+            return openChat(to.username);
         },
         addMessage: (message, roomName) => {
             let ref = elRefs.current.find((item) => (item.key === roomName));

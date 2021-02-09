@@ -19,6 +19,7 @@ import {QuestionAnswer,
     StarRounded
 } from '@material-ui/icons';
 import BanModal from '../BanModal';
+import RoomUserName from '../RoomUserName';
 const useStyles = makeStyles((theme) => ({
     listItem: {
         display: 'flex',
@@ -31,8 +32,8 @@ const useStyles = makeStyles((theme) => ({
         width: '100%',
     },
     username: {
-        font: 'bold 14px sans-serif',
-        cursor: 'pointer',
+        // font: 'bold 14px sans-serif',
+        // cursor: 'pointer',
         flexGrow: 1,
         overflow: 'hidden',
         display: 'flex',
@@ -163,6 +164,12 @@ const OnlineUser = ({roomName, username, user, role,
         setAnchorEl(null);
     };
 
+    const handleClickProfile = () => {
+        if(user && user.username)
+            window.open('/profile/'+user.username);
+        setAnchorEl(null);
+    }
+
     const sendPoke = () => {
         setAnchorEl(null);
         setTimeout(() => {
@@ -184,15 +191,33 @@ const OnlineUser = ({roomName, username, user, role,
                     className={classes.avatarBadge}
                     badgeContent={user.muted && <Block fontSize="small" />}
                 >
-                    <Avatar alt="Remy Sharp" src={
+                    <Avatar alt="User avatar" src={
                             user.gender === 'male' ? '/img/male.png': '/img/female.png'
                         } 
                         className={classes.avatar}
                     />
                 </StyledBadge>
                 <Videocam className={classes.camera} />
-                <div className={classes.username} onClick={handleClick}>
-                    <span>{user.username+(username===user.username ? ' (you)' : '')}</span>
+                <div className={classes.username}
+                // onClick={handleClick}
+                >
+                    {/* <span>{user.username+(username===user.username ? ' (you)' : '')}</span> */}
+                    <RoomUserName
+                        user={user}
+                        roomName={roomName}
+                        isMine={username === user.username}
+                        displayYou={true}
+                        changeMuteState={changeMuteState}
+                        sendPokeMessage={sendPokeMessage}
+                        kickUser={kickUser}
+                        banUser={banUser}
+                        addOrOpenPrivate={addOrOpenPrivate}
+                        role={role}
+                        anchorEl={anchorEl}
+                        setAnchorEl={setAnchorEl}
+                        open={open}
+                        handleClose={handleClose}
+                    />
                     { user.role === 'admin' &&
                         <StarRounded className={classes.adminStar} />
                     }
@@ -204,7 +229,7 @@ const OnlineUser = ({roomName, username, user, role,
                     }
                 </div>
             </div>
-            <Popover
+            {/* <Popover
                 anchorOrigin={{
                     vertical: 'bottom',
                     horizontal: 'left',
@@ -229,8 +254,8 @@ const OnlineUser = ({roomName, username, user, role,
                         <span>{user.gender}</span>
                     </CardMedia>
                     <Divider />
-                    <Button size="small" color="primary" fullWidth className={classes.cardButton}>
-                    <AccountCircleOutlined />&nbsp;Profile
+                    <Button size="small" color="primary" fullWidth className={classes.cardButton} onClick={handleClickProfile}>
+                        <AccountCircleOutlined />&nbsp;Profile
                     </Button>
                     { user.username != username &&
                         <>
@@ -277,8 +302,8 @@ const OnlineUser = ({roomName, username, user, role,
                             >
                             {
                                 user.muted
-                                ? 'Silence / Ignorance'
-                                : 'Unmute / Ignore'
+                                ? 'Unmute / Ignore'
+                                : 'Silence / Ignorance'
                             }
                             </Button>
                         </>
@@ -287,7 +312,22 @@ const OnlineUser = ({roomName, username, user, role,
             </Popover>
             <BanModal open={openBan} setOpen={setOpenBan} initVal={{name: user.username, ip: user.ip}} 
                 roomName={roomName}
-            />
+            /> */}
+            {/* <RoomUserPopover
+                user={user}
+                roomName={roomName}
+                isMine={username === user.usernmae}
+                changeMuteState={changeMuteState}
+                sendPokeMessage={sendPokeMessage}
+                kickUser={kickUser}
+                banUser={banUser}
+                addOrOpenPrivate={addOrOpenPrivate}
+                role={role}
+                anchorEl={anchorEl}
+                setAnchorEl={setAnchorEl}
+                open={open}
+                handleClose={handleClose}
+            /> */}
         </div>
     );
 }

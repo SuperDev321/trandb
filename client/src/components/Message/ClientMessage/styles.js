@@ -31,11 +31,12 @@ const useStyles = makeStyles((theme) => ({
         display: 'flex',
         justifyContent: 'start',
         alignContent: 'baseline',
-        
+
     },
     sender: {
         margin: 0,
         whiteSpace: 'nowrap',
+        fontWeight: 'bold'
     },
     time: {
         font: 'italic 12px sans-serif',
