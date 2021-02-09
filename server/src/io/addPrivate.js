@@ -4,28 +4,46 @@ var randomString = require('random-string')
 
 const addPrivate = (io, socket) => async ({ from, to }, callback) => {
     try {
-        var newPrivateRoomName = randomString({
-            length: 8,
-            numeric: true,
-            letters: true,
-            special: false
+        let rooms = Array.from(socket.rooms);
+        let privateRoom = rooms.find((item) => {
+            let strArr = item.split('_');
+            if(strArr.length === 4 && strArr[3] === 'private') {
+                if((strArr[1] === from && strArr[2] === to) || (strArr[1] === to && strArr[2] === from)) {
+                    return true;
+                }
+            }
+            return false;
         });
-        newPrivateRoomName += '_' + from + '_' + to;
-        console.log('private',to)
-        const toUser = await findUserByName(to);
-        let socketIds = await io.of('/').in(toUser._id.toString()).allSockets();
-        let it = socketIds.values();
-        let first = it.next();
-        let id = first.value;
-        let socketToPrivate = io.sockets.sockets.get(id);
-        if(socketToPrivate) {
-            socketToPrivate.join(newPrivateRoomName);
-            socket.join(newPrivateRoomName);
-            console.log('add private callback', newPrivateRoomName)
-            callback(newPrivateRoomName);
+        if(privateRoom) {
+            privateRoomName = privateRoom;
+            callback(privateRoom);
         } else {
-            callback(null)
+            var newPrivateRoomName = randomString({
+                length: 8,
+                numeric: true,
+                letters: true,
+                special: false
+            });
+            // find other user's socket
+            newPrivateRoomName += '_' + from + '_' + to + '_' + 'private';
+            socket.join(newPrivateRoomName);
+            const toUser = await findUserByName(to);
+            let socketIds = await io.of('/').in(toUser._id.toString()).allSockets();
+            let it = socketIds.values();
+            let first = it.next();
+            let id = first.value;
+            let socketToPrivate = io.sockets.sockets.get(id);
+            if(socketToPrivate) {
+                socketToPrivate.join(newPrivateRoomName);
+                console.log('add private callback', newPrivateRoomName)
+                callback(newPrivateRoomName);
+            } else {
+                callback(null)
+            }
         }
+        
+        
+        
     } catch (err) {
         console.log(err);
         callback(null);

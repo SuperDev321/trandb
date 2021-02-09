@@ -22,7 +22,7 @@ const joinRoom = (io, socket) => async ({ room }) => {
         
         socket.join(room);
         let {welcomeMessage} = await Rooms.findOne({name: room});
-        const messages = await Chats.find({ room, type: 'public' }).sort({date: -1});
+        const messages = await Chats.find({ room, type: 'public' }).sort({date: -1}).limit(30);
         const usersInfo = await findRoomUsers(room, user.role);
         socket.emit('init room', {messages, onlineUsers: usersInfo, room: {name: room, welcomeMessage}}, (data)=> {
             if(data === 'success') {

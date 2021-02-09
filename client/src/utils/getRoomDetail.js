@@ -4,15 +4,20 @@ const getRoomDetail = async (roomName, successCallback, errCallback) => {
     console.log('get room detail')
     try {
         const {
-            data: { data },
+            data: { data, statusCode, error },
         } = await axios({url: '/api/rooms/' + roomName,
             method: 'GET'
         });
         // setLoading(false);
         // setRooms(data);
-        successCallback(data);
+        
+        if(statusCode === 200) {console.log('status',statusCode)
+            successCallback(data);
+        } else {
+            errCallback(error)
+        }
+        
     } catch (err) {
-        // console.log('get room error')
         errCallback('Something went wrong, please try again later')
         // setLoading(false);
         // setError('Something went wrong, please try again later');

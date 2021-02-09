@@ -15,7 +15,7 @@ emoji.allow_native = false;
 emoji.replace_mode = 'img';// 'unified';
 emoji.use_sheet = true;
 
-const MyMessage = ({message, font_size, userAction}) => {
+const MyMessage = ({user, message, font_size, userAction}) => {
     
   const classes = useStyles({color: message.color, bold: message.bold});
   const urlify = (text) => {
@@ -161,7 +161,7 @@ const MyMessage = ({message, font_size, userAction}) => {
     return (
       <div className={classes.message}>
         <div className={classes.messageContent}>
-            <span className={classes.sender}><strong>{message.from}</strong>:&nbsp;</span>
+            <span className={classes.sender}>{message.from}:&nbsp;</span>
                 <span
                 className={classes.text + ' ' + classes.size10}
                 // dangerouslySetInnerHTML={{__html: makeTag(emojiConverter(message.msg))}}

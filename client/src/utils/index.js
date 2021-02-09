@@ -13,5 +13,8 @@ export { getSocket } from './socketHandler';
 export { default as getRoomDetail } from './getRoomDetail';
 export { default as getUserDetail } from './getUserDetail';
 export { default as deleteBan } from './deleteBan';
-
+export { default as deleteModerator } from './deleteModerator';
+export { default as addModerator } from './addModerator';
+export { default as updateRoomGeneral } from './updateRoomGeneral';
+export { default as updateRoomMedia } from './updateRoomMedia';
 

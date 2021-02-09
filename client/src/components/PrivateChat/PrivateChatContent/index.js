@@ -19,8 +19,8 @@ import {getPrivateMessages} from '../../../utils';
 import {ReactComponent as Maximium} from './square.svg'
 import {ReactComponent as Restore} from './restore.svg';
 
-const defaultHeight = 300;
-const defaultWidth = 400;
+const defaultHeight = 250;
+const defaultWidth = 350;
 
 const useStyles = makeStyles((theme) => ({
     rnd: {
@@ -200,7 +200,7 @@ const PrivateChat = ({ me, to, sendMessage, active, setActive, initMessages, del
         addErrorMessage: () => {
             console.log('private error set')
             setError(true);
-        }
+        },
     }));
 
     // useEffect(() => {
@@ -236,11 +236,11 @@ const PrivateChat = ({ me, to, sendMessage, active, setActive, initMessages, del
             default={{
                 x: window.innerWidth/2 - 200,
                 y: 200,
-                width: 400,
-                height: 300,
+                width: defaultWidth,
+                height: defaultHeight,
             }}
             minHeight={30}
-            minWidth={300}
+            minWidth={250}
             // maxHeight={rndHeight ? rndHeight: null}
             dragHandleClassName="private-header"
             bounds="body"
@@ -290,9 +290,13 @@ const PrivateChat = ({ me, to, sendMessage, active, setActive, initMessages, del
                         <SvgIcon style={{fontSize: '1.3em'}} component={max? Restore: Maximium} viewBox="0 0 600 476.6" />
                     </div>
                     <div className={classes.icon}
-                        onClick={()=>{
-                            setHide(true);
-                            // deleteChat(to.username, roomName);
+                        onClick={() => {
+                            if(error) {
+                                deleteChat(to.username, roomName);
+                            }
+                            else {
+                                setHide(true);
+                            }
                         }}
                     >
                         <Close />

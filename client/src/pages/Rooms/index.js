@@ -5,7 +5,9 @@ import { RoomsList, PublicLayout, Loading } from '../../components';
 import { makeStyles } from '@material-ui/styles';
 import UserContext from '../../context';
 
-import { getRooms } from '../../utils'
+import { getRooms } from '../../utils';
+import './style.css';
+
 
 const useStyles = makeStyles((theme) => ({
     action: {
