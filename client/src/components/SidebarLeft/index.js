@@ -82,7 +82,7 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 
-const SideBarLeft = ({ roomName, username, unReadInfo, changeMuteState, sendPokeMessage, kickUser, banUser,
+const SideBarLeft = ({ roomName, username, mutes, unReadInfo, changeMuteState, sendPokeMessage, kickUser, banUser,
     users,
     addOrOpenPrivate,
      cameraState, openCamera, closeCamera }) => {
@@ -106,6 +106,14 @@ const SideBarLeft = ({ roomName, username, unReadInfo, changeMuteState, sendPoke
         }
     }, [searchText, users])
 
+    const isMuted = (user) => {
+        if(mutes.includes(user.username)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     return (
         <div className={classes.root}>
             <BroadcastSetting users={users} className={classes.cameraBtn}/>
@@ -123,6 +131,7 @@ const SideBarLeft = ({ roomName, username, unReadInfo, changeMuteState, sendPoke
                                 username={username}
                                 role={role}
                                 user={user} key={index}
+                                isMuted={isMuted(user)}
                                 addOrOpenPrivate={addOrOpenPrivate}
                                 changeMuteState={changeMuteState}
                                 sendPokeMessage={sendPokeMessage}

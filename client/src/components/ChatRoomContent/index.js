@@ -50,10 +50,11 @@ const useStyles = makeStyles((theme) => ({
     }
 }))
 
-const ChatRoom = ({roomName, users, messages, sendMessage, changeMuteState, sendPokeMessage, kickUser, banUser,
+const ChatRoom = ({roomName, users, messages, mutes, sendMessage, changeMuteState, sendPokeMessage, kickUser, banUser,
     addOrOpenPrivate}) => {
     const classes = useStyles();
     const { username } = useContext(UserContext);
+    const [role, setRole] = useState(null)
     const [messagesToShow, setMessagesToShow] = useState([]);
     const [youtubeUrl, setYoutubeUrl] = useState(null);
     const [youtubeShow, setYoutubeShow] = useState(false)
@@ -77,24 +78,32 @@ const ChatRoom = ({roomName, users, messages, sendMessage, changeMuteState, send
     const toggleYoutube = () => {
         setYoutubeShow(!youtubeShow);
     }
+    useEffect(() => {
+        let me = users.find((item) => (item.username === username));
+        if(me) setRole(me.role);
+    }, [users, username])
 
     useEffect(() => {
-        let mutedUsers = users.filter((user) => (user.muted));
-        let mutedUserNames = mutedUsers.map(({username}) => (username));
-        let unMutedMessages = messages.filter(({from}) => (!((from) && (mutedUserNames.includes(from)))));
+        // let mutedUsers = users.filter((user) => (user.muted));
+        // let mutedUserNames = mutedUsers.map(({username}) => (username));
+        let unMutedMessages = messages.filter(({from}) => (!((from) && (mutes.includes(from)))));
         setMessagesToShow(unMutedMessages);
-    }, [messages, users])
+    }, [messages, mutes])
     return (
         <div className={classes.root}>
             <div className={classes.content}>
                 {messagesToShow.length ?
                     <MessagesList
                         users={users}
+                        mutes={mutes}
+                        role={role}
+                        roomName={roomName}
                         messages={messagesToShow}
                         changeMuteState={changeMuteState}
                         sendPokeMessage={sendPokeMessage}
                         kickUser={kickUser}
                         banUser={banUser}
+                        addOrOpenPrivate={addOrOpenPrivate}
                         className={classes.messageArea} userAction={userAction} />
                     : <div></div>
                 }

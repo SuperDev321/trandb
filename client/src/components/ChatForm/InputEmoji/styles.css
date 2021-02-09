@@ -38,7 +38,7 @@
   .react-input-emoji--input {
     /* font-weight: 400; */
     max-height: 100px;
-    min-height: 20px;
+    min-height: 40px;
     outline: none;
     overflow-x: hidden;
     overflow-y: auto;

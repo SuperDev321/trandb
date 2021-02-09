@@ -13,9 +13,7 @@ const useAuth = () => {
   useEffect(() => {
     (async () => {
       try {
-        const { data } = await axios.get(`${config.server_url}/api/checkToken`, {
-          withCredentials: true
-        });
+        const { data } = await axios.get(`${config.server_url}/api/checkToken`);
         if (data === 'un-auth') {
           setLoading(false);
         } else {

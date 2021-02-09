@@ -1,9 +1,11 @@
-import React, { useEffect } from 'react';
+import React, { useContext } from 'react';
+import UserContext from '../../../context';
 import PropTypes, { element } from 'prop-types';
 import {EmojiConvertor} from 'emoji-js';
 import parseHTML from 'parsehtml';
 import moment from 'moment';
 import randomstring from "randomstring";
+import RoomUserName from '../../RoomUserName';
 import useStyles from './styles';
 let emoji = new EmojiConvertor();
 emoji.img_set = 'apple';
@@ -15,9 +17,11 @@ emoji.allow_native = false;
 emoji.replace_mode = 'img';// 'unified';
 emoji.use_sheet = true;
 
-const MyMessage = ({user, message, font_size, userAction}) => {
+const MyMessage = ({user, roomName, message, role, font_size, userAction, changeMuteState, sendPokeMessage, 
+  kickUser, banUser, addOrOpenPrivate}) => {
     
   const classes = useStyles({color: message.color, bold: message.bold});
+  const { username } = useContext(UserContext);
   const urlify = (text) => {
     
     let urlRegex = /(https?:\/\/[^\s]+)/g;
@@ -161,7 +165,19 @@ const MyMessage = ({user, message, font_size, userAction}) => {
     return (
       <div className={classes.message}>
         <div className={classes.messageContent}>
-            <span className={classes.sender}>{message.from}:&nbsp;</span>
+          <RoomUserName
+            user={user}
+            roomName={roomName}
+            isMine={username === user.username}
+            displayYou={false}
+            changeMuteState={changeMuteState}
+            sendPokeMessage={sendPokeMessage}
+            kickUser={kickUser}
+            banUser={banUser}
+            addOrOpenPrivate={addOrOpenPrivate}
+            role={role}
+          />
+            <span className={classes.sender}>:&nbsp;</span>
                 <span
                 className={classes.text + ' ' + classes.size10}
                 // dangerouslySetInnerHTML={{__html: makeTag(emojiConverter(message.msg))}}

@@ -14,6 +14,7 @@ const useStyles =  makeStyles((theme) => ({
         flex: '1',
         width: '100%',
         wordBreak: 'break-word',
+        scrollbarWidth: 'thin',
         '&::-webkit-scrollbar': {
             width: '5px',
         },
@@ -39,7 +40,7 @@ const useStyles =  makeStyles((theme) => ({
 
 const itemUnit = 50;
 
-const MessagesList = ({ users, messages, userAction,roomName, changeMuteState, sendPokeMessage, kickUser, banUser,
+const MessagesList = ({ users, messages, role, userAction, roomName, changeMuteState, sendPokeMessage, kickUser, banUser,
     addOrOpenPrivate }) => {
     const messagesRef = useRef();
     const classes = useStyles();
@@ -67,8 +68,12 @@ const MessagesList = ({ users, messages, userAction,roomName, changeMuteState, s
 
     const getUserFromList = (username) => {
         // console.log(users)
-        let user = users.find((item) => (item.username === username))
-        return user;
+        let user = users.find((item) => (item.username === username));
+        if(user) {
+            return user;
+        } else {
+            return {username};
+        }
     }
 
     useEffect(() => {
@@ -104,11 +109,14 @@ const MessagesList = ({ users, messages, userAction,roomName, changeMuteState, s
                         { type==='public' &&
                         <ClientMessage userAction={userAction}
                             user={getUserFromList(from)}
+                            roomName={roomName}
+                            role={role}
                             message={{from, msg, date, color, bold}} font_size={10}
                             changeMuteState={changeMuteState}
                             sendPokeMessage={sendPokeMessage}
                             kickUser={kickUser}
                             banUser={banUser}
+                            addOrOpenPrivate={addOrOpenPrivate}
                         />
                         }
                         {
