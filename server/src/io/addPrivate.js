@@ -26,7 +26,7 @@ const addPrivate = (io, socket) => async ({ from, to }, callback) => {
             });
             // find other user's socket
             newPrivateRoomName += '_' + from + '_' + to + '_' + 'private';
-            socket.join(newPrivateRoomName);
+            
             const toUser = await findUserByName(to);
             let socketIds = await io.of('/').in(toUser._id.toString()).allSockets();
             let it = socketIds.values();
@@ -35,6 +35,7 @@ const addPrivate = (io, socket) => async ({ from, to }, callback) => {
             let socketToPrivate = io.sockets.sockets.get(id);
             if(socketToPrivate) {
                 socketToPrivate.join(newPrivateRoomName);
+                socket.join(newPrivateRoomName);
                 console.log('add private callback', newPrivateRoomName)
                 callback(newPrivateRoomName);
             } else {

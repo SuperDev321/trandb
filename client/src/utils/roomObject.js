@@ -17,6 +17,18 @@ class RoomObject  {
         }
         this.unReadMessages = [];
         this.private = {};
+        let mutes = null;
+        let item = window.localStorage.getItem('mutes');
+        if(item) mutes = JSON.parse(item);
+        if(!Array.isArray(mutes)) mutes = null;
+        let muted = false
+        if(mutes) {
+            let myMutes = mutes.filter((value) => (value.room === this.name));
+            this.mutes = myMutes.map(({user})=> (user));
+        } else {
+            this.mutes = [];
+        }
+        
 
         this.myStream = null;
         this.remoteStreams = [];
@@ -32,21 +44,27 @@ class RoomObject  {
         this.messages = [...this.messages, ...messages];
     }
 
+    setMutes(mutes) {
+        this.mutes = [...mutes];
+    }
+    addMute(mute) {
+        this.mutes = [...this.mutes, mute];
+    }
+    toogleMute(mute) {
+        if(this.mutes.includes(mute)) {
+            this.deleteMute(mute);
+        } else {
+            this.addMute(mute);
+        }
+    }
+    deleteMute(mute) {
+        this.mutes = this.mutes.filter((item) => (item !== mute));
+    }
+
     setOnlinUsers(roomName, users) {
-        let mutes = null;
-        let item = window.localStorage.getItem('mutes');
-        if(item) mutes = JSON.parse(item);
-        if(!Array.isArray(mutes)) mutes = null;
-        let roomUsers = users.map((item) => {
-            let muted = false
-            if(mutes) {
-                let mute = mutes.find((value) => (value.room === this.name && value.user === item.username));
-                if(mute) muted = true;
-            }
-            return {...item, muted}
-        });
         
-        this.users = roomUsers;
+        
+        this.users = users;
     }
     addOnlineUser(user) {
         let mutes = null;

@@ -41,6 +41,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
     const [currentRoomMessages, setCurrentRoomMessages] = useState([]);
     const [currentRoomUsers, setCurrentRoomUsers] = useState([]);
     const [currentRoomName, setCurrentRoomName] = useState(null);
+    const [currentRoomMutes, setCurrentRoomMutes] = useState([]);
     // receive new message
     const [newMessage, setNewMessage] = useState([]);
     // receive new infomation for rooms
@@ -90,18 +91,20 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
     }
     // mute or unmute user
     const changeMuteState = (roomName, usernameToMute) => {
+        console.log('changeMuteState', roomName, usernameToMute)
         let room = roomsRef.current.find((item) => (item.name === roomName));
         if(room) {
-            let user = room.users.find((item) => (item.username === usernameToMute));
-            user.muted = !user.muted;
+            room.toogleMute(usernameToMute);
             if(room.name === currentRoomName) {
-                setCurrentRoomUsers([...room.users]);
+                // setCurrentRoomUsers([...room.users]);
+                console.log(room.mutes)
+                setCurrentRoomMutes([...room.mutes]);
             }
             let localMute = mutes.find((item) => (item.room === roomName && item.user === usernameToMute))
-            if(localMute && !user.muted) {
+            if(localMute) {
                 let newMutes = mutes.filter((item) => (item.room !== roomName || item.user !== usernameToMute));
                 setMutes(newMutes);
-            } else if(!localMute && user.muted) {
+            } else if(!localMute) {
                 let newMutes = [...mutes, {room: roomName, user: usernameToMute}];
                 setMutes(newMutes);
             }
@@ -177,19 +180,21 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
             // this is callback function that can excute on server side
             if(response !== 'success') {
                 enqueueSnackbar('Error', {variant: 'error'});
+            } else {
+                let sameRoom = roomsRef.current.find((room) => (room.name) === roomName);
+                if(sameRoom) {
+                    let message = {
+                        type: 'poke',
+                        msg: 'You sent a rington to ' + userToSend,
+                    }
+                    sameRoom.messages = [message, ...sameRoom.messages];
+                    if(sameRoom.name === currentRoomName) {
+                        setCurrentRoomMessages([...sameRoom.messages]);
+                    }
+                }
             }
         });
-        let sameRoom = roomsRef.current.find((room) => (room.name) === roomName);
-        if(sameRoom) {
-            let message = {
-                type: 'poke',
-                msg: 'You sent a rington to ' + userToSend,
-            }
-            sameRoom.messages = [...sameRoom.messages, message];
-            if(sameRoom.name === currentRoomName) {
-                setCurrentRoomMessages([...sameRoom.messages]);
-            }
-        }
+        
     }
  /*********************************  camera   ******************************************/
     const createPeer = (userToSignal, callerID, room, stream) => {
@@ -717,6 +722,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                 setCurrentRoomUsers([...roomsRef.current[roomIndex].users]);
                 setCurrentRoomMessages([...roomsRef.current[roomIndex].messages]);
                 setCurrentRoomName(roomsRef.current[roomIndex].name);
+                setCurrentRoomMutes(roomsRef.current[roomIndex].mutes);
             }
         }
         
@@ -782,6 +788,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                         banUser={banUser}
                         // unReadInfo={currentRoom && currentRoom.private}
                         roomName={currentRoomName}
+                        mutes={currentRoomMutes}
                         // setOpenPrivate={setOpenPrivate}
                         // setPrivateTo={setPrivateTo}
                         addOrOpenPrivate={addOrOpenPrivate}
@@ -848,6 +855,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                         <ChatRoomContent
                             roomName={currentRoomName}
                             username={username}
+                            mutes={currentRoomMutes}
                             messages={currentRoomMessages}
                             sendMessage={sendMessage}
                             users={currentRoomUsers}
