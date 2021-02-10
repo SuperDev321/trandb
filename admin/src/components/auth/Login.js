@@ -18,7 +18,7 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import { makeStyles } from '@material-ui/core/styles';
 import { ValidatorForm, TextValidator} from 'react-material-ui-form-validator';
 import { useToasts } from 'react-toast-notifications';
-
+import config from '../../config'
 const useStyles = makeStyles((theme) => ({
   paper: {
     marginTop: theme.spacing(8),
@@ -56,7 +56,7 @@ export default function Login() {
     try {
       const loginUser = { email, password };
       const loginRes = await Axios.post(
-        "http://localhost:5000/users/login",
+        `${config.server_url}/users/login`,
         loginUser
       );
       setUserData({

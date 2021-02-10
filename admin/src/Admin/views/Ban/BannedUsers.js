@@ -22,6 +22,8 @@ import Grid from '@material-ui/core/Grid';
 import SearchBar from 'material-ui-search-bar';
 import Button from "Admin/components/CustomButtons/Button.js";
 import config from '../../../config'
+import { useToasts } from 'react-toast-notifications';
+
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
     return -1;
@@ -50,6 +52,7 @@ function stableSort(array, comparator) {
 
 const headCells = [
   { id: 'no', numeric: false, disablePadding: false, label: 'No'},
+  { id: 'type', numeric: false, disablePadding: false, label: 'type'},
   { id: 'username', numeric: false, disablePadding: true, label: 'Username' },
   { id: 'room', numeric: false, disablePadding: false, label: 'Room' },
   { id: 'ip', numeric: false, disablePadding: false, label: 'Ip' },
@@ -144,6 +147,7 @@ export default function BanComponent( {onClickNew} ) {
   const [query, setQuery] = React.useState('');
   const [rows, setRows] = React.useState([]);
   const [filteredRows, setFilteredRows] = React.useState([]);
+  const { addToast } = useToasts();
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -171,6 +175,7 @@ export default function BanComponent( {onClickNew} ) {
     })
     .catch((err) => {
       console.log(err)
+      addToast('Delete failed', { appearance: 'error' })
     })
   }
 
@@ -196,6 +201,7 @@ export default function BanComponent( {onClickNew} ) {
   React.useEffect(() => {
     const banRead = async () => {
       const bans = await Axios.get(`${config.server_url}/api/bans`);
+      console.log(bans)
       let bansToShow = bans.data.data.map((item, index) => ({...item, no: index+1}));
       setRows(bansToShow);
     }
@@ -270,6 +276,9 @@ export default function BanComponent( {onClickNew} ) {
 	                    >
 	                      <TableCell>
 	                        {row.no}
+	                      </TableCell>
+                        <TableCell align="left">
+	                        {row.type}
 	                      </TableCell>
 	                      <TableCell component="th" id={labelId} scope="row" padding="none">
 	                        {row.username}

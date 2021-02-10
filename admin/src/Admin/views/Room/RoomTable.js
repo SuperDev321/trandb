@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import Axios from 'axios';
 import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
@@ -20,26 +21,6 @@ import CardFooter from "Admin/components/Card/CardFooter.js";
 import ChatIcon from '@material-ui/icons/Chat';
 import Grid from '@material-ui/core/Grid';
 import SearchBar from 'material-ui-search-bar';
-
-function createData(no, name, calories, fat, carbs, protein) {
-  return { no, name, calories, fat, carbs, protein};
-}
-
-const rows = [
-  createData( 1, 'Cupcake', 305, 3.7, 67, 4.3),
-  createData( 2, 'Donut', 452, 25.0, 51, 4.9),
-  createData( 3, 'Eclair', 262, 16.0, 24, 6.0),
-  createData( 4, 'Frozen yoghurt', 159, 6.0, 24, 4.0),
-  createData( 5, 'Gingerbread', 356, 16.0, 49, 3.9),
-  createData( 6, 'Honeycomb', 408, 3.2, 87, 6.5),
-  createData( 7, 'Ice cream sandwich', 237, 9.0, 37, 4.3),
-  createData( 8, 'Jelly Bean', 375, 0.0, 94, 0.0),
-  createData( 9, 'KitKat', 518, 26.0, 65, 7.0),
-  createData( 10, 'Lollipop', 392, 0.2, 98, 0.0),
-  createData( 11, 'Marshmallow', 318, 0, 81, 2.0),
-  createData( 12, 'Nougat', 360, 19.0, 9, 37.0),
-  createData( 13, 'Oreo', 437, 18.0, 63, 4.0),
-];
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -69,11 +50,15 @@ function stableSort(array, comparator) {
 
 const headCells = [
   { id: 'no', numeric: false, disablePadding: false, label: 'No'},
-  { id: 'name', numeric: false, disablePadding: true, label: 'Dessert (100g serving)' },
-  { id: 'calories', numeric: false, disablePadding: false, label: 'Calories' },
-  { id: 'fat', numeric: false, disablePadding: false, label: 'Fat (g)' },
-  { id: 'carbs', numeric: false, disablePadding: false, label: 'Carbs (g)' },
-  { id: 'protein', numeric: false, disablePadding: false, label: 'Protein (g)' },
+  { id: 'type', numeric: false, disablePadding: false, label: 'Type'},
+  { id: 'avatar', numeric: false, disablePadding: false, label: 'Avatar'},
+  { id: 'owner', numeric: false, disablePadding: true, label: 'UserName' },
+  { id: 'name', numeric: false, disablePadding: false, label: 'RoomName' },
+  { id: 'category', numeric: false, disablePadding: false, label: 'Category'},
+  { id: 'maxUsers', numeric: false, disablePadding: false, label: 'Max users' },
+  { id: 'icon', numeric: false, disablePadding: false, label: 'icon' },
+  { id: 'cover', numeric: false, disablePadding: false, label: 'Cover' },
+  { id: 'created_at', numeric: false, disablePadding: false, label: 'Created at' },
 ];
 
 function EnhancedTableHead(props) {
@@ -91,6 +76,7 @@ function EnhancedTableHead(props) {
             align={headCell.numeric ? 'right' : 'left'}
             padding={headCell.disablePadding ? 'none' : 'default'}
             sortDirection={orderBy === headCell.id ? order : false}
+            className={classes.space}
           >
             <TableSortLabel
               active={orderBy === headCell.id}
@@ -107,10 +93,11 @@ function EnhancedTableHead(props) {
           </TableCell>
         ))}
         <TableCell
+          className={classes.space}
           align={'right'}
           padding={'default'}
         >
-          Action
+          Actions
         </TableCell>
       </TableRow>
     </TableHead>
@@ -151,6 +138,9 @@ const useStyles = makeStyles((theme) => ({
     paddingTop: "15px",
     marginBottom: "10px"
   },
+  space: {
+    padding: '16px 11px',
+  },
 }));
 
 export default function RoomTable( {onClickEdit} ) {
@@ -160,6 +150,8 @@ export default function RoomTable( {onClickEdit} ) {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [query, setQuery] = React.useState('');
+  const [rows, setRows] = React.useState([]);
+  const [filteredRows, setFilteredRows] = React.useState([]);
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -175,6 +167,35 @@ export default function RoomTable( {onClickEdit} ) {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
+
+  useEffect(() => {
+    if(query !== '') {
+      let filteredRows = rows.filter((row) => {
+        let strTmp = row.name + ' ';
+        if(row.no) strTmp += row.no + ' ';
+        if(row.type) strTmp += row.type + ' ';
+        if(row.owner) strTmp += row.owner + ' ';
+        if(row.name) strTmp += row.name + ' ';
+        if(row.category) strTmp += row.category + ' ';
+        if(row.maxUsers) strTmp += row.maxUsers + ' ';
+        if(row.created_at) strTmp += row.created_at;
+        if(strTmp.toLowerCase().indexOf(query.toLowerCase()) < 0) return false;
+        else return true;
+      })
+      setFilteredRows(filteredRows);
+    } else {
+      setFilteredRows([...rows]);
+    }
+  }, [rows, query])
+
+  useEffect(() => {
+    const roomRead = async () => {
+      const rooms = await Axios.get("http://10.10.10.238:4000/api/rooms");
+      let roomsToShow = rooms.data.data.map((item, index) => ({...item, no: index+1}));
+      setRows(roomsToShow);
+    }
+    roomRead()
+  }, []);
 
   return (
     <Paper className={classes.paper}>
@@ -221,7 +242,7 @@ export default function RoomTable( {onClickEdit} ) {
                 onRequestSort={handleRequestSort}
               />
               <TableBody>
-                {stableSort(rows, getComparator(order, orderBy))
+                {stableSort(filteredRows, getComparator(order, orderBy))
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((row, index) => {
                     const labelId = `enhanced-table-checkbox-${index}`;
@@ -233,17 +254,27 @@ export default function RoomTable( {onClickEdit} ) {
                         tabIndex={-1}
                         key={row.name}
                       >
-                        <TableCell>
+                        <TableCell className={classes.space}>
                           {row.no}
                         </TableCell>
-                        <TableCell component="th" id={labelId} scope="row" padding="none">
-                          {row.name}
+                        <TableCell className={classes.space}>
+                          general
                         </TableCell>
-                        <TableCell align="left">{row.calories}</TableCell>
-                        <TableCell align="left">{row.fat}</TableCell>
-                        <TableCell align="left">{row.carbs}</TableCell>
-                        <TableCell align="left">{row.protein}</TableCell>
-                        <TableCell align="right">
+                        <TableCell className={classes.space}>
+                          <img width="42px" src="/img/avatars/default_avatar.png" alt="avatar" />
+                        </TableCell>
+                        <TableCell component="th" id={labelId} scope="row" padding="none" className={classes.space}>
+                          {row.owner}
+                        </TableCell>
+                        <TableCell align="left" className={classes.space}>{row.name}</TableCell>
+                        <TableCell align="left" className={classes.space}>{row.category}</TableCell>
+                        <TableCell align="left" className={classes.space}>{row.maxUsers}</TableCell>
+                        <TableCell align="left" className={classes.space}>
+                          <img width="42px" src="/img/avatars/default_avatar.png" alt="avatar" />
+                        </TableCell>
+                        <TableCell className={classes.space}>{rows.cover}</TableCell>
+                        <TableCell className={classes.space}>2021-2-6</TableCell>
+                        <TableCell align="right" className={classes.space}>
                            <IconButton style={{color:"#4caf50"}} onClick={() => {onClickEdit()}}>
                             <CreateIcon />
                           </IconButton>

@@ -23,6 +23,7 @@ const getRoomPermission = require('./user/getRoomPermission');
 const banByUser = require('./ban/banByUser');
 const banByNameAndIp = require('./ban/banByNameAndIp');
 const checkBan = require('./ban/checkBan');
+const getAllBans = require('./ban/getBans');
 
 module.exports = {
   createError,
@@ -50,4 +51,5 @@ module.exports = {
   banByUser,
   banByNameAndIp,
   checkBan,
+  getAllBans
 };
