@@ -17,7 +17,7 @@ export default function BanTable() {
     <div className={classes.root}>
         {create ? (
             <BanComponent onClickNew={() => setCreate(false)} />
-          ): (<CreateComponent onClickBack={() => setCreate(true)} />)}
+          ): (<CreateComponent onClose={() => setCreate(true)} />)}
     </div>
   );
 }

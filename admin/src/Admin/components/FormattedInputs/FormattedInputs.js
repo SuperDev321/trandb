@@ -11,20 +11,15 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function FormattedInputs({textLabel}) {
+export default function FormattedInputs({textLabel, value, onChange}) {
   const classes = useStyles();
-  const [value, setValue] = React.useState('10.10.10.10');
-
-  const handleChange = (event) => {
-    setValue( event.target.value);
-  };
 
   return (
     <div className={classes.root}>
       <TextField
         label={textLabel}
         value={value}
-        onChange={handleChange}
+        onChange={onChange}
         name="numberformat"
         InputProps={{
           inputComponent: IpMaskInput,

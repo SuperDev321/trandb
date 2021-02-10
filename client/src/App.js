@@ -68,16 +68,6 @@ const App = () => {
                     <PrivateRoute path="/rooms">
                         <Rooms />
                     </PrivateRoute>
-                    <PrivateRoute path="/admin/rooms">
-                        <BlockUsers />
-                    </PrivateRoute>
-                    <PrivateRoute path="/admin/users">
-                        <BlockUsers />
-                    </PrivateRoute>
-                    <PrivateRoute path="/admin/bans">
-                        <BlockUsers />
-                    </PrivateRoute>
-                    <Redirect from="/admin" to="/admin/rooms" />
                 </Switch>
             </div>
             </UserContext.Provider>
