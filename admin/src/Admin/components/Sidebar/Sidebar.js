@@ -45,7 +45,7 @@ export default function Sidebar(props) {
         });
         return (
           <NavLink
-            to={prop.path}
+            to={prop.layout + prop.path}
             className={activePro + classes.item}
             activeClassName="active"
             key={key}

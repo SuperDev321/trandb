@@ -30,21 +30,21 @@ const dashboardRoutes = [
     name: "Dashboard",
     icon: Dashboard,
     component: DashboardPage,
-    // layout: "/"
+    layout: "/"
   },
   {
     path: "/room",
     name: "Rooms",
     icon: ChatIcon,
     component: Rooms,
-    // layout: "/admin"
+    layout: "/admin"
   },
   {
     path: "/ban",
     name: "BAN",
     icon: AssistantIcon,
     component: Ban,
-    // layout: "/admin"
+    layout: "/admin"
   },
 ];
 

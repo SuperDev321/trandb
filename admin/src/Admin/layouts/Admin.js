@@ -20,19 +20,19 @@ let ps;
 const switchRoutes = (
   <Switch>
     {routes.map((prop, key) => {
-      // if (prop.layout === "/") {
+      if (prop.layout === "/") {
       //   console.log('ok')
         return (
           <Route
-            path={prop.path}
+            path={prop.layout + prop.path}
             component={prop.component}
             key={key}
           />
         );
-      // }
-      // return null;
+      }
+      return null;
     })}
-    {/* <Redirect from="/" to="/dashboard" /> */}
+    <Redirect from="/admin" to="/admin/dashboard" />
   </Switch>
 );
 
