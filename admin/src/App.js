@@ -51,7 +51,7 @@ export default function App() {
                 
                 <Route path="/login" component={Login} />
                 <Route path="/register" component={Register} />
-                <Route path="/" component={Admin} />
+                <Route path="/admin" component={Admin} />
                 {/* <Redirect from="/" to="/dashboard" /> */}
               </Switch>
             </div>
