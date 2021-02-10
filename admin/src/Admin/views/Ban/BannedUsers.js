@@ -21,7 +21,7 @@ import AssignmentIcon from '@material-ui/icons/Assignment';
 import Grid from '@material-ui/core/Grid';
 import SearchBar from 'material-ui-search-bar';
 import Button from "Admin/components/CustomButtons/Button.js";
-
+import config from '../../../config'
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
     return -1;
@@ -161,7 +161,7 @@ export default function BanComponent( {onClickNew} ) {
   };
 
   const handleClickDelete = (id) => {
-    Axios.delete("http://10.10.10.238:4000/api/bans/" + id)
+    Axios.delete(`${config.server_url}/api/bans/` + id)
     .then((response) => {
       console.log(response);
       if(response.status === 204) {
@@ -195,7 +195,7 @@ export default function BanComponent( {onClickNew} ) {
 
   React.useEffect(() => {
     const banRead = async () => {
-      const bans = await Axios.get("http://10.10.10.238:4000/api/bans");
+      const bans = await Axios.get(`${config.server_url}/api/bans`);
       let bansToShow = bans.data.data.map((item, index) => ({...item, no: index+1}));
       setRows(bansToShow);
     }
