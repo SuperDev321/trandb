@@ -10,6 +10,7 @@ const {
   logout,
   getRoomDetail,
   getRooms,
+  getRoomsAdmin,
   addRoom,
   updateRoomGeneral,
   updateRoomMedia,
@@ -49,10 +50,12 @@ router.get('/users/:userId', getUserDetail);
 
 router.delete('/bans/:banId', withAuth, deleteBan);
 router.post('/bans', withAuth, isAdmin, addBan);
-router.get('/bans', withAuth, isAdmin, getBans);
+router.get('/bans', getBans);
 
 router.post('/moderators', withAuth, addModerator)
 router.post('/moderators/delete', withAuth, deleteModerator)
+
+router.get('/admin/rooms', getRoomsAdmin);
 
 router.use(clientError);
 router.use(serverError);

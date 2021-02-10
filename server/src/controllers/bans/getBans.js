@@ -3,8 +3,9 @@ const ipInt = require('ip-to-int');
 
 const getBans = async (req, res, next) => {
   try {
-    let user = req.userData;
-    if(user.role === 'admin' || user.role === 'super_admin') {
+    // let user = req.userData;
+    role = 'admin'
+    if(role === 'admin' || role === 'super_admin') {
         let bans = await Bans.find({});
         bans = bans.map(({_id, username, room, ip, fromIp, toIp}) => {
             let realIp = null, realStartIp = null, realEndIp = null;
