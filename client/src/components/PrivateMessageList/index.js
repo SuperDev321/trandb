@@ -61,6 +61,7 @@ const useListStyles = makeStyles((theme) => ({
         width: '100%',
         padding: 5,
         wordBreak: 'break-word',
+        scrollbarWidth: 'thin',
         '&::-webkit-scrollbar': {
             width: '5px',
         },
