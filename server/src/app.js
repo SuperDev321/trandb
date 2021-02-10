@@ -45,6 +45,9 @@ app.use('/api', router);
 
 if (process.env.NODE_ENV === 'production') {
     app.use(express.static(join(__dirname, '..', '..', 'client', 'build')));
+    app.all('admin/*', (req, res) =>
+        res.sendFile(join(__dirname, '..', '..', 'admin', 'build', 'index.html'))
+    );
     app.all('*', (req, res) =>
         res.sendFile(join(__dirname, '..', '..', 'client', 'build', 'index.html'))
     );
