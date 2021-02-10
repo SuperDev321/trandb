@@ -30,7 +30,7 @@ const dashboardRoutes = [
     name: "Dashboard",
     icon: Dashboard,
     component: DashboardPage,
-    layout: "/"
+    layout: "/admin"
   },
   {
     path: "/room",
