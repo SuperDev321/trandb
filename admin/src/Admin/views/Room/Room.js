@@ -12,12 +12,17 @@ const useStyles = makeStyles((theme) => ({
 export default function EnhancedTable() {
   const classes = useStyles();
   const [edit, setEdit] = React.useState(false);
+  const [rowToEdit, setRowToEdit] = React.useState(false);
+  const handleClickEdit = (row) => {
+    setRowToEdit(row);
+    setEdit(true);
+  }
 
   return (
     <div className={classes.root}>
       {edit ? (
-          <EditComponent onClickBack={() => setEdit(false)}/>
-        ): (<RoomComponent onClickEdit={() => setEdit(true)}/>)}
+          <EditComponent onClickBack={() => setEdit(false)} room={rowToEdit}/>
+        ): (<RoomComponent onClickEdit={handleClickEdit} />)}
     </div>
   );
 }
