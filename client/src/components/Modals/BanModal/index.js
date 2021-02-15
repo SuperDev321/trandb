@@ -11,11 +11,11 @@ import {
     Input
 } from '@material-ui/core';
 import DialogContentText from '@material-ui/core/DialogContentText';
-import CustomTextField from '../CustomTextField';
-import OutlinedButton from '../OutlinedButton';
+import CustomTextField from '../../CustomTextField';
+import OutlinedButton from '../../OutlinedButton';
 import useStyles from './styles';
-import IpMaskInput from '../IpMaskInput';
-import { getSocket } from '../../utils';
+import IpMaskInput from '../../IpMaskInput';
+import { getSocket } from '../../../utils';
 
 
 export default function BanModal({open, setOpen, initVal, roomName}) {

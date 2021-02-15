@@ -9,10 +9,10 @@ const findRoomUsers = async (room, myRole) => {
         const roomUsers = await Users.find({ _id: { $in: liveUserIds? liveUserIds: []  } });
         const usersInfo = roomUsers.map(({ _id, username, gender, role, avatar }) =>{
             let ip;
-            if(myRole === 'admin') {
+            // if(myRole === 'admin') {
                 let result = roomInfo.users.find((item)=>(item._id.equals(_id)));
                 ip = result.ip;
-            }
+            // }
             let userRole = role;
             if(role === 'user') {
                 if(_id.equals(owner)) {

@@ -3,14 +3,14 @@ const yup = require('yup');
 const createError = require('../createError');
 
 const loginValidationSchema = yup.object().shape({
-  email: yup.string().email().required().max(50),
+  username: yup.string().required().max(20),
   password: yup.string().required().min(8).max(20),
 });
 
-const validateLoginCredentials = async ({ email, password }) => {
+const validateLoginCredentials = async ({ username, password }) => {
   try {
     await loginValidationSchema.validate(
-      { email, password },
+      { username, password },
       {
         abortEarly: false,
       }

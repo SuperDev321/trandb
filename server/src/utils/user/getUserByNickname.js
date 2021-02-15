@@ -1,8 +1,8 @@
 const { Users } = require('../../database/models');
 const createError = require('../createError');
 
-const getUserByEmail = async (email) => {
-  const user = await Users.findOne({ email });
+const getUserByNickname = async (username) => {
+  const user = await Users.findOne({ username });
 
   if (!user)
     throw createError(
@@ -14,4 +14,4 @@ const getUserByEmail = async (email) => {
   return user;
 };
 
-module.exports = getUserByEmail;
+module.exports = getUserByNickname;

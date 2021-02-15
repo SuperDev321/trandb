@@ -11,6 +11,7 @@ export { default as handleCreateRoom } from './handleCreateRoom';
 export { default as getPrivateMessages } from './getPrivateMessages';
 export { getSocket } from './socketHandler';
 export { default as getRoomDetail } from './getRoomDetail';
+export { default as isPrivateRoom } from './isPrivateRoom';
 export { default as getUserDetail } from './getUserDetail';
 export { default as deleteBan } from './deleteBan';
 export { default as deleteModerator } from './deleteModerator';

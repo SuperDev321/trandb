@@ -1,16 +1,16 @@
 const {
   validateLoginCredentials,
-  getUserByEmail,
+  getUserByNickname,
   checkPassword,
   createToken,
 } = require('../../utils');
 
 const login = async (req, res, next) => {
-  const { email, password } = req.body;
+  const { username, password } = req.body;
   try {
-    await validateLoginCredentials({ email, password });
+    await validateLoginCredentials({ username, password });
 
-    const user = await getUserByEmail(email);
+    const user = await getUserByNickname(username);
 
     await checkPassword(password, user.password);
 
@@ -21,6 +21,7 @@ const login = async (req, res, next) => {
       .status(200)
       .json({ statusCode: 200, message: 'logged in successfully' });
   } catch (err) {
+    console.log(err)
     next(err);
   }
 };
