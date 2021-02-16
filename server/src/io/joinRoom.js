@@ -4,8 +4,7 @@ const { findRoomUsers, checkBan, getRoomBlocks, getGlobalBlocks, checkBlock } = 
 const joinRoom = (io, socket) => async ({ room, password }, callback) => {
     try {
         const { _id, role } = socket.decoded;
-        let ip = socket.handshake.address;
-        console.log(socket.handshake, socket.client.request.headers['cf-connecting-ip']);
+        let ip = socket.client.request.headers['cf-connecting-ip'];
         if (ip.substr(0, 7) === '::ffff:') {
             ip = ip.substr(7);
         }
