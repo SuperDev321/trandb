@@ -1,6 +1,6 @@
 const { Rooms, Users } = require('../database/models');
-const { getRoomPermission, findUserByName, banByUser, banByNameAndIp, checkBan } = require("../utils");
-const getUserIp = require('../utils/user/getUserIp');
+const { getRoomPermission, findUserByName, banByUser, banByNameAndIp, checkBan, findRoomUsers } = require("../utils");
+const {addBlock, removeBlock, getUserIp, getRoomBlocks, checkBlock} = require('../utils');
 const kickUser = (io, socket) => async ({room, to}) => {
     console.log('kick')
     try {
@@ -112,4 +112,74 @@ const banUserByAdmin = (io, socket) => async ({ room , ip, fromIp, toIp, to}) =>
     }
 }
 
-module.exports = { kickUser, banUser, banUserByAdmin };
+const blockUser = (io, socket) => async ({room, username}, callback) => {
+    const {_id} = socket.decoded;
+    const myRole = await getRoomPermission(room, _id);
+    if(myRole === 'admin' || myRole === 'owner' || myRole === 'moderator') {
+        let userToBlock = await findUserByName(username);
+        let userIp = await getUserIp(room, userToBlock._id);
+        let result = await addBlock(room, userToBlock.username, userIp);
+        if(result) {
+            const usersInfo = await findRoomUsers(room, myRole);
+            let onlineUsers = await Promise.all(usersInfo.map(async ({username, ip, role, gender}) => {
+                let item = {};
+                let blocked = await checkBlock(room, username, ip);
+                item.blocked = blocked;
+                // if(myRole === 'admin' || myRole === 'super-admin') {
+                    item.ip = ip;
+                // }
+                item.username = username;
+                item.role = role;
+                item.gender = gender;
+                return item;
+            }));
+            const blocks = await getRoomBlocks(room);
+            io.to(room).emit('update block', {room, onlineUsers, blocks}); 
+            callback(true);
+        } else {
+            callback(false, 'Can not block this user')
+        }
+
+    } else {
+        callback(false, 'Permission denied')
+    }
+    
+
+}
+
+const unBlockUser = (io, socket) => async ({room, username}, callback) => {
+    const {_id} = socket.decoded;
+    const myRole = await getRoomPermission(room, _id);
+    if(myRole === 'admin' || myRole === 'owner' || myRole === 'moderator') {
+        console.log('unblock', username, myRole)
+        let userToBlock = await findUserByName(username);
+        let userIp = await getUserIp(room, userToBlock._id);
+        let result = await removeBlock(room, userToBlock.username, userIp);
+        if(result) {
+            const usersInfo = await findRoomUsers(room, myRole);
+            let onlineUsers = await Promise.all(usersInfo.map(async ({username, ip, role, gender}) => {
+                let item = {};
+                let blocked = await checkBlock(room, username, ip);
+                item.blocked = blocked;
+                // if(myRole === 'admin' || myRole === 'super-admin') {
+                    item.ip = ip;
+                // }
+                item.username = username;
+                item.role = role;
+                item.gender = gender;
+                return item;
+            }));
+            const blocks = await getRoomBlocks(room);
+            io.to(room).emit('update block', {room, onlineUsers, blocks}); 
+            callback(true);
+        } else {
+            callback(false, 'Can not unblock this user')
+        }
+
+    } else {
+        callback(false, 'Permission denied')
+    }
+    
+
+}
+module.exports = { kickUser, banUser, banUserByAdmin, blockUser, unBlockUser };

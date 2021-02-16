@@ -1,7 +1,7 @@
 import Peer from 'simple-peer';
 import { getSocket } from '../utils';
 class RoomObject  {
-    constructor(name, messages, users) {
+    constructor(name, messages, users, blocks) {
         this.name = name;
         if(messages) {
             this.messages = messages;
@@ -11,28 +11,48 @@ class RoomObject  {
         if(users) {
             // let roomUsers = users.map((user) => ({...user, muted: false}));
             // this.users = roomUsers;
-            this.setOnlinUsers(name, users);
+            this.setOnlineUsers(users);
         } else {
-            this.users = null;
+            this.users = [];
         }
         this.unReadMessages = [];
         this.private = {};
-        let mutes = null;
-        let item = window.localStorage.getItem('mutes');
-        if(item) mutes = JSON.parse(item);
-        if(!Array.isArray(mutes)) mutes = null;
-        let muted = false
-        if(mutes) {
-            let myMutes = mutes.filter((value) => (value.room === this.name));
-            this.mutes = myMutes.map(({user})=> (user));
-        } else {
-            this.mutes = [];
-        }
+        // let mutes = null;
+        // let item = window.localStorage.getItem('mutes');
+        // if(item) mutes = JSON.parse(item);
+        // if(!Array.isArray(mutes)) mutes = null;
+        // if(mutes) {
+        //     let myMutes = mutes.filter((value) => (value.room === this.name));
+        //     this.mutes = myMutes.map(({user})=> (user));
+        // } else {
+        //     this.mutes = [];
+        // }
+        this.initMutes(users, blocks)
         
 
         this.myStream = null;
         this.remoteStreams = [];
         this.cameraState = false;
+    }
+
+    initMutes(users, blocks) {
+        let mutes = null;
+        let item = window.localStorage.getItem('mutes');
+        if(item) mutes = JSON.parse(item);
+        if(!Array.isArray(mutes)) mutes = null;
+        if(mutes) {
+            let myMutes = mutes.filter((value) => (value.room === this.name));
+            mutes = myMutes.map(({user})=> (user));
+        } else {
+            mutes = [];
+        }
+        let blockedUsers= users.filter((item) => (item.blocked));
+        let blockedUserNames = blockedUsers.map(({username}) => (username));
+        console.log('mutes', mutes,blockedUserNames, blocks);
+        mutes = [...mutes, ...blockedUserNames, ...blocks];
+        let muteSet = new Set(mutes);
+        this.mutes = Array.from(muteSet);
+        
     }
     
     setMessages(messages) {
@@ -58,27 +78,35 @@ class RoomObject  {
         }
     }
     deleteMute(mute) {
-        this.mutes = this.mutes.filter((item) => (item !== mute));
+        let user = this.users.find((item) => (item.username === mute));
+        if(!user.blocked) {
+            this.mutes = this.mutes.filter((item) => (item !== mute));
+            return true;
+        } else {
+            return false;
+        }
     }
 
-    setOnlinUsers(roomName, users) {
-        
-        
+    setOnlineUsers(users) {
         this.users = users;
     }
     addOnlineUser(user) {
-        let mutes = null;
-        let item = window.localStorage.getItem('mutes');
-        if(item) mutes = JSON.parse(item);
-        if(!Array.isArray(mutes)) mutes = null;
-        let muted = false
-        if(mutes) {
-            let mute = mutes.find((value) => (value.room === this.name && value.user === user.username));
-            if(mute) muted = true;
+        // let mutes = null;
+        // let item = window.localStorage.getItem('mutes');
+        // if(item) mutes = JSON.parse(item);
+        // if(!Array.isArray(mutes)) mutes = null;
+        // let muted = false
+        // if(mutes) {
+        //     let mute = mutes.find((value) => (value.room === this.name && value.user === user.username));
+        //     if(mute) muted = true;
+        // }
+        if(user.blocked && !this.mutes.includes(user.username)) {
+            this.mutes = [...this.mutes, user.username];
         }
+        console.log('add user', this.users)
         let currentUserNames = this.users.map(({username}) => (username));
         if(!currentUserNames.includes(user.username)) {
-            this.users = [...this.users, {...user, muted}];
+            this.users = [...this.users, user];
         }
     }
 

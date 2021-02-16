@@ -17,7 +17,7 @@ import {
 import AddIcon from '@material-ui/icons/Add';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import { useTheme } from '@material-ui/core/styles';
-import { getRooms } from '../../utils';
+import { getRooms } from '../../../utils';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -53,7 +53,7 @@ export default function AddRoomModal({addRoom}) {
             if(result) {
                 setOpen(false);
             } else {
-
+                setOpen(false)
             }
         }); 
     }

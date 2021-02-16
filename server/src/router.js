@@ -9,6 +9,7 @@ const {
   checkToken,
   logout,
   getRoomDetail,
+  checkRoomPermission,
   getRooms,
   getRoomsAdmin,
   addRoom,
@@ -37,6 +38,7 @@ router.post('/room', withAuth, addRoom);
 router.put('/room/general', withAuth, updateRoomGeneral);
 router.put('/room/media', withAuth, updateRoomMedia);
 router.get('/rooms/:roomName', withAuth, getRoomDetail);
+router.get('/rooms/:roomName/isPrivate', checkRoomPermission);
 router.post('/signup', signup);
 router.post('/login', login);
 router.post('/login/guest', guestLogin);
@@ -49,7 +51,7 @@ router.get('/users/:userId/rooms', withAuth, getUserRooms);
 router.get('/users/:userId', getUserDetail);
 
 router.delete('/bans/:banId', withAuth, deleteBan);
-router.post('/bans', withAuth, isAdmin, addBan);
+router.post('/bans', addBan);
 router.get('/bans', getBans);
 
 router.post('/moderators', withAuth, addModerator)

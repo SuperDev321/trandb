@@ -18,7 +18,6 @@ import {QuestionAnswer,
     Notifications,
     StarRounded
 } from '@material-ui/icons';
-import BanModal from '../BanModal';
 import RoomUserName from '../RoomUserName';
 const useStyles = makeStyles((theme) => ({
     listItem: {
@@ -217,6 +216,7 @@ const OnlineUser = ({roomName, username, user, role, isMuted,
                         setAnchorEl={setAnchorEl}
                         open={open}
                         handleClose={handleClose}
+                        isMuted={isMuted}
                     />
                     { user.role === 'admin' &&
                         <StarRounded className={classes.adminStar} />

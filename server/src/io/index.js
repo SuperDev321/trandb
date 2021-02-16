@@ -1,14 +1,15 @@
-const joinRoom = require('./joinRoom');
+const {joinRoom, rejoinRoom} = require('./joinRoom');
 const leaveRoom = require('./leaveRoom');
 const addPrivate = require('./addPrivate');
 const leavePrivate = require('./leavePrivate');
 const { publicMessage, privateMessage, pokeMessage } = require('./msgHandler');
-const { kickUser, banUser, banUserByAdmin } = require('./userHandler');
+const { kickUser, banUser, banUserByAdmin, blockUser, unBlockUser } = require('./userHandler');
 const {sendSignal, returnSignal} = require('./videoHandler');
 const socketDisconnect = require('./disconnect');
 
 const ioHandler = (io) => (socket) => {
     socket.on('join room', joinRoom(io, socket));
+    socket.on('rejoin room', rejoinRoom(io, socket));
     socket.on('leave room', leaveRoom(io, socket));
 
     // message events
@@ -20,6 +21,8 @@ const ioHandler = (io) => (socket) => {
     socket.on('poke message', pokeMessage(io, socket));
     socket.on('kick user', kickUser(io, socket));
     socket.on('ban user', banUser(io, socket));
+    socket.on('block user', blockUser(io, socket));
+    socket.on('unblock user', unBlockUser(io, socket));
     // video events
     socket.on('sending video signal', sendSignal(io));
     socket.on('returning video signal', returnSignal(io));

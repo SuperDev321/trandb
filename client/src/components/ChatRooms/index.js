@@ -11,14 +11,16 @@ import { useSnackbar } from 'notistack';
 import SideBarLeft from '../SidebarLeft'
 import useStyles from './styles'
 import ChatRoomContent from '../ChatRoomContent';
-import AddRoomModal from '../AddRoomModal';
+import AddRoomModal from '../Modals/AddRoomModal';
+import PasswordModal from '../Modals/PasswordModal'
 import PrivateChatList from '../PrivateChat/PrivateChatList'
 import VideoList from '../VideoList';
 import Peer from 'simple-peer';
 import {StyledTab , StyledTabs} from '../StyledTab';
+import DisconnectModal from '../Modals/DisconncetModal'
 import RoomObject from '../../utils/roomObject';
 import UserContext from '../../context';
-import { getSocket, useLocalStorage } from '../../utils';
+import { getSocket, useLocalStorage, isPrivateRoom } from '../../utils';
 import {useAudio} from 'react-use';
 
 const ChatRooms = ({room, addUnReadMsg}, ref) => {
@@ -49,6 +51,9 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
     // private chat send message to this user
     const [privateTo, setPrivateTo] = useState(null);
     const [privateMessgaes, setPrivateMessages] = useState(null);
+    const [openDisconnectModal, setOpenDisconnectModal] = useState(false);
+    const [openPasswordModal, setOpenPasswordModal] = useState(false);
+    const [roomNameForPassword, setRoomNameForPassword] = useState('');
     const privateListRef = useRef();
 
     // const audio = new Audio('/media/poke.mp3');
@@ -74,7 +79,6 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
 
 
     const handleChangeRoom = (event, newValue) => {
-        console.log(newValue)
         setRoomIndex(newValue);
     };
     // add a private modal to private list
@@ -90,27 +94,43 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
         }
     }
     // mute or unmute user
-    const changeMuteState = (roomName, usernameToMute) => {
-        console.log('changeMuteState', roomName, usernameToMute)
+    const changeMuteState = (roomName, usernameToMute, isMuted) => {
         let room = roomsRef.current.find((item) => (item.name === roomName));
+        console.log(roomName, isMuted)
         if(room) {
-            room.toogleMute(usernameToMute);
+            
+            // let userInfo = room.users.find((user) => (user.username === usernameToMute));
+            // console.log('change mute', userInfo, mutes)
+            
+            // let localMute = mutes.find((item) => (item.room === roomName && item.user === usernameToMute))
+            if(isMuted) {
+                let newMutes = mutes.filter((item) => (item.room !== roomName || item.user !== usernameToMute));
+                setMutes(newMutes);
+                // if(!userInfo || (userInfo && !userInfo.blocked)) {
+                if(!room.deleteMute(usernameToMute)) {
+                    enqueueSnackbar('This user was blocked', {variant: 'error'});
+                }
+                // }
+                
+            } else {
+                let localMute = mutes.find((item) => (item.room === roomName && item.user === usernameToMute))
+                if(!localMute) {
+                    let newMutes = [...mutes, {room: roomName, user: usernameToMute}];
+                    setMutes(newMutes);
+                }
+                // if(!userInfo || (userInfo && !userInfo.blocked)) {
+                    room.addMute(usernameToMute);
+                // }
+                
+            }
             if(room.name === currentRoomName) {
                 // setCurrentRoomUsers([...room.users]);
                 console.log(room.mutes)
                 setCurrentRoomMutes([...room.mutes]);
             }
-            let localMute = mutes.find((item) => (item.room === roomName && item.user === usernameToMute))
-            if(localMute) {
-                let newMutes = mutes.filter((item) => (item.room !== roomName || item.user !== usernameToMute));
-                setMutes(newMutes);
-            } else if(!localMute) {
-                let newMutes = [...mutes, {room: roomName, user: usernameToMute}];
-                setMutes(newMutes);
-            }
         }
-
     }
+    
     // kick a user from room
     const kickUser = (roomName, usernameToKick) => {
         socket.emit('kick user', {room: roomName, to: usernameToKick});
@@ -397,19 +417,32 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
     // socket events
     useEffect(() => {
         if(username && socket) {
-
             let result = socket.open();
-            socket.emit('join room', { room });
+            isPrivateRoom(room, ({isPrivate}) => {
+                if(isPrivate) {
+                   setRoomNameForPassword(room);
+                   setOpenPasswordModal(true);
+                } else {
+                    socket.emit('join room', { room }, (result, message) => {
+                        console.log('join callback', result, message)
+                        if(!result) {
+                            enqueueSnackbar(message, {variant: 'error'})
+                        }
+                    });
+                }
+            }, (err) => {
+                console.log(err);
+            })
+            
             socket.on('connect_error', (err) => {
                 console.log(err)
             })
-
-            socket.on('init room', async ({room, onlineUsers, messages}, fn) => {
+            socket.on('init room', async ({room, onlineUsers, messages, blocks}, fn) => {
                 fn('success');
                 let usernames = await onlineUsers.map((item) => (item.username));
                 if(usernames.includes(username)) {
                     // console.log('username: ', username);
-                    setNewInfo({ type: 'init room', payload: { room, onlineUsers, messages}});
+                    setNewInfo({ type: 'init room', payload: { room, onlineUsers, messages, blocks}});
                 }
             });
             socket.on('joined room',async ({room, onlineUsers, joinedUser}) => {
@@ -429,16 +462,16 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
             socket.on('global banned user', async ({kickedUserName}) => {
                 setNewInfo({type: 'kicked', payload: { kickedUserName, type: 'global ban'}}); 
             });
-            
+            socket.on('update block', ({room, onlineUsers, blocks}) => {
+                console.log('update block', room, onlineUsers, blocks)
+                setNewInfo({type: 'update block', payload: { room, onlineUsers, blocks}}); 
+            })
             socket.on('room message', (message, callback) => {
                 console.log('new message')
                 setNewMessage({message, callback});
             });
-
             // socket.on('private message', (message, callback) => {
-
             // })
-
             socket.on('poke message', payload => {
                 setNewInfo({type: 'poke', payload});
             })
@@ -456,6 +489,44 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                joinErrorHandler(payload);
             })
 
+            socket.on('disconnect', (reason) => {
+                console.log('disconnect', reason);
+                setOpenDisconnectModal(true);
+                if (reason === 'io server disconnect') {
+                    // the disconnection was initiated by the server, you need to reconnect manually
+                    socket.connect();
+                }
+            })
+
+            socket.on('connect_error', (err) => {
+                console.log('connect_error', err);
+            })
+
+            socket.io.on('reconnect', () => {
+                console.log('reconnect');
+                let roomNames = roomsRef.current.map((room) => (room.name));
+                roomNames.map((roomName) => {
+                    console.log('rejoin room', roomName, )
+                    socket.emit('rejoin room',{room: roomName}, (result) => {
+                        if(result) {
+                            console.log('rejoin success') 
+                        } else {
+                            console.log('rejoin fail')
+                        }
+                        
+                    })
+                });
+                setOpenDisconnectModal(false)
+            })
+
+            socket.io.on('reconnect_attempt', () => {
+                console.log('reconnect_attempt');
+
+            })
+            socket.on('connect', () => {
+                console.log('connect',roomsRef.current);
+            })
+
             return () => {
                 socket.removeAllListeners();
                 socket.close();
@@ -466,8 +537,24 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
     // add a new room to chat area
     const addRoom = async (room, callback) => {
         let roomNames = await roomsRef.current.map((oneRoom) => (oneRoom.name));
-        if(room && roomNames && roomNames.length > 0 && !roomNames.includes(room)) {
-            socket.emit('join room', { room });
+            if(room && roomNames && !roomNames.includes(room)) {
+                isPrivateRoom(room, ({isPrivate}) => {
+                    if(isPrivate) {
+                        setRoomNameForPassword(room);
+                        setOpenPasswordModal(true);
+                    } else {
+                        socket.emit('join room', { room }, (result, message) => {
+                            if(result) {
+                                
+                            } else {
+                                enqueueSnackbar(message, {variant: 'error'})
+                            }
+                        });
+                    }
+                }, (err) => {
+                    console.log(err);
+                })
+            // socket.emit('join room', { room });
             callback(true);
         } else {
             callback(false);
@@ -514,7 +601,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                                 messages = [wcMsg, ...messages];
                             }
                             
-                            let newRoomObject = new RoomObject(newInfo.payload.room.name, messages, newInfo.payload.onlineUsers);
+                            let newRoomObject = new RoomObject(newInfo.payload.room.name, messages, newInfo.payload.onlineUsers, newInfo.payload.blocks,);
                             roomsRef.current.push(newRoomObject);
                             setRoomIndex(roomsRef.current.length-1);
                             return;
@@ -548,6 +635,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                         if(username && usernames.includes(username)) {
                             if(newInfo.payload.onlineUsers && newInfo.payload.joinedUser) {
                                 let joinedUser = newInfo.payload.joinedUser;
+                                console.log('joined user', joinedUser)
                                 sameRoom.addOnlineUser(joinedUser);
                                 if(username !== joinedUser.username) {
                                     let sysMsg = {
@@ -674,6 +762,21 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                         }
                     }
                 }
+                break;
+            case 'update block':
+                if(roomsRef.current && newInfo.payload.room) {
+                    let {room, onlineUsers, blocks} = newInfo.payload;
+                    let sameRoom = await roomsRef.current.find((room) => (room.name === newInfo.payload.room));
+                    if(sameRoom) {
+                        sameRoom.setOnlineUsers(onlineUsers);
+                        sameRoom.initMutes(onlineUsers, blocks);
+                    }
+                    if(room === currentRoomName) {
+                        setCurrentRoomMutes([...sameRoom.mutes]);
+                        setCurrentRoomUsers([...sameRoom.users]);
+                    }
+                }
+                
                 break;
             case 'video':
                 // console.log('process video')
@@ -882,6 +985,15 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
             me={{username, avatar, gender}} />
         <div>{pokeAudio}</div>
         <div>{messageAudio}</div>
+        <DisconnectModal
+            open={openDisconnectModal}
+            setOpen={setOpenDisconnectModal}
+        />
+        <PasswordModal
+            open={openPasswordModal}
+            setOpen={setOpenPasswordModal}
+            room={roomNameForPassword}
+        />
         </>
     );
 }

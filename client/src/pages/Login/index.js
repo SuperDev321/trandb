@@ -25,10 +25,9 @@ import CustomTextField from '../../components/CustomTextField';
 
 
 const loginValidationSchema = yup.object({
-    email: yup
-    .string('Enter your email')
-    .email('Enter a valid email')
-    .required('Email is required'),
+    username: yup
+    .string('Enter your nickname')
+    .required('Nickname is required'),
     password: yup
     .string('Enter your password')
     .min(8, 'Password should be of minimum 8 characters length')
@@ -135,7 +134,7 @@ const Login = () => {
 
     const loginFormik = useFormik({
         initialValues: {
-            email: '',
+            username: '',
             password: '',
         },
         validationSchema: loginValidationSchema,
@@ -179,15 +178,15 @@ const Login = () => {
                                 <Grid item xs={12} sm={12}>
                                 <CustomTextField
                                     fullWidth
-                                    id="email"
-                                    label="Email Address"
-                                    name="email"
+                                    id="username"
+                                    label="Nickname"
+                                    name="username"
                                     autoComplete="off"
                                     value={loginFormik.values.email}
                                     onBlur={loginFormik.handleBlur}
                                     onChange={loginFormik.handleChange}
-                                    error={loginFormik.touched.email && Boolean(loginFormik.errors.email)}
-                                    helperText={loginFormik.touched.email && loginFormik.errors.email}
+                                    error={loginFormik.touched.username && Boolean(loginFormik.errors.username)}
+                                    helperText={loginFormik.touched.username && loginFormik.errors.username}
                                 />
                                 </Grid>
                                 <Grid item xs={12}>

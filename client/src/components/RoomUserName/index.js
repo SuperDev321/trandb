@@ -19,7 +19,8 @@ import {
 } from '@material-ui/icons';
 import { makeStyles } from '@material-ui/core/styles';
 import { pink } from '@material-ui/core/colors';
-import BanModal from '../BanModal';
+import BanModal from '../Modals/BanModal';
+import {getSocket} from '../../utils'
 const useStyles = makeStyles((theme) => ({
     username: {
         font: 'bold 14px sans-serif',
@@ -58,13 +59,14 @@ const useStyles = makeStyles((theme) => ({
 
 
 const RoomUserName = ({user, role, roomName,
-    changeMuteState, sendPokeMessage, kickUser, banUser,addOrOpenPrivate, isMine, displayYou,
+    changeMuteState, sendPokeMessage, kickUser, banUser,addOrOpenPrivate, isMine, displayYou, isMuted
     // open,
     // anchorEl,
     // setAnchorEl,
     // handleClose
 }) => { 
     const classes = useStyles();
+    const socket = getSocket();
     const [anchorEl, setAnchorEl] = React.useState(null);
     const [openBan, setOpenBan] = React.useState(false);
     const handleClickPrivateChat = (event) => {
@@ -83,8 +85,39 @@ const RoomUserName = ({user, role, roomName,
     const handleMute = (username) => {
         setAnchorEl(null);
         setTimeout(() => {
-            changeMuteState(roomName, username);
+            changeMuteState(roomName, username, isMuted);
         }, 0)
+    }
+    //block a user
+    const blockUser = (roomName, username) => {
+        console.log('blockUser')
+        socket.emit('block user', {room: roomName, username},
+        (result, message) => {
+            if(!result) {
+                // enqueueSnackbar(message, {variant: 'error'});
+            }
+        })
+    } 
+    const unBlockUser = (roomName, username) => {
+
+        socket.emit('unblock user', {room: roomName, username},
+        (result, message) => {
+            if(!result) {
+                // enqueueSnackbar(message, {variant: 'error'});
+            }
+        });
+        
+    }
+    const handleBlock = () => {
+        console.log('blockUser', user)
+        if(!user.blocked) {
+            console.log('block')
+            blockUser(roomName, user.username);
+        } else {
+            console.log('unblock')
+            unBlockUser(roomName, user.username);
+        }
+        setAnchorEl(null);
     }
     const handleKick = (username) => {
         setAnchorEl(null);
@@ -172,8 +205,8 @@ const RoomUserName = ({user, role, roomName,
                             <Notifications />&nbsp;Poke Message
                         </Button>
                         <Divider />
-                        { (role === 'admin' || role === 'owner' || role === 'moderator')
-                            && (user.role !== 'admin') && (user.role !== 'owner') &&
+                        { ((role === 'admin' || role === 'owner' || role === 'moderator')
+                            && (user.role !== 'admin') && (user.role !== 'owner')) ?
                             <>
                             <Button size="small"
                                 className={`${classes.cardButton} ${classes.kick}`}
@@ -189,19 +222,32 @@ const RoomUserName = ({user, role, roomName,
                                 >
                                     Kick
                             </Button>
+                            <Button size="small"
+                                className={`${classes.cardButton} ${classes.mute}`}
+                                fullWidth onClick={handleBlock}
+                                name={user.username}
+                            >
+                            {
+                                user.blocked
+                                ? 'UnBlock this person'
+                                : 'Block this person'
+                            }
+                            </Button>
                             </>
+                        :
+                            (
+                            <Button size="small"
+                                className={`${classes.cardButton} ${classes.mute}`}
+                                fullWidth onClick={() => { handleMute(user.username) }}
+                                name={user.username}
+                            >
+                            {
+                                isMuted
+                                ? 'Unmute / Ignore'
+                                : 'Silence / Ignorance'
+                            }
+                            </Button>)
                         }
-                        <Button size="small"
-                            className={`${classes.cardButton} ${classes.mute}`}
-                            fullWidth onClick={() => { handleMute(user.username) }}
-                            name={user.username}
-                        >
-                        {
-                            user.muted
-                            ? 'Unmute / Ignore'
-                            : 'Silence / Ignorance'
-                        }
-                        </Button>
                     </>
                 }
             </Card>
