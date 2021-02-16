@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 // @material-ui/core
 import { makeStyles } from "@material-ui/core/styles";
 import ChatIcon from '@material-ui/icons/Chat';
@@ -24,27 +24,72 @@ import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
-
 import styles from "Admin/assets/jss/material-dashboard-react/views/dashboardStyle.js";
+import Axios from "axios";
+import config from "config";
 
 const useStyles = makeStyles(styles);
 
-function createData(no, username) {
-  return { no, username};
-}
-
-const rows = [
-  createData('Frozen yoghurt', 159),
-  createData('Ice cream', 237),
-  createData('Eclair', 262),
-  createData('Cupcake', 305),
-  createData('Gingerbread', 356),
-];
-
-export default function Edit( {onClickBack} ) {
+export default function Edit( {onClickBack, room} ) {
   const classes = useStyles();
-  const [category, setCategory] = React.useState('Comedy');
-  const [maxUsers, setMaxUsers] = React.useState('unlimited');
+  const [id, setId] = useState(null);
+  const [name, setName] = useState('');
+  const [category, setCategory] = useState('');
+  const [welcomeMessage, setWelcomeMessage] = useState('');
+  const [description, setDescription] = useState('');
+  const [maxUsers, setMaxUsers] = useState(0);
+  const [owner, setOwner] = useState(null);
+  const [bans, setBans] = useState([]);
+  const [moderators, setModerators] = useState([]);
+  const [cover, setCover] = useState('');
+  const [icon, setIcon] = useState('');
+
+  const handleClickDeleteModerator = (moderatorId) => {
+    if(id) {
+      Axios.post(`${config.server_url}/api/moderators/delete`, {roomId: id, moderatorId})
+      .then((response) => {
+        if(response.status === 204) {
+          let newModerators = moderators.filter(({_id})=> (_id !== moderatorId));
+          setModerators(newModerators);
+        }
+      })
+    }
+  }
+  const handleDeleteBan = (banId) => {
+    if(id) {
+      Axios.delete(`${config.server_url}/api/bans/`+banId)
+      .then((response) => {
+        if(response.status === 204) {
+          let newBans = bans.filter(({_id}) => (_id !== banId));
+          setBans(newBans);
+        }
+      })
+    }
+  }
+  useEffect(() => {
+    if(room) {
+      const {name} = room;
+      Axios.get(`${config.server_url}/api/rooms/`+name)
+      .then((response) => {
+        if(response.status === 200) {
+          const {data : { data}} = response;
+          console.log(data)
+          const {_id, name, category, description, welcomeMessage, maxUsers, owner, bans, moderators, cover, icon} = data;
+          setId(_id);
+          setName(name);
+          setCategory(category);
+          setDescription(description);
+          setWelcomeMessage(welcomeMessage);
+          setMaxUsers(maxUsers);
+          setOwner(owner);
+          setBans(bans);
+          setModerators(moderators);
+          setCover(cover);
+          setIcon(icon);
+        }
+      })
+    }
+  } , [room])
 
   return (
     <GridContainer>
@@ -67,7 +112,7 @@ export default function Edit( {onClickBack} ) {
                 <p className={classes.cardCategory}>Room Name</p>
               </Grid>
               <Grid item sm={9}>
-                <TextField style={{width: '100%'}}/>
+                <TextField style={{width: '100%'}} value={name}/>
               </Grid>
             </Grid>
             <Grid container spacing={2} style={{marginTop:'20px'}}>
@@ -106,7 +151,10 @@ export default function Edit( {onClickBack} ) {
                 <p className={classes.cardCategory}>Description</p>
               </Grid>
               <Grid item sm={9}>
-                <TextField style={{width: '100%'}}/>
+                <TextField style={{width: '100%'}}
+                  value={description}
+                  onChange={(e) => {setDescription(e.target.value)}}
+                />
               </Grid>
             </Grid>
             <Grid container spacing={2} style={{marginTop:'20px'}}>
@@ -114,7 +162,10 @@ export default function Edit( {onClickBack} ) {
                 <p className={classes.cardCategory}>Welcome message</p>
               </Grid>
               <Grid item sm={9}>
-                <TextField style={{width: '100%'}}/>
+                <TextField style={{width: '100%'}}
+                  value={welcomeMessage}
+                  onChange={(e) => {setWelcomeMessage(e.target.value)}}
+                />
               </Grid>
             </Grid>
             <Grid container spacing={2} style={{marginTop:'20px'}}>
@@ -135,14 +186,14 @@ export default function Edit( {onClickBack} ) {
                       id: 'maxUsers',
                     }}
                   >
-                    <option value="5">5</option>
-                    <option value="10">10</option>
-                    <option value="15">15</option>
-                    <option value="25">25</option>
-                    <option value="50">50</option>
-                    <option value="100">100</option>
-                    <option value="200">200</option>
-                    <option value="unlimited">unlimited</option>
+                    <option value={5}>5</option>
+                    <option value={10}>10</option>
+                    <option value={15}>15</option>
+                    <option value={25}>25</option>
+                    <option value={50}>50</option>
+                    <option value={100}>100</option>
+                    <option value={200}>200</option>
+                    <option value={9999}>Unlimited</option>
                   </Select>
                 </FormControl>
               </Grid>
@@ -185,14 +236,14 @@ export default function Edit( {onClickBack} ) {
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {rows.map((row) => (
-                        <TableRow hover role="checkbox" key={row.no}>
+                      {moderators.map((row, index) => (
+                        <TableRow hover role="checkbox" key={index}>
                           <TableCell component="th" scope="row">
-                            {row.no}
+                            {index+1}
                           </TableCell>
-                          <TableCell align="right">{row.username}</TableCell>
-                          <TableCell>
-                            <IconButton style={{color:"#f44336"}}>
+                          <TableCell >{row.username}</TableCell>
+                          <TableCell align="right">
+                            <IconButton style={{color:"#f44336"}} onClick={() => handleClickDeleteModerator(row._id)}>
                               <DeleteIcon  />
                             </IconButton>
                           </TableCell>
@@ -211,20 +262,37 @@ export default function Edit( {onClickBack} ) {
                 <CardIcon color="primary">
                   <AssignmentIcon />
                 </CardIcon>
-                <p className={classes.cardCategory} style={{color:'#3c4858', fontSize:'40px', paddingTop:'16px',}}>Banned</p>
-                <p className={classes.cardCategory} style={{color:'#3c4858', fontSize:'40px'}}>Users</p>
+                <p className={classes.cardCategory} style={{color:'#3c4858', fontSize:'40px', paddingTop:'16px',}}>Banned Users</p>
               </CardHeader>
               <CardFooter style={{display: 'block'}}>
-                <Grid container spacing={2} style={{marginTop:'20px'}}>
-                  <Grid item sm={1}>
-                  </Grid>
-                  <Grid item sm={2} style={{textAlign: 'right'}}>
-                    <p className={classes.cardCategory}>Nickname</p>
-                  </Grid>
-                  <Grid item sm={9}>
-                    <TextField style={{width: '100%'}}/>
-                  </Grid>
-                </Grid>
+                <TableContainer>
+                  <Table className={classes.table} aria-label="simple table">
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>No</TableCell>
+                        <TableCell>Username</TableCell>
+                        <TableCell>IP</TableCell>
+                        <TableCell align="right">Actions</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {bans.map((row, index) => (
+                        <TableRow hover role="checkbox" key={index}>
+                          <TableCell component="th" scope="row">
+                            {index+1}
+                          </TableCell>
+                          <TableCell >{row.username}</TableCell>
+                          <TableCell >{row.ip}</TableCell>
+                          <TableCell align="right">
+                            <IconButton style={{color:"#f44336"}} onClick={() => handleDeleteBan(row._id)}>
+                              <DeleteIcon  />
+                            </IconButton>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
               </CardFooter>
             </Card>
           </GridItem>
@@ -234,7 +302,7 @@ export default function Edit( {onClickBack} ) {
         <Card>
           <CardHeader style={{textAlign:'center'}}>
             <p className={classes.cardCategory}>OWNER</p>
-            <p className={classes.cardCategory} style={{color:'#3c4858'}}>Chun Sim</p>
+            <p className={classes.cardCategory} style={{color:'#3c4858'}}>{owner ? owner.username: ''}</p>
           </CardHeader>
         </Card>
       </GridItem>

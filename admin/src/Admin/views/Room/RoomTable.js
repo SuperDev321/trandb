@@ -190,7 +190,7 @@ export default function RoomTable( {onClickEdit} ) {
 
   useEffect(() => {
     const roomRead = async () => {
-      const rooms = await Axios.get("http://10.10.10.238:4000/api/rooms");
+      const rooms = await Axios.get("http://10.10.10.238:8443/api/rooms");
       let roomsToShow = rooms.data.data.map((item, index) => ({...item, no: index+1}));
       setRows(roomsToShow);
     }
@@ -275,7 +275,7 @@ export default function RoomTable( {onClickEdit} ) {
                         <TableCell className={classes.space}>{rows.cover}</TableCell>
                         <TableCell className={classes.space}>2021-2-6</TableCell>
                         <TableCell align="right" className={classes.space}>
-                           <IconButton style={{color:"#4caf50"}} onClick={() => {onClickEdit()}}>
+                           <IconButton style={{color:"#4caf50"}} onClick={() => {onClickEdit(row)}}>
                             <CreateIcon />
                           </IconButton>
                           <IconButton style={{color:"#f44336"}}>

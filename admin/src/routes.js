@@ -23,6 +23,7 @@ import ChatIcon from '@material-ui/icons/Chat';
 import DashboardPage from "Admin/views/Dashboard/Dashboard.js";
 import Rooms from "Admin/views/Room/Room.js";
 import Ban from "Admin/views/Ban/Ban.js";
+import Words from 'Admin/views/Forbidden'
 
 const dashboardRoutes = [
   {
@@ -44,6 +45,13 @@ const dashboardRoutes = [
     name: "BAN",
     icon: AssistantIcon,
     component: Ban,
+    layout: "/admin"
+  },
+  {
+    path: "/fobidden words",
+    name: "Forbidden words",
+    icon: AssistantIcon,
+    component: Words,
     layout: "/admin"
   },
 ];
