@@ -1,13 +1,24 @@
 const { Rooms, Chats, Users } = require('../database/models');
 const { findRoomUsers, checkBan, getRoomBlocks, getGlobalBlocks, checkBlock } = require('../utils');
-
+const isIp = require('is-ip');
+const Address6 = require('ip-address').Address6;
 const joinRoom = (io, socket) => async ({ room, password }, callback) => {
     try {
         const { _id, role } = socket.decoded;
-        let ip = socket.client.request.headers['cf-connecting-ip'];
-        if (ip.substr(0, 7) === '::ffff:') {
-            ip = ip.substr(7);
+        let ip = socket.client.request.headers['cf-connecting-ip'] || socket.client.request.headers['x-forwarded-for'] || socket.client.request.connection.remoteAddress
+        if(isIp(ip)) {
+            if(!isIp.v4(ip)) {
+                var address = new Address6(ip);
+                var teredo = address.inspectTeredo();
+                ip = teredo.client4;
+            }
+            if (ip.substr(0, 7) === '::ffff:') {
+                ip = ip.substr(7);
+            }
+        } else {
+            ip = '10.10.10.10';
         }
+        console.log(ip)
         // console.log(socket.rooms);
         // console.log('joining room:', room, _id);
         // console.log(io)
@@ -74,11 +85,21 @@ const joinRoom = (io, socket) => async ({ room, password }, callback) => {
 const rejoinRoom = (io, socket) => async ({ room }, callback) => {
     try {
         const { _id, role } = socket.decoded;
-        let ip = socket.handshake.address;
-        if (ip.substr(0, 7) === '::ffff:') {
-            ip = ip.substr(7);
+        let ip = socket.client.request.headers['cf-connecting-ip'] || socket.client.request.headers['x-forwarded-for'] || socket.client.request.connection.remoteAddress
+        if(isIp(ip)) {
+            if(!isIp.v4(ip)) {
+                var address = new Address6(ip);
+                var teredo = address.inspectTeredo();
+                ip = teredo.client4;
+            }
+            if (ip.substr(0, 7) === '::ffff:') {
+                ip = ip.substr(7);
+            }
+        } else {
+            ip = '10.10.10.10';
         }
-        // console.log(socket.rooms);
+
+        console.log(ip);
         // console.log('joining room:', room, _id);
         // console.log(io)
 
