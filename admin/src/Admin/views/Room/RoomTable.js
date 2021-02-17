@@ -21,6 +21,7 @@ import CardFooter from "Admin/components/Card/CardFooter.js";
 import ChatIcon from '@material-ui/icons/Chat';
 import Grid from '@material-ui/core/Grid';
 import SearchBar from 'material-ui-search-bar';
+import config from 'config';
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -190,7 +191,7 @@ export default function RoomTable( {onClickEdit} ) {
 
   useEffect(() => {
     const roomRead = async () => {
-      const rooms = await Axios.get("http://10.10.10.238:8443/api/rooms");
+      const rooms = await Axios.get(`${config.server_url}/api/rooms`);
       let roomsToShow = rooms.data.data.map((item, index) => ({...item, no: index+1}));
       setRows(roomsToShow);
     }
