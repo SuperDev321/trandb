@@ -22,9 +22,11 @@ import RoomObject from '../../utils/roomObject';
 import UserContext from '../../context';
 import { getSocket, useLocalStorage, isPrivateRoom } from '../../utils';
 import {useAudio} from 'react-use';
+import { useTranslation, withTranslation, Trans } from 'react-i18next';
 
 const ChatRooms = ({room, addUnReadMsg}, ref) => {
     const classes = useStyles();
+    const { t, i18n } = useTranslation();
     const history= useHistory();
     const [mobileOpen, setMobileOpen] = useState(false);
     const { username, avatar, gender } = useContext(UserContext);
@@ -149,12 +151,13 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
             setRoomIndex(0);
         }
     }
-    const sendMessage = (roomName, to, color, msg, bold, type) => {
+    const sendMessage = (roomName, to, color, msg, bold, type, messageType) => {
+        console.log('message' , roomName, msg, messageType, type)
         if (msg) {
             const date = Date.now();
             if(type === 'private') {
                 socket.emit('private message',
-                    { roomName, msg, from: username, to, date, color, bold },
+                    { type, roomName, msg, from: username, to, date, color, bold, messageType },
                     (data) => {
                         console.log('private chat callback data',data);
                         if(data) {
@@ -169,19 +172,21 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                 );
                 
             } else{
-                socket.emit('public message', { msg, room: roomName, from: username, date, color, bold });
+                socket.emit('public message', { type, msg, room: roomName, from: username, date, color, bold, messageType });
                 let sameRoom = roomsRef.current.find((room) => (room.name) === roomName);
                 
                 if(sameRoom) {
                     
                     let message = {
                         type : 'public',
+                        messageType,
                         msg,
                         from: username,
                         date,
                         color,
                         bold,
                     }
+                    console.log('new message', message)
                     sameRoom.messages = [ message, ...sameRoom.messages,];
                     if(sameRoom.name === currentRoomName) {
                         setCurrentRoomMessages([...sameRoom.messages]);
@@ -879,7 +884,6 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
 
     return (
         <>
-        
         <div className={classes.root} color="primary">
             <Hidden xsDown implementation="css" className={classes.drawerWrapper}>
                 <div className={classes.drawer}>
@@ -935,15 +939,18 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                             users={currentRoomUsers}
                             changeMuteState={changeMuteState}
                             sendPokeMessage={sendPokeMessage}
+                            kickUser={kickUser}
+                            banUser={banUser}
                             // unReadInfo={currentRoom && currentRoom.private}
                             roomName={currentRoomName}
+                            mutes={currentRoomMutes}
                             // setOpenPrivate={setOpenPrivate}
                             // setPrivateTo={setPrivateTo}
                             addOrOpenPrivate={addOrOpenPrivate}
                             cameraState={currentRoom && currentRoom.cameraState}
                             openCamera = {openCamera}
                             closeCamera = {closeCamera}
-                            username={username} 
+                            username={username}
                             />
                         </Card>
                     }

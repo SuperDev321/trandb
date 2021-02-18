@@ -133,7 +133,7 @@ const ChatRoom = ({roomName, users, messages, mutes, sendMessage, changeMuteStat
                     }
                 </div>
             </div>
-            <ChatForm username={username} roomName={roomName} sendMessage={sendMessage}/>
+            <ChatForm username={username} roomName={roomName} type="public" sendMessage={sendMessage}/>
         </div>
     );
 };

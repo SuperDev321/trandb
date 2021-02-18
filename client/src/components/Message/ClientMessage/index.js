@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import UserContext from '../../../context';
 import PropTypes, { element } from 'prop-types';
 import {EmojiConvertor} from 'emoji-js';
@@ -19,9 +19,10 @@ emoji.use_sheet = true;
 
 const MyMessage = ({user, roomName, message, role, font_size, userAction, changeMuteState, sendPokeMessage, 
   kickUser, banUser, addOrOpenPrivate}) => {
-    
+    console.log(message)
   const classes = useStyles({color: message.color, bold: message.bold});
   const { username } = useContext(UserContext);
+  const [checked, setChecked] = useState(false);
   const urlify = (text) => {
     
     let urlRegex = /(https?:\/\/[^\s]+)/g;
@@ -130,31 +131,18 @@ const MyMessage = ({user, roomName, message, role, font_size, userAction, change
     return string
   }
 
-    // if (message.message_type === "image") {
+    // if (message.messageType === "image") {
     //   return (
     //     <div className="message">
     //       <div className="message-content">
     //         <p>
     //           <span className="sender"><strong>{message.from}</strong>:&nbsp;</span>
     //           <span className={`text size-${font_size}`}>
-    //           {!message.is_check ? <a href="javascript:void(0)"><strong
-    //               onClick={() => {}}
+    //           {!checked ? <a href="javascript:void(0)"><strong
+    //               onClick={() => {setChecked(true)}}
     //               style={{cursor: "pointer"}}>click to view</strong></a> :
-    //             <img src={message.text} className="photo"/>}
+    //             <img src={message.msg} className="photo"/>}
     //           </span>
-    //           <span className="time">{moment(message.time).format('HH:mm')}</span>
-    //         </p>
-    //       </div>
-    //     </div>
-    //   );
-    // } else if (message.message_type === "bold") {
-    //   return (
-    //     <div className="message">
-    //       <div className="message-content">
-    //         <p className={`font-${message.color}`}>
-    //           <span className="sender"><strong>{message.sender.name}:</strong>&nbsp;</span>
-    //           <span
-    //             className={`text size-${font_size}  ${message.message_type}`}> {convertHTML(emojiConverter(urlify(sanitarize(message.text))))}</span>
     //           <span className="time">{moment(message.time).format('HH:mm')}</span>
     //         </p>
     //       </div>
@@ -165,7 +153,7 @@ const MyMessage = ({user, roomName, message, role, font_size, userAction, change
     return (
       <div className={classes.message}>
         <div className={classes.messageContent}>
-          <RoomUserName
+          <span className={classes.sender}><RoomUserName
             user={user}
             roomName={roomName}
             isMine={username === user.username}
@@ -177,15 +165,27 @@ const MyMessage = ({user, roomName, message, role, font_size, userAction, change
             addOrOpenPrivate={addOrOpenPrivate}
             role={role}
           />
-            <span className={classes.sender}>:&nbsp;</span>
-                <span
-                className={classes.text + ' ' + classes.size10}
-                // dangerouslySetInnerHTML={{__html: makeTag(emojiConverter(message.msg))}}
-                >
-                  {
-                    convertHTML(makeTag(emojiConverter(message.msg)))
-                  }
+            :&nbsp;</span>
+            <>
+            { (message.messageType === 'image') ?
+            <span className={classes.text + ' ' + classes.size10}>
+            {!checked ? <a href="javascript:void(0)" style={{color: '#046eb9'}}>
+              <strong
+                onClick={() => {setChecked(true)}}
+                style={{cursor: "pointer"}}>click to view</strong></a> :
+              <img src={'/'+message.msg} className={classes.photo}/>}
             </span>
+            :
+            <span
+            className={classes.text + ' ' + classes.size10}
+            // dangerouslySetInnerHTML={{__html: makeTag(emojiConverter(message.msg))}}
+            >
+              {
+                convertHTML(makeTag(emojiConverter(message.msg)))
+              }
+            </span>
+            }
+            </>
         </div>
         <span className={classes.time}>{moment(message.date).format('HH:mm')}</span>
       </div>

@@ -10,6 +10,9 @@ const chatSchema = new Schema({
     type: String,
     required: true,
   },
+  messageType: {
+    type: String,
+  },
   from: {
     type: String,
     required: true,
