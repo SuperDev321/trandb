@@ -36,7 +36,10 @@ const useStyles = makeStyles((theme) => ({
     sender: {
         margin: 0,
         whiteSpace: 'nowrap',
-        fontWeight: 'bold'
+        fontWeight: 'bold',
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'baseline',
     },
     time: {
         font: 'italic 12px sans-serif',
@@ -98,7 +101,11 @@ const useStyles = makeStyles((theme) => ({
     size38: { '& img': { width: 42, height: 42} },
     size39: { '& img': { width: 43, height: 43} },
     size40: { '& img': { width: 44, height: 44} },
-
+    photo: {
+        maxWidth: '250px !important',
+        width: 'auto !important',
+        height: 'auto !important'
+    }
 }));
 
 export default useStyles;

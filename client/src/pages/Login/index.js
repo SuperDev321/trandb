@@ -1,6 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { useHistory, useLocation, Redirect } from 'react-router-dom';
 import { useFormik } from 'formik';
+import { useTranslation } from 'react-i18next';
 import * as yup from 'yup';
 import {
     CssBaseline,
@@ -24,20 +25,7 @@ import OutlinedButton from '../../components/OutlinedButton';
 import CustomTextField from '../../components/CustomTextField';
 
 
-const loginValidationSchema = yup.object({
-    username: yup
-    .string('Enter your nickname')
-    .required('Nickname is required'),
-    password: yup
-    .string('Enter your password')
-    .min(8, 'Password should be of minimum 8 characters length')
-    .required('Password is required'),
-});
-const guestValidationSchema = yup.object({
-    nickname: yup
-    .string('Enter your nickname')
-    .required('Nickname is required'),
-});
+
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -112,7 +100,6 @@ const RedRadio = withStyles({
 
 
 const Login = () => {
-    
     const { state } = useLocation();
     const { from } = state || { from: { pathname: "/" } };
     const history = useHistory();
@@ -122,6 +109,21 @@ const Login = () => {
     const [guest, setGuest] = useState(false);
     const [error, setError] = useState();
     const [redirectToReferrer, setRedirectToReferrer] = useState(false);
+    const { t, i18n } = useTranslation();
+    const loginValidationSchema = yup.object({
+        username: yup
+        .string('Enter your nickname')
+        .required(t('LoginPage.error_username')),
+        password: yup
+        .string('Enter your password')
+        .min(8, 'Password should be of minimum 8 characters length')
+        .required(t('LoginPage.error_password')),
+    });
+    const guestValidationSchema = yup.object({
+        nickname: yup
+        .string('Enter your nickname')
+        .required(t('LoginPage.error_username')),
+    });
 
     const handleSelectMode = (isGuest) => {
         if(isGuest) {
@@ -170,7 +172,7 @@ const Login = () => {
                 { !guest ?
                     <Card className={classes.card}>
                         <Typography component="h1" variant="h5">
-                        Sign in
+                        {t('LoginPage.sign_in')}
                         </Typography>
                         <Typography className={classes.error}>{error}</Typography>
                         <form className={classes.form} noValidate onSubmit={loginFormik.handleSubmit}>
@@ -179,7 +181,7 @@ const Login = () => {
                                 <CustomTextField
                                     fullWidth
                                     id="username"
-                                    label="Nickname"
+                                    label={t('LoginPage.username')}
                                     name="username"
                                     autoComplete="off"
                                     value={loginFormik.values.email}
@@ -193,7 +195,7 @@ const Login = () => {
                                 <CustomTextField
                                     fullWidth
                                     name="password"
-                                    label="Password"
+                                    label={t('LoginPage.password')}
                                     type="password"
                                     id="password"
                                     autoComplete="current-password"
@@ -212,7 +214,7 @@ const Login = () => {
                                     color="primary"
                                     className={classes.submit}
                                 >
-                                    Sign in
+                                    {t('LoginPage.sign_in')}
                                 </OutlinedButton>
                                 <OutlinedButton
                                     variant="contained"
@@ -220,7 +222,7 @@ const Login = () => {
                                     className={classes.submit}
                                     onClick = {() => { setSelected(false); setError(null) }}
                                 >
-                                    Return
+                                    {t('LoginPage.back')}
                                 </OutlinedButton>
                             </div>
                         </form>
@@ -232,7 +234,7 @@ const Login = () => {
                                     onClick={() => { history.push('/signup') }}
                                     variant="body2"
                                 >
-                                    Create a new account
+                                    {t('LoginPage.create_new')}
                                 </Link>
                                 
                             </Grid>
@@ -241,7 +243,7 @@ const Login = () => {
                     :
                     <Card className={classes.card}>
                         <Typography component="h1" variant="h5">
-                        Sign in with guest
+                            {t('LoginPage.guest_sign')}
                         </Typography>
                         <Typography className={classes.error}>{error}</Typography>
                         <form className={classes.form} noValidate onSubmit={guestFormik.handleSubmit}>
@@ -250,7 +252,7 @@ const Login = () => {
                                 <CustomTextField
                                     fullWidth
                                     id="nickname"
-                                    label="Nickname"
+                                    label={t('LoginPage.username')}
                                     name="nickname"
                                     autoComplete="off"
                                     value={guestFormik.values.nickname}
@@ -276,7 +278,7 @@ const Login = () => {
                                     color="primary"
                                     className={classes.submit}
                                 >
-                                    Guest Sign
+                                    {t('LoginPage.guest_sign')}
                                 </OutlinedButton>
                                 <OutlinedButton
                                     variant="contained"
@@ -284,7 +286,7 @@ const Login = () => {
                                     className={classes.submit}
                                     onClick = {() => { setSelected(false); setError(null); }}
                                 >
-                                    Return
+                                    {t('LoginPage.back')}
                                 </OutlinedButton>
                             </div>
                         </form>

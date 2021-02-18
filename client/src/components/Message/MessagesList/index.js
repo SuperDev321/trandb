@@ -103,7 +103,7 @@ const MessagesList = ({ users, messages, role, userAction, roomName, changeMuteS
         <>
         <div ref={messagesRef} className={classes.root}>
             { currentItems &&
-                currentItems.map(({ _id, from, msg, date, type, color, bold }, index) => (
+                currentItems.map(({ _id, from, msg, date, type, color, bold, messageType }, index) => (
                     // <Message key={_id} text={msg} from={from} date={date} />
                     <span key={_id? _id: index}>
                         { type==='public' &&
@@ -111,7 +111,7 @@ const MessagesList = ({ users, messages, role, userAction, roomName, changeMuteS
                             user={getUserFromList(from)}
                             roomName={roomName}
                             role={role}
-                            message={{from, msg, date, color, bold}} font_size={10}
+                            message={{_id, from, msg, date, color, bold, messageType}} font_size={10}
                             changeMuteState={changeMuteState}
                             sendPokeMessage={sendPokeMessage}
                             kickUser={kickUser}

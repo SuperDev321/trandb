@@ -43,6 +43,18 @@ const useStyles = makeStyles((theme) => ({
     },
     bold: {
         fontWeight: 'bold',
+    },
+    fileUpload: {
+        paddingLeft: 3,
+        display: 'flex'
+    },
+    fileUploadInput: {
+        width: 0,
+        height: 0
+    },
+    fileUploadLabel: {
+        cursor: 'pointer',
+        display: 'flex'
     }
 }));
 

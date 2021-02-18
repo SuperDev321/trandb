@@ -16,6 +16,7 @@ const {
   updateRoomGeneral,
   updateRoomMedia,
   getPrivateChat,
+  fileUploader,
   getUserByName,
   getUserDetail,
   addBan,
@@ -58,6 +59,8 @@ router.post('/moderators', withAuth, addModerator)
 router.post('/moderators/delete', withAuth, deleteModerator)
 
 router.get('/admin/rooms', getRoomsAdmin);
+
+router.post('/file_upload', fileUploader)
 
 router.use(clientError);
 router.use(serverError);
