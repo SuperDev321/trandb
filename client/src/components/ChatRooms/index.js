@@ -154,10 +154,9 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
     const sendMessage = (roomName, to, color, msg, bold, type, messageType) => {
         console.log('message' , roomName, msg, messageType, type)
         if (msg) {
-            const date = Date.now();
             if(type === 'private') {
                 socket.emit('private message',
-                    { type, roomName, msg, from: username, to, date, color, bold, messageType },
+                    { type, roomName, msg, from: username, to, color, bold, messageType },
                     (data) => {
                         console.log('private chat callback data',data);
                         if(data) {
@@ -172,26 +171,16 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                 );
                 
             } else{
-                socket.emit('public message', { type, msg, room: roomName, from: username, date, color, bold, messageType });
-                let sameRoom = roomsRef.current.find((room) => (room.name) === roomName);
+                socket.emit('public message', { type, msg, room: roomName, from: username, color, bold, messageType }, (data) => {
+                    let sameRoom = roomsRef.current.find((room) => (room.name) === roomName);
+                    if(sameRoom && data) {
+                        sameRoom.messages = [ data, ...sameRoom.messages,];
+                        if(sameRoom.name === currentRoomName) {
+                            setCurrentRoomMessages([...sameRoom.messages]);
+                        }
+                    }
+                });
                 
-                if(sameRoom) {
-                    
-                    let message = {
-                        type : 'public',
-                        messageType,
-                        msg,
-                        from: username,
-                        date,
-                        color,
-                        bold,
-                    }
-                    console.log('new message', message)
-                    sameRoom.messages = [ message, ...sameRoom.messages,];
-                    if(sameRoom.name === currentRoomName) {
-                        setCurrentRoomMessages([...sameRoom.messages]);
-                    }
-                }
             }
         }
     }

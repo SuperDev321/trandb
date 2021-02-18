@@ -13,12 +13,12 @@ function getFileName(prefix, filename) {
   }
 
 const fileUploader = async (req, res) => {
-    // console.log(req.files)
+    console.log('fileupload')
     if (req.files && req.files.file_icon) {
       var photoIcon = req.files.file_icon;
       var newIconFileName = getFileName("icon_", req.files.file_icon.name);
       try {
-        await photoIcon.mv(path.join(__dirname, '..', '..', '..', '..', 'client', 'public/img/messages/',newIconFileName))
+        await photoIcon.mv(path.join(__dirname, '..', '..', '..', '..', 'client', 'build/img/messages/',newIconFileName))
         var photoUrl =  "img/messages/" + newIconFileName;
         res
         .status(200)
@@ -26,10 +26,10 @@ const fileUploader = async (req, res) => {
             photoUrl
         })
       } catch (err) {
-        common.sendFullResponse(res, 300, {}, "file upload error");
+        console.log(err);
       }
     } else {
-      common.sendFullResponse(res, 300, {}, "file is empty");
+      console.log(err);
     }
 }
 
