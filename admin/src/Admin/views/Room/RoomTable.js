@@ -22,7 +22,7 @@ import ChatIcon from '@material-ui/icons/Chat';
 import Grid from '@material-ui/core/Grid';
 import SearchBar from 'material-ui-search-bar';
 import config from 'config';
-
+import { useToasts } from 'react-toast-notifications';
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
     return -1;
@@ -153,6 +153,7 @@ export default function RoomTable( {onClickEdit} ) {
   const [query, setQuery] = React.useState('');
   const [rows, setRows] = React.useState([]);
   const [filteredRows, setFilteredRows] = React.useState([]);
+  const { addToast } = useToasts();
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -168,6 +169,24 @@ export default function RoomTable( {onClickEdit} ) {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
+
+  const onClickDelete = (row) => {
+    console.log(row)
+    let id = row._id;
+    Axios.delete(`${config.server_url}/api/rooms/` + id)
+    .then((response) => {
+      console.log(response);
+      if(response.status === 204) {
+        let newRows = rows.filter((row) => (row._id !== id));
+        setRows(newRows);
+        addToast('Successfully deleted', { appearance: 'success' })
+      }
+    })
+    .catch((err) => {
+      console.log(err)
+      addToast('Delete failed', { appearance: 'error' })
+    })
+  }
 
   useEffect(() => {
     if(query !== '') {
@@ -280,7 +299,7 @@ export default function RoomTable( {onClickEdit} ) {
                             <CreateIcon />
                           </IconButton>
                           <IconButton style={{color:"#f44336"}}>
-                            <DeleteIcon  />
+                            <DeleteIcon onClick={() => {onClickDelete(row)}} />
                           </IconButton>
                         </TableCell>
                       </TableRow>

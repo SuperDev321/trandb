@@ -5,7 +5,7 @@ const getRooms = async (req, res, next) => {
         const rooms = await Rooms.aggregate([
             {
                 $project: {
-                    _id: false,
+                    _id: true,
                     name: true,
                     icon: true,
                     cover: true,
