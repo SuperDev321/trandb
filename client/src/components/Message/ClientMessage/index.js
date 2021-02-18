@@ -19,7 +19,6 @@ emoji.use_sheet = true;
 
 const MyMessage = ({user, roomName, message, role, font_size, userAction, changeMuteState, sendPokeMessage, 
   kickUser, banUser, addOrOpenPrivate}) => {
-    console.log(message)
   const classes = useStyles({color: message.color, bold: message.bold});
   const { username } = useContext(UserContext);
   const [checked, setChecked] = useState(false);

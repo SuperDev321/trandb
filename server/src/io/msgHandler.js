@@ -1,7 +1,7 @@
 const { Chats } = require('../database/models');
 const { findRoomUsers, findUserByName } = require('../utils');
 
-const publicMessage = (io, socket) => async ({ msg, room, from, color, bold, type, messageType }) => {
+const publicMessage = (io, socket) => async ({ msg, room, from, color, bold, type, messageType }, callback) => {
   try {
     console.log('ok')
     const date = Date.now();
@@ -16,7 +16,7 @@ const publicMessage = (io, socket) => async ({ msg, room, from, color, bold, typ
       bold,
       date,
     });
-    console.log(newChat)
+    callback(newChat);
     
     socket.to(room).emit('room message', {
         type: 'public',
