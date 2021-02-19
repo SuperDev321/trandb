@@ -241,7 +241,7 @@ const CreateRoom = () => {
                     <Grid item xs={12}>
                     <FileUploader title='cover' value={formik.values.cover}
                     handleFile={(file) => {console.log('cover set', {file});formik.setFieldValue('cover', file, false)}}/>
-                    <FileUploader title='icon' handleFile={()=>console.log('uploaded')}/>
+                    <FileUploader title='icon' handleFile={(file)=>{console.log('uploaded');formik.setFieldValue('icon', file, false)}}/>
                     {/* <TextField
                         required
                         fullWidth

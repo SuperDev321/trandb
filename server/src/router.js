@@ -13,6 +13,7 @@ const {
   getRooms,
   getRoomsAdmin,
   addRoom,
+  deleteRoom,
   updateRoomGeneral,
   updateRoomMedia,
   getPrivateChat,
@@ -24,7 +25,10 @@ const {
   getBans,
   getUserRooms,
   addModerator,
-  deleteModerator
+  deleteModerator,
+  getWords,
+  addWord,
+  deleteWord
 } = require('./controllers');
 
 const { withAuth } = require('./middleware');
@@ -40,6 +44,7 @@ router.put('/room/general', withAuth, updateRoomGeneral);
 router.put('/room/media', withAuth, updateRoomMedia);
 router.get('/rooms/:roomName', withAuth, getRoomDetail);
 router.get('/rooms/:roomName/isPrivate', checkRoomPermission);
+router.delete('/rooms/:id', deleteRoom);
 router.post('/signup', signup);
 router.post('/login', login);
 router.post('/login/guest', guestLogin);
@@ -54,6 +59,10 @@ router.get('/users/:userId', getUserDetail);
 router.delete('/bans/:banId', withAuth, deleteBan);
 router.post('/bans', addBan);
 router.get('/bans', getBans);
+
+router.get('/forbiddenWords', getWords);
+router.post('/forbiddenWords', addWord);
+router.delete('/forbiddenWords/:id', deleteWord);
 
 router.post('/moderators', withAuth, addModerator)
 router.post('/moderators/delete', withAuth, deleteModerator)
