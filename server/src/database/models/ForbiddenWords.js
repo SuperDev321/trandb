@@ -1,5 +1,4 @@
 const { Schema, model } = require('mongoose');
-const { string } = require('yup');
 
 const forbiddenWordSchema = new Schema({
     word: {

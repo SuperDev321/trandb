@@ -1,9 +1,9 @@
 const { Bans } = require('../../database/models');
 const ipInt = require('ip-to-int');
 
-const banByNameAndIp = async (room, username, ip, fromIp, toIp) => {
+const banByNameAndIp = async (room=null, username, ip=null, fromIp=null, toIp=null) => {
     let ban = null;
-    console.log('ban infos', username, fromIp, toIp, ip);
+    console.log('ban infos', username, ip);
     try{
         if(room) { // room ban
             if(ip) {

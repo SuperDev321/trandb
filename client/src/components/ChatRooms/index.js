@@ -422,6 +422,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                         if(!result) {
                             enqueueSnackbar(message, {variant: 'error'})
                         }
+                        setRoomIndex(0);
                     });
                 }
             }, (err) => {
@@ -822,7 +823,6 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                 setCurrentRoomMutes(roomsRef.current[roomIndex].mutes);
             }
         }
-        
     }, [roomsInfo, roomIndex])
 
     useEffect(() => {
@@ -989,6 +989,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
             open={openPasswordModal}
             setOpen={setOpenPasswordModal}
             room={roomNameForPassword}
+            onClose={() => {if(!roomIndex) setRoomIndex(0)}}
         />
         </>
     );

@@ -144,7 +144,7 @@ function InputEmoji ({
             cleanedTextRef.current = ''
         }
 
-        const container = document.createElement('div')
+        const container = document.createElement('div');
         container.innerHTML = textInputRef.current.innerHTML
 
         const images = Array.prototype.slice.call(container.querySelectorAll('img'))

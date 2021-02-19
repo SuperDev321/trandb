@@ -1,10 +1,21 @@
 const { Chats } = require('../database/models');
-const { findRoomUsers, findUserByName } = require('../utils');
-
+const { findRoomUsers, findUserByName, isForbidden, hasFobiddenWord, getUserIp, banByUser, banByNameAndIp, findUserById } = require('../utils');
+const {banUserByAdmin, banUser} = require('./userHandler');
 const publicMessage = (io, socket) => async ({ msg, room, from, color, bold, type, messageType }, callback) => {
   try {
-    console.log('ok')
+    const { _id } = socket.decoded;
     const date = Date.now();
+
+    if(messageType !== 'image') {
+      let words = msg.split(/[\s,]+/);
+      let isForbiddenMessage = await hasFobiddenWord(words);
+      if(isForbiddenMessage) {
+        let user = await findUserById(_id);
+        let userIp = await getUserIp(room, _id);
+        await banUser(io, socket)({ip: userIp, to: user.username, role: 'admin'});
+        return callback(false);
+      }
+    }
     
     const newChat = await Chats.create({
       msg,

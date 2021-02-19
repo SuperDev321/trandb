@@ -29,6 +29,7 @@ const {getRoomBlocks, getGlobalBlocks} = require('./block/getBlocks');
 const checkBlock = require('./block/checkBlock');
 const addBlock = require('./block/addBlock');
 const removeBlock = require('./block/removeBlock');
+const {isForbidden, hasFobiddenWord} = require('./forbiddenWord/isForbidden');
 
 module.exports = {
   createError,
@@ -62,5 +63,7 @@ module.exports = {
   getRoomBlocks,
   checkBlock,
   addBlock,
-  removeBlock
+  removeBlock,
+  isForbidden,
+  hasFobiddenWord
 };
