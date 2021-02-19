@@ -78,7 +78,7 @@ const joinRoom = (io, socket) => async ({ room, password }, callback) => {
         
     } catch (err) {
         console.log(err);
-        socket.emit('join error', 'You cannot join to this room');
+        callback(false, 'You cannot join to this room')
     }
 };
 
@@ -125,7 +125,6 @@ const rejoinRoom = (io, socket) => async ({ room }, callback) => {
         callback(true);
         
     } catch (err) {
-        console.log(err);
         callback(false)
     }
 };
