@@ -420,9 +420,9 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                     socket.emit('join room', { room }, (result, message) => {
                         console.log('join callback', result, message)
                         if(!result) {
-                            enqueueSnackbar(message, {variant: 'error'})
+                            enqueueSnackbar(message, {variant: 'error'});
+                            setRoomIndex(0);
                         }
-                        setRoomIndex(0);
                     });
                 }
             }, (err) => {
