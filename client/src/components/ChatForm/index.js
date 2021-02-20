@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useContext } from 'react';
 import AddIcon from '@material-ui/icons/Add';
 import CloudUploadIcon from '@material-ui/icons/CloudUpload';
 import useStyles from './styles';
@@ -8,7 +8,7 @@ import {EmojiConvertor} from 'emoji-js';
 import { getSocket } from '../../utils';
 import axios from 'axios';
 import config from '../../config';
-
+import UserContext from '../../context'
 
 
 const ChatForm = ({roomName, to, sendMessage, onFocus, onBlur, type}) => {
@@ -18,6 +18,7 @@ const ChatForm = ({roomName, to, sendMessage, onFocus, onBlur, type}) => {
     const [userColor, setUserColor] = useState(null);
     const [bold, setBold] = useState(false);
     const emoji = new EmojiConvertor();
+    const {role} = useContext(UserContext);
     
     const onFinish = (e) => {
         e.preventDefault();
@@ -67,13 +68,15 @@ const ChatForm = ({roomName, to, sendMessage, onFocus, onBlur, type}) => {
     return (
         <div className={classes.inputArea}>
             <form className={classes.inputForm} onSubmit={onFinish} ref={formRef}>
+                { role !== 'guest'?
                 <div  className={classes.fileUpload}>
                 <input id="upload_file" type="file" className={classes.fileUploadInput}
                 onChange={(e) => handleChangeFile(e.target.files)}
                 />
                 <label htmlFor="upload_file" className={classes.fileUploadLabel}><CloudUploadIcon fontSize="small"/></label>
                         
-                </div>
+                </div>:null
+                }
                 <div className={classes.boldSelector} onClick={() => setBold(!bold)}>
                     <span className={bold?classes.bold: ''}>B</span>
                 </div>

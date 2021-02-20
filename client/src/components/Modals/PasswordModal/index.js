@@ -27,10 +27,11 @@ const StyledDialog = withStyles((theme) => ({
     />
 ))
 
-const PasswordModal = ({room, open, setOpen}) => {
+const PasswordModal = ({room, open, setOpen, onClose}) => {
     const [password, setPassword] = useState('');
     const { enqueueSnackbar, closeSnackbar } = useSnackbar();
     const handleClose = () => {
+        onClose();
         setOpen(false);
     };
     const socket = getSocket();
@@ -39,7 +40,8 @@ const PasswordModal = ({room, open, setOpen}) => {
             if(result) {
                 setOpen(false);
             } else {
-                enqueueSnackbar(message, {variant: 'error'})
+                enqueueSnackbar(message, {variant: 'error'});
+                onClose();
             }
         })
         setPassword('');

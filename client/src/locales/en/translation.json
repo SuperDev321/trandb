@@ -1,4 +1,8 @@
 {
+  "global": {
+    "save": "Save",
+    "cancel": "Cancel"
+  },
   "ChatApp": {
     "rooms": "ROOMS",
     "rooms_descr": "join room",

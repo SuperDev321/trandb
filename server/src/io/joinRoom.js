@@ -98,35 +98,30 @@ const rejoinRoom = (io, socket) => async ({ room }, callback) => {
         } else {
             ip = '10.10.10.10';
         }
-
-        console.log(ip);
-        // console.log('joining room:', room, _id);
-        // console.log(io)
-
         let user = await Users.findOne({_id});
         let isBan = await checkBan(room, user.username, ip);
         if(isBan) {
-            socket.emit('join error', 'You are banned from this room.');
+            callback(false, 'You are banned from this room.');
             return;
         }
-        await Rooms.updateOne({ name: room }, { $addToSet: { users: [{_id, ip}] } });
-        
+        let result = await Rooms.updateOne({ name: room }, { $addToSet: { users: [{_id, ip}] } });
+        console.log('rejoin result', result)
         socket.join(room);
         // let {welcomeMessage} = await Rooms.findOne({name: room});
-        // const messages = await Chats.find({ room, type: 'public' }).sort({date: -1}).limit(30);
+        const messages = await Chats.find({ room, type: 'public' }).sort({date: -1}).limit(30);
         const usersInfo = await findRoomUsers(room, user.role);
-        // socket.emit('init room', {messages, onlineUsers: usersInfo, room: {name: room, welcomeMessage}}, (data)=> {
-            // if(data === 'success') {
-                // io.to(room).emit('joined room', {room, onlineUsers: usersInfo,
-                //     joinedUser: {
-                //         _id: user._id,
-                //         username: user.username,
-                //         role: user.role,
-                //         gender: user.gender,
-                //         ip
-                //     }});
-            // }
-        // });
+        socket.emit('init room', {messages, onlineUsers: usersInfo, room: {name: room}}, (data)=> {
+            if(data === 'success' && result && result.nModified) {
+                io.to(room).emit('joined room', {room, onlineUsers: usersInfo,
+                    joinedUser: {
+                        _id: user._id,
+                        username: user.username,
+                        role: user.role,
+                        gender: user.gender,
+                        ip
+                    }});
+            }
+        });
         callback(true);
         
     } catch (err) {

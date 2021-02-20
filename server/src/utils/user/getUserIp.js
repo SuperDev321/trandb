@@ -6,7 +6,6 @@ const getUserIp = async (room, _id) => {
     if(roomInfo) {
     
         let liveUserData = roomInfo.users.find((item)=>(item._id.equals(_id)));
-        console.log('live user', liveUserData, roomInfo.users)
         if(liveUserData)
             ip = liveUserData.ip;
     }

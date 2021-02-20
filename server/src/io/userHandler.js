@@ -29,10 +29,11 @@ const kickUser = (io, socket) => async ({room, to}) => {
     }
 }
 
-const banUser = (io, socket) => async ({room , ip, to}) => {
+const banUser = (io, socket) => async ({room , ip, to, role}) => {
     try {
         const { _id } = socket.decoded;
-        const role = await getRoomPermission(room, _id);
+        if(!role)
+            role = await getRoomPermission(room, _id);
         const userToBan = await findUserByName(to);
         if(role) {
             let res = null;
@@ -86,11 +87,12 @@ const banUser = (io, socket) => async ({room , ip, to}) => {
 }
 
 const banUserByAdmin = (io, socket) => async ({ room , ip, fromIp, toIp, to}) => {
-    
+    console.log('banUserByAdmin')
     try {
         const { _id } = socket.decoded;
         const userToBan = await findUserByName(to);
-        let res = await banByNameAndIp(room , ip, fromIp, toIp, to);
+        console.log('msg ban', room, ip, to)
+        let res = await banByNameAndIp(room , to, ip, fromIp, toIp);
         if(res) {
             await Rooms.updateOne({ name: room }, { $pull: { users: {_id: userToBan._id} } });
             let socketIds = await io.of('/').in(userToBan._id.toString()).allSockets();
@@ -98,13 +100,15 @@ const banUserByAdmin = (io, socket) => async ({ room , ip, fromIp, toIp, to}) =>
             let first = it.next();
             let id = first.value;
             let socketToBan = io.sockets.sockets.get(id);
+            console.log('kick user', socketToBan);
+            if(socketToBan) {
+                socketToBan.leave(room);
+            }
             io.to(room).emit('banned user', {
                 room,
                 kickedUserName: to
             });
-            if(socketToBan) {
-                socketToBan.leave(room);
-            }
+            
         }
     } catch(err) {
         console.log(err)
