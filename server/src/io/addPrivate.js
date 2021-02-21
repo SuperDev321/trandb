@@ -15,9 +15,11 @@ const addPrivate = (io, socket) => async ({ from, to }, callback) => {
             return false;
         });
         if(privateRoom) {
+            console.log('find private')
             privateRoomName = privateRoom;
-            callback(privateRoom);
+            return callback(privateRoom);
         } else {
+            console.log('not find private')
             var newPrivateRoomName = randomString({
                 length: 8,
                 numeric: true,
@@ -37,9 +39,9 @@ const addPrivate = (io, socket) => async ({ from, to }, callback) => {
                 socketToPrivate.join(newPrivateRoomName);
                 socket.join(newPrivateRoomName);
                 console.log('add private callback', newPrivateRoomName)
-                callback(newPrivateRoomName);
+                return callback(newPrivateRoomName);
             } else {
-                callback(null)
+                return callback(null)
             }
         }
         

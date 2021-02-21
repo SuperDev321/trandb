@@ -16,6 +16,8 @@ import OutlinedButton from '../../OutlinedButton';
 import useStyles from './styles';
 import IpMaskInput from '../../IpMaskInput';
 import { getSocket } from '../../../utils';
+import Axios from 'axios';
+import config from '../../../config';
 
 
 export default function BanModal({open, setOpen, initVal, roomName}) {
@@ -27,13 +29,23 @@ export default function BanModal({open, setOpen, initVal, roomName}) {
     // const [fromIp, setFromIp] = useState(initVal.ip?initVal.ip: ''); 
     // const [ipSel, setIpSel] = useState(true);
     const socket = getSocket();
+    useEffect(() => {
+        if(initVal.name) {
+            Axios.get(`${config.server_url}/api/users/`+initVal.name+'/ip')
+            .then((response) => {
+                if(response.status === 200) {
+                    setIp(response.data);
+                }
+            })
+        }
+    }, [initVal])
     const handleClose = () => {
         setOpen(false);
     };
 
     const handleIpChange = (e) => {
         if(e.target.value) {
-            setIp(e.target.value); console.log(ip)
+            setIp(e.target.value);
         }
     }
     // const handleFromIpChange = (e) => {
@@ -60,7 +72,6 @@ export default function BanModal({open, setOpen, initVal, roomName}) {
         //     payload.toIp = toIp
         // }
         payload.to = name;
-        console.log(payload)
         socket.emit('ban user', payload);
         setOpen(false);
     }

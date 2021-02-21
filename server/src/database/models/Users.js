@@ -8,7 +8,6 @@ const userSchema = new Schema({
   },
   email: {
     type: String,
-    unique: true,
   },
   gender: {
     type: String,
@@ -16,6 +15,8 @@ const userSchema = new Schema({
   },
   password: String,
   role: String,
+  ip: String,
+  created_at: Date
 });
 
 const Users = model('Users', userSchema);

@@ -22,11 +22,11 @@ const roomSchema = new Schema({
     icon: String,
     users: [ 
     {
-        _id: {
+        // _id: {
             type: Schema.Types.ObjectId,
             ref: 'Users',
-        },
-        ip: String
+        // },
+        // ip: String
     }
     ],
     moderators: [

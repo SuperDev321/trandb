@@ -18,7 +18,7 @@ const fileUploader = async (req, res) => {
       var photoIcon = req.files.file_icon;
       var newIconFileName = getFileName("icon_", req.files.file_icon.name);
       try {
-        await photoIcon.mv(path.join(__dirname, '..', '..', '..', '..', 'client', 'build/img/messages/',newIconFileName))
+        await photoIcon.mv(path.join(__dirname, '..', '..', '..', '..', 'client', 'public/img/messages/',newIconFileName))
         var photoUrl =  "img/messages/" + newIconFileName;
         res
         .status(200)

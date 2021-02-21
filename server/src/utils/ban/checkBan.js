@@ -16,7 +16,6 @@ const checkBan = async (room, username, ip) => {
                 {room: undefined, username},
             ]
         });
-        console.log(nameBan)
         if(nameBan) {
             return true;
         }

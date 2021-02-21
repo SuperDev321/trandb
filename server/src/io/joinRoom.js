@@ -1,24 +1,23 @@
 const { Rooms, Chats, Users } = require('../database/models');
-const { findRoomUsers, checkBan, getRoomBlocks, getGlobalBlocks, checkBlock } = require('../utils');
-const isIp = require('is-ip');
-const Address6 = require('ip-address').Address6;
+const { findRoomUsers, checkBan, getRoomBlocks, getGlobalBlocks, checkBlock, getBlocks } = require('../utils');
+const ipInt = require('ip-to-int');
 const joinRoom = (io, socket) => async ({ room, password }, callback) => {
     try {
         const { _id, role } = socket.decoded;
-        let ip = socket.client.request.headers['cf-connecting-ip'] || socket.client.request.headers['x-forwarded-for'] || socket.client.request.connection.remoteAddress
-        if(isIp(ip)) {
-            if(!isIp.v4(ip)) {
-                var address = new Address6(ip);
-                var teredo = address.inspectTeredo();
-                ip = teredo.client4;
-            }
-            if (ip.substr(0, 7) === '::ffff:') {
-                ip = ip.substr(7);
-            }
-        } else {
-            ip = '10.10.10.10';
-        }
-        console.log(ip)
+        // let ip = socket.client.request.headers['cf-connecting-ip'] || socket.client.request.headers['x-forwarded-for'] || socket.client.request.connection.remoteAddress
+        // if(isIp(ip)) {
+        //     if(!isIp.v4(ip)) {
+        //         var address = new Address6(ip);
+        //         var teredo = address.inspectTeredo();
+        //         ip = teredo.client4;
+        //     }
+        //     if (ip.substr(0, 7) === '::ffff:') {
+        //         ip = ip.substr(7);
+        //     }
+        // } else {
+        //     ip = '10.10.10.10';
+        // }
+        // console.log(ip)
         // console.log(socket.rooms);
         // console.log('joining room:', room, _id);
         // console.log(io)
@@ -29,11 +28,11 @@ const joinRoom = (io, socket) => async ({ room, password }, callback) => {
             }
         }
         let user = await Users.findOne({_id});
-        let isBan = await checkBan(room, user.username, ip);
+        let isBan = await checkBan(room, user.username, user.ip);
         if(isBan) {
             return callback(false, 'You are banned from this room.')
         }
-        await Rooms.updateOne({ name: room }, { $addToSet: { users: [{_id, ip}] } });
+        await Rooms.updateOne({ name: room }, { $addToSet: { users: _id} });
         
         socket.join(room);
         callback(true)
@@ -45,17 +44,18 @@ const joinRoom = (io, socket) => async ({ room, password }, callback) => {
             let blocked = await checkBlock(room, username, ip);
             item.blocked = blocked;
             // if(user.role === 'admin' || user.role === 'super-admin') {
-                item.ip = ip;
+            // item.ip = ipInt(ip).toIP();
             // }
             item.username = username;
             item.role = role;
             item.gender = gender;
             return item;
         }));
-        console.log(onlineUsers)
 
-        const blocks = await getRoomBlocks(room);
-        let blocked = await checkBlock(room, user.username, ip);
+        const roomBlocks = await getRoomBlocks(room);
+        const globalBlocks = await getGlobalBlocks();
+        const blocks = await getBlocks(room);
+        let blocked = await checkBlock(room, user.username, user.ip);
         socket.emit('init room',
             {messages, onlineUsers, room: {name: room, welcomeMessage: roomInfo.welcomeMessage}, blocks},
             (data)=> {
@@ -67,7 +67,7 @@ const joinRoom = (io, socket) => async ({ room, password }, callback) => {
                             username: user.username,
                             role: user.role,
                             gender: user.gender,
-                            ip,
+                            // ip: ipInt(user.ip).toIP(),
                             blocked
                         }
                     });
@@ -86,31 +86,43 @@ const rejoinRoom = (io, socket) => async ({ room }, callback) => {
     try {
         const { _id, role } = socket.decoded;
         let ip = socket.client.request.headers['cf-connecting-ip'] || socket.client.request.headers['x-forwarded-for'] || socket.client.request.connection.remoteAddress
-        if(isIp(ip)) {
-            if(!isIp.v4(ip)) {
-                var address = new Address6(ip);
-                var teredo = address.inspectTeredo();
-                ip = teredo.client4;
-            }
-            if (ip.substr(0, 7) === '::ffff:') {
-                ip = ip.substr(7);
-            }
-        } else {
-            ip = '10.10.10.10';
-        }
+        // if(isIp(ip)) {
+        //     if(!isIp.v4(ip)) {
+        //         var address = new Address6(ip);
+        //         var teredo = address.inspectTeredo();
+        //         ip = teredo.client4;
+        //     }
+        //     if (ip.substr(0, 7) === '::ffff:') {
+        //         ip = ip.substr(7);
+        //     }
+        // } else {
+        //     ip = '10.10.10.10';
+        // }
         let user = await Users.findOne({_id});
-        let isBan = await checkBan(room, user.username, ip);
+        let isBan = await checkBan(room, user.username, user.ip);
         if(isBan) {
             callback(false, 'You are banned from this room.');
             return;
         }
-        let result = await Rooms.updateOne({ name: room }, { $addToSet: { users: [{_id, ip}] } });
-        console.log('rejoin result', result)
+        let result = await Rooms.updateOne({ name: room }, { $addToSet: { users: _id } });
+        console.log('rejoin result', result, user.username)
         socket.join(room);
         // let {welcomeMessage} = await Rooms.findOne({name: room});
         const messages = await Chats.find({ room, type: 'public' }).sort({date: -1}).limit(30);
         const usersInfo = await findRoomUsers(room, user.role);
-        socket.emit('init room', {messages, onlineUsers: usersInfo, room: {name: room}}, (data)=> {
+        let onlineUsers = await Promise.all(usersInfo.map(async ({username, ip, role, gender}) => {
+            let item = {};
+            let blocked = await checkBlock(room, username, ip);
+            item.blocked = blocked;
+            // if(user.role === 'admin' || user.role === 'super-admin') {
+            // item.ip = ipInt(ip).toIP();
+            // }
+            item.username = username;
+            item.role = role;
+            item.gender = gender;
+            return item;
+        }));
+        socket.emit('init room', {messages, onlineUsers, room: {name: room}}, (data)=> {
             if(data === 'success' && result && result.nModified) {
                 io.to(room).emit('joined room', {room, onlineUsers: usersInfo,
                     joinedUser: {
@@ -118,7 +130,7 @@ const rejoinRoom = (io, socket) => async ({ room }, callback) => {
                         username: user.username,
                         role: user.role,
                         gender: user.gender,
-                        ip
+                        // ip: ipInt(user.ip).toIP()
                     }});
             }
         });

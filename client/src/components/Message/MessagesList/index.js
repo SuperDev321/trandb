@@ -52,7 +52,11 @@ const MessagesList = ({ users, messages, role, userAction, roomName, changeMuteS
         prev: 0,
         next: itemUnit
     });
-
+    const setScrollTop = () => {
+        if (messagesRef.current) {
+            messagesRef.current.scrollTop = messagesRef.current.scrollHeight;
+        }
+    }
     const addItems = () => {
         if(currentItems.length === messages.length) {
             return;
@@ -93,11 +97,12 @@ const MessagesList = ({ users, messages, role, userAction, roomName, changeMuteS
             setLoading(false);
         }
         
-        // if (messagesRef.current) {
-        //     messagesRef.current.scrollTop = messagesRef.current.scrollHeight;
-        // }
-        // console.log(messages);
+        
     }, [messages]);
+
+    useEffect(() => {
+        setScrollTop();
+    }, [currentItems])
 
     return (
         <>
@@ -117,6 +122,7 @@ const MessagesList = ({ users, messages, role, userAction, roomName, changeMuteS
                             kickUser={kickUser}
                             banUser={banUser}
                             addOrOpenPrivate={addOrOpenPrivate}
+                            setScrollTop={setScrollTop}
                         />
                         }
                         {

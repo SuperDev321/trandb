@@ -14,6 +14,7 @@ import {
 import AppMenu from '../AppMenu';
 import { makeStyles } from '@material-ui/core/styles';
 import PrivateMails from './PrivateMails';
+import SettingModal from '../Modals/SettingModal';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -82,9 +83,7 @@ const HomeLayout = ({children, unReadMsgs, openPrivate}) => {
                 }
                 </div>
                 <div className={classes.sectionDesktop}>
-                    <IconButton aria-label="show 17 new notifications" color="inherit">
-                        <Settings />
-                    </IconButton>
+                    <SettingModal />
                     {/* <PrivateMails unReadMsgs={unReadMsgs} openPrivate={openPrivate} /> */}
                     {/* <IconButton aria-label="show 4 new mails" color="inherit">
                         <Badge badgeContent={unReadMsgs.length} color="secondary">
