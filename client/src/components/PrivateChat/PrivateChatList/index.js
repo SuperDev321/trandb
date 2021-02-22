@@ -22,7 +22,6 @@ const PrivateChatList = ({sendMessage, readMsg ,me}, ref) => {
         else {
             let ref = elRefs.current.find((item) => (item.key === roomName));
             if(ref) {
-                console.log('private show')
                 ref.ref.current.show();
                 setActiveChat(roomName);
             }
@@ -66,7 +65,6 @@ const PrivateChatList = ({sendMessage, readMsg ,me}, ref) => {
                     return false;
                 }
             } else {
-                console.log('add new chat', message.from, roomName)
                 addNewChat(message.from, [message], roomName);
             }
             return false;

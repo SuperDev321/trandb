@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useContext } from 'react';
+import React, { useState, useRef, useEffect, useContext, useCallback } from 'react';
 import AddIcon from '@material-ui/icons/Add';
 import CloudUploadIcon from '@material-ui/icons/CloudUpload';
 import useStyles from './styles';
@@ -12,17 +12,16 @@ import UserContext from '../../context'
 
 
 const ChatForm = ({roomName, to, sendMessage, onFocus, onBlur, type}) => {
+    const {role} = useContext(UserContext);
     const classes = useStyles();
     const [msg, setMsg] = useState('');
     const formRef = useRef(null);
     const [userColor, setUserColor] = useState(null);
     const [bold, setBold] = useState(false);
     const emoji = new EmojiConvertor();
-    const {role} = useContext(UserContext);
     
     const onFinish = (e) => {
         e.preventDefault();
-        // sendMessage();
     };
 
     useEffect(() => {
@@ -36,10 +35,10 @@ const ChatForm = ({roomName, to, sendMessage, onFocus, onBlur, type}) => {
         emoji.use_sheet = true;
     }, []);
 
-    const handleChangeFile = (files) => {
+    const sendFileMessage = useCallback((file) => {
         const data = new FormData();
-        data.append('file_icon', files[0]);
-        console.log('file upload', config)
+        data.append('file_icon', file);
+        
         axios.post(config.server_url + '/api/file_upload', data, {
             headers: {
                 'Content-Type': 'multipart/form-data',
@@ -48,10 +47,16 @@ const ChatForm = ({roomName, to, sendMessage, onFocus, onBlur, type}) => {
         .then((response) => {
             if(response.status === 200) {
                 let fileUrl = response.data.photoUrl;
-                console.log(response.data)
                 sendMessage(roomName, to, null, fileUrl, null, type, 'image');
             }
         })
+    }, [roomName, to, type]);
+    const handleChangeFile = (files, type) => {
+        console.log('private upload type', type)
+        if(files[0]) {
+            let file = files[0];
+            sendFileMessage(file);
+        }
     }
 
 
@@ -62,7 +67,6 @@ const ChatForm = ({roomName, to, sendMessage, onFocus, onBlur, type}) => {
             setTimeout(() => {sendMessage(roomName, to, color, realMsg, bold, type, 'general');}, 0);
             setMsg('');
         }
-        
     }
     
     return (
@@ -70,10 +74,12 @@ const ChatForm = ({roomName, to, sendMessage, onFocus, onBlur, type}) => {
             <form className={classes.inputForm} onSubmit={onFinish} ref={formRef}>
                 { role !== 'guest'?
                 <div  className={classes.fileUpload}>
-                <input id="upload_file" type="file" className={classes.fileUploadInput}
-                onChange={(e) => handleChangeFile(e.target.files)}
-                />
-                <label htmlFor="upload_file" className={classes.fileUploadLabel}><CloudUploadIcon fontSize="small"/></label>
+                
+                <label className={classes.fileUploadLabel}><CloudUploadIcon fontSize="small"/>
+                    <input type="file" className={classes.fileUploadInput}
+                        onChange={(e) => handleChangeFile(e.target.files)}
+                    />
+                </label>
                         
                 </div>:null
                 }

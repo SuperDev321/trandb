@@ -98,11 +98,9 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
     // mute or unmute user
     const changeMuteState = (roomName, usernameToMute, isMuted) => {
         let room = roomsRef.current.find((item) => (item.name === roomName));
-        console.log(roomName, isMuted)
         if(room) {
             
             // let userInfo = room.users.find((user) => (user.username === usernameToMute));
-            // console.log('change mute', userInfo, mutes)
             
             // let localMute = mutes.find((item) => (item.room === roomName && item.user === usernameToMute))
             if(isMuted) {
@@ -127,7 +125,6 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
             }
             if(room.name === currentRoomName) {
                 // setCurrentRoomUsers([...room.users]);
-                console.log(room.mutes)
                 setCurrentRoomMutes([...room.mutes]);
             }
         }
@@ -152,13 +149,11 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
         }
     }
     const sendMessage = (roomName, to, color, msg, bold, type, messageType) => {
-        console.log('message' , roomName, msg, messageType, type)
         if (msg) {
             if(type === 'private') {
                 socket.emit('private message',
                     { type, roomName, msg, from: username, to, color, bold, messageType },
                     (data) => {
-                        console.log('private chat callback data',data);
                         if(data) {
                             let message = data;
                             privateListRef.current.addMessage(message, roomName);
@@ -185,7 +180,6 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
         }
     }
     const leaveFromPrivate = (roomName) => {
-        console.log('leave private', roomName)
         socket.emit('leave private', roomName);
     }
     // send poke message
@@ -331,7 +325,6 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                 peersRef.current.push({room: room.name, peerID: user.username ,peer});
             }
         });
-        console.log('set current room with open camera')
         setCurrentRoom({...room});
         // console.log(room);
         // console.log('set current room to open camera');
@@ -361,7 +354,6 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
     // receive new message
     useEffect(() => {
         if( roomIndex !== null && newMessage && newMessage.message) {
-            console.log('new message', newMessage)
             // for (let msgIndex = 0; msgIndex < newMessages.length; msgIndex++) {   
                 // const newMessage = newMessages[msgIndex]; 
                 if(newMessage.message.type === 'public') {
@@ -383,7 +375,6 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                             room.users = [...newMessage.message.onlineUsers];
                         }
                         if(currentRoomName === room.name) {
-                            console.log('set current room due to new message')
                             // setCurrentRoom({...room});
                             setCurrentRoomName(room.name);
                             setCurrentRoomMessages([...room.messages]);
@@ -392,7 +383,6 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                     } 
                     
                 } else if(newMessage.message.type==='private' && newMessage.message.msg && newMessage.message.to) {
-                    console.log('new private')
                     if(!privateListRef.current.addMessage(newMessage.message, newMessage.message.roomName)) {
                         addUnReadMsg(newMessage.message);
                     }
@@ -418,7 +408,6 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                    setOpenPasswordModal(true);
                 } else {
                     socket.emit('join room', { room }, (result, message) => {
-                        console.log('join callback', result, message)
                         if(!result) {
                             enqueueSnackbar(message, {variant: 'error'});
                             setRoomIndex(0);
@@ -445,7 +434,6 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                 setNewInfo({type: 'joined room', payload: {room, onlineUsers, joinedUser}});
             });
             socket.on('leave room', async ({room, onlineUsers, leavedUser}) => {
-                console.log('leave room');
                 setNewInfo({type: 'leave room', payload: {room, onlineUsers, leavedUser}});
             });
             socket.on('kicked user', async ({room, kickedUserName}) => {
@@ -458,11 +446,9 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                 setNewInfo({type: 'kicked', payload: { kickedUserName, type: 'global ban'}}); 
             });
             socket.on('update block', ({room, onlineUsers, blocks}) => {
-                console.log('update block', room, onlineUsers, blocks)
                 setNewInfo({type: 'update block', payload: { room, onlineUsers, blocks}}); 
             })
             socket.on('room message', (message, callback) => {
-                console.log('new message')
                 setNewMessage({message, callback});
             });
             // socket.on('private message', (message, callback) => {
@@ -485,7 +471,6 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
             })
 
             socket.on('disconnect', (reason) => {
-                console.log('disconnect', reason);
                 setOpenDisconnectModal(true);
                 if (reason === 'io server disconnect') {
                     // the disconnection was initiated by the server, you need to reconnect manually
@@ -498,7 +483,6 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
             })
 
             socket.io.on('reconnect', () => {
-                console.log('reconnect');
                 let roomNames = roomsRef.current.map((room) => (room.name));
                 roomNames.map((roomName) => {
                     console.log('rejoin room', roomName, )
@@ -515,11 +499,11 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
             })
 
             socket.io.on('reconnect_attempt', () => {
-                console.log('reconnect_attempt');
+                // console.log('reconnect_attempt');
 
             })
             socket.on('connect', () => {
-                console.log('connect',roomsRef.current);
+                // console.log('connect',roomsRef.current);
             })
 
             return () => {
@@ -630,7 +614,6 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                         if(username && usernames.includes(username)) {
                             if(newInfo.payload.onlineUsers && newInfo.payload.joinedUser) {
                                 let joinedUser = newInfo.payload.joinedUser;
-                                console.log('joined user', joinedUser)
                                 sameRoom.addOnlineUser(joinedUser);
                                 if(username !== joinedUser.username) {
                                     let sysMsg = {
@@ -680,7 +663,6 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                     if(sameRoom) {
 
                         if(username !== newInfo.payload.kickedUserName) { // kick other
-                            console.log('kick other')
                             let usersToSet = sameRoom.users.filter((user) => (user.username !== newInfo.payload.kickedUserName));
                             sameRoom.users = usersToSet;
                             let type = newInfo.payload.type;
@@ -850,26 +832,6 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
             setCurrentStreams(curStreams);
         }
     }, [currentRoom])
-
-    // useEffect(() => {
-    //     if(openPrivate) {
-    //         if(privateTo && currentRoom && roomIndex !==null) {
-    //             getPrivateMessages({room: currentRoom.name, from: username, to: privateTo.username} ,
-    //                 (data) => {
-    //                     setPrivateMessages(data);
-    //                 },
-    //                 (err) => {
-    //                     console.log(err);
-    //                 }
-    //             );
-    //             if(currentRoom.private[privateTo.username]) {
-    //                 let room = roomsRef.current[roomIndex];
-    //                 room.private[privateTo.username] = 0;
-    //                 setCurrentRoom({...room});
-    //             }
-    //         }
-    //     }
-    // }, [openPrivate, privateTo])
 
     return (
         <>

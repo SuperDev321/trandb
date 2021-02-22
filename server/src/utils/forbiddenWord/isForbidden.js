@@ -3,7 +3,6 @@ const { ForbiddenWords } = require('../../database/models');
 const isForbidden = async (word) => {
     try {
         let result = await ForbiddenWords.findOne({word});
-        console.log('check forbidden', word, result)
         if(result) {
             return true;
         } else {
@@ -14,14 +13,18 @@ const isForbidden = async (word) => {
     }
 }
 
-const hasFobiddenWord = async (words) => {
+const hasFobiddenWord = async (text) => {
+    
     try {
-        let result = await ForbiddenWords.findOne({word: {$in: words}});
-        if(result) {
-            return true;
-        } else {
-            return false;
-        }
+        let words = await ForbiddenWords.find({});
+        let result = false;
+        let lowText = text.toLowerCase();
+        words.map(({word}) => {
+            if(lowText.includes(word.toLowerCase())) {
+                result = true;
+            }
+        })
+        return result;
     } catch (err) {
         return false;
     }

@@ -30,8 +30,9 @@ const {
   addWord,
   deleteWord
 } = require('./controllers');
+const getUserIp = require('./controllers/users/getUserIp');
 
-const { withAuth } = require('./middleware');
+const { withAuth, withIp } = require('./middleware');
 const isAdmin = require('./middleware/isAdmin');
 
 const router = express.Router();
@@ -46,8 +47,8 @@ router.get('/rooms/:roomName', withAuth, getRoomDetail);
 router.get('/rooms/:roomName/isPrivate', checkRoomPermission);
 router.delete('/rooms/:id', deleteRoom);
 router.post('/signup', signup);
-router.post('/login', login);
-router.post('/login/guest', guestLogin);
+router.post('/login', withIp, login);
+router.post('/login/guest', withIp, guestLogin);
 router.post('/login/google', googleLogin);
 
 router.post('/messages/private', getPrivateChat);
@@ -55,6 +56,7 @@ router.post('/messages/private', getPrivateChat);
 router.get('/user/:username', getUserByName);
 router.get('/users/:userId/rooms', withAuth, getUserRooms);
 router.get('/users/:userId', getUserDetail);
+router.get('/users/:username/ip', withAuth, isAdmin, getUserIp);
 
 router.delete('/bans/:banId', withAuth, deleteBan);
 router.post('/bans', addBan);

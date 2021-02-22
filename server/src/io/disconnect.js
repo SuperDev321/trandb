@@ -13,7 +13,7 @@ const socketDisconnect = (io, socket) => async (reason) => {
             for (let index = 2; index < rooms.length; index++) {
                 const room = rooms[index];
                 if(room) {
-                    await Rooms.updateOne({ name: room }, { $pull: { users: {_id} } });
+                    await Rooms.updateOne({ name: room }, { $pull: { users: _id }});
                     const usersInfo = await findRoomUsers(room);
                     io.to(room).emit('leave room', {room, onlineUsers: usersInfo, leavedUser: user});
                 }

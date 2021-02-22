@@ -2,11 +2,13 @@ const {
     getGuest,
     createUser,
     createToken,
-    isForbidden
+    isForbidden,
+    updateIp
 } = require('../../utils');
   
 const guestLogin = async (req, res, next) => {
     const { nickname, gender } = req.body;
+    const ipAddress = req.userIp;
     try {
         let forbidden = await isForbidden(nickname);
         if(forbidden) {
@@ -20,9 +22,10 @@ const guestLogin = async (req, res, next) => {
         let user = await getGuest(nickname, gender);
         if(!user)
             user = await createUser({ username: nickname, role: 'guest', gender });
-            console.log('created token')
+        
+        await updateIp(user._id, ipAddress);
+        console.log(user)
         const token = await createToken(user._id, 'guest');
-        console.log('created token', token)
 
         res
             .cookie('token', token)

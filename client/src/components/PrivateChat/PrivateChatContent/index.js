@@ -148,7 +148,6 @@ const PrivateChat = ({ me, to, sendMessage, active, setActive, initMessages, del
         let width = winRef.current.getBoundingClientRect().width;
         let height = winRef.current.getBoundingClientRect().height;
         if(width>400) width = 400;
-        console.log('client top react', top)
         if(min) {
             setMin(false);
             rndRef.current.updateSize({width, height: defaultHeight});
@@ -198,7 +197,6 @@ const PrivateChat = ({ me, to, sendMessage, active, setActive, initMessages, del
             }
         },
         addErrorMessage: () => {
-            console.log('private error set')
             setError(true);
         },
     }));
@@ -310,7 +308,7 @@ const PrivateChat = ({ me, to, sendMessage, active, setActive, initMessages, del
                         }
                     </div>
                     <ChatForm to={to} sendMessage={sendMessage} onFocus={onFocus} onBlur={onBlur} roomName={roomName}
-                        type={'private'}
+                        type='private'
                     />
                 </div>
                 

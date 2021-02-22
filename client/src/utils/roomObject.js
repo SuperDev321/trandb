@@ -48,8 +48,7 @@ class RoomObject  {
         }
         let blockedUsers= users.filter((item) => (item.blocked));
         let blockedUserNames = blockedUsers.map(({username}) => (username));
-        console.log('mutes', mutes,blockedUserNames, blocks);
-        mutes = [...mutes, ...blockedUserNames, ...blocks];
+        mutes = [...mutes, ...blocks];
         let muteSet = new Set(mutes);
         this.mutes = Array.from(muteSet);
         
@@ -103,7 +102,6 @@ class RoomObject  {
         if(user.blocked && !this.mutes.includes(user.username)) {
             this.mutes = [...this.mutes, user.username];
         }
-        console.log('add user', this.users)
         let currentUserNames = this.users.map(({username}) => (username));
         if(!currentUserNames.includes(user.username)) {
             this.users = [...this.users, user];

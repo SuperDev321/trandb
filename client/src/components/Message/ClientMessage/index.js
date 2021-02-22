@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import UserContext from '../../../context';
 import PropTypes, { element } from 'prop-types';
 import {EmojiConvertor} from 'emoji-js';
@@ -18,7 +18,7 @@ emoji.replace_mode = 'img';// 'unified';
 emoji.use_sheet = true;
 
 const MyMessage = ({user, roomName, message, role, font_size, userAction, changeMuteState, sendPokeMessage, 
-  kickUser, banUser, addOrOpenPrivate}) => {
+  kickUser, banUser, addOrOpenPrivate, setScrollTop}) => {
   const classes = useStyles({color: message.color, bold: message.bold});
   const { username } = useContext(UserContext);
   const [checked, setChecked] = useState(false);
@@ -108,47 +108,9 @@ const MyMessage = ({user, roomName, message, role, font_size, userAction, change
     }
     return result
   }
-
-  const sanitarize = (string) => {
-    const map = {
-      '&': '&amp;',
-      '<': '&lt;',
-      '>': '&gt;',
-      '"': '&quot;',
-      "'": '&#x27;',
-    };
-    const reg = /[&<>"']/ig;
-    return string.replace(reg, match => (map[match]));
-  }
-
-  const desanitarize = (string) => {
-    string = string.replace(/&amp;/ig, '&')
-    string = string.replace(/&lt;/ig, '<')
-    string = string.replace(/&gt;/ig, '>')
-    string = string.replace(/&quot;/ig, '"')
-    string = string.replace(/&#x27;/ig, "'")
-    return string
-  }
-
-    // if (message.messageType === "image") {
-    //   return (
-    //     <div className="message">
-    //       <div className="message-content">
-    //         <p>
-    //           <span className="sender"><strong>{message.from}</strong>:&nbsp;</span>
-    //           <span className={`text size-${font_size}`}>
-    //           {!checked ? <a href="javascript:void(0)"><strong
-    //               onClick={() => {setChecked(true)}}
-    //               style={{cursor: "pointer"}}>click to view</strong></a> :
-    //             <img src={message.msg} className="photo"/>}
-    //           </span>
-    //           <span className="time">{moment(message.time).format('HH:mm')}</span>
-    //         </p>
-    //       </div>
-    //     </div>
-    //   );
-    // }
-
+  useEffect(() => {
+    setTimeout(() =>setScrollTop(), 100);
+  }, [checked])
     return (
       <div className={classes.message}>
         <div className={classes.messageContent}>
@@ -168,7 +130,7 @@ const MyMessage = ({user, roomName, message, role, font_size, userAction, change
             <>
             { (message.messageType === 'image') ?
             <span className={classes.text + ' ' + classes.size10}>
-            {!checked ? <a href="javascript:void(0)" style={{color: '#046eb9'}}>
+            {!checked ? <a href="#!" style={{color: '#046eb9'}}>
               <strong
                 onClick={() => {setChecked(true)}}
                 style={{cursor: "pointer"}}>click to view</strong></a> :

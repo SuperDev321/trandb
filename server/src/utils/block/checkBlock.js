@@ -1,8 +1,6 @@
 const {Blocks} = require("../../database/models")
 const ipInt = require('ip-to-int');
-const checkBlock = async (roomName, username, ip) => {
-    console.log('block', roomName, ip, username)
-    let ipNum = ipInt(ip).toInt();
+const checkBlock = async (roomName, username, ipNum) => {
     let block = await Blocks.findOne({
         $or: [
             {room: roomName, username},

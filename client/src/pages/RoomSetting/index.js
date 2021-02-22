@@ -1,7 +1,5 @@
 import React, {useState, useEffect} from "react";
 import { useParams } from 'react-router-dom';
-// import { Link } from "react-router-dom";
-// import Axios from "axios";
 import {
   Paper,
   TextField,
@@ -13,8 +11,6 @@ import {
   Container,
   Tabs,
   Tab,
-  Box,
-  Typography,
   Table,
   TableHead,
   TableBody,
@@ -44,9 +40,7 @@ function TabPanel(props) {
       {...other}
     >
       {value === index && (
-        // <Box p={3}>
           children
-        // </Box>
       )}
     </div>
   );
@@ -75,7 +69,7 @@ export default function RoomSetting() {
 
 
   const [moderator, setModerator] = useState('');
-  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+  const { enqueueSnackbar } = useSnackbar();
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };

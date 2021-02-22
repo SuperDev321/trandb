@@ -57,7 +57,6 @@ const useStyles = makeStyles((theme) => ({
     },
 }))
 
-
 const RoomUserName = ({user, role, roomName,
     changeMuteState, sendPokeMessage, kickUser, banUser,addOrOpenPrivate, isMine, displayYou, isMuted
     // open,
@@ -252,9 +251,10 @@ const RoomUserName = ({user, role, roomName,
                 }
             </Card>
         </Popover>
-         <BanModal open={openBan} setOpen={setOpenBan} initVal={{name: user.username, ip: user.ip}} 
+        {role === 'admin' && <BanModal open={openBan} setOpen={setOpenBan} initVal={{name: user.username}}
             roomName={roomName}
         />
+        }
         </>
     )
 }

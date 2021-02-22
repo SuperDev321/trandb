@@ -5,10 +5,9 @@ const publicMessage = (io, socket) => async ({ msg, room, from, color, bold, typ
   try {
     const { _id } = socket.decoded;
     const date = Date.now();
-
+    console.log(msg, messageType)
     if(messageType !== 'image') {
-      let words = msg.split(/[\s,]+/);
-      let isForbiddenMessage = await hasFobiddenWord(words);
+      let isForbiddenMessage = await hasFobiddenWord(msg);
       if(isForbiddenMessage) {
         let user = await findUserById(_id);
         let userIp = await getUserIp(room, _id);
@@ -60,12 +59,25 @@ const pokeMessage = (io, socket) => async ({from, to, room}, callback) => {
   }
 }
 
-const privateMessage = (io, socket) => async ({ roomName, msg, from, to, color, bold }, fn) => {
+const privateMessage = (io, socket) => async ({ roomName, msg, from, to, color, bold, messageType }, fn) => {
   try {
+    const { _id } = socket.decoded;
     const date = Date.now();
+    console.log(msg, messageType, roomName)
+    if(messageType !== 'image') {
+      let isForbiddenMessage = await hasFobiddenWord(msg);
+      if(isForbiddenMessage) {
+        let user = await findUserById(_id);
+        let userIp = await getUserIp(room, _id);
+        await banUser(io, socket)({ip: userIp, to: user.username, role: 'admin'});
+        console.log('forbidden')
+        return callback(false);
+      }
+    }
     
     const newChat = await Chats.create({
       msg,
+      messageType,
       type: 'private',
       from,
       to,
@@ -99,6 +111,7 @@ const privateMessage = (io, socket) => async ({ roomName, msg, from, to, color, 
         socketToPrivate.emit('room message',
           {
             type: 'private',
+            messageType: newChat.messageType,
             _id: newChat._id,
             msg: newChat.msg,
             from: newChat.from,

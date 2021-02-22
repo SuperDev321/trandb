@@ -2,54 +2,53 @@ import React, { useEffect, useRef } from 'react';
 import propTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
 import StyledMessage from '../Message/StyledMessage'
-import moment from 'moment';
-const useStyles = makeStyles((theme) => ({
-    root: {
-        display: 'flex',
-        flexDirection: (props) => 
-            props.mine
-            ?'row'
-            :'row-reverse',
-    },
-    author: {
-        fontSize: '1rem',
-        fontWeight: '700',
-        whiteSpace: 'nowrap',
-        '&:hover': {
-            cursor: 'pointer',
-            textDecoration: 'underline'
-        }
-    },
-    content: {
-        margin: 5,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: props => 
-            props.mine
-            ? 'flex-start'
-            : 'flex-end'
-    },
-    message: {
-        background: (props) => 
-        props.mine
-        ?theme.palette.primary.main
-        :'lightgrey',
-        color: (props) => 
-        props.mine
-        ?theme.palette.primary.contrastText
-        :'black',
-        padding: 5,
-        borderRadius: 5,
-        borderTopLeftRadius: (props) => 
-        !props.mine && 0,
-        borderTopRightRadius: (props) => 
-        props.mine && 0,
-        maxWidth: '200px'
-    },
-    date: {
-        fontSize: 12
-    }
-}));
+// const useStyles = makeStyles((theme) => ({
+//     root: {
+//         display: 'flex',
+//         flexDirection: (props) => 
+//             props.mine
+//             ?'row'
+//             :'row-reverse',
+//     },
+//     author: {
+//         fontSize: '1rem',
+//         fontWeight: '700',
+//         whiteSpace: 'nowrap',
+//         '&:hover': {
+//             cursor: 'pointer',
+//             textDecoration: 'underline'
+//         }
+//     },
+//     content: {
+//         margin: 5,
+//         display: 'flex',
+//         flexDirection: 'column',
+//         alignItems: props => 
+//             props.mine
+//             ? 'flex-start'
+//             : 'flex-end'
+//     },
+//     message: {
+//         background: (props) => 
+//         props.mine
+//         ?theme.palette.primary.main
+//         :'lightgrey',
+//         color: (props) => 
+//         props.mine
+//         ?theme.palette.primary.contrastText
+//         :'black',
+//         padding: 5,
+//         borderRadius: 5,
+//         borderTopLeftRadius: (props) => 
+//         !props.mine && 0,
+//         borderTopRightRadius: (props) => 
+//         props.mine && 0,
+//         maxWidth: '200px'
+//     },
+//     date: {
+//         fontSize: 12
+//     }
+// }));
 
 const useListStyles = makeStyles((theme) => ({
     root: {
@@ -81,15 +80,21 @@ const PrivateMessageList = ({messages, me}) => {
     const classes = useListStyles();
     const listRef = useRef();
     useEffect(() => {
+        setScrollTop();
+    }, [messages]);
+    const setScrollTop = () => {
         if (listRef.current) {
+            console.log('private scroll')
             listRef.current.scrollTop = listRef.current.scrollHeight;
         }
-    }, [messages]);
+    }
     return (
         <div className={classes.root} ref={listRef}>
             { messages &&
                 messages.map((message, index) => (
-                    <StyledMessage message={message} mine={Boolean(message.from === me.username)} key={index}/>
+                    <StyledMessage message={message} mine={Boolean(message.from === me.username)} key={index}
+                        setScrollTop={setScrollTop}
+                    />
                 ))
             }
         </div>

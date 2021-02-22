@@ -15,7 +15,8 @@ const createUser = require('./user/createUser');
 const getUserByNickname = require('./user/getUserByNickname');
 const checkPassword = require('./user/checkPassword');
 const createToken = require('./user/createToken');
-const getUserIp = require('./user/getUserIp')
+const getIp = require('./user/getIp');
+const updateIp = require('./user/updateIp');
 const validateRoomName = require('./room/roomValidation');
 const isNewRoom = require('./room/isNewRoom');
 const createRoom = require('./room/createRoom');
@@ -25,7 +26,7 @@ const banByUser = require('./ban/banByUser');
 const banByNameAndIp = require('./ban/banByNameAndIp');
 const checkBan = require('./ban/checkBan');
 const getAllBans = require('./ban/getBans');
-const {getRoomBlocks, getGlobalBlocks} = require('./block/getBlocks');
+const {getRoomBlocks, getGlobalBlocks, getBlocks} = require('./block/getBlocks');
 const checkBlock = require('./block/checkBlock');
 const addBlock = require('./block/addBlock');
 const removeBlock = require('./block/removeBlock');
@@ -46,7 +47,8 @@ module.exports = {
   isNewEmail,
   isNewUsername,
   createUser,
-  getUserIp,
+  getIp,
+  updateIp,
   getUserByNickname,
   checkPassword,
   createToken,
@@ -61,6 +63,7 @@ module.exports = {
   getAllBans,
   getGlobalBlocks,
   getRoomBlocks,
+  getBlocks,
   checkBlock,
   addBlock,
   removeBlock,
