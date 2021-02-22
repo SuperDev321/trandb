@@ -1,5 +1,5 @@
 const { Chats } = require('../database/models');
-const { findRoomUsers, findUserByName, isForbidden, hasFobiddenWord, getUserIp, banByUser, banByNameAndIp, findUserById } = require('../utils');
+const { findRoomUsers, findUserByName, isForbidden, hasFobiddenWord, banByUser, banByNameAndIp, findUserById } = require('../utils');
 const {banUserByAdmin, banUser} = require('./userHandler');
 const publicMessage = (io, socket) => async ({ msg, room, from, color, bold, type, messageType }, callback) => {
   try {
@@ -10,8 +10,7 @@ const publicMessage = (io, socket) => async ({ msg, room, from, color, bold, typ
       let isForbiddenMessage = await hasFobiddenWord(msg);
       if(isForbiddenMessage) {
         let user = await findUserById(_id);
-        let userIp = await getUserIp(room, _id);
-        await banUser(io, socket)({ip: userIp, to: user.username, role: 'admin'});
+        await banUser(io, socket)({ip: user.ip, to: user.username, role: 'admin'});
         return callback(false);
       }
     }
@@ -68,8 +67,7 @@ const privateMessage = (io, socket) => async ({ roomName, msg, from, to, color, 
       let isForbiddenMessage = await hasFobiddenWord(msg);
       if(isForbiddenMessage) {
         let user = await findUserById(_id);
-        let userIp = await getUserIp(room, _id);
-        await banUser(io, socket)({ip: userIp, to: user.username, role: 'admin'});
+        await banUser(io, socket)({ip: user.ip, to: user.username, role: 'admin'});
         console.log('forbidden')
         return callback(false);
       }
