@@ -5,9 +5,9 @@ const logout = async (req, res, next) => {
     
     let {_id, role} = req.userData;
     console.log('logout', _id, role)
-    if(role === 'guest' && _id) {
-      await removeUser(_id);
-    }
+    // if(role === 'guest' && _id) {
+    //   await removeUser(_id);
+    // }
     res.clearCookie('token').sendStatus(200);
   } catch (err) {
     console.log(err)
