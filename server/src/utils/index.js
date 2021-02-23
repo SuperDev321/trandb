@@ -12,6 +12,7 @@ const findUserById = require('./user/findUserById');
 const isNewEmail = require('./user/isNewEmail');
 const isNewUsername = require('./user/isNewUsername');
 const createUser = require('./user/createUser');
+const removeUser = require('./user/removeUser');
 const getUserByNickname = require('./user/getUserByNickname');
 const checkPassword = require('./user/checkPassword');
 const createToken = require('./user/createToken');
@@ -47,6 +48,7 @@ module.exports = {
   isNewEmail,
   isNewUsername,
   createUser,
+  removeUser,
   getIp,
   updateIp,
   getUserByNickname,

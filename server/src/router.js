@@ -38,7 +38,7 @@ const isAdmin = require('./middleware/isAdmin');
 const router = express.Router();
 
 router.get('/checkToken', checkToken);
-router.get('/logout', logout);
+router.get('/logout', withAuth, logout);
 router.get('/rooms', getRooms);
 router.post('/room', withAuth, addRoom);
 router.put('/room/general', withAuth, updateRoomGeneral);

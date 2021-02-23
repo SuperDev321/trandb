@@ -1,4 +1,5 @@
 const { Schema, model } = require('mongoose');
+const { boolean } = require('yup');
 
 const userSchema = new Schema({
   username: {
@@ -16,6 +17,7 @@ const userSchema = new Schema({
   password: String,
   role: String,
   ip: String,
+  isInChat: Boolean,
   created_at: Date
 });
 

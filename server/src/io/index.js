@@ -6,8 +6,19 @@ const { publicMessage, privateMessage, pokeMessage } = require('./msgHandler');
 const { kickUser, banUser, banUserByAdmin, blockUser, unBlockUser } = require('./userHandler');
 const {sendSignal, returnSignal} = require('./videoHandler');
 const socketDisconnect = require('./disconnect');
+const { Users } = require('../database/models');
 
-const ioHandler = (io) => (socket) => {
+const ioHandler = (io) => async (socket) => {
+
+  let socketIds = await io.of('/').in(socket.decoded._id).allSockets();
+  if(socketIds.size === 0) {
+    socket.join(socket.decoded._id);
+  } else {
+    socket.emit('repeat connection');
+    return;
+  }
+  await Users.updateOne({_id: socket.decoded._id}, {isInChat: true});
+
     socket.on('join room', joinRoom(io, socket));
     socket.on('rejoin room', rejoinRoom(io, socket));
     socket.on('leave room', leaveRoom(io, socket));

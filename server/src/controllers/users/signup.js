@@ -7,7 +7,6 @@ const {
 
 const signup = async (req, res, next) => {
   const { username, email, password, gender } = req.body;
-  console.log(gender);
   try {
     await validateSignUpData({ username, email, password, gender });
     await isNewUsername(username);

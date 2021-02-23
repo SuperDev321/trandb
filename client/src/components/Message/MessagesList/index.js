@@ -122,7 +122,6 @@ const MessagesList = ({ users, messages, role, userAction, roomName, changeMuteS
                             kickUser={kickUser}
                             banUser={banUser}
                             addOrOpenPrivate={addOrOpenPrivate}
-                            setScrollTop={setScrollTop}
                         />
                         }
                         {
