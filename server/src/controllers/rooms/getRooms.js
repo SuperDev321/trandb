@@ -26,6 +26,7 @@ const getRooms = async (req, res, next) => {
             data: rooms,
         });
     } catch (err) {
+        console.log(err)
         return next(err);
     }
 };

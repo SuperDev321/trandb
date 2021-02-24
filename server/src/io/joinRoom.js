@@ -32,7 +32,7 @@ const joinRoom = (io, socket) => async ({ room, password }, callback) => {
         if(isBan) {
             return callback(false, 'You are banned from this room.')
         }
-        await Rooms.updateOne({ name: room }, { $addToSet: { users: _id} });
+        let result = await Rooms.updateOne({ name: room }, { $addToSet: { users: _id} });
         
         socket.join(room);
         callback(true)
@@ -105,7 +105,6 @@ const rejoinRoom = (io, socket) => async ({ room }, callback) => {
             return;
         }
         let result = await Rooms.updateOne({ name: room }, { $addToSet: { users: _id } });
-        console.log('rejoin result', result, user.username)
         socket.join(room);
         // let {welcomeMessage} = await Rooms.findOne({name: room});
         const messages = await Chats.find({ room, type: 'public' }).sort({date: -1}).limit(30);

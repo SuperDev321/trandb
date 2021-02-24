@@ -93,7 +93,6 @@ const PrivateMessageList = ({messages, me}) => {
             { messages &&
                 messages.map((message, index) => (
                     <StyledMessage message={message} mine={Boolean(message.from === me.username)} key={index}
-                        setScrollTop={setScrollTop}
                     />
                 ))
             }

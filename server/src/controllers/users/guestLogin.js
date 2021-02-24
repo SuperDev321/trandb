@@ -19,9 +19,21 @@ const guestLogin = async (req, res, next) => {
                         message: 'This nickname is not allowed'
                     })
         }
-        let user = await getGuest(nickname, gender);
-        if(!user)
+        let user = await getGuest(nickname);
+        if(!user) {
             user = await createUser({ username: nickname, role: 'guest', gender });
+        } else {
+            if(user.isInChat) {
+                for (let index = 0; ; index++) {
+                    let newUsername = nickname + ' ('+ (index+1) + ')';
+                    user = await getGuest(newUsername);
+                    if(!user) {
+                        user = await createUser({ username: newUsername, role: 'guest', gender });
+                        break;
+                    }
+                }
+            }
+        }
         
         await updateIp(user._id, ipAddress);
         console.log(user)
@@ -36,6 +48,6 @@ const guestLogin = async (req, res, next) => {
         next(err);
     }
 };
-  
+
 module.exports = guestLogin;
   

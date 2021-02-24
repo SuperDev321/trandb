@@ -84,7 +84,7 @@ emoji.allow_native = false;
 emoji.replace_mode = 'img';// 'unified';
 emoji.use_sheet = true;
 
-const StyledMessage = ({message, mine, setScrollTop}) => {
+const StyledMessage = ({message, mine}) => {
     const [checked, setChecked] = useState(false);
     const classes = useStyles({mine, color: message.color, bold: message.bold});
     // const emojiConverter = (text) => {
@@ -176,10 +176,6 @@ const StyledMessage = ({message, mine, setScrollTop}) => {
         }
         return result
     }
-
-    useEffect(() => {
-        setTimeout(() =>setScrollTop(), 100);
-    }, [checked])
 
     return (
         <div className={classes.root}>

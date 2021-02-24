@@ -434,6 +434,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                 setNewInfo({type: 'joined room', payload: {room, onlineUsers, joinedUser}});
             });
             socket.on('leave room', async ({room, onlineUsers, leavedUser}) => {
+                console.log('leave room', onlineUsers, leavedUser)
                 setNewInfo({type: 'leave room', payload: {room, onlineUsers, leavedUser}});
             });
             socket.on('kicked user', async ({room, kickedUserName}) => {
@@ -470,6 +471,11 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                joinErrorHandler(payload);
             })
 
+            socket.on('hey', (payload, callback) => {
+                console.log('hey response')
+                callback(true);
+            })
+
             socket.on('disconnect', (reason) => {
                 setOpenDisconnectModal(true);
                 if (reason === 'io server disconnect') {
@@ -499,11 +505,17 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
             })
 
             socket.io.on('reconnect_attempt', () => {
-                // console.log('reconnect_attempt');
+                console.log('reconnect_attempt');
 
             })
             socket.on('connect', () => {
-                // console.log('connect',roomsRef.current);
+                console.log('connect',socket);
+            })
+
+            socket.on('repeat connection', () => {
+                console.log('repeat connect');
+                enqueueSnackbar('This user already is in chat', {variant: 'error'});
+                history.push('/');
             })
 
             return () => {
@@ -636,14 +648,16 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                     let sameRoom = await roomsRef.current.find((room) => (room.name === newInfo.payload.room));
                     if(sameRoom) {
                         let leavedUser = newInfo.payload.leavedUser;
+                        console.log('leave user', leavedUser, sameRoom.users)
                         let usernames = await newInfo.payload.onlineUsers.map((item) => (item.username));
-                        if(username && usernames.includes(username) && username !== leavedUser.username) {
-                            if(newInfo.payload.onlineUsers) {
-                                let usersToSet = sameRoom.users.filter((user) => (user.username !== leavedUser.username));
+                        if(username && usernames.includes(username)) {
+                            let leavedUserInfo = sameRoom.users.find((user) => (user._id === leavedUser));
+                            if(leavedUserInfo) {
+                                let usersToSet = sameRoom.users.filter((user) => (user._id !== leavedUser));
                                 sameRoom.users = usersToSet;
                                 let message = {
                                     type: 'system',
-                                    msg: leavedUser.username + ' leaved room' 
+                                    msg: leavedUserInfo.username + ' leaved room' 
                                 }
                                 sameRoom.messages = [message, ...sameRoom.messages];
                             }
@@ -661,7 +675,6 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                 if(roomsRef.current && newInfo.payload.room) {
                     let sameRoom = await roomsRef.current.find((room) => (room.name === newInfo.payload.room));
                     if(sameRoom) {
-
                         if(username !== newInfo.payload.kickedUserName) { // kick other
                             let usersToSet = sameRoom.users.filter((user) => (user.username !== newInfo.payload.kickedUserName));
                             sameRoom.users = usersToSet;

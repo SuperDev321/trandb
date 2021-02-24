@@ -18,7 +18,7 @@ emoji.replace_mode = 'img';// 'unified';
 emoji.use_sheet = true;
 
 const MyMessage = ({user, roomName, message, role, font_size, userAction, changeMuteState, sendPokeMessage, 
-  kickUser, banUser, addOrOpenPrivate, setScrollTop}) => {
+  kickUser, banUser, addOrOpenPrivate}) => {
   const classes = useStyles({color: message.color, bold: message.bold});
   const { username } = useContext(UserContext);
   const [checked, setChecked] = useState(false);
@@ -108,9 +108,6 @@ const MyMessage = ({user, roomName, message, role, font_size, userAction, change
     }
     return result
   }
-  useEffect(() => {
-    setTimeout(() =>setScrollTop(), 100);
-  }, [checked])
     return (
       <div className={classes.message}>
         <div className={classes.messageContent}>
