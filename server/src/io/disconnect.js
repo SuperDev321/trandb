@@ -5,7 +5,7 @@ const disconnectSocket = async (io, socket) => {
     const rooms = [...socket.rooms];
     // socket.rooms returns an object where key and value are the same
     // first key is socket id, second key is rooms name
-    const { _id } = socket.decoded; console.log('disconnect', reason, rooms)
+    const { _id } = socket.decoded;
     await Users.updateOne({_id}, {isInChat: false});
     for (let index = 0; index < rooms.length; index++) {
         const room = rooms[index];
