@@ -39,13 +39,14 @@ const joinRoom = (io, socket) => async ({ room, password }, callback) => {
         
         const messages = await Chats.find({ room, type: 'public' }).sort({date: -1}).limit(30);
         const usersInfo = await findRoomUsers(room, user.role);
-        let onlineUsers = await Promise.all(usersInfo.map(async ({username, ip, role, gender}) => {
+        let onlineUsers = await Promise.all(usersInfo.map(async ({_id, username, ip, role, gender}) => {
             let item = {};
             let blocked = await checkBlock(room, username, ip);
             item.blocked = blocked;
             // if(user.role === 'admin' || user.role === 'super-admin') {
             // item.ip = ipInt(ip).toIP();
             // }
+            item._id = _id;
             item.username = username;
             item.role = role;
             item.gender = gender;
@@ -109,13 +110,14 @@ const rejoinRoom = (io, socket) => async ({ room }, callback) => {
         // let {welcomeMessage} = await Rooms.findOne({name: room});
         const messages = await Chats.find({ room, type: 'public' }).sort({date: -1}).limit(30);
         const usersInfo = await findRoomUsers(room, user.role);
-        let onlineUsers = await Promise.all(usersInfo.map(async ({username, ip, role, gender}) => {
+        let onlineUsers = await Promise.all(usersInfo.map(async ({_id, username, ip, role, gender}) => {
             let item = {};
             let blocked = await checkBlock(room, username, ip);
             item.blocked = blocked;
             // if(user.role === 'admin' || user.role === 'super-admin') {
             // item.ip = ipInt(ip).toIP();
             // }
+            item._id = _id;
             item.username = username;
             item.role = role;
             item.gender = gender;
