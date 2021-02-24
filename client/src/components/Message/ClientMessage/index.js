@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import UserContext from '../../../context';
+import {UserContext} from '../../../context';
 import PropTypes, { element } from 'prop-types';
 import {EmojiConvertor} from 'emoji-js';
 import parseHTML from 'parsehtml';
@@ -123,7 +123,7 @@ const MyMessage = ({user, roomName, message, role, font_size, userAction, change
             addOrOpenPrivate={addOrOpenPrivate}
             role={role}
           />
-            :&nbsp;</span>
+            <span>:&nbsp;</span></span>
             <>
             { (message.messageType === 'image') ?
             <span className={classes.text + ' ' + classes.size10}>

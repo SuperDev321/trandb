@@ -14,7 +14,8 @@ const useStyles = makeStyles((theme) => ({
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
-        background: 'white'
+        background: theme.palette.menu.background,
+        fontSize: '0.85rem'
     },
     cameraBtn: {
         borderRadius: '0px',
@@ -31,20 +32,23 @@ const useStyles = makeStyles((theme) => ({
     roomName: {
         fontSize: 22,
         fontWeight: 'bold',
-        paddingRight: 10
+        paddingRight: 10,
+        color: theme.palette.menu.color
     },
     usersCount: {
         fontSize: 20,
-        lineHeight: 1
+        lineHeight: 1,
+        color: theme.palette.menu.color
     },
     list: {
         padding: '0',
         flexGrow: 1,
         overflow: 'auto',
+        
     },
     listItem: {
         paddingTop: theme.spacing(0.5),
-        paddingBottom: theme.spacing(0.5)
+        paddingBottom: theme.spacing(0.5),
     },
     searchRoot: {
         width: '100%',
@@ -56,6 +60,7 @@ const useStyles = makeStyles((theme) => ({
         backgroundColor: fade(theme.palette.common.white, 0.15),
         width: '100%',
         boxShadow: '0 0 0px 1px #0000002b',
+        color: theme.palette.menu.color
     },
     searchIcon: {
         padding: theme.spacing(0, 2),

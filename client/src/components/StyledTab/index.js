@@ -36,7 +36,7 @@ const StyledTab = withStyles((theme) => ({
         fontWeight: theme.typography.fontWeightRegular,
         fontSize: theme.typography.pxToRem(15),
         height: '30px',
-        border: '1px solid',
+        // border: '1px solid',
         minHeight: '10px',
         minWidth: '0px',
         padding: '0px',

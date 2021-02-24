@@ -3,7 +3,7 @@ import { useHistory } from 'react-router-dom';
 import { FormControlLabel, Checkbox, Container, Button } from '@material-ui/core';
 import { RoomsList, PublicLayout, Loading } from '../../components';
 import { makeStyles } from '@material-ui/styles';
-import UserContext from '../../context';
+import {UserContext} from '../../context';
 
 import { getRooms } from '../../utils';
 import './style.css';

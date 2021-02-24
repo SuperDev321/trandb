@@ -17,9 +17,15 @@ const theme = createMuiTheme({
     background: {
       default: '#f5f5f5',
     },
+    placeHolder: '#a0a0a0',
+    emoji: '#858585',
+    menu: {
+      background: 'white',
+      color: 'black',
+    },
     titleBar: {
-      main: '#eeeeee',
-      contrastText: '#222222',
+      main: '#f5f5f5',
+      contrastText: '#000000',
     },
   },
   direction: 'rtl',

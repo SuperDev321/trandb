@@ -12,7 +12,7 @@ import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import { makeStyles } from '@material-ui/core/styles';
 import MenuItem from '@material-ui/core/MenuItem';
 import axios from 'axios';
-import UserContext from '../../context';
+import {UserContext} from '../../context';
 import { message } from 'antd';
 
 const useStyles = makeStyles((theme) => ({

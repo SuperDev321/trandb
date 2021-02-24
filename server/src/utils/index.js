@@ -32,7 +32,8 @@ const checkBlock = require('./block/checkBlock');
 const addBlock = require('./block/addBlock');
 const removeBlock = require('./block/removeBlock');
 const {isForbidden, hasFobiddenWord} = require('./forbiddenWord/isForbidden');
-
+const createAdminUser = require('./setting/initSetting');
+const initSetting = require('./setting/initSetting')
 module.exports = {
   createError,
   validateSignUpData,
@@ -70,5 +71,7 @@ module.exports = {
   addBlock,
   removeBlock,
   isForbidden,
-  hasFobiddenWord
+  hasFobiddenWord,
+  createAdminUser,
+  initSetting
 };

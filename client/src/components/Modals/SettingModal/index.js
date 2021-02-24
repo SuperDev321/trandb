@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles, makeStyles } from '@material-ui/core/styles';
 import {
@@ -20,6 +20,10 @@ import {useTranslation} from 'react-i18next';
 import CustomTextField from '../../CustomTextField';
 import OutlinedButton from '../../OutlinedButton';
 import ThemeSetting from './ThemeSetting';
+import MessageSetting from './MessageSetting';
+import {SettingContext} from '../../../context';
+import SoundSetting from './SoundSetting';
+
 const StyledDialog = withStyles((theme) => ({
     root: {
         direction: 'ltr',
@@ -43,6 +47,9 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 const SettingModal = () => {
+    const {messageSize, setMessageSize, enablePokeSound, setEnablePokeSound, enablePrivateSound, setEnablePrivateSound,
+        enablePublicSound, setEnablePublicSound,
+    } = useContext(SettingContext);
     const [open, setOpen] = useState(false);
     const [page, setPage] = useState(null);
     const classes = useStyles();
@@ -51,6 +58,11 @@ const SettingModal = () => {
     const handleClose = () => {
         setOpen(false);
     };
+    useEffect(() => {
+        if(open) {
+            setPage(null)
+        }
+    }, [open])
     return (
         <>
         <IconButton aria-label="show 17 new notifications" color="inherit"
@@ -70,13 +82,29 @@ const SettingModal = () => {
                         <ListItem button onClick={()=>setPage('theme')}>
                             <ListItemText primary="Theme" />
                         </ListItem>
-                        <ListItem button>
-                            <ListItemText primary="Bluetooth" />
+                        <ListItem button onClick={()=>setPage('message')}>
+                            <ListItemText primary="Message" />
+                        </ListItem>
+                        <ListItem button onClick={()=>setPage('sound')}>
+                            <ListItemText primary="Sound" />
                         </ListItem>
                     </List>
                 }
-                {page === 'theme' &&
-                    <ThemeSetting />
+                {page === 'theme' ?
+                    <ThemeSetting />:null
+                }
+                {page === 'message' ?
+                    <MessageSetting messageSize={messageSize} setMessageSize={setMessageSize} />: null
+                }
+                {page === 'sound' ?
+                    <SoundSetting
+                    enablePokeSound={enablePokeSound}
+                    setEnablePokeSound={setEnablePokeSound}
+                    enablePrivateSound={enablePrivateSound}
+                    setEnablePrivateSound={setEnablePrivateSound}
+                    enablePublicSound={enablePublicSound}
+                    setEnablePublicSound={setEnablePublicSound}
+                    />: null
                 }
             </DialogContent>
         </StyledDialog>
