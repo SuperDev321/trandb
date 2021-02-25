@@ -14,7 +14,7 @@ const dbConnection = require('./database/dbConnection');
 const router = require('./router');
 // const { RateLimiterMemory } = require('rate-limiter-flexible');
 const {ioHandler, adminIoHandler} = require('./io');
-const { verifyToken, findUserById } = require('./utils');
+const { verifyToken, findUserById, createAdminUser, initSetting } = require('./utils');
 const cors = require('cors');
 const options = {
   key: fs.readFileSync(config.ssl_key),
@@ -27,7 +27,6 @@ const io = socketIO(server);
 const initRooms = require('./utils/room/initRooms')
 const fileUpload = require('express-fileupload');
 const cookie = require('cookie');
-const createAdminUser = require('./utils/user/createAdminUser');
 initRooms();
 // app.disabled('x-powered-by');
 // app.enable('trust proxy');   
@@ -71,6 +70,6 @@ io.use(async (socket, next) => {
 
 
 createAdminUser({username: 'rafa', email: 'rafa@gmail.com',password: '12345678', gender: 'male'});
-
+initSetting();
 
 module.exports = { server, app, dbConnection };
