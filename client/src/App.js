@@ -26,7 +26,9 @@ const App = () => {
     const classes = useStyles();
     const { loading, auth, role, setAuth, setLoading, username, removeCurrentUser } = useAuth();
     const { defaultTheme, messageSize, enablePokeSound, enablePrivateSound, enablePublicSound,
-        setDefaultTheme, setMessageSize, setEnablePokeSound, setEnablePrivateSound, setEnablePublicSound} = useSetting();
+        setDefaultTheme, setMessageSize, setEnablePokeSound, setEnablePrivateSound, setEnablePublicSound,
+        language, setLanguage
+    } = useSetting();
     if (loading) {
         return <Loading />;
     }
@@ -51,14 +53,14 @@ const App = () => {
                         value={{ defaultTheme, messageSize, enablePokeSound,
                             enablePrivateSound, enablePublicSound,
                             setDefaultTheme,setMessageSize, setEnablePokeSound,
-                            setEnablePrivateSound, setEnablePublicSound}}>
-        <CustomThemeProvider>
+                            setEnablePrivateSound, setEnablePublicSound,
+                            language, setLanguage
+                        }}>
+        <CustomThemeProvider defaultTheme={defaultTheme}>
             <UserContext.Provider
                 value={{ auth, role, loading, setAuth, setLoading, username, removeCurrentUser }}
             >
-            <div className={classes.app}
-                style={{fontSize: messageSize}}
-             dir="rtl">
+            <div className={classes.app} dir="rtl">
                 <Switch>
                     <PublicRoute exact path="/">
                         <Rooms />
@@ -77,7 +79,7 @@ const App = () => {
                     </PublicRoute>
                     <PrivateRoute path="/rooms/:room">
                         
-                            <ChattingRoom />
+                            <ChattingRoom/>
                     
                     </PrivateRoute>
                     <PrivateRoute path="/room/create">

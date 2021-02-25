@@ -7,6 +7,7 @@ import Picker from 'emoji-picker-react';
 import t from 'prop-types'
 import './styles.css'
 import useStyles from './styles';
+import {useTranslation} from 'react-i18next';
 
 function InputEmoji ({
     value,

@@ -15,6 +15,7 @@ const useStyles =  makeStyles((theme) => ({
         width: '100%',
         wordBreak: 'break-word',
         scrollbarWidth: 'thin',
+        scrollbarColor: `#585B5E #ecdbdb00`,
         '&::-webkit-scrollbar': {
             width: '5px',
         },

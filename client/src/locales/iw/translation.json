@@ -1,4 +1,10 @@
 {
+  "global": {
+    "save": "להציל",
+    "cancel": "לְבַטֵל",
+    "logout": "להתנתק",
+    "profile": "פּרוֹפִיל"
+  },
   "ChatApp": {
     "rooms": "חדרים",
     "rooms_descr": "הצטרפות לחדר",
@@ -89,22 +95,28 @@
   },
   "LoginPage": {
     "error_username": "נא להכניס  כינוי",
+    "error_email": "אנא הכנס דוא\"ל",
     "error_password": "נא להכניס סיסמה",
     "error_version": "Please use new version {{version}}",
     "error_missing_room": "הקישור  אינו נכון  נא להתחבר לדף  הבית של הצאט",
     "error_ban": "נחסמתם על ידיי ההנהלה",
     "session_expired": "נדרשת התחברות מחדש",
+    "select_mode":"אנא בחר במצב כניסה",
     "login": "התחברות",
     "guest": "אורחים",
     "user_login": "התחברות רשומים",
     "username": "כינוי",
+    "email": "אימייל",
     "password": "סיסמה",
     "back": "חזרה",
     "guest_join_chat": "התחברות כאורח",
     "male": "זכר",
     "female": "נקבה",
     "join": "התחברות",
-    "default": "default"
+    "default": "default",
+    "sign_up": "הירשם",
+    "create_new": "צור חשבון חדש",
+    "already_login": "האם כבר יש לך חשבון? התחברות"
   },
   "UserActionArea": {
     "sent_broadcast_request": "שלחת בקשת צפיה ל- {{owner}}, נא להמתין לתגובה",
@@ -130,6 +142,7 @@
     "my_profile": "הפרופיל/חדר שלי",
     "languages": "שפות",
     "messages": "גודל הטקסט",
+    "themes": "ערכות נושא",
     "notifications": "התראות צליל",
     "blocked": "רשימת התעלמות",
     "english": "אנגלית",
@@ -150,7 +163,8 @@
   },
   "LandingPage": {
     "show_empty_room": "הראה גם חדרים ריקים",
-    "default": "default"
+    "default": "default",
+    "join": "לְהִצְטַרֵף"
   },
   "Message": {
     "default": "default"
@@ -177,5 +191,8 @@
   "Broadcast": {
     "owner_closed_broadcast":"השידור של{{owner}} הופסק",
     "default":"default"
+  },
+  "InputMessage": {
+    "type_message": "הקלד הודעה"
   }
 }

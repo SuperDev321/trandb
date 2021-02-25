@@ -17,6 +17,7 @@ import {
     Notifications,
     StarRounded
 } from '@material-ui/icons';
+import {useTranslation} from 'react-i18next';
 import { makeStyles } from '@material-ui/core/styles';
 import { pink } from '@material-ui/core/colors';
 import BanModal from '../Modals/BanModal';
@@ -66,6 +67,7 @@ const RoomUserName = ({user, role, roomName,
     // handleClose
 }) => { 
     const classes = useStyles();
+    const {t} = useTranslation();
     const socket = getSocket();
     const [anchorEl, setAnchorEl] = React.useState(null);
     const [openBan, setOpenBan] = React.useState(false);
@@ -184,7 +186,7 @@ const RoomUserName = ({user, role, roomName,
                 </CardMedia>
                 <Divider />
                 <Button size="small" color="primary" fullWidth className={classes.cardButton} onClick={handleClickProfile}>
-                    <AccountCircleOutlined />&nbsp;Profile
+                    <AccountCircleOutlined />&nbsp;{t('UserActionArea.view_profile')}
                 </Button>
                 { !isMine &&
                     <>
@@ -195,14 +197,14 @@ const RoomUserName = ({user, role, roomName,
                             className={classes.cardButton}
                             onClick={ handleClickPrivateChat}
                         >
-                            <QuestionAnswer />&nbsp;Private Chat
+                            <QuestionAnswer />&nbsp;{t('UserActionArea.poke')}
                         </Button>
                         <Button size="small" fullWidth
                             color="primary"
                             className={classes.cardButton}
                             onClick={() => {sendPoke()}}
                         >
-                            <Notifications />&nbsp;Poke Message
+                            <Notifications />&nbsp;{t('UserActionArea.message')}
                         </Button>
                         <Divider />
                         { ((role === 'admin' || role === 'owner' || role === 'moderator')
@@ -213,14 +215,14 @@ const RoomUserName = ({user, role, roomName,
                                 fullWidth onClick={() => { handleBan(user.username) }}
                                 name={user.username}
                             >
-                                Ban/Block
+                                {t('UserActionArea.ban_from_room')}
                             </Button>
                             <Button size="small"
                                     className={`${classes.cardButton} ${classes.kick}`}
                                     fullWidth onClick={() => { handleKick(user.username) }}
                                     name={user.username}
                                 >
-                                    Kick
+                                    {t('UserActionArea.kick_from_room')}
                             </Button>
                             <Button size="small"
                                 className={`${classes.cardButton} ${classes.mute}`}
@@ -229,8 +231,8 @@ const RoomUserName = ({user, role, roomName,
                             >
                             {
                                 user.blocked
-                                ? 'UnBlock this person'
-                                : 'Block this person'
+                                ? t('UserActionArea.unmute_this_person')
+                                : t('UserActionArea.mute_this_person')
                             }
                             </Button>
                             </>
@@ -243,8 +245,8 @@ const RoomUserName = ({user, role, roomName,
                             >
                             {
                                 isMuted
-                                ? 'Unmute / Ignore'
-                                : 'Silence / Ignorance'
+                                ? t('UserActionArea.unmute_this_person')
+                                : t('UserActionArea.mute_this_person')
                             }
                             </Button>)
                         }

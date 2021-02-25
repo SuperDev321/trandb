@@ -58,7 +58,7 @@ const MessageSetting = ({messageSize, setMessageSize}) => {
                     <span>Message Size</span>
                 </Grid>
                 <Grid item xs={12} spacing={5}>
-                    <PrettoSlider value={value} onChange={handleChange} aria-labelledby="continuous-slider" />
+                    <PrettoSlider value={(messageSize-10)*5} onChange={handleChange} aria-labelledby="continuous-slider" />
                 </Grid>
             </Grid>
         </div>

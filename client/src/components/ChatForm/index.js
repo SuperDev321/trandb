@@ -8,12 +8,14 @@ import {EmojiConvertor} from 'emoji-js';
 import { getSocket } from '../../utils';
 import axios from 'axios';
 import config from '../../config';
-import {UserContext} from '../../context'
+import {UserContext} from '../../context';
+import {useTranslation} from 'react-i18next';
 
 
 const ChatForm = ({roomName, to, sendMessage, onFocus, onBlur, type}) => {
     const {role} = useContext(UserContext);
     const classes = useStyles();
+    const {t} = useTranslation();
     const [msg, setMsg] = useState('');
     const formRef = useRef(null);
     const [userColor, setUserColor] = useState(null);
@@ -97,7 +99,7 @@ const ChatForm = ({roomName, to, sendMessage, onFocus, onBlur, type}) => {
                     onEnter={handleOnEnter}
                     color={userColor ? userColor: 'black'}
                     fontWeight={bold?'bold': 'inherit'}
-                    placeholder="Type a message"
+                    placeholder={t('InputMessage.type_message')}
                 />
                 
             </form>

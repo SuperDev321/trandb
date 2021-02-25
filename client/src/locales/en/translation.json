@@ -1,7 +1,9 @@
 {
   "global": {
     "save": "Save",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "logout": "Log out",
+    "profile": "Profile"
   },
   "ChatApp": {
     "rooms": "ROOMS",
@@ -53,7 +55,7 @@
     "error3": "You can't join into this room. over users",
     "rooms": "Rooms",
     "create_room": "Create Room",
-    "show_empty_room": "show empty room",
+    "show_empty_room": "Show empty rooms",
     "default": "default"
   },
   "CreateRoomModal": {
@@ -96,12 +98,14 @@
     "error_password": "You must enter password",
     "error_version": "Please use new version {{version}}",
     "error_missing_room": "Please select room",
+    "select_mode": "Please select room",
     "error_ban": "You banned by admin",
     "session_expired": "Your session expired, Please login again.",
-    "sign_in": "Sign in",
+    "login": "Login",
     "guest": "Guest",
     "user_login": "User Login",
     "username": "UserName",
+    "email": "Email",
     "password": "Password",
     "back": "Back",
     "guest_sign": "Guest Sign",
@@ -109,7 +113,9 @@
     "female": "Female",
     "join": "Join",
     "default": "default",
-    "create_new": "Create a new account"
+    "create_new": "Create a new account",
+    "sign_up": "Sign up",
+    "already_login": "Already have an account? Login"
   },
   "UserActionArea": {
     "sent_broadcast_request": "Your request to view was sent to {{owner}}, Please wait for response",
@@ -135,6 +141,7 @@
     "my_profile": "My profile",
     "languages": "Languages",
     "messages": "Messages",
+    "themes": "Theme",
     "notifications": "Notifications",
     "blocked": "Blocked",
     "english": "English",
@@ -156,7 +163,8 @@
   },
   "LandingPage": {
     "show_empty_room": "show empty room",
-    "default": "default"
+    "default": "default",
+    "join": "Join"
   },
   "Message": {
     "default": "default"
@@ -183,5 +191,8 @@
   "Broadcast": {
     "owner_closed_broadcast":"{{owner}} has stopped broadcasting",
     "default":"default"
+  },
+  "InputMessage": {
+    "type_message": "Type a message"
   }
 }

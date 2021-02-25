@@ -634,7 +634,8 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                                 if(sameRoom.addOnlineUser(joinedUser) && username !== joinedUser.username) {
                                     let sysMsg = {
                                         type: 'system',
-                                        msg: joinedUser.username + ' joined the room'
+                                        msg: t('ChatApp.sys_join_room', {username: joinedUser.username})
+                                        // msg: joinedUser.username + ' joined the room'
                                     }
                                     sameRoom.messages = [sysMsg, ...sameRoom.messages];
                                 }
@@ -661,7 +662,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                                 sameRoom.users = usersToSet;
                                 let message = {
                                     type: 'system',
-                                    msg: leavedUserInfo.username + ' leaved room' 
+                                    msg: t('ChatApp.sys_leave_room', {username: leavedUserInfo.username}) 
                                 }
                                 sameRoom.messages = [message, ...sameRoom.messages];
                             }
@@ -684,8 +685,8 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                             sameRoom.users = usersToSet;
                             let type = newInfo.payload.type;
                             let msg = (type === 'kick') 
-                                ? newInfo.payload.kickedUserName + ' kicked from room'
-                                : newInfo.payload.kickedUserName + ' baned from room';
+                                ? t('ChatApp.sys_kick_room',{username: newInfo.payload.kickedUserName})
+                                : t('ChatApp.sys_ban_owner_room',{username: newInfo.payload.kickedUserName});
                             let message = {
                                 type: 'system',
                                 msg
@@ -699,8 +700,8 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                             removeRoom(newInfo.payload.room, (result) => {
                                 if(result) {
                                     let alertText = (newInfo.payload.type === 'kick') 
-                                        ?'You kicked from '+newInfo.payload.room
-                                        :'You baned from '+newInfo.payload.room;
+                                        ?t('ChatApp.kicked_from_owner',{roomName: newInfo.payload.room})
+                                        :t('ChatApp.banned_from_admin',{roomName: newInfo.payload.room});
                                     enqueueSnackbar(alertText, {variant: 'error'});
                                 }
                                 
@@ -714,7 +715,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                          // kick other
                             let usersToSet = roomRef.users.filter((user) => (user.username !== newInfo.payload.kickedUserName));
                             roomRef.users = usersToSet;
-                            let msg = newInfo.payload.kickedUserName + ' baned from room';
+                            let msg = t('ChatApp.sys_ban_admin_room_all', {username: newInfo.payload.kickedUserName});
                             let message = {
                                 type: 'system',
                                 msg
@@ -731,7 +732,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                         // remove all room
                         roomsRef.current = [];
                         setRoomsInfo([]);
-                        let alertText = 'You baned globally';
+                        let alertText = t('ChatApp.error_admin_ban_all_room');
                         enqueueSnackbar(alertText, {variant: 'error'});
                     }
                 }
@@ -745,7 +746,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                             let message = {
                                 type: 'poke',
                                 from: pokeMessage.from,
-                                msg: pokeMessage.from + ' sent a rington to you' 
+                                msg: t('PokeMessage.have_poked_you', {username: pokeMessage.from}) 
                             }
                             sameRoom.messages = [message, ...sameRoom.messages];
                             let userToReceive = sameRoom.users.find((item) => (item.username === pokeMessage.from));
