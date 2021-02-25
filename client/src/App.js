@@ -1,10 +1,10 @@
 import React from 'react';
 import { Switch, Redirect } from 'react-router-dom';
 import { Spin } from 'antd';
-
-import UserContext from './context';
+import {makeStyles} from '@material-ui/core/styles';
+import {UserContext, SettingContext} from './context';
 import CustomThemeProvider from './themes/cutomThemeProvider'
-import { useAuth } from './utils';
+import { useAuth, useSetting } from './utils';
 import { Signup, Login, Rooms, ChattingRoom, Admin, RoomSetting, Profile } from './pages';
 import { PublicRoute, PrivateRoute, Loading } from './components';
 import CreateRoom from './pages/CreateRoom';
@@ -13,10 +13,20 @@ import { SnackbarProvider } from 'notistack';
 import CloseIcon from '@material-ui/icons/Close';
 import {useAudio} from 'react-use';
 import './App.css';
-const App = () => {
-    
-    const { loading, auth, role, setAuth, setLoading, username, removeCurrentUser } = useAuth();
 
+const useStyles = makeStyles((theme) =>({
+    app: {
+        fontFamily: 'sans-serif',
+        height: '100vh',
+    }
+}));
+
+
+const App = () => {
+    const classes = useStyles();
+    const { loading, auth, role, setAuth, setLoading, username, removeCurrentUser } = useAuth();
+    const { defaultTheme, messageSize, enablePokeSound, enablePrivateSound, enablePublicSound,
+        setDefaultTheme, setMessageSize, setEnablePokeSound, setEnablePrivateSound, setEnablePublicSound} = useSetting();
     if (loading) {
         return <Loading />;
     }
@@ -37,12 +47,18 @@ const App = () => {
                 <CloseIcon onClick={onClickDismiss(key)} />
             )}
         >
+        <SettingContext.Provider
+                        value={{ defaultTheme, messageSize, enablePokeSound,
+                            enablePrivateSound, enablePublicSound,
+                            setDefaultTheme,setMessageSize, setEnablePokeSound,
+                            setEnablePrivateSound, setEnablePublicSound}}>
         <CustomThemeProvider>
-            
             <UserContext.Provider
                 value={{ auth, role, loading, setAuth, setLoading, username, removeCurrentUser }}
             >
-            <div className="App" dir="rtl">
+            <div className={classes.app}
+                style={{fontSize: messageSize}}
+             dir="rtl">
                 <Switch>
                     <PublicRoute exact path="/">
                         <Rooms />
@@ -60,7 +76,9 @@ const App = () => {
                         <Login />
                     </PublicRoute>
                     <PrivateRoute path="/rooms/:room">
-                        <ChattingRoom />
+                        
+                            <ChattingRoom />
+                    
                     </PrivateRoute>
                     <PrivateRoute path="/room/create">
                         <CreateRoom />
@@ -72,7 +90,9 @@ const App = () => {
             </div>
             </UserContext.Provider>
         </CustomThemeProvider>
+        </SettingContext.Provider>
         </SnackbarProvider>
+        
     );
 };
 

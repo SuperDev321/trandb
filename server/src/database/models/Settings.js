@@ -1,9 +1,13 @@
 const { Schema, model } = require('mongoose');
 
-const userSchema = new Schema({
+const settingSchema = new Schema({
+  type: String,
   theme: {
     type: String,
     required: true,
+  },
+  language: {
+    type: String,
   },
   messageNum: {
     type: Number,
@@ -11,6 +15,6 @@ const userSchema = new Schema({
   }
 });
 
-const Users = model('Users', userSchema);
+const Settings = model('Settings', settingSchema);
 
-module.exports = Users;
+module.exports = Settings;

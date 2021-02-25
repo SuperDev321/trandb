@@ -4,6 +4,7 @@ const Chats = require('./Chats');
 const Bans = require('./Bans');
 const Blocks = require('./Blocks');
 const ForbiddenWords = require('./ForbiddenWords');
+const Settings = require('./Settings')
 
 module.exports = {
   Users,
@@ -11,5 +12,6 @@ module.exports = {
   Chats,
   Bans,
   Blocks,
-  ForbiddenWords
+  ForbiddenWords,
+  Settings
 };

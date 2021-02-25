@@ -3,6 +3,7 @@ const { findRoomUsers } = require('../utils');
 
 const disconnectSocket = async (io, socket) => {
     const rooms = [...socket.rooms];
+    console.log('disconnect rooms', socket.rooms)
     // socket.rooms returns an object where key and value are the same
     // first key is socket id, second key is rooms name
     const { _id } = socket.decoded;
@@ -32,10 +33,12 @@ const socketDisconnect = (io, socket) => async (reason) => {
                 if(!state) {
                     disconnectSocket(io, socket);
                 }
-            }, 3000)
+            }, 1000)
+        } else {
+            disconnectSocket(io, socket);
         }
         // if(reason === 'client namespace disconnect' || reason === 'transport error' || reason === 'transport close') {
-            disconnectSocket(io, socket);
+            
         // }
         
         // for (let index = 2; index < rooms.length; index++) {

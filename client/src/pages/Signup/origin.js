@@ -4,7 +4,7 @@ import { useHistory } from 'react-router-dom';
 
 import './style.css';
 
-import UserContext from '../../context';
+import {UserContext} from '../../context';
 import { handleSignup } from '../../utils';
 import { GoogleLoginBtn } from '../../components';
 

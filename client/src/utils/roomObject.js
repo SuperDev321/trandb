@@ -105,6 +105,9 @@ class RoomObject  {
         let currentUserNames = this.users.map(({username}) => (username));
         if(!currentUserNames.includes(user.username)) {
             this.users = [...this.users, user];
+            return true;
+        } else {
+            return false;
         }
     }
 

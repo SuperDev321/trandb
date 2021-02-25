@@ -8,7 +8,7 @@ import { AppBar,
 } from "@material-ui/core";
 import AppMenu from '../AppMenu';
 import { makeStyles } from '@material-ui/core/styles';
-import UserContext from '../../context';
+import {UserContext} from '../../context';
 
 const useStyles = makeStyles((theme) => ({
     root: { 

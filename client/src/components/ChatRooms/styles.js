@@ -6,7 +6,7 @@ const useStyles = makeStyles((theme) => ({
     root: {
         display: 'flex',
         flexGrow: '1',
-        width: '100%'
+        width: '100%',
     },
     mainWrapper: {
         flexGrow: 1,
@@ -52,7 +52,7 @@ const useStyles = makeStyles((theme) => ({
         //   marginLeft: drawerWidth,
         },
         boxShadow: '1px 1px 0px 0px rgb(0 0 0 / 0%), 0px 1px 0px 0px rgb(0 0 0 / 5%)',
-        background: 'white',
+        background: theme.palette.menu.background,
         height: '50px',
         color: theme.palette.primary.main,
     },

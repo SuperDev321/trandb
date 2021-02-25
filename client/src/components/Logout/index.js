@@ -3,7 +3,7 @@ import axios from 'axios';
 import { message } from 'antd';
 
 // import { makeStyles } from '@material-ui/core/styles';
-import UserContext from '../../context';
+import {UserContext} from '../../context';
 
 // const useStyles = makeStyles((theme) => ({
 //     logout: {

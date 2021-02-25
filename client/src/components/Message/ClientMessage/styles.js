@@ -40,15 +40,18 @@ const useStyles = makeStyles((theme) => ({
         display: 'flex',
         flexDirection: 'row',
         alignItems: 'baseline',
+        fontSize: '0.95em',
+        lineHeight: 1.8
     },
     time: {
-        font: 'italic 12px sans-serif',
+        font: 'italic 0.8em sans-serif',
         minWidth: '35px',
         lineHeight: '1',
         margin: '0',
     },
     text: {
         margin: 0,
+        fontSize: '1.15em',
         '& img.photo': {
           maxWidth: '250px !important',
           width:' auto !important',
@@ -59,7 +62,6 @@ const useStyles = makeStyles((theme) => ({
         '& img.emoji': {
             verticalAlign: 'bottom'
         },
-        fontSize: '1rem',
     },
     url_underline: {
         cursor: 'pointer',

@@ -23,12 +23,13 @@ import BanModal from '../Modals/BanModal';
 import {getSocket} from '../../utils'
 const useStyles = makeStyles((theme) => ({
     username: {
-        font: 'bold 14px sans-serif',
+        font: 'bold 1.1em sans-serif',
         cursor: 'pointer',
         // flexGrow: 1,
         overflow: 'hidden',
         display: 'flex',
         alignItems: 'center',
+        color: theme.palette.menu.color
     },
     cardRoot: {
         width: 200,

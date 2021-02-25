@@ -12,19 +12,18 @@ const ThemeSetting = () => {
     useEffect(() => {
         if(contextValue) {
             if(contextValue.currentTheme === 'normal') {
-                setChecked(true);
-            } else {
                 setChecked(false);
+            } else {
+                setChecked(true);
             }
         }
     }, [contextValue]);
     const handleChange = (event) => {
-        
         if(contextValue && contextValue.setTheme) {
             if(event.target.checked) {
-                contextValue.setTheme('normal');
-            } else {
                 contextValue.setTheme('dark');
+            } else {
+                contextValue.setTheme('normal');
             }
         }
     }
