@@ -3,7 +3,8 @@ const { signup, login, guestLogin, googleLogin, checkToken, logout, getUserByNam
 const { getRooms, getRoomsAdmin, addRoom, deleteRoom, getRoomDetail, checkRoomPermission, getUserRooms, addModerator, deleteModerator, updateRoomGeneral, updateRoomMedia } = require('./rooms');
 const { getPrivateChat, fileUploader } = require('./chats');
 const {addBan, deleteBan, getBans} = require('./bans');
-const {getWords, addWord, deleteWord} = require('./forbiddenWords')
+const {getWords, addWord, deleteWord} = require('./forbiddenWords');
+const {getSetting} = require('./settings');
 
 module.exports = {
   clientError,
@@ -34,5 +35,6 @@ module.exports = {
   getUserRooms,
   getWords,
   addWord,
-  deleteWord
+  deleteWord,
+  getSetting
 };

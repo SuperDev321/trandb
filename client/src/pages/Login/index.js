@@ -19,7 +19,7 @@ import { makeStyles, withStyles } from '@material-ui/core/styles';
 import { green, red } from '@material-ui/core/colors';
 import LoginSelect from '../../components/LoginSelect';
 
-import UserContext from '../../context';
+import {UserContext} from '../../context';
 import { handleLogin, handleGuestLogin } from '../../utils';
 import OutlinedButton from '../../components/OutlinedButton';
 import CustomTextField from '../../components/CustomTextField';

@@ -8,7 +8,7 @@ import {EmojiConvertor} from 'emoji-js';
 import { getSocket } from '../../utils';
 import axios from 'axios';
 import config from '../../config';
-import UserContext from '../../context'
+import {UserContext} from '../../context'
 
 
 const ChatForm = ({roomName, to, sendMessage, onFocus, onBlur, type}) => {

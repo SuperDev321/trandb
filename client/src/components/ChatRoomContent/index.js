@@ -1,7 +1,7 @@
 import React, { useContext, useState, useRef, useEffect, memo } from 'react';
 import ReactPlayer from 'react-player'
 import ChatForm from '../ChatForm';
-import UserContext from '../../context';
+import {UserContext} from '../../context';
 import MessagesList from '../Message/MessagesList';
 import { makeStyles } from '@material-ui/styles';
 import IconButton from '@material-ui/core/IconButton';
@@ -26,7 +26,7 @@ const useStyles = makeStyles((theme) => ({
     root: {
         height: '100%',
         width: '100%',
-        overflow: 'auto',
+        overflow: 'hidden',
         display: 'flex',
         flexDirection: 'column',
     },

@@ -1,7 +1,9 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { ThemeProvider } from '@material-ui/core/styles'
 import RTL from "./rtl";
 import getTheme from './index'
+import Axios from 'axios';
+import config from '../config';
 
 // eslint-disable-next-line no-unused-vars
 export const CustomThemeContext = React.createContext(
@@ -29,6 +31,18 @@ const CustomThemeProvider = (props) => {
     localStorage.setItem('appTheme', name)
     _setThemeName(name)
   }
+  useEffect(() => {
+    console.log('get theme')
+    Axios.get(`${config.server_url}/api/setting`)
+    .then((response) => {
+      console.log('get theme', response)
+      if(response.status === 200) {
+        let data = response.data;
+        if(data && data.theme)
+          setThemeName(data.theme);
+      }
+    })
+  }, [])
 
   const contextValue = {
     currentTheme: themeName,

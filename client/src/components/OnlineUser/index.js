@@ -29,6 +29,9 @@ const useStyles = makeStyles((theme) => ({
         alignItems: 'center',
         padding: '2px 15px 2px 15px',
         width: '100%',
+        '&:hover': {
+            background: '#00000014'
+        }
     },
     username: {
         // font: 'bold 14px sans-serif',

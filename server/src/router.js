@@ -28,7 +28,8 @@ const {
   deleteModerator,
   getWords,
   addWord,
-  deleteWord
+  deleteWord,
+  getSetting
 } = require('./controllers');
 const getUserIp = require('./controllers/users/getUserIp');
 
@@ -39,6 +40,9 @@ const router = express.Router();
 
 router.get('/checkToken', checkToken);
 router.get('/logout', withAuth, logout);
+
+router.get('/setting', getSetting)
+
 router.get('/rooms', getRooms);
 router.post('/room', withAuth, addRoom);
 router.put('/room/general', withAuth, updateRoomGeneral);

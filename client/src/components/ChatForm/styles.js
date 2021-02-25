@@ -7,7 +7,7 @@ const useStyles = makeStyles((theme) => ({
         height: 'fit-content',
         boxShadow: '1px 1px 0px 0px rgb(0 0 0 / 0%), 0px -1px 0px 0px rgb(0 0 0 / 5%)',
         zIndex: '10',
-        backgroundColor: 'white'
+        backgroundColor: theme.palette.menu.background
     },
     inputForm: {
         display: 'flex',
@@ -39,10 +39,12 @@ const useStyles = makeStyles((theme) => ({
         fontFamily: '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";',
         '& span': {
             marginBottom: 2.5
-        }
+        },
+        color: theme.palette.menu.color
     },
     bold: {
         fontWeight: 'bold',
+        
     },
     fileUpload: {
         paddingLeft: 3,
@@ -54,7 +56,8 @@ const useStyles = makeStyles((theme) => ({
     },
     fileUploadLabel: {
         cursor: 'pointer',
-        display: 'flex'
+        display: 'flex',
+        color: theme.palette.menu.color
     }
 }));
 

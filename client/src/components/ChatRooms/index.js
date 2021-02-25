@@ -19,7 +19,7 @@ import Peer from 'simple-peer';
 import {StyledTab , StyledTabs} from '../StyledTab';
 import DisconnectModal from '../Modals/DisconncetModal'
 import RoomObject from '../../utils/roomObject';
-import UserContext from '../../context';
+import {UserContext, SettingContext} from '../../context';
 import { getSocket, useLocalStorage, isPrivateRoom } from '../../utils';
 import {useAudio} from 'react-use';
 import { useTranslation, withTranslation, Trans } from 'react-i18next';
@@ -30,6 +30,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
     const history= useHistory();
     const [mobileOpen, setMobileOpen] = useState(false);
     const { username, avatar, gender } = useContext(UserContext);
+    const {enablePokeSound, enablePrivateSound, enablePublicSound} = useContext(SettingContext);
     const [mutes, setMutes] = useLocalStorage('mutes', []);
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
@@ -64,8 +65,12 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
         src: '/media/poke.mp3',
         autoPlay: false ,
     });
-    const [messageAudio, messageAudioState, messageAudioControls] = useAudio({
-        src: '/media/new_message.mp3',
+    const [publicAudio, publicAudioState, publicAudioControls] = useAudio({
+        src: '/media/public.mp3',
+        autoPlay: false ,
+    });
+    const [privateAudio, privateAudioState, privateAudioControls] = useAudio({
+        src: '/media/private.mp3',
         autoPlay: false ,
     });
     const peersRef = useRef([]);
@@ -78,7 +83,6 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
             addOrOpenPrivate(userToChat);
         }
     }));
-
 
     const handleChangeRoom = (event, newValue) => {
         setRoomIndex(newValue);
@@ -362,8 +366,8 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                         if(newMessage.message.msg) {
                             let userToReceive = room.users.find((item) => (item.username === newMessage.message.from));
                             if(userToReceive && !userToReceive.muted) {
-                                messageAudioControls.seek(0);
-                                messageAudioControls.play();
+                                publicAudioControls.seek(0);
+                                publicAudioControls.play();
                             }
                             if(currentRoomName !== room.name) {
                                 room.unReadMessages = [newMessage.message, ...room.unReadMessages];
@@ -389,8 +393,8 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                     if(newMessage.callback) {
                         newMessage.callback(true);
                     }
-                    messageAudioControls.seek(0);
-                    messageAudioControls.play();
+                    privateAudioControls.seek(0);
+                    privateAudioControls.play();
                 }
             // }
             let infos = roomsRef.current.map(({name, unReadMessages}) => ({name, unReadMessages}));
@@ -626,8 +630,8 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                         if(username && usernames.includes(username)) {
                             if(newInfo.payload.onlineUsers && newInfo.payload.joinedUser) {
                                 let joinedUser = newInfo.payload.joinedUser;
-                                sameRoom.addOnlineUser(joinedUser);
-                                if(username !== joinedUser.username) {
+                                
+                                if(sameRoom.addOnlineUser(joinedUser) && username !== joinedUser.username) {
                                     let sysMsg = {
                                         type: 'system',
                                         msg: joinedUser.username + ' joined the room'
@@ -846,6 +850,32 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
         }
     }, [currentRoom])
 
+    // sound setting
+    useEffect(() => {
+
+        if(enablePokeSound) {
+            pokeAudioControls.unmute();
+        } else {
+            pokeAudioControls.mute();
+        }
+    }, [enablePokeSound])
+    useEffect(() => {
+
+        if(enablePublicSound) {
+            publicAudioControls.unmute();
+        } else {
+            publicAudioControls.mute();
+        }
+    }, [enablePublicSound]);
+    useEffect(() => {
+
+        if(enablePrivateSound) {
+            privateAudioControls.unmute();
+        } else {
+            privateAudioControls.mute();
+        }
+    }, [enablePrivateSound])
+
     return (
         <>
         <div className={classes.root} color="primary">
@@ -955,7 +985,8 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
             leaveFromPrivate={leaveFromPrivate}
             me={{username, avatar, gender}} />
         <div>{pokeAudio}</div>
-        <div>{messageAudio}</div>
+        <div>{publicAudio}</div>
+        <div>{privateAudio}</div>
         <DisconnectModal
             open={openDisconnectModal}
             setOpen={setOpenDisconnectModal}

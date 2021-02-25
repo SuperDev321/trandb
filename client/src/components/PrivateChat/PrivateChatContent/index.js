@@ -46,7 +46,8 @@ const useStyles = makeStyles((theme) => ({
         padding: '0 7px',
         boxShadow: '1px 1px 11px 1px rgb(0 0 0 / 19%), 0px 0px 0px 0px rgb(0 0 0)',
         background: theme.palette.primary.main,
-        color: theme.palette.primary.contrastText
+        color: theme.palette.primary.contrastText,
+        fontSize: '1rem',
     },
     headerContent: {
         cursor: props =>
@@ -72,7 +73,7 @@ const useStyles = makeStyles((theme) => ({
         display: 'flex',
         flexDirection: 'column',
         width: '100%',
-        overflow: 'auto'
+        overflow: 'hidden',
         // height: 300,
     },
     content: {
