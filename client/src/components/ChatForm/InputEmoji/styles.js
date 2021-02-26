@@ -23,10 +23,12 @@ const useStyles = makeStyles((theme) => ({
         width: 'inherit',
         willChange: 'width',
         verticalAlign: 'baseline',
-        border: 'none',
+        border: '1px solid',
+        borderColor: theme.palette.separate.main,
         marginRight: 0,
         marginLeft: 0,
-        background: 'rgba(255, 255, 255, 0.15)'
+        background: theme.palette.placeHolder,
+
       },
       
       inputEmojiWrapper: {

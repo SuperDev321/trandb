@@ -22,15 +22,24 @@ const useStyles = makeStyles((theme) => ({
         bottom: '50px',
         padding: '5px 10px',
         left: '-11px',
-        backgroundColor: 'white',
-        boxShadow: '0 2px 10px -2px grey',
+        borderRadius: 5,
+        backgroundColor: props =>
+        props.backgroundColor
+        ?props.backgroundColor
+        :'#fff',
+        boxShadow: '0px -3px 6px 0px #cccccc1a',
         '&::before': {
             content: '" "',
             position: 'absolute',
             display: 'block',
             bottom: '-7px',
             border: '8px solid #fff',
-            borderColor: 'transparent transparent #fff #fff',
+            // borderColor: transparent,
+            // borderColor: 'transparent transparent #fff #fff',
+            borderColor: props =>
+                props.backgroundColor
+                ?`transparent ${props.backgroundColor} ${props.backgroundColor} transparent`
+                :'transparent',
             '-webkit-transform': 'translateX(-50%) rotate(315deg)',
             transform: 'translateX(-50%) rotate(315deg)',
             boxShadow: '-2px 2px 3px rgba(57, 73, 76, 0.1)',
@@ -49,7 +58,10 @@ const useStyles = makeStyles((theme) => ({
             content: '"\\2713"',
             left: '4px',
             position: 'relative',
-            color: '#fff',
+            color: props =>
+            props.defaultColor
+            ?theme.palette.getContrastText(props.defaultColor)
+            :'#fff'
         }
     }
     // end

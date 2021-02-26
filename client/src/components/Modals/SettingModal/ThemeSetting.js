@@ -6,7 +6,6 @@ import {
 import {CustomThemeContext} from '../../../themes/cutomThemeProvider';
 const ThemeSetting = () => {
     const contextValue = useContext(CustomThemeContext);
-    console.log(CustomThemeContext,contextValue)
     const [checked, setChecked] = useState(false);
 
     useEffect(() => {
@@ -40,7 +39,7 @@ const ThemeSetting = () => {
                         inputProps={{ 'aria-label': 'secondary checkbox' }}
                     />
                 </Grid>
-                <Grid item>Dard</Grid>
+                <Grid item>Dark</Grid>
             </Grid>
         </div>
     )

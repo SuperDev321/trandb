@@ -30,7 +30,6 @@ const useStyles = makeStyles((theme) => ({
         overflow: 'hidden',
         display: 'flex',
         alignItems: 'center',
-        color: theme.palette.menu.color
     },
     cardRoot: {
         width: 200,

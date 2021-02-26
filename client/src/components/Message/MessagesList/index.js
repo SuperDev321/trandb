@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useContext } from 'react';
 import propTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
 import ClientMessage from '../ClientMessage';
 import SystemMessage from '../SystemMessage';
-
+import {CustomThemeContext} from '../../../themes/cutomThemeProvider';
 
 const useStyles =  makeStyles((theme) => ({
     root: {
@@ -45,7 +45,7 @@ const MessagesList = ({ users, messages, role, userAction, roomName, changeMuteS
     addOrOpenPrivate }) => {
     const messagesRef = useRef();
     const classes = useStyles();
-
+    const {currentTheme} = useContext(CustomThemeContext);
     const [currentItems, setCurrentItems] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -80,7 +80,7 @@ const MessagesList = ({ users, messages, role, userAction, roomName, changeMuteS
             return {username};
         }
     }
-
+    const defaultColor = currentTheme === 'normal'? '#000': '#fff';
     useEffect(() => {
         const handleScroll = () => {
             if(messagesRef.current.scrollHeight + messagesRef.current.scrollTop - messagesRef.current.clientHeight <= 2) {
@@ -118,6 +118,7 @@ const MessagesList = ({ users, messages, role, userAction, roomName, changeMuteS
                             roomName={roomName}
                             role={role}
                             message={{_id, from, msg, date, color, bold, messageType}} font_size={10}
+                            defaultColor={defaultColor}
                             changeMuteState={changeMuteState}
                             sendPokeMessage={sendPokeMessage}
                             kickUser={kickUser}

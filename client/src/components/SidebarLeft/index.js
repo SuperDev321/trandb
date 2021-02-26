@@ -7,6 +7,7 @@ import {
 import SearchIcon from '@material-ui/icons/Search'
 import OnlineUser from '../OnlineUser';
 import BroadcastSetting from '../Broadcast/BroadcastSettingModal';
+import SeparateLine from '../SeparateLine';
 import { useTranslation } from 'react-i18next';
 
 const useStyles = makeStyles((theme) => ({
@@ -16,7 +17,8 @@ const useStyles = makeStyles((theme) => ({
         display: 'flex',
         flexDirection: 'column',
         background: theme.palette.menu.background,
-        fontSize: '0.85rem'
+        fontSize: '0.85rem',
+        color: theme.palette.textColor.main
     },
     cameraBtn: {
         borderRadius: '0px',
@@ -24,7 +26,7 @@ const useStyles = makeStyles((theme) => ({
         background: theme.palette.primary.main,
     },
     roomInfo: {
-        color: theme.palette.primary.main,
+        // color: theme.palette.primary.main,
         height: 40,
         padding: '0 20px',
         display: 'flex',
@@ -34,12 +36,12 @@ const useStyles = makeStyles((theme) => ({
         fontSize: 22,
         fontWeight: 'bold',
         paddingRight: 10,
-        color: theme.palette.menu.color
+        // color: theme.palette.menu.color
     },
     usersCount: {
         fontSize: 20,
         lineHeight: 1,
-        color: theme.palette.menu.color
+        // color: theme.palette.menu.color
     },
     list: {
         padding: '0',
@@ -58,7 +60,7 @@ const useStyles = makeStyles((theme) => ({
     search: {
         position: 'relative',
         borderRadius: theme.shape.borderRadius,
-        backgroundColor: fade(theme.palette.common.white, 0.15),
+        backgroundColor: theme.palette.placeHolder,
         width: '100%',
         boxShadow: '0 0 0px 1px #0000002b',
         color: theme.palette.menu.color
@@ -124,12 +126,12 @@ const SideBarLeft = ({ roomName, username, mutes, unReadInfo, changeMuteState, s
     return (
         <div className={classes.root}>
             <BroadcastSetting users={users} className={classes.cameraBtn}/>
-            <Divider />
+            <SeparateLine />
             <div className={classes.roomInfo}>
                 <span className={classes.roomName}>{roomName}</span>
                 <span className={classes.usersCount}>{users&& `(${users.length})`}</span>
             </div>
-            <Divider />
+            <SeparateLine />
             <div  className={classes.list}>
                 { sideUsers &&
                         sideUsers.map((user, index)=>(

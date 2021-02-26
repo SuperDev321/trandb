@@ -3,6 +3,7 @@ import ReactPlayer from 'react-player'
 import ChatForm from '../ChatForm';
 import {UserContext} from '../../context';
 import MessagesList from '../Message/MessagesList';
+import SeparateLine from '../SeparateLine';
 import { makeStyles } from '@material-ui/styles';
 import IconButton from '@material-ui/core/IconButton';
 import {
@@ -133,7 +134,9 @@ const ChatRoom = ({roomName, users, messages, mutes, sendMessage, changeMuteStat
                     }
                 </div>
             </div>
+            <SeparateLine />
             <ChatForm username={username} roomName={roomName} type="public" sendMessage={sendMessage}/>
+            <SeparateLine />
         </div>
     );
 };
