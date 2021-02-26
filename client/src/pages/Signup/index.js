@@ -17,25 +17,13 @@ import {
 } from '@material-ui/core';
 import { makeStyles, withStyles } from '@material-ui/core/styles';
 import { green, red } from '@material-ui/core/colors';
-
+import {useTranslation} from 'react-i18next';
 import {UserContext} from '../../context';
 import { handleSignup } from '../../utils';
 import CustomTextField from '../../components/CustomTextField';
 import OutlinedButton from '../../components/OutlinedButton';
 
-const validationSchema = yup.object({
-    username: yup
-    .string('Enter your nick name.')
-    .required('username is required'),
-    email: yup
-    .string('Enter your email')
-    .email('Enter a valid email')
-    .required('Email is required'),
-    password: yup
-    .string('Enter your password')
-    .min(8, 'Password should be of minimum 8 characters length')
-    .required('Password is required'),
-});
+
 const useStyles = makeStyles((theme) => ({
     root: {
         paddingTop: theme.spacing(8),
@@ -113,7 +101,20 @@ const SignUp = () => {
     const history = useHistory();
     const { setAuth } = useContext(UserContext);
     const classes = useStyles();
-   
+    const {t} = useTranslation();
+    const validationSchema = yup.object({
+        username: yup
+        .string('Enter your nick name.')
+        .required(t('LoginPage.error_username')),
+        email: yup
+        .string('Enter your email')
+        .email('Enter a valid email')
+        .required(t('LoginPage.error_email')),
+        password: yup
+        .string('Enter your password')
+        .min(8, 'Password should be of minimum 8 characters length')
+        .required(t('LoginPage.error_password')),
+    });
     const formik = useFormik({
         initialValues: {
             username: '',
@@ -126,7 +127,7 @@ const SignUp = () => {
             handleSignup(values, () => {setAuth(true); history.push('/')}, message.error);
         },
     });
-
+    
     return (
         <Container component="main" className={classes.root} maxWidth="xs">
         <CssBaseline />
@@ -135,7 +136,7 @@ const SignUp = () => {
             <LockOutlinedIcon />
             </Avatar> */}
             <Typography component="h1" variant="h5" className={classes.headerText}>
-            Sign up
+            {t('LoginPage.sign_up')}
             </Typography>
             <form className={classes.form} noValidate onSubmit={formik.handleSubmit}>
                 <Grid container spacing={2}>
@@ -145,7 +146,7 @@ const SignUp = () => {
                         name="username"
                         fullWidth
                         id="username"
-                        label="Username"
+                        label={t('LoginPage.username')}
                         className={classes.textField}
                         // InputProps={{
                         //     className: classes.input,
@@ -168,7 +169,7 @@ const SignUp = () => {
                     <CustomTextField
                         fullWidth
                         id="email"
-                        label="Email Address"
+                        label={t('LoginPage.email')}
                         name="email"
                         autoComplete="off"
                         value={formik.values.email}
@@ -182,10 +183,9 @@ const SignUp = () => {
                     <CustomTextField
                         fullWidth
                         name="password"
-                        label="Password"
+                        label={t('LoginPage.password')}
                         type="password"
                         id="password"
-                        autoComplete="current-password"
                         value={formik.values.password}
                         onBlur={formik.handleBlur}
                         onChange={formik.handleChange}
@@ -196,8 +196,8 @@ const SignUp = () => {
                     <Grid item xs={12}>
                     <FormControl component="fieldset">
                     <RadioGroup row aria-label="gender" name="gender" value={formik.values.gender} onChange={formik.handleChange}>
-                        <FormControlLabel value="female" control={<RedRadio />} label="Female" />
-                        <FormControlLabel value="male" control={<GreenRadio />} label="Male" />
+                        <FormControlLabel value="female" control={<RedRadio />} label={t('LoginPage.female')} />
+                        <FormControlLabel value="male" control={<GreenRadio />} label={t('LoginPage.male')} />
                     </RadioGroup>
                     </FormControl>
                     </Grid>
@@ -209,7 +209,7 @@ const SignUp = () => {
                         color="primary"
                         className={classes.submit}
                     >
-                        Sign Up
+                        {t('LoginPage.sign_up')}
                     </OutlinedButton>
                 </div>
                
@@ -222,7 +222,7 @@ const SignUp = () => {
                         variant="body2"
                         onClick={() => history.push('/login')}
                     >
-                        Already have an account? Sign in
+                        {t('LoginPage.already_login')}
                     </Link>
                 </Grid>
             </Grid>

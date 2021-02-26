@@ -5,6 +5,7 @@ import { useHistory } from 'react-router-dom';
 import { makeStyles } from '@material-ui/styles';
 import { Card, CardContent, CardMedia, CardActions, Button } from '@material-ui/core';
 import PeopleIcon from '@material-ui/icons/People';
+import { useTranslation } from 'react-i18next';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -39,6 +40,7 @@ const useStyles = makeStyles((theme) => ({
 const RoomExcerpt = ({ name, owner, icon, cover ,description, users }) => {
     const history = useHistory();
     const classes = useStyles();
+    const {t} = useTranslation()
     return (
         <Card
             className={classes.root}
@@ -58,7 +60,7 @@ const RoomExcerpt = ({ name, owner, icon, cover ,description, users }) => {
                         variant="contained"
                         onClick={() =>{history.push(`/rooms/${name}`)}}
                     >
-                        Connect
+                        {t('LandingPage.join')}
                     </Button>
                 </div>
                 <div>

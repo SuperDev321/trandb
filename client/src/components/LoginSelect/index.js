@@ -2,7 +2,7 @@ import React from 'react';
 import { Card } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import OutlinedButton from '../OutlinedButton';
-
+import { useTranslation } from 'react-i18next';
 const useStyles = makeStyles((theme) => ({
     root: {
         background: theme.palette.primary.main,
@@ -20,17 +20,18 @@ const useStyles = makeStyles((theme) => ({
 
 const LoginSelect = ({onSelect}) => {
     const classes = useStyles();
-
+    const { t } = useTranslation();
 
 
     return (
         <Card className={classes.root}>
-            <h2>Please select login mode</h2>
+            <h2>{t('LoginPage.select_mode')}</h2>
             <div className={classes.actionButton} onClick={() => { onSelect(false) }}>
-                <OutlinedButton >Login</OutlinedButton>
+                <OutlinedButton >{t('LoginPage.login')}
+                </OutlinedButton>
             </div>
             <div className={classes.actionButton} onClick={() => { onSelect(true) }}>
-                <OutlinedButton >Guest</OutlinedButton>
+                <OutlinedButton >{t('LoginPage.guest_join_chat')}</OutlinedButton>
             </div>
             
         </Card>

@@ -1,4 +1,4 @@
-import React, { useState, useLayoutEffect } from 'react';
+import React, { useState, useLayoutEffect, useContext, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import {
     AppBar,
@@ -16,8 +16,11 @@ import { makeStyles } from '@material-ui/core/styles';
 import PrivateMails from './PrivateMails';
 import SettingModal from '../Modals/SettingModal';
 
+import { message } from 'antd';
 const useStyles = makeStyles((theme) => ({
     root: {
+    },
+    appBar: {
         flexDirection: 'row',
         display: `flex`,
         justifyContent: `space-between`,
@@ -58,18 +61,19 @@ const useStyles = makeStyles((theme) => ({
         },
     },
 }));
-const HomeLayout = ({children, unReadMsgs, openPrivate}) => {
+const HomeLayout = ({children, unReadMsgs, openPrivate, messageSize, setMessageSize}) => {
+    
     const classes = useStyles();
     const history = useHistory();
     const [frameShow, setFrameShow] = useState(false);
-
+    console.log('home messageSize', messageSize)
     useLayoutEffect(() => {
         setFrameShow(true)
     }, [])
     
     return (
-    <div>
-        <AppBar position="static" className={classes.root}>
+    <div style={{fontSize: messageSize}}>
+        <AppBar position="static" className={classes.appBar}>
             <Toolbar  className={classes.title}>
                 <img
                     src="/img/logo.png"
@@ -77,9 +81,8 @@ const HomeLayout = ({children, unReadMsgs, openPrivate}) => {
                     className={classes.logo}
                     onClick={()=>history.push('/')}
                 />
-                <div className={classes.grow} >{ frameShow ?
+                <div className={classes.grow} >{ frameShow &&
                     <iframe src="https://widget.walla.co.il/fxp4" height="40px" width="100%" frameBorder={0} scrolling="no" />
-                    :<span />
                 }
                 </div>
                 <div className={classes.sectionDesktop}>

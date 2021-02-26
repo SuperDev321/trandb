@@ -43,6 +43,7 @@ const useStyles = makeStyles((theme) => ({
         margin: '4px 3px',
         borderRadius: '50%',
         float: 'left',
+        fontSize: '1rem',
         '&.active::after': {
             // top: '-3px',
             content: '"\\2713"',

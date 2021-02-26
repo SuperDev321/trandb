@@ -23,6 +23,7 @@ import ThemeSetting from './ThemeSetting';
 import MessageSetting from './MessageSetting';
 import {SettingContext} from '../../../context';
 import SoundSetting from './SoundSetting';
+import LanguageSetting from './LanguageSetting';
 
 const StyledDialog = withStyles((theme) => ({
     root: {
@@ -48,13 +49,13 @@ const useStyles = makeStyles((theme) => ({
 
 const SettingModal = () => {
     const {messageSize, setMessageSize, enablePokeSound, setEnablePokeSound, enablePrivateSound, setEnablePrivateSound,
-        enablePublicSound, setEnablePublicSound,
+        enablePublicSound, setEnablePublicSound, language, setLanguage
     } = useContext(SettingContext);
     const [open, setOpen] = useState(false);
     const [page, setPage] = useState(null);
     const classes = useStyles();
     const { enqueueSnackbar, closeSnackbar } = useSnackbar();
-    const {t, i18n} = useTranslation();
+    const {t} = useTranslation();
     const handleClose = () => {
         setOpen(false);
     };
@@ -75,37 +76,47 @@ const SettingModal = () => {
             onClose={handleClose}
             aria-labelledby="responsive-dialog-title"
         >
-            <DialogTitle id="responsive-dialog-title">{t('SettingModal.settings')+(page?`/${page}`:'')}</DialogTitle>
+            <DialogTitle id="responsive-dialog-title">{t('SettingModal.settings')+(page?`/${t('SettingModal.'+page)}`:'')}</DialogTitle>
             <DialogContent>
                 {!page &&
                     <List className={classes.root}>
-                        <ListItem button onClick={()=>setPage('theme')}>
-                            <ListItemText primary="Theme" />
+                        <ListItem button onClick={()=>setPage('themes')}>
+                            <ListItemText primary={t('SettingModal.themes')} />
                         </ListItem>
-                        <ListItem button onClick={()=>setPage('message')}>
-                            <ListItemText primary="Message" />
+                        <ListItem button onClick={()=>setPage('languages')}>
+                            <ListItemText primary={t('SettingModal.languages')} />
                         </ListItem>
-                        <ListItem button onClick={()=>setPage('sound')}>
-                            <ListItemText primary="Sound" />
+                        <ListItem button onClick={()=>setPage('messages')}>
+                            <ListItemText primary={t('SettingModal.messages')} />
+                        </ListItem>
+                        <ListItem button onClick={()=>setPage('notifications')}>
+                            <ListItemText primary={t('SettingModal.notifications')}/>
                         </ListItem>
                     </List>
                 }
-                {page === 'theme' ?
+                {page === 'themes' ?
                     <ThemeSetting />:null
                 }
-                {page === 'message' ?
+                {page === 'languages' ?
+                    <LanguageSetting
+                        language={language}
+                        setLanguage={setLanguage}
+                    />:null
+                }
+                {page === 'messages' ?
                     <MessageSetting messageSize={messageSize} setMessageSize={setMessageSize} />: null
                 }
-                {page === 'sound' ?
+                {page === 'notifications' ?
                     <SoundSetting
-                    enablePokeSound={enablePokeSound}
-                    setEnablePokeSound={setEnablePokeSound}
-                    enablePrivateSound={enablePrivateSound}
-                    setEnablePrivateSound={setEnablePrivateSound}
-                    enablePublicSound={enablePublicSound}
-                    setEnablePublicSound={setEnablePublicSound}
+                        enablePokeSound={enablePokeSound}
+                        setEnablePokeSound={setEnablePokeSound}
+                        enablePrivateSound={enablePrivateSound}
+                        setEnablePrivateSound={setEnablePrivateSound}
+                        enablePublicSound={enablePublicSound}
+                        setEnablePublicSound={setEnablePublicSound}
                     />: null
                 }
+                
             </DialogContent>
         </StyledDialog>
         </>

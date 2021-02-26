@@ -1,6 +1,6 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useContext } from 'react';
 import { useParams } from 'react-router-dom';
-
+import {SettingContext} from '../../context';
 import { HomeLayout } from '../../components';
 // import { makeStyles } from '@material-ui/styles';
 import {
@@ -10,6 +10,7 @@ import ChatRooms from '../../components/ChatRooms';
 
 const ChattingRoom = () => {
     const { room } = useParams();
+    const {messageSize, setMessageSize} = useContext(SettingContext);
     const [unReadMsgs, setUnReadMsgs] = useState([]);
     const chatRef = useRef();
     const addUnReadMsg = ({from, msg}) => {
@@ -27,7 +28,7 @@ const ChattingRoom = () => {
         chatRef.current.openPrivate(user);
     }
     return (
-        <HomeLayout unReadMsgs={unReadMsgs} openPrivate={openPrivate}>
+        <HomeLayout messageSize={messageSize} setMessageSize={setMessageSize}>
             <CssBaseline />
             <ChatRooms ref={chatRef} room={room} addUnReadMsg={addUnReadMsg}
             //  readMsg={readMsg}

@@ -14,6 +14,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import axios from 'axios';
 import {UserContext} from '../../context';
 import { message } from 'antd';
+import { useTranslation } from 'react-i18next';
 
 const useStyles = makeStyles((theme) => ({
     avatar: {
@@ -39,7 +40,7 @@ const useStyles = makeStyles((theme) => ({
 export default function AppMenu() {
     // const [anchorEl, setAnchorEl] = React.useState(null);
     const classes = useStyles();
-
+    const {t} = useTranslation()
     // const handleClick = (event) => {
     //     setAnchorEl(event.currentTarget);
     // };
@@ -122,8 +123,8 @@ export default function AppMenu() {
                             id="menu-list-grow"
                             onKeyDown={handleListKeyDown}
                         >
-                            <MenuItem onClick={handleClickProfile}>Profile</MenuItem>
-                            <MenuItem onClick={logout}>Log out</MenuItem>
+                            <MenuItem onClick={handleClickProfile}>{t('global.profile')}</MenuItem>
+                            <MenuItem onClick={logout}>{t('global.logout')}</MenuItem>
                         </MenuList>
                     </ClickAwayListener>
                 </Paper>

@@ -15,10 +15,10 @@ export const CustomThemeContext = React.createContext(
 
 const CustomThemeProvider = (props) => {
   // eslint-disable-next-line react/prop-types
-  const { children } = props
+  const { children, defaultTheme } = props
 
   // Read current theme from localStorage or maybe from an api
-  const currentTheme = localStorage.getItem('appTheme') || 'normal'
+  const currentTheme = defaultTheme || localStorage.getItem('appTheme') || 'normal'
 
   // State to hold the selected theme name
   const [themeName, _setThemeName] = useState(currentTheme)

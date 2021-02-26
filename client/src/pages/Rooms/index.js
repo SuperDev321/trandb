@@ -4,7 +4,7 @@ import { FormControlLabel, Checkbox, Container, Button } from '@material-ui/core
 import { RoomsList, PublicLayout, Loading } from '../../components';
 import { makeStyles } from '@material-ui/styles';
 import {UserContext} from '../../context';
-
+import {useTranslation} from 'react-i18next';
 import { getRooms } from '../../utils';
 import './style.css';
 
@@ -24,7 +24,7 @@ const Rooms = () => {
     const [error, setError] = useState('');
     const [showEmpty, setShowEmpty] = useState(false);
     const history = useHistory();
-
+    const {t} = useTranslation();
     useEffect(() => {
         getRooms((data) => {
             setLoading(false);
@@ -51,7 +51,7 @@ const Rooms = () => {
                     name="showEmpty"
                     onChange={(e)=> setShowEmpty(e.target.checked)}
                     color="primary"/>}
-                label="Show Empty Rooms"
+                    label={t('JoinRoomModal.show_empty_room')}
             />
             { (role !=='guest') && (auth) &&
                 <Button
@@ -60,7 +60,7 @@ const Rooms = () => {
                 variant="contained"
                 className={classes.roomButton}
                 onClick={() => { history.push('/room/create')}}
-            >Create Room</Button>
+            >{t('JoinRoomModal.create_room')}</Button>
             }
             </div>
             {rooms &&

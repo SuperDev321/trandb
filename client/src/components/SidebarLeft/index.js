@@ -7,6 +7,7 @@ import {
 import SearchIcon from '@material-ui/icons/Search'
 import OnlineUser from '../OnlineUser';
 import BroadcastSetting from '../Broadcast/BroadcastSettingModal';
+import { useTranslation } from 'react-i18next';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -95,6 +96,7 @@ const SideBarLeft = ({ roomName, username, mutes, unReadInfo, changeMuteState, s
     const [searchText, setSearchText] = useState('');
     const [sideUsers, setSideUsers] = useState([]);
     const [role, setRole] = useState(null);
+    const {t} = useTranslation();
 
     useEffect(() => {
         let me = users.find((item) => (item.username === username));
@@ -154,7 +156,7 @@ const SideBarLeft = ({ roomName, username, mutes, unReadInfo, changeMuteState, s
                 <SearchIcon />
                 </div>
                 <InputBase
-                    placeholder="Search…"
+                    placeholder={t('SidebarLeft.search')}
                     classes={{
                         root: classes.inputRoot,
                         input: classes.inputInput,

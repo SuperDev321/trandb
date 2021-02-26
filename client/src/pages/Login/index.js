@@ -172,7 +172,7 @@ const Login = () => {
                 { !guest ?
                     <Card className={classes.card}>
                         <Typography component="h1" variant="h5">
-                        {t('LoginPage.sign_in')}
+                        {t('LoginPage.login')}
                         </Typography>
                         <Typography className={classes.error}>{error}</Typography>
                         <form className={classes.form} noValidate onSubmit={loginFormik.handleSubmit}>
@@ -214,7 +214,7 @@ const Login = () => {
                                     color="primary"
                                     className={classes.submit}
                                 >
-                                    {t('LoginPage.sign_in')}
+                                    {t('LoginPage.login')}
                                 </OutlinedButton>
                                 <OutlinedButton
                                     variant="contained"
@@ -265,8 +265,8 @@ const Login = () => {
                                 <Grid item xs={12}>
                                     <FormControl component="fieldset">
                                     <RadioGroup row aria-label="gender" name="gender" value={guestFormik.values.gender} onChange={guestFormik.handleChange}>
-                                        <FormControlLabel value="female" control={<RedRadio />} label="Female" />
-                                        <FormControlLabel value="male" control={<GreenRadio />} label="Male" />
+                                        <FormControlLabel value="female" control={<RedRadio />} label={t('LoginPage.female')} />
+                                        <FormControlLabel value="male" control={<GreenRadio />} label={t('LoginPage.male')} />
                                     </RadioGroup>
                                     </FormControl>
                                 </Grid>
