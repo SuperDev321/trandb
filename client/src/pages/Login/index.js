@@ -243,7 +243,7 @@ const Login = () => {
                     :
                     <Card className={classes.card}>
                         <Typography component="h1" variant="h5">
-                            {t('LoginPage.guest_sign')}
+                            {t('LoginPage.guest_join_chat')}
                         </Typography>
                         <Typography className={classes.error}>{error}</Typography>
                         <form className={classes.form} noValidate onSubmit={guestFormik.handleSubmit}>
@@ -278,7 +278,7 @@ const Login = () => {
                                     color="primary"
                                     className={classes.submit}
                                 >
-                                    {t('LoginPage.guest_sign')}
+                                    {t('LoginPage.login')}
                                 </OutlinedButton>
                                 <OutlinedButton
                                     variant="contained"
