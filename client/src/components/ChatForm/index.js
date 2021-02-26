@@ -61,7 +61,7 @@ const ChatForm = ({roomName, to, sendMessage, onFocus, onBlur, type}) => {
         }
     }
     const defaultColor = currentTheme === 'normal'? '#000': '#fff';
-    const colorPickBackground = currentTheme === 'normal'? '#000': '#263238';
+    const colorPickBackground = currentTheme === 'normal'? '#fff': '#263238';
 
     const handleOnEnter = () => {
         let realMsg = msg.trim();
