@@ -7,7 +7,7 @@ import useStyles from './styles'
 import { useEffect } from 'react';
 
 const colorPanels = [
-    '#212121',
+    'default',
     '#656565',
     '#800080',
     '#6f4341',
@@ -34,12 +34,12 @@ const colorPanels = [
     '#33CC66',
     '#660000',
     '#6666FF',
-    '#089dec',
+    '#820082',
 ];
 
-const ColorPicker = ({userColor, setUserColor}) => {
+const ColorPicker = ({userColor, setUserColor, defaultColor, backgroundColor}) => {
     // my code start
-    const classes = useStyles();
+    const classes = useStyles({defaultColor, backgroundColor});
     const [colorPanel, setColorPanel] = useState(false);
     
     // end
@@ -65,11 +65,12 @@ const ColorPicker = ({userColor, setUserColor}) => {
     return (
         <>
         <div className={classes.colorArea} onClick={openColorArea}>
-            <div className={classes.userColor} style={{backgroundColor: userColor? userColor: 'black'}}>&nbsp;</div>
+            <div className={classes.userColor} style={{backgroundColor: userColor ==='default'? defaultColor: userColor}}>&nbsp;</div>
                 {colorPanel && <div className={classes.colorPanel}>
                     {colorPanels.map((color, key) => {
                         return (
-                            <div className={`${classes.colorSnap} ${userColor === color ? 'active' : ''}`} style={{backgroundColor: color }}
+                            <div className={`${classes.colorSnap} ${userColor === color ? 'active' : ''}`}
+                            style={{backgroundColor: color === 'default'? defaultColor: color }}
                                 key={key} onClick={() => onSelectColor(color)}>
                             </div>
                         );
