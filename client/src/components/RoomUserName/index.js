@@ -196,14 +196,14 @@ const RoomUserName = ({user, role, roomName,
                             className={classes.cardButton}
                             onClick={ handleClickPrivateChat}
                         >
-                            <QuestionAnswer />&nbsp;{t('UserActionArea.poke')}
+                            <QuestionAnswer />&nbsp;{t('UserActionArea.message')}
                         </Button>
                         <Button size="small" fullWidth
                             color="primary"
                             className={classes.cardButton}
                             onClick={() => {sendPoke()}}
                         >
-                            <Notifications />&nbsp;{t('UserActionArea.message')}
+                            <Notifications />&nbsp;{t('UserActionArea.poke')}
                         </Button>
                         <Divider />
                         { ((role === 'admin' || role === 'owner' || role === 'moderator')
