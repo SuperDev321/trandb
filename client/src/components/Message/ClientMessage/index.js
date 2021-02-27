@@ -17,9 +17,9 @@ emoji.allow_native = false;
 emoji.replace_mode = 'img';// 'unified';
 emoji.use_sheet = true;
 
-const MyMessage = ({user, roomName, message, role, font_size, userAction, changeMuteState, sendPokeMessage, 
+const MyMessage = ({user, roomName, message, defaultColor, role, font_size, userAction, changeMuteState, sendPokeMessage, 
   kickUser, banUser, addOrOpenPrivate}) => {
-  const classes = useStyles({color: message.color, bold: message.bold});
+  const classes = useStyles({color: message.color === 'default' ? defaultColor: message.color, bold: message.bold});
   const { username } = useContext(UserContext);
   const [checked, setChecked] = useState(false);
   const urlify = (text) => {

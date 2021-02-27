@@ -1,4 +1,5 @@
 import { makeStyles } from '@material-ui/core/styles';
+import { BorderColor } from '@material-ui/icons';
 
 const drawerWidth = 240;
 
@@ -11,9 +12,9 @@ const useStyles = makeStyles((theme) => ({
     mainWrapper: {
         flexGrow: 1,
         overflow: 'hidden',
-        margin: '1px',
-        marginBottom: 0,
-        marginRight: 0,
+        // margin: '1px',
+        // marginBottom: 0,
+        // marginRight: 0,
         position: 'relative',
     },
     main: {
@@ -25,10 +26,12 @@ const useStyles = makeStyles((theme) => ({
         width: drawerWidth,
         flexShrink: 0,
         },
-        height: `calc(100vh - 52px)`,
+        height: `calc(100vh - 50px)`,
         background: 'transparent',
         borderRadius: '0px',
-        margin: '1px 0 0 0',
+        // margin: '1px 0 0 0',
+        border: 'solid 1px',
+        borderColor: theme.palette.separate.main
     },
     drawerWrapper: {
         zIndex: '100',
@@ -38,13 +41,15 @@ const useStyles = makeStyles((theme) => ({
             width: drawerWidth,
             flexShrink: 0,
         },
-        height: `calc(100vh - 52px)`,
+        height: `calc(100vh - 50px)`,
         position: 'absolute',
         bottom: '0px',
         right: '0px',
         borderRadius: '0',
         background: 'white',
         zIndex: '100',
+        border: 'solid 1px',
+        borderColor: theme.palette.separate.main
     },
     chatBar: {
         [theme.breakpoints.up('sm')]: {
@@ -53,8 +58,12 @@ const useStyles = makeStyles((theme) => ({
         },
         boxShadow: '1px 1px 0px 0px rgb(0 0 0 / 0%), 0px 1px 0px 0px rgb(0 0 0 / 5%)',
         background: theme.palette.menu.background,
-        height: '50px',
-        color: theme.palette.primary.main,
+        // height: '50px',
+        color: theme.palette.textColor.main,
+        border: 'solid 1px',
+        borderColor: theme.palette.separate.main,
+        borderLeft: 'none',
+        borderRight: 'none',
     },
     chatBarContent: {
         display: 'flex',

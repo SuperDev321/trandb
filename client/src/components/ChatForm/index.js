@@ -10,7 +10,7 @@ import axios from 'axios';
 import config from '../../config';
 import {UserContext} from '../../context';
 import {useTranslation} from 'react-i18next';
-
+import {CustomThemeContext} from '../../themes/cutomThemeProvider';
 
 const ChatForm = ({roomName, to, sendMessage, onFocus, onBlur, type}) => {
     const {role} = useContext(UserContext);
@@ -18,10 +18,10 @@ const ChatForm = ({roomName, to, sendMessage, onFocus, onBlur, type}) => {
     const {t} = useTranslation();
     const [msg, setMsg] = useState('');
     const formRef = useRef(null);
-    const [userColor, setUserColor] = useState(null);
+    const [userColor, setUserColor] = useState('default');
     const [bold, setBold] = useState(false);
     const emoji = new EmojiConvertor();
-    
+    const {currentTheme} = useContext(CustomThemeContext);
     const onFinish = (e) => {
         e.preventDefault();
     };
@@ -60,13 +60,13 @@ const ChatForm = ({roomName, to, sendMessage, onFocus, onBlur, type}) => {
             sendFileMessage(file);
         }
     }
-
+    const defaultColor = currentTheme === 'normal'? '#000': '#fff';
+    const colorPickBackground = currentTheme === 'normal'? '#000': '#263238';
 
     const handleOnEnter = () => {
         let realMsg = msg.trim();
-        let color = userColor? userColor: 'black';
         if(realMsg) {
-            setTimeout(() => {sendMessage(roomName, to, color, realMsg, bold, type, 'general');}, 0);
+            setTimeout(() => {sendMessage(roomName, to, userColor, realMsg, bold, type, 'general');}, 0);
             setMsg('');
         }
     }
@@ -88,7 +88,8 @@ const ChatForm = ({roomName, to, sendMessage, onFocus, onBlur, type}) => {
                 <div className={classes.boldSelector} onClick={() => setBold(!bold)}>
                     <span className={bold?classes.bold: ''}>B</span>
                 </div>
-                <ColorPicker userColor={userColor} setUserColor={setUserColor} />
+                <ColorPicker userColor={userColor} setUserColor={setUserColor}
+                defaultColor={defaultColor} backgroundColor={colorPickBackground} />
                 
                 <InputEmoji
                     value={msg}
@@ -97,7 +98,7 @@ const ChatForm = ({roomName, to, sendMessage, onFocus, onBlur, type}) => {
                     onFocus={onFocus}
                     onBlur={onBlur}
                     onEnter={handleOnEnter}
-                    color={userColor ? userColor: 'black'}
+                    color={userColor === 'default' ? defaultColor: userColor}
                     fontWeight={bold?'bold': 'inherit'}
                     placeholder={t('InputMessage.type_message')}
                 />

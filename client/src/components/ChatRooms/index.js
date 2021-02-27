@@ -23,6 +23,7 @@ import {UserContext, SettingContext} from '../../context';
 import { getSocket, useLocalStorage, isPrivateRoom } from '../../utils';
 import {useAudio} from 'react-use';
 import { useTranslation, withTranslation, Trans } from 'react-i18next';
+import SeparateLine from '../SeparateLine';
 
 const ChatRooms = ({room, addUnReadMsg}, ref) => {
     const classes = useStyles();
@@ -977,6 +978,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                     </div>
                 </main>
             </div>
+            <SeparateLine orientation="vertical" style={{height: 'auto'}} />
         </div>
             {/* <PrivateChat open={openPrivate} setOpen={setOpenPrivate}
                 me={{username, avatar, gender}} to={privateTo} room={currentRoom} messages={privateMessgaes}

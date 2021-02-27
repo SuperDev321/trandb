@@ -14,13 +14,19 @@ const theme = createMuiTheme({
     error: {
       main: red.A400,
     },
-    background: {
-      default: '#0e1a19e8',
+    textColor: {
+      main: '#e5e5e5',
     },
-    placeHolder: '#a7b0b9',
+    separate: {
+      main: '#f0f0f0ab'
+    },
+    background: {
+      default: '#000',
+    },
+    placeHolder: 'rgb(179 221 237 / 15%)',
     emoji: '#c2d2c9',
     menu: {
-      background: '#132322',
+      background: '#000',
       color: '#d5d5d5',
     },
     titleBar: {

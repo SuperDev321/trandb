@@ -467,6 +467,7 @@ function InputEmoji ({
             variant="contained"
             disabled={value.trim()? false: true}
             onClick={onSend}
+            color="primary"
         >
             <SendIcon fontSize="default"/>
         </IconButton>

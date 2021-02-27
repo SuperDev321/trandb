@@ -14,10 +14,16 @@ const theme = createMuiTheme({
     error: {
       main: red.A400,
     },
+    textColor: {
+      main: '#212121'
+    },
+    separate: {
+      main: '#f0f0f0'
+    },
     background: {
       default: '#f5f5f5',
     },
-    placeHolder: '#a0a0a0',
+    placeHolder: '#a0a0a000',
     emoji: '#858585',
     menu: {
       background: 'white',
