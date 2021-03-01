@@ -53,7 +53,8 @@ export default function App() {
 
 
   return (
-    <>{
+    <>
+    {
       loading? null:
       <BrowserRouter>
         <UserContext.Provider value={{ auth, username }}>
@@ -63,7 +64,7 @@ export default function App() {
                 <Route path="/admin/login" component={Login} />
                 {/* <Route path="/register" component={Register} /> */}
                 <PrivateRoute path="/admin" component={Admin} />
-                {/* <Redirect from="/" to="/dashboard" /> */}
+                {/* <Redirect from="/admin" to="admin/dashboard" /> */}
               </Switch>
             </div>
           </ToastProvider>
