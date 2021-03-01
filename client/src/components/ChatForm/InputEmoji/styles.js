@@ -8,7 +8,7 @@ const useStyles = makeStyles((theme) => ({
         // backgroundColor: theme.,
         // border: '1px solid',
         // borderColor: theme.palette.placeHolder,
-        boxShadow: '0 0 0px 1px #0000002b',
+        // boxShadow: '0 0 0px 1px #0000002b',
         borderRadius: '21px',
         margin: '5px 10px',
         boxSizing: 'border-box',

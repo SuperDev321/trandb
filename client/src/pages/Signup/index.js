@@ -158,6 +158,7 @@ const SignUp = () => {
                         // InputLabelProps={{
                         //     className: classes.label,
                         // }}
+                        // onKeyPress={event => {if(!((event.charCode >= 65 && event.charCode <= 90) || (event.charCode >= 97 && event.charCode <= 122))) event.preventDefault()}}
                         value={formik.values.username}
                         onBlur={formik.handleBlur}
                         onChange={formik.handleChange}

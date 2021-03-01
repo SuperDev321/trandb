@@ -22,15 +22,17 @@ import config from '../../../config';
 
 export default function BanModal({open, setOpen, initVal, roomName}) {
     const classes = useStyles();
-    const name = initVal.name?initVal.name: '';
+    // const name = initVal.name?initVal.name: '';
+    const [name, setName] = useState(initVal.name || '');
     const [type, setType] = useState('all');
     const [ip, setIp] = useState(initVal.ip?initVal.ip: '');
     // const [toIp, setToIp] = useState(initVal.ip?initVal.ip: '');
     // const [fromIp, setFromIp] = useState(initVal.ip?initVal.ip: ''); 
     // const [ipSel, setIpSel] = useState(true);
     const socket = getSocket();
+    
     useEffect(() => {
-        if(initVal.name) {
+        if(initVal.name && open) {
             Axios.get(`${config.server_url}/api/users/`+initVal.name+'/ip')
             .then((response) => {
                 if(response.status === 200) {
@@ -38,7 +40,7 @@ export default function BanModal({open, setOpen, initVal, roomName}) {
                 }
             })
         }
-    }, [initVal])
+    }, [open])
     const handleClose = () => {
         setOpen(false);
     };

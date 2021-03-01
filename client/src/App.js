@@ -78,9 +78,7 @@ const App = () => {
                         <Login />
                     </PublicRoute>
                     <PrivateRoute path="/rooms/:room">
-                        
                             <ChattingRoom/>
-                    
                     </PrivateRoute>
                     <PrivateRoute path="/room/create">
                         <CreateRoom />
