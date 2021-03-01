@@ -496,7 +496,6 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
             socket.io.on('reconnect', () => {
                 let roomNames = roomsRef.current.map((room) => (room.name));
                 roomNames.map((roomName) => {
-                    console.log('rejoin room', roomName, )
                     socket.emit('rejoin room',{room: roomName}, (result) => {
                         if(result) {
                             console.log('rejoin success') 

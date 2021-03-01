@@ -5,7 +5,7 @@ const findRoomUsers = async (room, myRole) => {
     if(roomInfo) {
         const owner = roomInfo.owner;
         const moderators = roomInfo.moderators;
-        let liveUserIds = roomInfo.users.map((item) => (item._id));
+        let liveUserIds = roomInfo.users.map((item) => (item));
         const roomUsers = await Users.find({ _id: { $in: liveUserIds? liveUserIds: []  } });
         const usersInfo = roomUsers.map(({ _id, username, gender, role, avatar, ip }) =>{
             // let ip;

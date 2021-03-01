@@ -48,6 +48,10 @@ const PrivateChatList = ({sendMessage, readMsg ,me}, ref) => {
         // leaveFromPrivate(roomName);
     })
     useImperativeHandle(ref, () => ({
+        getPrivateRooms: () => {
+            let rooms = chatList.map((item) => (item.roomName));
+            return rooms;
+        },
         addChat: (to, roomName) => {
             addNewChat(to.username, [], roomName);
         },

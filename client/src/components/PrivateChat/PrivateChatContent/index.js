@@ -37,6 +37,8 @@ const useStyles = makeStyles((theme) => ({
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
+        border: '1px solid',
+        borderColor: theme.palette.primary.main
     },
     header: {
         height: 30,
@@ -81,6 +83,8 @@ const useStyles = makeStyles((theme) => ({
         overflow: 'auto',
         flexGrow: 1,
         position: 'relative',
+        background: theme.palette.background.default,
+        borderBottom: '1px solid '+ theme.palette.primary.main
     },
     hide: {
         display: 'none !important',
