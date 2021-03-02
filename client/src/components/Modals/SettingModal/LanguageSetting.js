@@ -5,7 +5,8 @@ import {
     FormControl,
     InputLabel,
     InputBase,
-    Select
+    Select,
+    MenuItem
 } from '@material-ui/core';
 
 import {CustomThemeContext} from '../../../themes/cutomThemeProvider';
@@ -40,6 +41,8 @@ const BootstrapInput = withStyles((theme) => ({
       borderRadius: 4,
       borderColor: '#80bdff',
       boxShadow: '0 0 0 0.2rem rgba(0,123,255,.25)',
+      backgroundColor: 'white',
+      color: 'black'
     },
   },
 }))(InputBase);
@@ -70,8 +73,8 @@ const LanguageSetting = ({language, setLanguage}) => {
               onChange={handleChange}
               input={<BootstrapInput />}
             >
-              <option value="en" >English</option>
-              <option value={'iw'}>Isarel</option>
+              <MenuItem value="en" >English</MenuItem>
+              <MenuItem value='iw'>Hebrew</MenuItem>
             </Select>
         </FormGroup>
     )

@@ -4,7 +4,7 @@ const { getRooms, getRoomsAdmin, addRoom, deleteRoom, getRoomDetail, checkRoomPe
 const { getPrivateChat, fileUploader } = require('./chats');
 const {addBan, deleteBan, getBans} = require('./bans');
 const {getWords, addWord, deleteWord} = require('./forbiddenWords');
-const {getSetting} = require('./settings');
+const {getSetting, updateSetting} = require('./settings');
 
 module.exports = {
   clientError,
@@ -36,5 +36,6 @@ module.exports = {
   getWords,
   addWord,
   deleteWord,
-  getSetting
+  getSetting,
+  updateSetting
 };

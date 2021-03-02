@@ -60,7 +60,7 @@ const useStyles = makeStyles((theme) => ({
     search: {
         position: 'relative',
         borderRadius: theme.shape.borderRadius,
-        backgroundColor: theme.palette.placeHolder,
+        backgroundColor: theme.palette.inputField,
         width: '100%',
         boxShadow: '0 0 0px 1px #0000002b',
         color: theme.palette.menu.color

@@ -6,12 +6,14 @@ import {
     Dialog,
     DialogActions,
     DialogContent,
-    DialogTitle,
+    // MuiDialogTitle,
     IconButton,
     List,
     ListItem,
-    ListItemText
+    ListItemText,
+    Typography,
 } from '@material-ui/core';
+import MuiDialogTitle from '@material-ui/core/DialogTitle';
 import {
     Settings,
 } from '@material-ui/icons'
@@ -24,6 +26,8 @@ import MessageSetting from './MessageSetting';
 import {SettingContext} from '../../../context';
 import SoundSetting from './SoundSetting';
 import LanguageSetting from './LanguageSetting';
+import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+import CloseIcon from '@material-ui/icons/Close';
 
 const StyledDialog = withStyles((theme) => ({
     root: {
@@ -40,6 +44,38 @@ const StyledDialog = withStyles((theme) => ({
         {...props}
     />
 ));
+
+const styles = (theme) => ({
+    root: {
+        margin: 0,
+        padding: theme.spacing(2),
+    },
+    closeButton: {
+        position: 'absolute',
+        right: theme.spacing(1),
+        top: theme.spacing(1),
+        color: theme.palette.grey[500],
+    },
+});
+  
+const DialogTitle = withStyles(styles)((props) => {
+const { children, classes, onBack, onClose, ...other } = props;
+return (
+    <MuiDialogTitle disableTypography className={classes.root} {...other}>
+    <Typography variant="h6">{children}</Typography>
+    {onBack ? (
+        <IconButton aria-label="close" className={classes.closeButton} onClick={onBack}>
+        <ArrowBackIcon />
+        </IconButton>
+    ) : null}
+    {onClose ? (
+        <IconButton aria-label="close" className={classes.closeButton} onClick={onClose}>
+        <CloseIcon />
+        </IconButton>
+    ) : null}
+    </MuiDialogTitle>
+);
+});
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -59,6 +95,9 @@ const SettingModal = () => {
     const handleClose = () => {
         setOpen(false);
     };
+    const handleClickBack = () => {
+        setPage(null);
+    }
     useEffect(() => {
         if(open) {
             setPage(null)
@@ -76,7 +115,12 @@ const SettingModal = () => {
             onClose={handleClose}
             aria-labelledby="responsive-dialog-title"
         >
-            <DialogTitle id="responsive-dialog-title">{t('SettingModal.settings')+(page?`/${t('SettingModal.'+page)}`:'')}</DialogTitle>
+            <DialogTitle id="responsive-dialog-title"
+                onBack={page && handleClickBack}
+                onClose={!page && handleClose}
+            >
+                {t('SettingModal.settings')+(page?`/${t('SettingModal.'+page)}`:'')}
+            </DialogTitle>
             <DialogContent>
                 {!page &&
                     <List className={classes.root}>

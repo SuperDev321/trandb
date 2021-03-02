@@ -12,7 +12,7 @@ const useStyles = makeStyles((theme) => ({
         },
         color: (props) =>
             props.color
-            ? props.color
+            ? (props.color === 'default')? theme.palette.textColor.main : props.color
             : 'black'
         ,
         

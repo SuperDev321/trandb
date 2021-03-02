@@ -495,8 +495,9 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
 
             socket.io.on('reconnect', () => {
                 let roomNames = roomsRef.current.map((room) => (room.name));
+                let privateRooms = privateListRef.current.getPrivateRooms();
                 roomNames.map((roomName) => {
-                    socket.emit('rejoin room',{room: roomName}, (result) => {
+                    socket.emit('rejoin room',{room: roomName, type: 'public'}, (result) => {
                         if(result) {
                             console.log('rejoin success') 
                         } else {
@@ -505,6 +506,16 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                         
                     })
                 });
+                privateRooms.map((roomName) => {
+                    socket.emit('rejoin room',{room: roomName, type: 'private'}, (result) => {
+                        if(result) {
+                            console.log('rejoin success') 
+                        } else {
+                            console.log('rejoin fail')
+                        }
+                        
+                    })
+                })
                 setOpenDisconnectModal(false)
             })
 

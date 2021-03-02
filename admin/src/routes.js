@@ -24,6 +24,7 @@ import DashboardPage from "Admin/views/Dashboard/Dashboard.js";
 import Rooms from "Admin/views/Room/Room.js";
 import Ban from "Admin/views/Ban/Ban.js";
 import Words from 'Admin/views/Forbidden'
+import Setting from 'Admin/views/Setting'
 
 const dashboardRoutes = [
   {
@@ -52,6 +53,13 @@ const dashboardRoutes = [
     name: "Forbidden words",
     icon: AssistantIcon,
     component: Words,
+    layout: "/admin"
+  },
+  {
+    path: "/setting",
+    name: "Setting",
+    icon: AssistantIcon,
+    component: Setting,
     layout: "/admin"
   },
 ];

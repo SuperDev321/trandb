@@ -19,13 +19,13 @@ const CustomThemeProvider = (props) => {
 
   // Read current theme from localStorage or maybe from an api
   const currentTheme =  localStorage.getItem('appTheme') || defaultTheme || 'normal'
-
+  console.log(currentTheme, defaultTheme)
   // State to hold the selected theme name
   const [themeName, _setThemeName] = useState(currentTheme)
 
   // Retrieve the theme object by theme name
-  const theme = getTheme(themeName)
-
+  const theme = getTheme(currentTheme)
+  console.log(theme, themeName)
   // Wrap _setThemeName to store new theme names in localStorage
   const setThemeName = (name) => {
     localStorage.setItem('appTheme', name)

@@ -10,7 +10,7 @@ const updateRoomGeneral = async (req, res, next) => {
     let user_id = user._id;
     let role = user.role;
     let room = await Rooms.findById(_id);
-    if(room && room.owner.equals(user_id)) {
+    if(room && room.owner.equals(user_id) || role === 'admin') {
       await Rooms.updateOne({_id}, {category, description, welcomeMessage, password, maxUsers});
       res
       .status(202)
