@@ -5,6 +5,7 @@ import {
     Grid,
     Slider
 } from '@material-ui/core';
+import {useTranslation} from 'react-i18next';
 import {CustomThemeContext} from '../../../themes/cutomThemeProvider';
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -44,7 +45,7 @@ const PrettoSlider = withStyles({
 const MessageSetting = ({messageSize, setMessageSize}) => {
     const classes = useStyles();
     const [value, setValue] = React.useState(30);
-
+    const { t } = useTranslation();
     const handleChange = (event, newValue) => {
         console.log(value)
         setValue(newValue);
@@ -55,7 +56,7 @@ const MessageSetting = ({messageSize, setMessageSize}) => {
         <div className={classes.root}>
             <Grid container alignItems="center" spacing={0}>
                 <Grid item xs={12} spacing={5}>
-                    <span>Message Size</span>
+                    <span>{t('SettingModal.message_size')}</span>
                 </Grid>
                 <Grid item xs={12} spacing={5}>
                     <PrettoSlider value={(messageSize-10)*5} onChange={handleChange} aria-labelledby="continuous-slider" />

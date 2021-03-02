@@ -10,6 +10,7 @@ import {
 } from '@material-ui/core';
 
 import {CustomThemeContext} from '../../../themes/cutomThemeProvider';
+import { useTranslation } from 'react-i18next';
 const BootstrapInput = withStyles((theme) => ({
   root: {
     'label + &': {
@@ -58,7 +59,7 @@ const useStyles = makeStyles((theme) => ({
 }))
 const LanguageSetting = ({language, setLanguage}) => {
     const classes = useStyles();
-    
+    const { t } = useTranslation();
     const handleChange = (e) => {
       setLanguage(e.target.value);
     }
@@ -66,15 +67,15 @@ const LanguageSetting = ({language, setLanguage}) => {
 
     return (
         <FormGroup className={classes.root}>
-            <InputLabel className={classes.label}>Select Language</InputLabel>
+            <InputLabel className={classes.label}>{t('SettingModal.select_lan')}</InputLabel>
             <Select
               className={classes.select}
               value={language}
               onChange={handleChange}
               input={<BootstrapInput />}
             >
-              <MenuItem value="en" >English</MenuItem>
-              <MenuItem value='iw'>Hebrew</MenuItem>
+              <MenuItem value="en" >{t('SettingModal.english')}</MenuItem>
+              <MenuItem value='iw'>{t('SettingModal.hebrew')}</MenuItem>
             </Select>
         </FormGroup>
     )

@@ -543,27 +543,27 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
     // add a new room to chat area
     const addRoom = async (room, callback) => {
         let roomNames = await roomsRef.current.map((oneRoom) => (oneRoom.name));
-            if(room && roomNames && !roomNames.includes(room)) {
-                isPrivateRoom(room, ({isPrivate}) => {
-                    if(isPrivate) {
-                        setRoomNameForPassword(room);
-                        setOpenPasswordModal(true);
-                    } else {
-                        socket.emit('join room', { room }, (result, message) => {
-                            if(result) {
-                                
-                            } else {
-                                enqueueSnackbar(message, {variant: 'error'})
-                            }
-                        });
-                    }
-                }, (err) => {
-                    console.log(err);
-                })
-            // socket.emit('join room', { room });
+        if(room && roomNames && !roomNames.includes(room)) {
+            isPrivateRoom(room, ({isPrivate}) => {
+                if(isPrivate) {
+                    setRoomNameForPassword(room);
+                    setOpenPasswordModal(true);
+                } else {
+                    socket.emit('join room', { room }, (result, message) => {
+                        if(result) {
+                            
+                        } else {
+                            enqueueSnackbar(message, {variant: 'error'})
+                        }
+                    });
+                }
+            }, (err) => {
+                console.log(err);
+            })
+        // socket.emit('join room', { room });
             callback(true);
         } else {
-            callback(false);
+            callback(false, 'already_entered');
         }
     }
     // remove a room from chat area

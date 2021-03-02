@@ -18,6 +18,8 @@ import AddIcon from '@material-ui/icons/Add';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import { useTheme } from '@material-ui/core/styles';
 import { getRooms } from '../../../utils';
+import { useTranslation } from 'react-i18next';
+import { useSnackbar } from 'notistack';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -29,7 +31,9 @@ const useStyles = makeStyles((theme) => ({
     button: {
         margin: '0 10px',
         // borderRadius: '0',
-        height: '30px'
+        height: '30px',
+        color: theme.palette.primary.tab,
+        borderColor: theme.palette.primary.tab,
     },
 }));
 
@@ -39,7 +43,8 @@ export default function AddRoomModal({addRoom}) {
     const [rooms, setRooms] = useState(null);
     const theme = useTheme();
     const fullScreen = useMediaQuery(theme.breakpoints.down('xs'));
-
+    const { t } = useTranslation();
+    const { enqueueSnackbar } = useSnackbar();
     const handleClickOpen = () => {
         setOpen(true);
     };
@@ -53,7 +58,10 @@ export default function AddRoomModal({addRoom}) {
             if(result) {
                 setOpen(false);
             } else {
-                setOpen(false)
+                setOpen(false);
+                if(message === 'already_entered') {
+                    enqueueSnackbar(t('AddRoomModal.error1'), {variant: 'error'});
+                }
             }
         }); 
     }
@@ -86,7 +94,7 @@ export default function AddRoomModal({addRoom}) {
             onClose={handleClose}
             aria-labelledby="responsive-dialog-title"
         >
-            <DialogTitle id="responsive-dialog-title">{"Add a room"}</DialogTitle>
+            <DialogTitle id="responsive-dialog-title">{t('AddRoomModal.add_room')}</DialogTitle>
             <DialogContent>
             <List dense className={classes.root}>
             {rooms && rooms.map((room, index) => {

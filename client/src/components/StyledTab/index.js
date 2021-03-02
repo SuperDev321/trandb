@@ -36,7 +36,7 @@ const StyledTab = withStyles((theme) => ({
         fontWeight: theme.typography.fontWeightRegular,
         fontSize: theme.typography.pxToRem(15),
         height: '30px',
-        // border: '1px solid',
+        border: '1px solid',
         minHeight: '10px',
         minWidth: '0px',
         padding: '0px',
@@ -44,6 +44,8 @@ const StyledTab = withStyles((theme) => ({
         borderRadius: 4,
         paddingLeft: 10,
         paddingRight: 10,
+        color: theme.palette.primary.tab,
+        borderColor: theme.palette.primary.tab,
     },
     selected: {
         color: 'white',

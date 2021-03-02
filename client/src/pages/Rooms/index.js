@@ -51,7 +51,7 @@ const Rooms = () => {
                     name="showEmpty"
                     onChange={(e)=> setShowEmpty(e.target.checked)}
                     color="primary"/>}
-                    label={t('JoinRoomModal.show_empty_room')}
+                    label={t('AddRoomModal.show_empty_room')}
             />
             { (role !=='guest') && (auth) &&
                 <Button

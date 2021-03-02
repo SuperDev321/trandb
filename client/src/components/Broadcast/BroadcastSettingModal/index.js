@@ -16,6 +16,7 @@ import {
 } from '@material-ui/core';
 import TextField from '@material-ui/core/TextField';
 import VideocamIcon from '@material-ui/icons/Videocam';
+import { useTranslation } from 'react-i18next';
 const drawerWidth = 240;
 const useStyles = makeStyles((theme) => ({
     cameraBtn: {
@@ -32,7 +33,7 @@ export default function BroadcastSetting({users}) {
     const [open, setOpen] = useState(false);
     const [devices, setDevices] = useState(null);
     const [usersState, setUsersState] = useState(null);
-
+    const { t } = useTranslation();
     const handleClickOpen = () => {
         // console.log('users', users)
         setOpen(true);
@@ -100,7 +101,7 @@ export default function BroadcastSetting({users}) {
                 variant="contained"
                 onClick={handleClickOpen}
                 className={classes.cameraBtn}
-            >Turn on my camera
+            >{t('SidebarLeft.start_broadcasting')}
                 &nbsp;
                 <VideocamIcon />
         </Button>
