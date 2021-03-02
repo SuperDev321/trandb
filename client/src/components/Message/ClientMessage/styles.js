@@ -40,8 +40,8 @@ const useStyles = makeStyles((theme) => ({
         display: 'flex',
         flexDirection: 'row',
         alignItems: 'baseline',
-        fontSize: '0.95em',
-        lineHeight: 1.8
+        fontSize: '1em',
+        lineHeight: 1
     },
     time: {
         font: 'italic 0.8em sans-serif',
@@ -51,7 +51,7 @@ const useStyles = makeStyles((theme) => ({
     },
     text: {
         margin: 0,
-        fontSize: '1.15em',
+        fontSize: '1em',
         '& img.photo': {
           maxWidth: '250px !important',
           width:' auto !important',

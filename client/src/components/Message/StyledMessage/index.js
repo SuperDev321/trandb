@@ -32,10 +32,10 @@ const useStyles = makeStyles((theme) => ({
             : 'flex-end'
     },
     message: {
-        background: grey[100],
+        background: '#17171829',
         color: (props) => 
         props.color
-        ?props.color
+        ?(props.color === 'default'? theme.palette.textColor.main: props.color)
         :theme.palette.getContrastText(grey[100]),
         fontSize: '0.9rem',
         fontWeight: (props) =>
@@ -54,7 +54,7 @@ const useStyles = makeStyles((theme) => ({
             height: 20,
             verticalAlign: 'bottom'
         },
-        boxShadow: '0 0 6px 1px #00000052',
+        boxShadow: '0 0 0px 1px #a0a0a0b5',
     },
     date: {
         fontSize: 12

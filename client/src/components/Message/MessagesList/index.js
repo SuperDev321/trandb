@@ -4,6 +4,8 @@ import { makeStyles } from '@material-ui/core/styles';
 import ClientMessage from '../ClientMessage';
 import SystemMessage from '../SystemMessage';
 import {CustomThemeContext} from '../../../themes/cutomThemeProvider';
+import { SettingContext } from '../../../context';
+import { message } from 'antd';
 
 const useStyles =  makeStyles((theme) => ({
     root: {
@@ -46,6 +48,7 @@ const MessagesList = ({ users, messages, role, userAction, roomName, changeMuteS
     const messagesRef = useRef();
     const classes = useStyles();
     const {currentTheme} = useContext(CustomThemeContext);
+    const {messageNum} = useContext(SettingContext);
     const [currentItems, setCurrentItems] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -81,20 +84,26 @@ const MessagesList = ({ users, messages, role, userAction, roomName, changeMuteS
         }
     }
     const defaultColor = currentTheme === 'normal'? '#000': '#fff';
-    useEffect(() => {
-        const handleScroll = () => {
-            if(messagesRef.current.scrollHeight + messagesRef.current.scrollTop - messagesRef.current.clientHeight <= 2) {
-                addItems();
-            }
-        }
-        messagesRef.current.addEventListener('scroll', handleScroll)
-        return () => messagesRef.current.removeEventListener('scroll', handleScroll)
-    }, [currentItems])
+    // useEffect(() => {
+    //     // const handleScroll = () => {
+    //     //     if(messagesRef.current.scrollHeight + messagesRef.current.scrollTop - messagesRef.current.clientHeight <= 2) {
+    //     //         addItems();
+    //     //     }
+    //     // }
+    //     messagesRef.current.addEventListener('scroll', handleScroll)
+    //     return () => messagesRef.current.removeEventListener('scroll', handleScroll)
+    // }, [currentItems])
 
     useEffect(() => {
         if(messages.length) {
-            setCount({prev: 0, next: itemUnit})
-            setCurrentItems(messages.slice(0, count.next));
+            console.log(messageNum, messages.length)
+            if(messages.length > messageNum) {
+            // setCount({prev: 0, next: itemUnit})
+            // setCurrentItems(messages.slice(0, count.next));
+            setCurrentItems(messages.slice(0, messageNum));
+            } else {
+                setCurrentItems(messages)
+            }
             setLoading(false);
         }
         

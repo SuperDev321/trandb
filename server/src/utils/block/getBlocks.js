@@ -7,6 +7,7 @@ const getRoomBlocks = (roomName) => {
 
 const getGlobalBlocks = () => {
     let blocks = Blocks.find({type: 'all'});
+    return blocks;
 }
 
 const getBlocks = async (roomName) => {
@@ -32,7 +33,9 @@ const getBlocks = async (roomName) => {
             {ip: {$in: blockIps}}
         ]
     });
-    blockedUsers = blockedUsers.map((item) => (item.username));
+    if(blockedUsers && blockedUsers.length > 0)
+        blockedUsers = blockedUsers.map((item) => (item.username));
+    else blockedUsers = [];
     return blockedUsers;
 }
 

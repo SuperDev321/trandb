@@ -18,7 +18,7 @@ const CustomThemeProvider = (props) => {
   const { children, defaultTheme } = props
 
   // Read current theme from localStorage or maybe from an api
-  const currentTheme = defaultTheme || localStorage.getItem('appTheme') || 'normal'
+  const currentTheme =  localStorage.getItem('appTheme') || defaultTheme || 'normal'
 
   // State to hold the selected theme name
   const [themeName, _setThemeName] = useState(currentTheme)
@@ -31,18 +31,18 @@ const CustomThemeProvider = (props) => {
     localStorage.setItem('appTheme', name)
     _setThemeName(name)
   }
-  useEffect(() => {
-    console.log('get theme')
-    Axios.get(`${config.server_url}/api/setting`)
-    .then((response) => {
-      console.log('get theme', response)
-      if(response.status === 200) {
-        let data = response.data;
-        if(data && data.theme)
-          setThemeName(data.theme);
-      }
-    })
-  }, [])
+  // useEffect(() => {
+  //   console.log('get theme')
+  //   Axios.get(`${config.server_url}/api/setting`)
+  //   .then((response) => {
+  //     console.log('get theme', response)
+  //     if(response.status === 200) {
+  //       let data = response.data;
+  //       if(data && data.theme)
+  //         setThemeName(data.theme);
+  //     }
+  //   })
+  // }, [])
 
   const contextValue = {
     currentTheme: themeName,

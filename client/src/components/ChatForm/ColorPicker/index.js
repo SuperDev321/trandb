@@ -34,7 +34,7 @@ const colorPanels = [
     '#33CC66',
     '#660000',
     '#6666FF',
-    '#820082',
+    '#20264d',
 ];
 
 const ColorPicker = ({userColor, setUserColor, defaultColor, backgroundColor}) => {

@@ -5,24 +5,24 @@ import {
 } from '@material-ui/core';
 import {CustomThemeContext} from '../../../themes/cutomThemeProvider';
 const ThemeSetting = () => {
-    const contextValue = useContext(CustomThemeContext);
-    const [checked, setChecked] = useState(false);
+    const {currentTheme, setTheme} = useContext(CustomThemeContext);
+    const [checked, setChecked] = useState((currentTheme !== 'normal'));
 
     useEffect(() => {
-        if(contextValue) {
-            if(contextValue.currentTheme === 'normal') {
+        if(currentTheme) {
+            if(currentTheme === 'normal') {
                 setChecked(false);
             } else {
                 setChecked(true);
             }
         }
-    }, [contextValue]);
+    }, [currentTheme]);
     const handleChange = (event) => {
-        if(contextValue && contextValue.setTheme) {
+        if(setTheme) {
             if(event.target.checked) {
-                contextValue.setTheme('dark');
+                setTheme('dark');
             } else {
-                contextValue.setTheme('normal');
+                setTheme('normal');
             }
         }
     }

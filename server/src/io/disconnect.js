@@ -21,22 +21,23 @@ const disconnectSocket = async (io, socket) => {
 
 const socketDisconnect = (io, socket) => async (reason) => {
     try {
-        if(reason === 'ping timeout') {
-            let state = false;
-            socket.emit('hey', null, (response) => {
-                console.log('hey response', response)
-                if(response) {
-                    state = true;
-                }
-            });
-            setTimeout(() => {
-                if(!state) {
-                    disconnectSocket(io, socket);
-                }
-            }, 1000)
-        } else {
+        // if(reason === 'ping timeout') {
+        //     let state = false;
+        //     socket.emit('hey', null, (response) => {
+        //         console.log('hey response', response)
+        //         if(response) {
+        //             state = true;
+        //         }
+        //     });
+        //     setTimeout(() => {
+        //         console.log('ping timeout state', state)
+        //         if(!state) {
+        //             disconnectSocket(io, socket);
+        //         }
+        //     }, 1000)
+        // } else {
             disconnectSocket(io, socket);
-        }
+        // }
         // if(reason === 'client namespace disconnect' || reason === 'transport error' || reason === 'transport close') {
             
         // }
