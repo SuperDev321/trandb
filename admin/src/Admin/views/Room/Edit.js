@@ -27,7 +27,7 @@ import TableRow from '@material-ui/core/TableRow';
 import styles from "Admin/assets/jss/material-dashboard-react/views/dashboardStyle.js";
 import Axios from "axios";
 import config from "config";
-
+import { useToasts } from 'react-toast-notifications';
 const useStyles = makeStyles(styles);
 
 export default function Edit( {onClickBack, room} ) {
@@ -43,6 +43,7 @@ export default function Edit( {onClickBack, room} ) {
   const [moderators, setModerators] = useState([]);
   const [cover, setCover] = useState('');
   const [icon, setIcon] = useState('');
+  const { addToast } = useToasts();
 
   const handleClickDeleteModerator = (moderatorId) => {
     if(id) {
@@ -63,6 +64,22 @@ export default function Edit( {onClickBack, room} ) {
           let newBans = bans.filter(({_id}) => (_id !== banId));
           setBans(newBans);
         }
+      })
+    }
+  }
+  const handleUpdateRoom = () => {
+    if(id) {
+      Axios.put(`${config.server_url}/api/room/general`, {_id: id, category, description, welcomeMessage, maxUsers})
+      .then((response) => {
+        if(response.status === 202) {
+          addToast('Successfully updated', { appearance: 'success' });
+          onClickBack();
+        } else {
+          addToast('Update failed', { appearance: 'error' });
+        }
+      })
+      .catch((err) => {
+        addToast('Update failed', { appearance: 'error' });
       })
     }
   }
@@ -209,6 +226,7 @@ export default function Edit( {onClickBack, room} ) {
               <Button 
                 variant="contained" 
                 color="rose"
+                onClick={handleUpdateRoom}
               >
                 Update Room
               </Button>
