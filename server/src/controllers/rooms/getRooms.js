@@ -9,6 +9,8 @@ const getRooms = async (req, res, next) => {
                     name: true,
                     icon: true,
                     cover: true,
+                    category: true,
+                    maxUsers: true,
                     description: true,
                     welcomeMessage: true,
                     owner: true,
