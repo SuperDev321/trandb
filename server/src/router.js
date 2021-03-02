@@ -43,7 +43,7 @@ router.get('/checkToken', checkToken);
 router.get('/logout', withAuth, logout);
 
 router.get('/setting', getSetting);
-router.post('/setting', isAdmin ,updateSetting);
+router.post('/setting', withAuth, isAdmin ,updateSetting);
 
 router.get('/rooms', getRooms);
 router.post('/room', withAuth, addRoom);
