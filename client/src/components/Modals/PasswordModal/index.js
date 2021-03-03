@@ -9,6 +9,7 @@ import {
     DialogTitle,
 } from '@material-ui/core';
 import { useSnackbar } from 'notistack';
+import { useTranslation } from 'react-i18next';
 import CustomTextField from '../../CustomTextField';
 import OutlinedButton from '../../OutlinedButton';
 import {getSocket} from '../../../utils';
@@ -34,13 +35,14 @@ const PasswordModal = ({room, open, setOpen, onClose}) => {
         onClose();
         setOpen(false);
     };
+    const { t } = useTranslation();
     const socket = getSocket();
     const handleJoin = () => {
         socket.emit('join room' , {room, password}, (result, message) => {
             if(result) {
                 setOpen(false);
             } else {
-                enqueueSnackbar(message, {variant: 'error'});
+                enqueueSnackbar(t('PasswordModal.wrong'), {variant: 'error'});
                 onClose();
             }
         })
@@ -53,20 +55,20 @@ const PasswordModal = ({room, open, setOpen, onClose}) => {
             onClose={handleClose}
             aria-labelledby="responsive-dialog-title"
         >
-            <DialogTitle id="responsive-dialog-title">Join room</DialogTitle>
+            <DialogTitle id="responsive-dialog-title">{t('PasswordModal.title')}</DialogTitle>
             <DialogContent>
                 <CustomTextField
                     value={password}
                     onChange={(e) => {setPassword(e.target.value)}}
-                    label="Password" type="password" name="password" autoFocus autoComplete="off"
+                    label={t('PasswordModal.password')} type="password" name="password" autoFocus autoComplete="off"
                 />
             </DialogContent>
             <DialogActions style={{justifyContent: 'center'}}>
                 <OutlinedButton autoFocus onClick={handleJoin} color="primary">
-                    Join
+                {t('PasswordModal.join')}
                 </OutlinedButton>
                 <OutlinedButton onClick={handleClose} color="primary">
-                    Cancel
+                {t('PasswordModal.cancel')}
                 </OutlinedButton>
             </DialogActions>
         </StyledDialog>

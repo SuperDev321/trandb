@@ -495,7 +495,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
 
             socket.io.on('reconnect', () => {
                 let roomNames = roomsRef.current.map((room) => (room.name));
-                let privateRooms = privateListRef.current.getPrivateRooms();
+                let privateRooms = privateListRef.current ? privateListRef.current.getPrivateRooms(): [];
                 roomNames.map((roomName) => {
                     socket.emit('rejoin room',{room: roomName, type: 'public'}, (result) => {
                         if(result) {

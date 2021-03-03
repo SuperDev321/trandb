@@ -59,7 +59,7 @@
     "default": "default",
     "add_room": "הוסף חדר"
   },
-  "CreateRoomModal": {
+  "CreateRoom": {
     "error1": "שגיאה לא מוכרת",
     "error2": "נא לתת שם  לחדר",
     "error3": "נא לבחור קטגוריה",
@@ -69,13 +69,13 @@
     "room_name_descr": "שם חדר ארוך  לא יוצג טוב",
     "category": "*קטגוריה",
     "select": "- בחירה -",
-    "commedy": "כללי",
+    "comedy": "כללי",
     "entertainment": "בלוג",
-    "gaming": "Gaming",
-    "social": "Social",
-    "technology": "Technology",
-    "teen": "Teen",
-    "other": "Other",
+    "gaming": "משחקים",
+    "social": "חֶברָתִי",
+    "technology": "טֶכנוֹלוֹגִיָה",
+    "teen": "נוער",
+    "other": "אַחֵר",
     "category_descr": "Help people understand what your room is about by choosing the most appropriate category.",
     "description": "תיאור החדר",
     "description_descr": "תיאור קצר מומלץ",
@@ -89,7 +89,7 @@
     "media": "תמונות",
     "upload_icon": "העלאת תמונת אייקון",
     "icon_descr": "מופיע ברשימת חדרים בתוך הצאט",
-    "cover": "העלאת תמונת  מעטפת",
+    "cover": "תמונה של החדר",
     "cover_descr": "מופיע ברשימה מחוץ לצאט",
     "create": "יצירה ומעבר לחדר",
     "default": "default"
@@ -180,7 +180,12 @@
     "default": "default"
   },
   "PasswordModal": {
-    "default": "default"
+    "default": "default",
+    "title": "הזן את הסיסמה",
+    "password": "סיסמה",
+    "join": "לְהִצְטַרֵף",
+    "cancel": "לְבַטֵל",
+    "wrong": "סיסמה שגויה"
   },
   "SidebarLeft": {
     "start_broadcasting": "הפעלת מצלמה",

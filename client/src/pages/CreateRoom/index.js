@@ -14,39 +14,11 @@ import {
     MenuItem
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+import { useTranslation } from 'react-i18next';
 import { FileUploader } from '../../components'
 import { handleCreateRoom } from '../../utils';
 
-const categorys = [
-    'Comedy',
-    'Entertainment',
-    'Gaming',
-    'Social',
-    'Technology',
-    'Teen',
-    'Other',
-];
 
-const maxUsers = [
-    {title: 'Unlimited', value: 9999},
-    {title: '5', value: 5},
-    {title: '10', value: 10},
-    {title: '15', value: 15},
-    {title: '25', value: 25},
-    {title: '50', value: 50},
-    {title: '100', value: 100},
-    {title: '150', value: 150},
-    {title: '200', value: 200},
-]
-
-const validationSchema = yup.object({
-    name: yup
-    .string('Enter your nick name.')
-    .required('Name is required'),
-    category: yup
-    .string('Please select category')
-    .required('Category is required')
-});
 const useStyles = makeStyles((theme) => ({
     root: {
         paddingTop: theme.spacing(8),
@@ -87,18 +59,48 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-
+const categorys = [
+    'comedy',
+    'entertainment',
+    'gaming',
+    'social',
+    'technology',
+    'teen',
+    'other',
+];
 
 const CreateRoom = () => {
     const history = useHistory();
     const classes = useStyles();
+    const { t } = useTranslation();
+    
+    const maxUsers = [
+        {title: t('CreateRoom.unlimited'), value: 9999},
+        {title: '5', value: 5},
+        {title: '10', value: 10},
+        {title: '15', value: 15},
+        {title: '25', value: 25},
+        {title: '50', value: 50},
+        {title: '100', value: 100},
+        {title: '150', value: 150},
+        {title: '200', value: 200},
+    ]
+    
+    const validationSchema = yup.object({
+        name: yup
+        .string('Enter your nick name.')
+        .required(t('CreateRoom.error2')),
+        category: yup
+        .string('Please select category')
+        .required(t('CreateRoom.error3'))
+    });
 
     const [coverFile, setCoverFile] = useState(null);
    
     const formik = useFormik({
         initialValues: {
             name: '',
-            category: 'Comedy',
+            category: 'comedy',
             maxUsers: 9999,
             password: '',
             description: '',
@@ -121,7 +123,7 @@ const CreateRoom = () => {
             <LockOutlinedIcon />
             </Avatar> */}
             <Typography component="h1" variant="h5" className={classes.headerText}>
-            Create Room
+                {t('CreateRoom.create_a_room')}
             </Typography>
             <form className={classes.form} noValidate onSubmit={formik.handleSubmit}>
                 <Grid container spacing={2}>
@@ -132,7 +134,7 @@ const CreateRoom = () => {
                         required
                         fullWidth
                         id="name"
-                        label="Name of Room"
+                        label={t('CreateRoom.room_name')}
                         className={classes.textField}
                         value={formik.values.name}
                         onBlur={formik.handleBlur}
@@ -150,7 +152,7 @@ const CreateRoom = () => {
                             select
                             id="maxUsers"
                             type="number"
-                            label="Room maxUsers"
+                            label={t('CreateRoom.max_users')}
                             InputLabelProps={{
                                 shrink: true,
                             }}
@@ -172,7 +174,7 @@ const CreateRoom = () => {
                         <TextField
                             fullWidth
                             select
-                            label="Category"
+                            label={t('CreateRoom.category')}
                             id="category"
                             name='category'
                             className={classes.textField}
@@ -184,7 +186,7 @@ const CreateRoom = () => {
                         >
                             {categorys.map((category) => (
                                 <MenuItem key={category} value={category}>
-                                    {category}
+                                    {t('CreateRoom.'+category)}
                                 </MenuItem>
                             ))}
                         </TextField>
@@ -193,7 +195,7 @@ const CreateRoom = () => {
                     <TextField
                         fullWidth
                         name="password"
-                        label="Password"
+                        label={t('CreateRoom.password')}
                         type="password"
                         id="password"
                         autoComplete="current-password"
@@ -210,7 +212,7 @@ const CreateRoom = () => {
                         fullWidth
                         multiline
                         name="welcomeMessage"
-                        label="Welcome Message"
+                        label={t('CreateRoom.welcome_message')}
                         type="welcomeMessage"
                         id="welcomeMessage"
                         autoComplete="current-welcomeMessage"
@@ -227,7 +229,7 @@ const CreateRoom = () => {
                         fullWidth
                         multiline
                         name="description"
-                        label="Description"
+                        label={t('CreateRoom.description')}
                         type="description"
                         id="description"
                         autoComplete="current-description"
@@ -239,9 +241,9 @@ const CreateRoom = () => {
                     />
                     </Grid>
                     <Grid item xs={12}>
-                    <FileUploader title='cover' value={formik.values.cover}
+                    <FileUploader title={t('CreateRoom.cover')} value={formik.values.cover}
                     handleFile={(file) => {console.log('cover set', {file});formik.setFieldValue('cover', file, false)}}/>
-                    <FileUploader title='icon' handleFile={(file)=>{console.log('uploaded');formik.setFieldValue('icon', file, false)}}/>
+                    <FileUploader title={t('CreateRoom.upload_icon')} handleFile={(file)=>{console.log('uploaded');formik.setFieldValue('icon', file, false)}}/>
                     {/* <TextField
                         required
                         fullWidth
@@ -271,7 +273,7 @@ const CreateRoom = () => {
                     color="primary"
                     className={classes.submit}
                 >
-                    Create Room
+                    {t('CreateRoom.create')}
                 </Button>
             </form>
         </Card>
