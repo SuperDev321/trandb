@@ -53,10 +53,12 @@ const headCells = [
   { id: 'no', numeric: false, disablePadding: false, label: 'No'},
   { id: 'type', numeric: false, disablePadding: false, label: 'Type'},
   { id: 'avatar', numeric: false, disablePadding: false, label: 'Avatar'},
-  { id: 'owner', numeric: false, disablePadding: true, label: 'UserName' },
-  { id: 'name', numeric: false, disablePadding: false, label: 'RoomName' },
+  { id: 'owner', numeric: false, disablePadding: true, label: 'User Name' },
+  { id: 'name', numeric: false, disablePadding: false, label: 'Room Name' },
   { id: 'category', numeric: false, disablePadding: false, label: 'Category'},
   { id: 'maxUsers', numeric: false, disablePadding: false, label: 'Max users' },
+  { id: 'description', numeric: false, disablePadding: false, label: 'Description' },
+  { id: 'welcomeMessage', numeric: false, disablePadding: false, label: 'Welcome Message' },
   { id: 'icon', numeric: false, disablePadding: false, label: 'icon' },
   { id: 'cover', numeric: false, disablePadding: false, label: 'Cover' },
   { id: 'created_at', numeric: false, disablePadding: false, label: 'Created at' },
@@ -197,6 +199,8 @@ export default function RoomTable( {onClickEdit} ) {
         if(row.owner) strTmp += row.owner + ' ';
         if(row.name) strTmp += row.name + ' ';
         if(row.category) strTmp += row.category + ' ';
+        if(row.welcomeMessage) strTmp += row.welcomeMessage + ' ';
+        if(row.description) strTmp += row.description + ' ';
         if(row.maxUsers) strTmp += row.maxUsers + ' ';
         if(row.created_at) strTmp += row.created_at;
         if(strTmp.toLowerCase().indexOf(query.toLowerCase()) < 0) return false;
@@ -289,10 +293,16 @@ export default function RoomTable( {onClickEdit} ) {
                         <TableCell align="left" className={classes.space}>{row.name}</TableCell>
                         <TableCell align="left" className={classes.space}>{row.category}</TableCell>
                         <TableCell align="left" className={classes.space}>{row.maxUsers}</TableCell>
+                        <TableCell align="left" className={classes.space}>{row.description}</TableCell>
+                        <TableCell align="left" className={classes.space}>{row.welcomeMessage}</TableCell>
                         <TableCell align="left" className={classes.space}>
-                          <img width="42px" src="/img/avatars/default_avatar.png" alt="avatar" />
+                          <img width="42px" src={row.cover? "/img/rooms/"+row.cover:"/img/public_chat.png"}
+                          alt="cover image" />
                         </TableCell>
-                        <TableCell className={classes.space}>{rows.cover}</TableCell>
+                        <TableCell className={classes.space}>
+                            <img width="42px" src={row.icon? "/img/rooms/"+row.icon:"/img/public_chat.png"}
+                          alt="cover image" />
+                        </TableCell>
                         <TableCell className={classes.space}>2021-2-6</TableCell>
                         <TableCell align="right" className={classes.space}>
                            <IconButton style={{color:"#4caf50"}} onClick={() => {onClickEdit(row)}}>
