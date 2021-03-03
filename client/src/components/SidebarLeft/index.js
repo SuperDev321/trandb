@@ -63,7 +63,8 @@ const useStyles = makeStyles((theme) => ({
         backgroundColor: theme.palette.inputField,
         width: '100%',
         boxShadow: '0 0 0px 1px #0000002b',
-        color: theme.palette.menu.color
+        color: theme.palette.menu.color,
+        backgroundColor: theme.palette.inputField
     },
     searchIcon: {
         padding: theme.spacing(0, 2),

@@ -14,6 +14,7 @@ const useSetting = () => {
   const [enablePrivateSound, _setEnablePrivateSound] = useState(true);
   const [language, _setLanguage] = useState(null);
   const [messageNum, setMessageNum] = useState(30);
+  const [enableSysMessage, _setEnableSysMessage] = useState(true);
   const { t, i18n } = useTranslation();
 
   useEffect(() => {
@@ -47,6 +48,16 @@ const useSetting = () => {
         _setEnablePublicSound(true);
       } else {
         _setEnablePublicSound(false);
+      }
+    }
+    const currentSysMessageState = localStorage.getItem('system-message');
+    if(!currentSysMessageState) {
+      setEnableSysMessage(true)
+    } else {
+      if(currentSysMessageState === 'on') {
+        _setEnableSysMessage(true);
+      } else {
+        _setEnableSysMessage(false);
       }
     }
     axios.get(`${config.server_url}/api/setting`)
@@ -99,6 +110,15 @@ const useSetting = () => {
     else localStorage.setItem('poke-sound', 'off');
     _setEnablePokeSound(setting);
   }
+  const setEnableSysMessage = (setting) => {
+    if(setting) {
+      localStorage.setItem('system-message', 'on');
+      _setEnableSysMessage(true);
+    } else {
+      localStorage.setItem('system-message', 'off');
+      _setEnableSysMessage(false);
+    }
+  }
 //   useEffect(() => {
 //     (async () => {
 //       try {
@@ -111,7 +131,7 @@ const useSetting = () => {
 
   return { defaultTheme, messageSize, enablePokeSound, enablePrivateSound, enablePublicSound,
     setDefaultTheme, setMessageSize, setEnablePokeSound, setEnablePrivateSound, setEnablePublicSound,
-    language, setLanguage, messageNum};
+    language, setLanguage, messageNum, enableSysMessage, setEnableSysMessage};
 };
 
 export default useSetting;

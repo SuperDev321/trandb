@@ -27,7 +27,7 @@ const App = () => {
     const { loading, auth, role, setAuth, setLoading, username, removeCurrentUser } = useAuth();
     const { defaultTheme, messageSize, enablePokeSound, enablePrivateSound, enablePublicSound,
         setDefaultTheme, setMessageSize, setEnablePokeSound, setEnablePrivateSound, setEnablePublicSound,
-        language, setLanguage, messageNum
+        language, setLanguage, messageNum, enableSysMessage, setEnableSysMessage
     } = useSetting();
     if (loading) {
         return <Loading />;
@@ -54,7 +54,7 @@ const App = () => {
                             enablePrivateSound, enablePublicSound,
                             setDefaultTheme,setMessageSize, setEnablePokeSound,
                             setEnablePrivateSound, setEnablePublicSound,
-                            language, setLanguage, messageNum
+                            language, setLanguage, messageNum, enableSysMessage, setEnableSysMessage
                         }}>
         <CustomThemeProvider defaultTheme={defaultTheme}>
             <UserContext.Provider

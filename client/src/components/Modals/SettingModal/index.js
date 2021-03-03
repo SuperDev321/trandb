@@ -85,7 +85,7 @@ const useStyles = makeStyles((theme) => ({
 
 const SettingModal = () => {
     const {messageSize, setMessageSize, enablePokeSound, setEnablePokeSound, enablePrivateSound, setEnablePrivateSound,
-        enablePublicSound, setEnablePublicSound, language, setLanguage
+        enablePublicSound, setEnablePublicSound, language, setLanguage, enableSysMessage, setEnableSysMessage
     } = useContext(SettingContext);
     const [open, setOpen] = useState(false);
     const [page, setPage] = useState(null);
@@ -148,7 +148,12 @@ const SettingModal = () => {
                     />:null
                 }
                 {page === 'messages' ?
-                    <MessageSetting messageSize={messageSize} setMessageSize={setMessageSize} />: null
+                    <MessageSetting
+                        messageSize={messageSize}
+                        setMessageSize={setMessageSize}
+                        enableSysMessage={enableSysMessage}
+                        setEnableSysMessage={setEnableSysMessage}
+                    />: null
                 }
                 {page === 'notifications' ?
                     <SoundSetting

@@ -31,7 +31,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
     const history= useHistory();
     const [mobileOpen, setMobileOpen] = useState(false);
     const { username, avatar, gender } = useContext(UserContext);
-    const {enablePokeSound, enablePrivateSound, enablePublicSound} = useContext(SettingContext);
+    const {enablePokeSound, enablePrivateSound, enablePublicSound, enableSysMessage} = useContext(SettingContext);
     const [mutes, setMutes] = useLocalStorage('mutes', []);
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
@@ -642,7 +642,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                             if(newInfo.payload.onlineUsers && newInfo.payload.joinedUser) {
                                 let joinedUser = newInfo.payload.joinedUser;
                                 
-                                if(sameRoom.addOnlineUser(joinedUser) && username !== joinedUser.username) {
+                                if(sameRoom.addOnlineUser(joinedUser) && username !== joinedUser.username && enableSysMessage) {
                                     let sysMsg = {
                                         type: 'system',
                                         msg: t('ChatApp.sys_join_room', {username: joinedUser.username})
@@ -668,7 +668,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                         let usernames = await newInfo.payload.onlineUsers.map((item) => (item.username));
                         if(username && usernames.includes(username)) {
                             let leavedUserInfo = sameRoom.users.find((user) => (user._id === leavedUser));
-                            if(leavedUserInfo) {
+                            if(leavedUserInfo && enableSysMessage) {
                                 let usersToSet = sameRoom.users.filter((user) => (user._id !== leavedUser));
                                 sameRoom.users = usersToSet;
                                 let message = {

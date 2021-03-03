@@ -161,10 +161,12 @@
     "poke": "Poke",
     "view_broadcast_request": "View broadcast requests",
     "join_room_descr": "Display notification messages when people join or leave a chat room.",
-    "join_leave_messages": "JOIN/LEAVE MESSAGES",
+    "join_leave_messages": "Join/Leave messages",
     "auto_broadcasting": "AUTO BROADCASTING",
     "remove": "Remove",
-    "default": "default"
+    "default": "default",
+    "show": "Show",
+    "hide": "Hide"
   },
   "BanModal": {
     "default": "default"

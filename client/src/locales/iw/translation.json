@@ -164,7 +164,9 @@
     "join_leave_messages": "הראה/הסתר הודעות כניסה ויציאה מהחדר",
     "auto_broadcasting": "הראה כל מצלמה שמתחילה שידור/הראה רק  מצלמות שביקשתי בהן צפיה",
     "remove": "הסרה",
-    "default": "default"
+    "default": "default",
+    "show": "הופעה",
+    "hide": "להתחבא"
   },
   "BanModal": {
     "default": "default"

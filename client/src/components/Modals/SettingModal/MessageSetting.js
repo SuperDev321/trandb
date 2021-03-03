@@ -42,7 +42,7 @@ const PrettoSlider = withStyles({
       borderRadius: 4,
     },
 })(Slider);
-const MessageSetting = ({messageSize, setMessageSize}) => {
+const MessageSetting = ({messageSize, setMessageSize, enableSysMessage, setEnableSysMessage}) => {
     const classes = useStyles();
     const [value, setValue] = React.useState(30);
     const { t } = useTranslation();
@@ -60,6 +60,26 @@ const MessageSetting = ({messageSize, setMessageSize}) => {
                 </Grid>
                 <Grid item xs={12} spacing={5}>
                     <PrettoSlider value={(messageSize-10)*5} onChange={handleChange} aria-labelledby="continuous-slider" />
+                </Grid>
+            </Grid>
+            <Grid container alignItems="center" spacing={0}>
+                <Grid item xs={12} spacing={5}>
+                    <span>{t('SettingModal.join_leave_messages')}</span>
+                </Grid>
+                <Grid item xs={12} spacing={5}>
+                  <Grid container alignItems="center">
+                    <Grid item>{t('SettingModal.hide')}</Grid>
+                    <Grid item>
+                      <Switch
+                          checked={enableSysMessage}
+                          onChange={(e) => {setEnableSysMessage(e.target.checked)}}
+                          color="secondary"
+                          name="checkedB"
+                          inputProps={{ 'aria-label': 'system message checkbox' }}
+                      />
+                    </Grid>
+                    <Grid item>{t('SettingModal.show')}</Grid>
+                  </Grid>
                 </Grid>
             </Grid>
         </div>
