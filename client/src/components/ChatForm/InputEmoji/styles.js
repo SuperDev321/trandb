@@ -27,7 +27,7 @@ const useStyles = makeStyles((theme) => ({
         borderColor: theme.palette.separate.main,
         marginRight: 0,
         marginLeft: 0,
-        background: theme.palette.placeHolder,
+        background: theme.palette.inputField,
 
       },
       

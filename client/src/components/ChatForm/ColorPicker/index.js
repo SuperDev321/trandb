@@ -9,7 +9,7 @@ import { useEffect } from 'react';
 const colorPanels = [
     'default',
     '#656565',
-    '#800080',
+    '#0400E6',
     '#6f4341',
     '#990703',
     '#ca226b',

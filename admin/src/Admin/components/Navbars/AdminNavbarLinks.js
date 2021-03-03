@@ -52,7 +52,7 @@ export default function AdminNavbarLinks() {
           onClick={handleClickProfile}
           className={classes.buttonLink}
         >
-          <img className={classes.icons} src="/img/avatars/default_avatar.png" alt="Avatar img" />
+          <img className={classes.icons} src="/img/default_avatar.png" alt="Avatar img" />
           <p style={{textTransform: 'initial'}}>&nbsp; rafa</p>
           <Hidden mdUp implementation="css">
             <p className={classes.linkText}>Profile</p>
