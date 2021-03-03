@@ -34,14 +34,14 @@ const useStyles = makeStyles((theme) => ({
 
     },
     sender: {
+        display: 'flex',
+        alignItems: 'center',
         margin: 0,
         whiteSpace: 'nowrap',
         fontWeight: 'bold',
         display: 'flex',
         flexDirection: 'row',
-        alignItems: 'baseline',
         fontSize: '1em',
-        lineHeight: 1
     },
     time: {
         font: 'italic 0.8em sans-serif',
@@ -50,6 +50,8 @@ const useStyles = makeStyles((theme) => ({
         margin: '0',
     },
     text: {
+        display: 'flex',
+        alignItems: 'center',
         margin: 0,
         fontSize: '1em',
         '& img.photo': {
@@ -60,8 +62,16 @@ const useStyles = makeStyles((theme) => ({
         fontWeight: (props) =>
             props.bold? 'bold' : '',
         '& img.emoji': {
-            verticalAlign: 'bottom'
+            verticalAlign: 'bottom',
+            width: (props) =>
+            props.messageSize? props.messageSize + 7 : 21,
+            height: (props) =>
+            props.messageSize? props.messageSize + 7 : 21,
         },
+        '& img': {
+            width: 21,
+            height: 21
+        }
     },
     url_underline: {
         cursor: 'pointer',

@@ -49,14 +49,15 @@
     "connection_attempt": "נסיון התחברות מספר: ",
     "default": "default"
   },
-  "JoinRoomModal": {
+  "AddRoomModal": {
     "error1": "אתם כבר בחדר זה",
     "error2": "אתם חסומים מחדר זה ",
     "error3": "לא ניתן להצטרף לחדר .החדר מלא",
     "rooms": "חדרים",
     "create_room": "פתיחת חדר",
     "show_empty_room": "הראה גם חדרים ריקים",
-    "default": "default"
+    "default": "default",
+    "add_room": "הוסף חדר"
   },
   "CreateRoomModal": {
     "error1": "שגיאה לא מוכרת",
@@ -141,11 +142,18 @@
     "settings": "הגדרות",
     "my_profile": "הפרופיל/חדר שלי",
     "languages": "שפות",
+    "select_lan": "בחר שפה",
     "messages": "גודל הטקסט",
+    "message_size": "גודל ההודעה",
     "themes": "ערכות נושא",
+    "dark": "אפל",
+    "light": "בָּהִיר",
     "notifications": "התראות צליל",
+    "public_message": "מסר ציבורי",
+    "private_message": "הודעה פרטית",
+    "poke_message": "עיסוי לתקוע",
     "blocked": "רשימת התעלמות",
-    "english": "אנגלית",
+    "english": "English",
     "hebrew": "עברית",
     "size_descr": "כוון גודל הטקסט בצאט",
     "text_size": "גודל הטקסט",

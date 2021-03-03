@@ -3,11 +3,12 @@ import {
     Switch,
     Grid
 } from '@material-ui/core';
+import {useTranslation} from 'react-i18next';
 import {CustomThemeContext} from '../../../themes/cutomThemeProvider';
 const ThemeSetting = () => {
     const {currentTheme, setTheme} = useContext(CustomThemeContext);
     const [checked, setChecked] = useState((currentTheme !== 'normal'));
-
+    const {t} = useTranslation();
     useEffect(() => {
         if(currentTheme) {
             if(currentTheme === 'normal') {
@@ -29,7 +30,7 @@ const ThemeSetting = () => {
     return (
         <div>
             <Grid component="label" container alignItems="center" spacing={1}>
-                <Grid item>Normal</Grid>
+                <Grid item>{t('SettingModal.light')}</Grid>
                 <Grid item>
                     <Switch
                         checked={checked}
@@ -39,7 +40,7 @@ const ThemeSetting = () => {
                         inputProps={{ 'aria-label': 'secondary checkbox' }}
                     />
                 </Grid>
-                <Grid item>Dark</Grid>
+                <Grid item>{t('SettingModal.dark')}</Grid>
             </Grid>
         </div>
     )

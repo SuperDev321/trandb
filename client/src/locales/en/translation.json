@@ -49,14 +49,15 @@
     "connection_attempt": "Connection attempt: ",
     "default": "default"
   },
-  "JoinRoomModal": {
+  "AddRoomModal": {
     "error1": "You are already in this room",
     "error2": "You can't join into this room. You banned by owner",
     "error3": "You can't join into this room. over users",
     "rooms": "Rooms",
     "create_room": "Create Room",
     "show_empty_room": "Show empty rooms",
-    "default": "default"
+    "default": "default",
+    "add_room": "Add a room"
   },
   "CreateRoomModal": {
     "error1": "Somgthing error",
@@ -140,9 +141,16 @@
     "settings": "Settings",
     "my_profile": "My profile",
     "languages": "Languages",
+    "select_lan": "Select Language",
     "messages": "Messages",
+    "message_size": "Message Size",
     "themes": "Theme",
+    "dark": "Dark",
+    "light": "Light",
     "notifications": "Notifications",
+    "public_message": "Public Message",
+    "private_message": "Private Message",
+    "poke_message": "Poke Message",
     "blocked": "Blocked",
     "english": "English",
     "hebrew": "עברית",

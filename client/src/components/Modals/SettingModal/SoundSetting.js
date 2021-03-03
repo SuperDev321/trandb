@@ -7,6 +7,7 @@ import {
     Checkbox
 } from '@material-ui/core';
 import {CustomThemeContext} from '../../../themes/cutomThemeProvider';
+import { useTranslation } from 'react-i18next';
 const useStyles = makeStyles((theme) => ({
     root: {
         // width: '100%',
@@ -26,7 +27,7 @@ const GreenCheckbox = withStyles({
 const SoundSetting = ({enablePokeSound, setEnablePokeSound, enablePrivateSound, setEnablePrivateSound,
     enablePublicSound, setEnablePublicSound}) => {
     const classes = useStyles();
-
+    const { t } = useTranslation();
     const handleChangePublic = (event) => {
         setEnablePublicSound(event.target.checked);
     };
@@ -42,15 +43,15 @@ const SoundSetting = ({enablePokeSound, setEnablePokeSound, enablePrivateSound, 
             <FormGroup column>
                 <FormControlLabel
                     control={<GreenCheckbox checked={enablePublicSound} onChange={handleChangePublic} name="publicSound" />}
-                    label="Public Message"
+                    label={t('SettingModal.public_message')}
                 />
                 <FormControlLabel
                     control={<GreenCheckbox checked={enablePrivateSound} onChange={handleChangePrivate} name="privateSound" />}
-                    label="Private Message"
+                    label={t('SettingModal.private_message')}
                 />
                 <FormControlLabel
                     control={<GreenCheckbox checked={enablePokeSound} onChange={handleChangePoke} name="publicSound" />}
-                    label="Poke Message"
+                    label={t('SettingModal.poke_message')}
                 />
                 
             </FormGroup>

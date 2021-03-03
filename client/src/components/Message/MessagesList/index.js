@@ -48,7 +48,7 @@ const MessagesList = ({ users, messages, role, userAction, roomName, changeMuteS
     const messagesRef = useRef();
     const classes = useStyles();
     const {currentTheme} = useContext(CustomThemeContext);
-    const {messageNum} = useContext(SettingContext);
+    const {messageNum, messageSize} = useContext(SettingContext);
     const [currentItems, setCurrentItems] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -127,7 +127,7 @@ const MessagesList = ({ users, messages, role, userAction, roomName, changeMuteS
                             roomName={roomName}
                             role={role}
                             message={{_id, from, msg, date, color, bold, messageType}} font_size={10}
-                            defaultColor={defaultColor}
+                            messageSize={messageSize}
                             changeMuteState={changeMuteState}
                             sendPokeMessage={sendPokeMessage}
                             kickUser={kickUser}
