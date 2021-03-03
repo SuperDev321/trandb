@@ -1,10 +1,12 @@
 .rooms__wrapper {
   height: 100%;
   overflow: auto;
+  scrollbar-width: none;
 }
 
 .rooms__wrapper::-webkit-scrollbar {
-  display: 'none'
+  display: none;
+  width: 0;
 }
 
 .rooms__error {

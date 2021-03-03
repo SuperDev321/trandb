@@ -69,7 +69,12 @@ export default function AddRoomModal({addRoom}) {
     useEffect(() => {
         if(open) {
             getRooms((data) => {
-                setRooms(data);
+                if(Array.isArray(data)) {
+                    let sortedRooms = data.sort((roomA, roomB) => {
+                        return roomB.users - roomA.users;
+                    });
+                    setRooms(sortedRooms);
+                }
                 // console.log(data);
             },
             (err) => {

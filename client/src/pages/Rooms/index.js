@@ -20,7 +20,7 @@ const useStyles = makeStyles((theme) => ({
 
 const Rooms = () => {
     const classes = useStyles();
-    const [rooms, setRooms] = useState(null);
+    const [rooms, setRooms] = useState([]);
     const [error, setError] = useState('');
     const [showEmpty, setShowEmpty] = useState(false);
     const history = useHistory();
@@ -28,7 +28,13 @@ const Rooms = () => {
     useEffect(() => {
         getRooms((data) => {
             setLoading(false);
-            setRooms(data);
+            if(Array.isArray(data)) {
+                let sortedRooms = data.sort((roomA, roomB) => {
+                    return roomB.users - roomA.users;
+                });
+                setRooms(sortedRooms);
+            }
+           
         },
         (err) => {
             setLoading(false);
@@ -60,7 +66,7 @@ const Rooms = () => {
                 variant="contained"
                 className={classes.roomButton}
                 onClick={() => { history.push('/room/create')}}
-            >{t('JoinRoomModal.create_room')}</Button>
+            >{t('AddRoomModal.create_room')}</Button>
             }
             </div>
             {rooms &&
