@@ -9,6 +9,7 @@ const socketDisconnect = require('./disconnect');
 const { Users } = require('../database/models');
 const LogManager = require('../constructors/logManager');
 const ipInt = require('ip-to-int');
+const isIp = require('is-ip')
 const ioHandler = (io) => async (socket) => {
 
   let socketIds = await io.of('/').in(socket.decoded._id).allSockets();
@@ -19,10 +20,23 @@ const ioHandler = (io) => async (socket) => {
     socket.emit('repeat connection');
     return;
   }
+  let ip = socket.client.request.headers['cf-connecting-ip'] || socket.client.request.headers['x-forwarded-for'] || socket.client.request.connection.remoteAddress
+  if(isIp(ip)) {
+      if(!isIp.v4(ip)) {
+          var address = new Address6(ip);
+          var teredo = address.inspectTeredo();
+          ip = teredo.client4;
+      }
+      if (ip.substr(0, 7) === '::ffff:') {
+          ip = ip.substr(7);
+      }
+  } else {
+      ip = '0.0.0.0';
+  }
   let user = await Users.findOne({_id: socket.decoded._id});
   if(!user) return;
-  let result = await Users.updateOne({_id: socket.decoded._id}, {isInChat: true});
-  LogManager.saveLogInfo(ipInt(user.ip).toIP(), user.username, user.role, 'Connect');
+  let result = await Users.updateOne({_id: socket.decoded._id}, {ip: ipInt(ip).toInt(),isInChat: true});
+  LogManager.saveLogInfo(ip, user.username, user.role, 'Connect');
 
     socket.on('join room', joinRoom(io, socket));
     socket.on('rejoin room', rejoinRoom(io, socket));
