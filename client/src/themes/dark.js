@@ -24,6 +24,7 @@ const theme = createMuiTheme({
     background: {
       default: '#000',
     },
+    inputField: 'rgb(204 213 216 / 15%)',
     placeHolder: 'rgb(179 221 237 / 15%)',
     emoji: '#c2d2c9',
     menu: {
