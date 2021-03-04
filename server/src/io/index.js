@@ -7,7 +7,8 @@ const { kickUser, banUser, banUserByAdmin, blockUser, unBlockUser } = require('.
 const {sendSignal, returnSignal} = require('./videoHandler');
 const socketDisconnect = require('./disconnect');
 const { Users } = require('../database/models');
-
+const LogManager = require('../constructors/logManager');
+const ipInt = require('ip-to-int');
 const ioHandler = (io) => async (socket) => {
 
   let socketIds = await io.of('/').in(socket.decoded._id).allSockets();
@@ -18,7 +19,10 @@ const ioHandler = (io) => async (socket) => {
     socket.emit('repeat connection');
     return;
   }
-  await Users.updateOne({_id: socket.decoded._id}, {isInChat: true});
+  let user = await Users.findOne({_id: socket.decoded._id});
+  if(!user) return;
+  let result = await Users.updateOne({_id: socket.decoded._id}, {isInChat: true});
+  LogManager.saveLogInfo(ipInt(user.ip).toIP(), user.username, user.role, 'Connect');
 
     socket.on('join room', joinRoom(io, socket));
     socket.on('rejoin room', rejoinRoom(io, socket));

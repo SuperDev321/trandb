@@ -59,7 +59,7 @@
     "default": "default",
     "add_room": "Add a room"
   },
-  "CreateRoomModal": {
+  "CreateRoom": {
     "error1": "Somgthing error",
     "error2": "You must enter room name",
     "error3": "You must select a category",
@@ -69,7 +69,7 @@
     "room_name_descr": "Please keep in mind that your room name is permanent and offensive words are restricted.",
     "category": "Category *",
     "select": "- Select -",
-    "commedy": "Comedy",
+    "comedy": "Comedy",
     "entertainment": "Entertainment",
     "gaming": "Gaming",
     "social": "Social",
@@ -87,9 +87,9 @@
     "password": "Password (optional)",
     "password_descr": "Password protect your room. People can only join your room in they know the password.",
     "media": "Media",
-    "upload_icon": "Upload a room icon",
+    "upload_icon": "Icon",
     "icon_descr": "This icon will display on your chat room page and chat sidebar. 160x160 is the recommended size for this image.",
-    "cover": "Upload a cover photo",
+    "cover": "Cover",
     "cover_descr": "This image will show up at the top of your chat room page. 800x200 is the recommended size for this image.",
     "create": "Create",
     "default": "default"
@@ -180,7 +180,12 @@
     "default": "default"
   },
   "PasswordModal": {
-    "default": "default"
+    "title": "Enter the Password",
+    "password": "Password",
+    "default": "default",
+    "join": "Join",
+    "cancel": "Cancel",
+    "wrong": "Wrong Password"
   },
   "SidebarLeft": {
     "start_broadcasting": "Start Broadcasting",

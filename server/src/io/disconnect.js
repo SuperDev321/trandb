@@ -1,13 +1,18 @@
 const { Rooms, Users } = require('../database/models');
 const { findRoomUsers } = require('../utils');
-
+const LogManager = require('../constructors/logManager');
+const ipInt = require('ip-to-int');
 const disconnectSocket = async (io, socket) => {
     const rooms = [...socket.rooms];
     console.log('disconnect rooms', socket.rooms)
     // socket.rooms returns an object where key and value are the same
     // first key is socket id, second key is rooms name
     const { _id } = socket.decoded;
-    await Users.updateOne({_id}, {isInChat: false});
+    let user = await Users.findOne({_id});
+    if(user) {
+        await Users.updateOne({_id}, {isInChat: false});
+        LogManager.saveLogInfo(ipInt(user.ip).toIP(), user.username, user.role, 'disconnect');
+    }
     for (let index = 0; index < rooms.length; index++) {
         const room = rooms[index];
         if(room) {

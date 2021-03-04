@@ -107,9 +107,9 @@ const ChatRoom = ({roomName, users, messages, mutes, sendMessage, changeMuteStat
                         addOrOpenPrivate={addOrOpenPrivate}
                         className={classes.messageArea} userAction={userAction} />
                     : <div></div>
-                }
+                }{ youtubeUrl ?
                 <div className={classes.youtube}>
-                    { youtubeUrl &&
+                    
                     <>
                     <ReactPlayer
                         url={youtubeUrl}
@@ -131,8 +131,8 @@ const ChatRoom = ({roomName, users, messages, mutes, sendMessage, changeMuteStat
                         </IconButton>
                     </div>
                     </>
-                    }
-                </div>
+                    </div>: null
+                }
             </div>
             <SeparateLine />
             <ChatForm username={username} roomName={roomName} type="public" sendMessage={sendMessage}/>

@@ -27,7 +27,7 @@ const useStyles = makeStyles((theme) => ({
     },
     roomInfo: {
         // color: theme.palette.primary.main,
-        height: 40,
+        minHeight: 40,
         padding: '0 20px',
         display: 'flex',
         alignItems: 'center',
@@ -36,6 +36,7 @@ const useStyles = makeStyles((theme) => ({
         fontSize: 22,
         fontWeight: 'bold',
         paddingRight: 10,
+        textAlign: 'center'
         // color: theme.palette.menu.color
     },
     usersCount: {
