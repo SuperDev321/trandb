@@ -17,9 +17,9 @@ const login = async (req, res, next) => {
     let user = await checkUserFromServer(username, password);
     if(user) {
       
-      let currentUser = getUserByNickname(username);
+      let currentUser = await getUserByNickname(username);
       if(!currentUser) {
-        currentUser = Users.create({username, password, role: user.role, gender: user.gender});
+        currentUser = await Users.create({username, password, role: user.role, gender: user.gender});
       }
       // await checkPassword(password, currentUser.password);
       await updateIp(currentUser._id, ipAddress);
