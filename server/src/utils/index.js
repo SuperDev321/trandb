@@ -29,10 +29,11 @@ const checkBan = require('./ban/checkBan');
 const getAllBans = require('./ban/getBans');
 const {getRoomBlocks, getGlobalBlocks, getBlocks} = require('./block/getBlocks');
 const checkBlock = require('./block/checkBlock');
+const checkBlockById = require('./block/checkBlockById');
 const addBlock = require('./block/addBlock');
 const removeBlock = require('./block/removeBlock');
 const {isForbidden, hasFobiddenWord} = require('./forbiddenWord/isForbidden');
-const createAdminUser = require('./setting/initSetting');
+const createAdminUser = require('./user/createAdminUser');
 const initSetting = require('./setting/initSetting')
 module.exports = {
   createError,
@@ -68,6 +69,7 @@ module.exports = {
   getRoomBlocks,
   getBlocks,
   checkBlock,
+  checkBlockById,
   addBlock,
   removeBlock,
   isForbidden,

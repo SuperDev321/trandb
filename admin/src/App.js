@@ -13,6 +13,7 @@ import config from './config'
 
 export default function App() {
   const [auth, setAuth] = useState(null);
+  const [superAdmin, setSuperAdmin] = useState(false);
   const [username, setUsername] = useState('');
   const [loading, setLoading] = useState(true);
 
@@ -22,7 +23,12 @@ export default function App() {
         if (data === 'un-auth') {
           setLoading(false);
         } else {
-          if (data.role === 'admin') setAuth(true);
+          if (data.role === 'admin'){
+            setAuth(true);
+          }else if( data.role === 'super_admin') {
+            setAuth(true);
+            setSuperAdmin(true);
+          }
           if(data.username) setUsername(data.username);
           setLoading(false);
         }
@@ -57,7 +63,7 @@ export default function App() {
     {
       loading? null:
       <BrowserRouter>
-        <UserContext.Provider value={{ auth, username }}>
+        <UserContext.Provider value={{ auth, username, superAdmin: true }}>
           <ToastProvider autoDismissTimeout={3000} autoDismiss={true}>
             <div className="container">
               <Switch>

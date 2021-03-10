@@ -51,10 +51,11 @@ const useStyles = makeStyles((theme) => ({
     }
 }))
 
-const ChatRoom = ({roomName, users, messages, mutes, sendMessage, changeMuteState, sendPokeMessage, kickUser, banUser,
+const ChatRoom = ({roomName, users, messages, mutes, blocks, globalBlocks, sendMessage, changeMuteState, sendPokeMessage, kickUser, banUser,
     addOrOpenPrivate}) => {
     const classes = useStyles();
     const { username } = useContext(UserContext);
+    const [blocked, setBlocked] = useState(false);
     const [role, setRole] = useState(null)
     const [messagesToShow, setMessagesToShow] = useState([]);
     const [youtubeUrl, setYoutubeUrl] = useState(null);
@@ -85,11 +86,21 @@ const ChatRoom = ({roomName, users, messages, mutes, sendMessage, changeMuteStat
     }, [users, username])
 
     useEffect(() => {
-        // let mutedUsers = users.filter((user) => (user.muted));
-        // let mutedUserNames = mutedUsers.map(({username}) => (username));
-        let unMutedMessages = messages.filter(({from}) => (!((from) && (mutes.includes(from)))));
-        setMessagesToShow(unMutedMessages);
-    }, [messages, mutes])
+        if(messages && messages.length > 0) {
+            let unMutedMessages = messages.filter(({from}) => (!( (from) && ((mutes && mutes.includes(from)) || (blocks &&  blocks.includes(from)) || ( globalBlocks && globalBlocks.includes(from))))));
+            setMessagesToShow(unMutedMessages);
+        }
+    }, [messages, mutes, blocks, globalBlocks])
+    useEffect(() => {
+        if(blocks && blocks.includes(username)) {
+            setBlocked(true);
+        } else if(globalBlocks && globalBlocks.includes(username)) {
+            setBlocked(true);
+        } else {
+            setBlocked(false);
+        }
+        
+    }, [blocks, globalBlocks, username]);
     return (
         <div className={classes.root}>
             <div className={classes.content}>
@@ -135,7 +146,7 @@ const ChatRoom = ({roomName, users, messages, mutes, sendMessage, changeMuteStat
                 }
             </div>
             <SeparateLine />
-            <ChatForm username={username} roomName={roomName} type="public" sendMessage={sendMessage}/>
+            <ChatForm username={username} blocked={blocked} roomName={roomName} type="public" sendMessage={sendMessage}/>
             <SeparateLine />
         </div>
     );

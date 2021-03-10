@@ -12,7 +12,7 @@ import {UserContext} from '../../context';
 import {useTranslation} from 'react-i18next';
 import {CustomThemeContext} from '../../themes/cutomThemeProvider';
 
-const ChatForm = ({roomName, to, sendMessage, onFocus, onBlur, type}) => {
+const ChatForm = ({roomName, to, sendMessage, onFocus, onBlur, type, blocked}) => {
     const {role} = useContext(UserContext);
     const classes = useStyles();
     const {t} = useTranslation();
@@ -38,6 +38,9 @@ const ChatForm = ({roomName, to, sendMessage, onFocus, onBlur, type}) => {
     }, []);
 
     const sendFileMessage = useCallback((file) => {
+        if(blocked) {
+            return;
+        }
         const data = new FormData();
         data.append('file_icon', file);
         
@@ -66,7 +69,11 @@ const ChatForm = ({roomName, to, sendMessage, onFocus, onBlur, type}) => {
     const handleOnEnter = () => {
         let realMsg = msg.trim();
         if(realMsg) {
-            setTimeout(() => {sendMessage(roomName, to, userColor, realMsg, bold, type, 'general');}, 0);
+            if(!blocked) {
+                setTimeout(() => {
+                    sendMessage(roomName, to, userColor, realMsg, bold, type, 'general');
+                }, 0);
+            }
             setMsg('');
         }
     }

@@ -3,7 +3,7 @@ import PrivateChatContent from '../PrivateChatContent';
 import { makeStyles } from '@material-ui/core/styles';
 // import getUser from '../../utils/getUser';
 
-const PrivateChatList = ({sendMessage, readMsg ,me}, ref) => {
+const PrivateChatList = ({sendMessage, readMsg ,me, globalBlocks}, ref) => {
     const [chatList, setChatList] = useState([]);
     const [activeChat, setActiveChat] = useState(null);
     const elRefs = useRef([]);
@@ -92,6 +92,7 @@ const PrivateChatList = ({sendMessage, readMsg ,me}, ref) => {
                     active={item.roomName === activeChat}
                     setActive={setActive}
                     roomName={item.roomName}
+                    globalBlocks={globalBlocks}
                 />
             )
             }

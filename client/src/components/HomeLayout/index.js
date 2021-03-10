@@ -71,6 +71,14 @@ const HomeLayout = ({children, unReadMsgs, openPrivate, messageSize, setMessageS
         setFrameShow(true)
     }, [])
     
+    useEffect(() => {
+        const resetMessageSize = async (size) => {
+                
+            setMessageSize(size)
+        };
+        
+        resetMessageSize(messageSize);
+    }, [messageSize])
     return (
     <div style={{fontSize: messageSize}}>
         <AppBar position="static" className={classes.appBar}>

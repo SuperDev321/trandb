@@ -92,7 +92,7 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 
-const SideBarLeft = ({ roomName, username, mutes, unReadInfo, changeMuteState, sendPokeMessage, kickUser, banUser,
+const SideBarLeft = ({ roomName, username, mutes, blocks, globalBlocks, unReadInfo, changeMuteState, sendPokeMessage, kickUser, banUser,
     users,
     addOrOpenPrivate,
      cameraState, openCamera, closeCamera }) => {
@@ -107,8 +107,8 @@ const SideBarLeft = ({ roomName, username, mutes, unReadInfo, changeMuteState, s
         if(me) setRole(me.role);
     }, [users, username])
 
+
     useEffect(() => {
-        
         if(searchText) {
             let filteredUsers = users.filter((item) => (item.username.includes(searchText)));
             setSideUsers(filteredUsers);
@@ -118,7 +118,15 @@ const SideBarLeft = ({ roomName, username, mutes, unReadInfo, changeMuteState, s
     }, [searchText, users])
 
     const isMuted = (user) => {
-        if(mutes.includes(user.username)) {
+        if(mutes && mutes.includes(user.username)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    const isBlocked = (user) => {
+        if(blocks.includes(user.username) || globalBlocks.includes(user.username)) {
             return true;
         } else {
             return false;
@@ -143,6 +151,7 @@ const SideBarLeft = ({ roomName, username, mutes, unReadInfo, changeMuteState, s
                                 role={role}
                                 user={user} key={index}
                                 isMuted={isMuted(user)}
+                                isBlocked = {isBlocked(user)}
                                 addOrOpenPrivate={addOrOpenPrivate}
                                 changeMuteState={changeMuteState}
                                 sendPokeMessage={sendPokeMessage}

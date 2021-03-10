@@ -9,31 +9,31 @@ import { makeStyles } from "@material-ui/core/styles";
 import Navbar from "Admin/components/Navbars/Navbar.js";
 import Sidebar from "Admin/components/Sidebar/Sidebar.js";
 import routes from "routes.js";
-
+import UserContext from '../../context/UserContext';
 import styles from "Admin/assets/jss/material-dashboard-react/layouts/adminStyle.js";
 
 import bgImage from "Admin/assets/img/sidebar-2.jpg";
 
 let ps;
 
-const switchRoutes = (
-  <Switch>
-    {routes.map((prop, key) => {
-      if (prop.layout === "/admin") {
-      //   console.log('ok')
-        return (
-          <Route
-            path={prop.layout + prop.path}
-            component={prop.component}
-            key={key}
-          />
-        );
-      }
-      return null;
-    })}
-    <Redirect from="/admin/" to="/admin/dashboard" />
-  </Switch>
-);
+// const switchRoutes = (
+//   <Switch>
+//     {routes.map((prop, key) => {
+//       if (prop.layout === "/admin" && (!prop.super || (prop.super && superAdmin))) {
+//       //   console.log('ok')
+//         return (
+//           <Route
+//             path={prop.layout + prop.path}
+//             component={prop.component}
+//             key={key}
+//           />
+//         );
+//       }
+//       return null;
+//     })}
+//     <Redirect from="/admin/" to="/admin/dashboard" />
+//   </Switch>
+// );
 
 const useStyles = makeStyles(styles);
 
@@ -41,6 +41,7 @@ export default function Admin({ ...rest }) {
   const classes = useStyles();
   // ref to help us initialize PerfectScrollbar on windows devices
   const mainPanel = React.createRef();
+  const {superAdmin} = useContext(UserContext);
   // states and functions
   // const [image, setImage] = React.useState(bgImage);
   // const [color, setColor] = React.useState("blue");
@@ -103,12 +104,30 @@ export default function Admin({ ...rest }) {
       <div className={classes.mainPanel} ref={mainPanel}>
         <Navbar
           routes={routes}
+          superAdmin={superAdmin}
           handleDrawerToggle={handleDrawerToggle}
           {...rest}
         />
         {/* On the /maps route we want the map to be on full screen - this is not possible if the content and conatiner classes are present because they have some paddings which would make the map smaller */}
           <div className={classes.content}>
-            <div className={classes.container}>{switchRoutes}</div>
+            <div className={classes.container}>
+            <Switch>
+              {routes.map((prop, key) => {
+                if (prop.layout === "/admin" && (!prop.super || (prop.super && superAdmin))) {
+                //   console.log('ok')
+                  return (
+                    <Route
+                      path={prop.layout + prop.path}
+                      component={prop.component}
+                      key={key}
+                    />
+                  );
+                }
+                return null;
+              })}
+              <Redirect from="/admin/" to="/admin/dashboard" />
+            </Switch>
+            </div>
           </div>
       </div>
     </div>

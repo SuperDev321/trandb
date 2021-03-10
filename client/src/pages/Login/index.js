@@ -116,7 +116,7 @@ const Login = () => {
         .required(t('LoginPage.error_username')),
         password: yup
         .string('Enter your password')
-        .min(8, 'Password should be of minimum 8 characters length')
+        .min(4, 'Password should be of minimum 4 characters length')
         .required(t('LoginPage.error_password')),
     });
     const guestValidationSchema = yup.object({

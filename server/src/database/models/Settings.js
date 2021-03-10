@@ -12,6 +12,10 @@ const settingSchema = new Schema({
   messageNum: {
     type: Number,
     required: true,
+  },
+  privateAllow: {
+    type: Boolean,
+    required: true
   }
 });
 

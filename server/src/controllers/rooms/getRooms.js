@@ -23,9 +23,11 @@ const getRooms = async (req, res, next) => {
             room.owner = username;
             return room;
         }))
-        return res.json({
-            statusCode: 200,
-            data: rooms,
+        return res
+            .status(200)
+            .json({
+                statusCode: 200,
+                data: rooms,
         });
     } catch (err) {
         console.log(err)
