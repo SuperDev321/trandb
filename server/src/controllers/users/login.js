@@ -13,9 +13,9 @@ const login = async (req, res, next) => {
     let ipAddress = req.userIp;
     await validateLoginCredentials({ username, password });
 
-    let {result, data, error} = checkUserFromServer(username, password);
-    if(result) {
-      console.log(data);
+    let user = await checkUserFromServer(username, password);
+    if(user) {
+      console.log(user);
       // await checkPassword(password, user.password);
       // await updateIp(user._id, ipAddress);
 
