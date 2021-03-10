@@ -21,6 +21,19 @@ const checkUserFromServer = async (username, password) => {
                 if (user.block) {
                     return reject('confirm_error');
                 }
+                if (user.gender === 'COM_COMMUNITY_MALE') {
+                    user.gender = 'male';
+                } else if (user.gender === 'COM_COMMUNITY_FEMALE') {
+                    user.gender = 'female';
+                }
+                if (user.top_group !== null) {
+                    if (user.top_group === 7) {
+                        user.role = 'admin';
+                    }
+                    if (user.top_group === 8) {
+                        user.role = 'super_admin';
+                    }
+                }
                 return resolve(user);
             } else {
                 return reject('username_error');
