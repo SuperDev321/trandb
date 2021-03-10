@@ -20,6 +20,7 @@ const {
   fileUploader,
   getUserByName,
   getUserDetail,
+  getPublicRoomNames,
   addBan,
   deleteBan,
   getBans,
@@ -30,7 +31,9 @@ const {
   addWord,
   deleteWord,
   getSetting,
-  updateSetting
+  updateSetting,
+  getQuizes,
+  addQuiz
 } = require('./controllers');
 const getUserIp = require('./controllers/users/getUserIp');
 
@@ -46,6 +49,7 @@ router.get('/setting', getSetting);
 router.post('/setting', withAuth, isAdmin ,updateSetting);
 
 router.get('/rooms', getRooms);
+router.get('/room/names', getPublicRoomNames);
 router.post('/room', withAuth, addRoom);
 router.put('/room/general', withAuth, updateRoomGeneral);
 router.put('/room/media', withAuth, updateRoomMedia);
@@ -77,7 +81,10 @@ router.post('/moderators/delete', withAuth, deleteModerator)
 
 router.get('/admin/rooms', getRoomsAdmin);
 
-router.post('/file_upload', fileUploader)
+router.post('/file_upload', fileUploader);
+
+router.get('/quizes', getQuizes);
+router.post('/quizes', addQuiz);
 
 router.use(clientError);
 router.use(serverError);

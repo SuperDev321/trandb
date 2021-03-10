@@ -35,7 +35,7 @@ const useStyles = makeStyles((theme) => ({
     },
     sender: {
         display: 'flex',
-        alignItems: 'center',
+        // alignItems: 'center',
         margin: 0,
         whiteSpace: 'nowrap',
         fontWeight: 'bold',

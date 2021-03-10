@@ -3,6 +3,7 @@ const getRoomsAdmin = require('./getRoomsAdmin');
 const addRoom = require('./createRoom');
 const deleteRoom = require('./deleteRoom');
 const getRoomDetail = require('./getRoomDetail');
+const getPublicRoomNames = require('./getPublicRoomNames');
 const checkRoomPermission = require('./checkRoomPermission');
 const getUserRooms = require('./getUserRooms');
 const addModerator = require('./addModerator');
@@ -20,5 +21,6 @@ module.exports = {
   deleteModerator,
   updateRoomGeneral,
   updateRoomMedia,
-  deleteRoom
+  deleteRoom,
+  getPublicRoomNames
 };

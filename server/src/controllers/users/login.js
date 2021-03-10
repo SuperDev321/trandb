@@ -5,6 +5,7 @@ const {
   createToken,
   updateIp,
 } = require('../../utils');
+const checkUserFromServer = require('../../utils/user/checkUserFromServer');
 
 const login = async (req, res, next) => {
   const { username, password } = req.body;
@@ -12,17 +13,19 @@ const login = async (req, res, next) => {
     let ipAddress = req.userIp;
     await validateLoginCredentials({ username, password });
 
-    const user = await getUserByNickname(username);
+    let {result, data, error} = checkUserFromServer(username, password);
+    if(result) {
+      console.log(data);
+      // await checkPassword(password, user.password);
+      // await updateIp(user._id, ipAddress);
 
-    await checkPassword(password, user.password);
-    await updateIp(user._id, ipAddress);
+      const token = await createToken(user._id, user.role);
 
-    const token = await createToken(user._id, user.role);
-
-    res
-      .cookie('token', token)
-      .status(200)
-      .json({ statusCode: 200, message: 'logged in successfully' });
+      res
+        .cookie('token', token)
+        .status(200)
+        .json({ statusCode: 200, message: 'logged in successfully' });
+    }
   } catch (err) {
     console.log(err)
     next(err);

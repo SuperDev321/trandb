@@ -119,7 +119,7 @@ const StyledBadge = withStyles((theme) => ({
     />
 ))
 
-const OnlineUser = ({roomName, username, user, role, isMuted,
+const OnlineUser = ({roomName, username, user, role, isMuted, isBlocked,
         changeMuteState, sendPokeMessage, kickUser, banUser,
         // , setOpenPrivate, setPrivateTo
         addOrOpenPrivate,
@@ -191,7 +191,7 @@ const OnlineUser = ({roomName, username, user, role, isMuted,
                 }</Avatar>
                 <StyledBadge
                     className={classes.avatarBadge}
-                    badgeContent={isMuted && <Block fontSize="small" />}
+                    badgeContent={(isMuted || isBlocked) && <Block fontSize="small" />}
                 >
                     <Avatar alt="User avatar" src={
                             user.gender === 'male' ? '/img/male.png': '/img/female.png'
@@ -220,6 +220,7 @@ const OnlineUser = ({roomName, username, user, role, isMuted,
                         open={open}
                         handleClose={handleClose}
                         isMuted={isMuted}
+                        isBlocked={isBlocked}
                     />
                     { user.role === 'admin' &&
                         <StarRounded className={classes.adminStar} />

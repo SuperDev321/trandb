@@ -7,6 +7,7 @@ import TextField from '@material-ui/core/TextField';
 import Grid from '@material-ui/core/Grid';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
+import Switch from '@material-ui/core/Switch';
 import DeleteIcon from '@material-ui/icons/Delete';
 import IconButton from '@material-ui/core/IconButton';
 // core components
@@ -17,13 +18,7 @@ import CardHeader from "Admin/components/Card/CardHeader.js";
 import CardIcon from "Admin/components/Card/CardIcon.js";
 import CardFooter from "Admin/components/Card/CardFooter.js";
 import Button from "Admin/components/CustomButtons/Button.js";
-// table components
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableContainer from '@material-ui/core/TableContainer';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
+
 import styles from "Admin/assets/jss/material-dashboard-react/views/dashboardStyle.js";
 import Axios from "axios";
 import config from "config";
@@ -35,6 +30,7 @@ export default function Setting() {
     const [theme, setTheme] = useState('normal'); 
     const [language, setLanguage] = useState('en');
     const [messageNum, setMessageNum] = useState(20);
+    const [allowPrivate, setAllowPrivate] = useState(false);
     const { addToast } = useToasts();
 
     useEffect(() => {
@@ -66,7 +62,7 @@ export default function Setting() {
 
     return (
         <GridContainer>
-            <GridItem xs={12} sm={8} md={8}>
+            <GridItem xs={12} sm={12} md={12}>
                 <Card>
                 <CardHeader color="warning" icon>
                     <CardIcon color="rose">
@@ -102,56 +98,75 @@ export default function Setting() {
                                 </Select>
                             </FormControl>
                         </Grid>
-                        </Grid>
+                    </Grid>
                     <Grid container spacing={2} style={{marginTop:'20px'}}>
-                    <Grid item sm={1}>
+                        <Grid item sm={1}>
+                        </Grid>
+                        <Grid item sm={2} style={{textAlign: 'right'}}>
+                            <p className={classes.cardCategory}>Language</p>
+                        </Grid>
+                       <Grid item sm={9}>
+                            <FormControl style={{width: '100%'}}>
+                                <Select
+                                    native
+                                    value={language}
+                                    onChange={(e) => setLanguage(e.target.value)}
+                                    label="Language"
+                                    inputProps={{
+                                    name: 'language',
+                                    id: 'language',
+                                    }}
+                                >
+                                    {/* <option aria-label="None" value="" /> */}
+                                    <option value="en">English</option>
+                                    <option value="iw">Hebrew</option>
+                                </Select>
+                            </FormControl>
+                        </Grid>
                     </Grid>
-                    <Grid item sm={2} style={{textAlign: 'right'}}>
-                        <p className={classes.cardCategory}>Language</p>
+                    <Grid container spacing={2} style={{marginTop:'20px'}}>
+                        <Grid item sm={1}>
+                        </Grid>
+                        <Grid item sm={2} style={{textAlign: 'right'}}>
+                            <p className={classes.cardCategory}>Number of Message</p>
+                        </Grid>
+                        <Grid item sm={9}>
+                            <FormControl style={{width: '100%'}}>
+                                <Select
+                                    native
+                                    value={messageNum}
+                                    onChange={(e) => setMessageNum(e.target.value)}
+                                    label="MessageNum"
+                                    inputProps={{
+                                    name: 'messageNum',
+                                    id: 'messageNum',
+                                    }}
+                                >
+                                    {/* <option aria-label="None" value="" /> */}
+                                    <option value={20}>20</option>
+                                    <option value={30}>30</option>
+                                    <option value={40}>40</option>
+                                    <option value={50}>50</option>
+                                </Select>
+                            </FormControl>
+                        </Grid>
                     </Grid>
-                    <Grid item sm={9}>
-                        <FormControl style={{width: '100%'}}>
-                            <Select
-                                native
-                                value={language}
-                                onChange={(e) => setLanguage(e.target.value)}
-                                label="Language"
-                                inputProps={{
-                                name: 'language',
-                                id: 'language',
-                                }}
-                            >
-                                {/* <option aria-label="None" value="" /> */}
-                                <option value="en">English</option>
-                                <option value="iw">Hebrew</option>
-                            </Select>
-                        </FormControl>
-                    </Grid>
-                    <Grid item sm={1}>
-                    </Grid>
-                    <Grid item sm={2} style={{textAlign: 'right'}}>
-                        <p className={classes.cardCategory}>Language</p>
-                    </Grid>
-                    <Grid item sm={9}>
-                        <FormControl style={{width: '100%'}}>
-                            <Select
-                                native
-                                value={messageNum}
-                                onChange={(e) => setMessageNum(e.target.value)}
-                                label="MessageNum"
-                                inputProps={{
-                                name: 'messageNum',
-                                id: 'messageNum',
-                                }}
-                            >
-                                {/* <option aria-label="None" value="" /> */}
-                                <option value={20}>20</option>
-                                <option value={30}>30</option>
-                                <option value={40}>40</option>
-                                <option value={50}>50</option>
-                            </Select>
-                        </FormControl>
-                    </Grid>
+                    <Grid container spacing={2} style={{marginTop:'20px'}}>
+                        <Grid item sm={1}>
+                        </Grid>
+                        <Grid item sm={2} style={{textAlign: 'right'}}>
+                            <p className={classes.cardCategory}>Private Allow to Guest</p>
+                        </Grid>
+                        <Grid item sm={9}>
+                            <FormControl style={{width: '100%'}}>
+                            <Switch
+                                checked={allowPrivate}
+                                onChange={(e) => setAllowPrivate(e.target.checked)}
+                                name="allowPrivate"
+                                inputProps={{ 'aria-label': 'allow private' }}
+                            />
+                            </FormControl>
+                        </Grid>
                     </Grid>
                     <div style={{display:'flex', justifyContent:'space-between', marginTop: '20px', marginBottom: '20px'}}>
                     <Button 

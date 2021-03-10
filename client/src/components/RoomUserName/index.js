@@ -24,12 +24,14 @@ import BanModal from '../Modals/BanModal';
 import {getSocket} from '../../utils'
 const useStyles = makeStyles((theme) => ({
     username: {
-        font: 'bold 1.1em sans-serif',
+        fontWeight: 'bold',
+        fontSize: '1.1em',
+        lineHeight: 1.3,
         cursor: 'pointer',
         // flexGrow: 1,
         overflow: 'hidden',
         display: 'flex',
-        alignItems: 'center',
+        // alignItems: 'center',
     },
     cardRoot: {
         width: 200,
@@ -59,7 +61,7 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 const RoomUserName = ({user, role, roomName,
-    changeMuteState, sendPokeMessage, kickUser, banUser,addOrOpenPrivate, isMine, displayYou, isMuted
+    changeMuteState, sendPokeMessage, kickUser, banUser,addOrOpenPrivate, isMine, displayYou, isMuted, isBlocked
     // open,
     // anchorEl,
     // setAnchorEl,
@@ -91,7 +93,7 @@ const RoomUserName = ({user, role, roomName,
     }
     //block a user
     const blockUser = (roomName, username) => {
-        console.log('blockUser')
+        console.log('block user', roomName, username)
         socket.emit('block user', {room: roomName, username},
         (result, message) => {
             if(!result) {
@@ -102,20 +104,18 @@ const RoomUserName = ({user, role, roomName,
     const unBlockUser = (roomName, username) => {
 
         socket.emit('unblock user', {room: roomName, username},
-        (result, message) => {
-            if(!result) {
-                // enqueueSnackbar(message, {variant: 'error'});
+            (result, message) => {
+                if(!result) {
+                    // enqueueSnackbar(message, {variant: 'error'});
+                }
             }
-        });
+        );
         
     }
     const handleBlock = () => {
-        console.log('blockUser', user)
-        if(!user.blocked) {
-            console.log('block')
+        if(!isBlocked) {
             blockUser(roomName, user.username);
         } else {
-            console.log('unblock')
             unBlockUser(roomName, user.username);
         }
         setAnchorEl(null);

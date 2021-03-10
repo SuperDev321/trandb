@@ -47,7 +47,10 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
     const [currentRoomMessages, setCurrentRoomMessages] = useState([]);
     const [currentRoomUsers, setCurrentRoomUsers] = useState([]);
     const [currentRoomName, setCurrentRoomName] = useState(null);
+    const [currentRoomBlocks, setCurrentRoomBlocks] = useState([]);
     const [currentRoomMutes, setCurrentRoomMutes] = useState([]);
+    const [globalBlocks, setGlobalBlocks] = useState([]);
+
     // receive new message
     const [newMessage, setNewMessage] = useState([]);
     // receive new infomation for rooms
@@ -158,13 +161,18 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
             if(type === 'private') {
                 socket.emit('private message',
                     { type, roomName, msg, from: username, to, color, bold, messageType },
-                    (data) => {
+                    (data, err) => {
                         if(data) {
                             let message = data;
                             privateListRef.current.addMessage(message, roomName);
                         } else {
+                            if(err === 'logout') {
+                                privateListRef.current.addErrorMessage(roomName);
+                            } else if(err === 'forbidden') {
+                                enqueueSnackbar('Forbidden word', {variant: 'error'});
+                            }
                             // enqueueSnackbar(to + ' was out of chat. Please close the private chat with '+ to +'.', {variant: 'error'});
-                            privateListRef.current.addErrorMessage(roomName);
+                            
                         }
                         
                     }
@@ -198,7 +206,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                 if(sameRoom) {
                     let message = {
                         type: 'poke',
-                        msg: 'You sent a rington to ' + userToSend,
+                        msg: t('PokeMessage.you_have_poked', {username: userToSend}),
                     }
                     sameRoom.messages = [message, ...sameRoom.messages];
                     if(sameRoom.name === currentRoomName) {
@@ -451,8 +459,11 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
             socket.on('global banned user', async ({kickedUserName}) => {
                 setNewInfo({type: 'kicked', payload: { kickedUserName, type: 'global ban'}}); 
             });
-            socket.on('update block', ({room, onlineUsers, blocks}) => {
-                setNewInfo({type: 'update block', payload: { room, onlineUsers, blocks}}); 
+            socket.on('update block', ({room, blocks}) => {
+                setNewInfo({type: 'update block', payload: { room, blocks}}); 
+            })
+            socket.on('update global block', ({blocks}) => {
+                setGlobalBlocks(blocks);
             })
             socket.on('room message', (message, callback) => {
                 setNewMessage({message, callback});
@@ -770,16 +781,17 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                 }
                 break;
             case 'update block':
+                
                 if(roomsRef.current && newInfo.payload.room) {
-                    let {room, onlineUsers, blocks} = newInfo.payload;
+                    let {room, blocks} = newInfo.payload;
                     let sameRoom = await roomsRef.current.find((room) => (room.name === newInfo.payload.room));
                     if(sameRoom) {
-                        sameRoom.setOnlineUsers(onlineUsers);
-                        sameRoom.initMutes(onlineUsers, blocks);
+                        // sameRoom.setOnlineUsers(onlineUsers);
+                        sameRoom.updateBlocks(blocks);
                     }
                     if(room === currentRoomName) {
-                        setCurrentRoomMutes([...sameRoom.mutes]);
-                        setCurrentRoomUsers([...sameRoom.users]);
+                        setCurrentRoomBlocks([...sameRoom.blocks]);
+                        // setCurrentRoomUsers([...sameRoom.users]);
                     }
                 }
                 
@@ -832,6 +844,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                 setCurrentRoomMessages([...roomsRef.current[roomIndex].messages]);
                 setCurrentRoomName(roomsRef.current[roomIndex].name);
                 setCurrentRoomMutes(roomsRef.current[roomIndex].mutes);
+                setCurrentRoomBlocks(roomsRef.current[roomIndex].blocks);
             }
         }
     }, [roomsInfo, roomIndex])
@@ -902,6 +915,8 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                         // unReadInfo={currentRoom && currentRoom.private}
                         roomName={currentRoomName}
                         mutes={currentRoomMutes}
+                        blocks={currentRoomBlocks}
+                        globalBlocks={globalBlocks}
                         // setOpenPrivate={setOpenPrivate}
                         // setPrivateTo={setPrivateTo}
                         addOrOpenPrivate={addOrOpenPrivate}
@@ -950,6 +965,8 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                             // unReadInfo={currentRoom && currentRoom.private}
                             roomName={currentRoomName}
                             mutes={currentRoomMutes}
+                            blocks={currentRoomBlocks}
+                            globalBlocks={globalBlocks}
                             // setOpenPrivate={setOpenPrivate}
                             // setPrivateTo={setPrivateTo}
                             addOrOpenPrivate={addOrOpenPrivate}
@@ -972,6 +989,8 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                             roomName={currentRoomName}
                             username={username}
                             mutes={currentRoomMutes}
+                            blocks={currentRoomBlocks}
+                            globalBlocks={globalBlocks}
                             messages={currentRoomMessages}
                             sendMessage={sendMessage}
                             users={currentRoomUsers}
@@ -996,7 +1015,9 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
         <PrivateChatList ref={privateListRef}
             sendMessage={sendMessage}
             leaveFromPrivate={leaveFromPrivate}
-            me={{username, avatar, gender}} />
+            me={{username, avatar, gender}}
+            globalBlocks={globalBlocks}
+        />
         <div>{pokeAudio}</div>
         <div>{publicAudio}</div>
         <div>{privateAudio}</div>

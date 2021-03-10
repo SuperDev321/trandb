@@ -8,7 +8,7 @@ const leaveRoom = (io, socket) => async ({ room }) => {
         let user = await Users.findOne({_id});
         await Rooms.updateOne({ name: room }, { $pull: { users: _id }});
         const usersInfo = await findRoomUsers(room);
-        io.to(room).emit('leave room', {room, onlineUsers: usersInfo, leavedUser: user});
+        io.to(room).emit('leave room', {room, onlineUsers: usersInfo, leavedUser: _id});
     } catch (err) {
         console.log(err);
     }

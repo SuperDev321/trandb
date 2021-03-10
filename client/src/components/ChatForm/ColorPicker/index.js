@@ -37,9 +37,9 @@ const colorPanels = [
     '#20264d',
 ];
 
-const ColorPicker = ({userColor, setUserColor, defaultColor, backgroundColor}) => {
+const ColorPicker = ({userColor, setUserColor, backgroundColor, defaultColor}) => {
     // my code start
-    const classes = useStyles({defaultColor, backgroundColor});
+    const classes = useStyles({backgroundColor});
     const [colorPanel, setColorPanel] = useState(false);
     
     // end
@@ -65,12 +65,12 @@ const ColorPicker = ({userColor, setUserColor, defaultColor, backgroundColor}) =
     return (
         <>
         <div className={classes.colorArea} onClick={openColorArea}>
-            <div className={classes.userColor} style={{backgroundColor: userColor ==='default'? defaultColor: userColor}}>&nbsp;</div>
+            <div className={classes.userColor} style={{backgroundColor: userColor === 'default' ? defaultColor: userColor}}>&nbsp;</div>
                 {colorPanel && <div className={classes.colorPanel}>
                     {colorPanels.map((color, key) => {
                         return (
                             <div className={`${classes.colorSnap} ${userColor === color ? 'active' : ''}`}
-                            style={{backgroundColor: color === 'default'? defaultColor: color }}
+                            style={{backgroundColor: color? (color==='default' ? defaultColor: color): '#fff' }}
                                 key={key} onClick={() => onSelectColor(color)}>
                             </div>
                         );

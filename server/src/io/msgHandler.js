@@ -1,5 +1,5 @@
 const { Chats } = require('../database/models');
-const { findRoomUsers, findUserByName, isForbidden, hasFobiddenWord, getIp, banByUser, banByNameAndIp, findUserById } = require('../utils');
+const { findRoomUsers, findUserByName, isForbidden, hasFobiddenWord, getIp, banByUser, banByNameAndIp, findUserById, checkBlockById } = require('../utils');
 const {banUserByAdmin, banUser} = require('./userHandler');
 const publicMessage = (io, socket) => async ({ msg, room, from, color, bold, type, messageType }, callback) => {
   try {
@@ -15,7 +15,10 @@ const publicMessage = (io, socket) => async ({ msg, room, from, color, bold, typ
         return callback(false);
       }
     }
-    
+    let isBlocked = await checkBlockById(_id);
+    if(isBlocked) {
+      return callback(false, 'blocked');
+    }
     const newChat = await Chats.create({
       msg,
       type: 'public',
@@ -46,6 +49,11 @@ const publicMessage = (io, socket) => async ({ msg, room, from, color, bold, typ
 
 const pokeMessage = (io, socket) => async ({from, to, room}, callback) => {
   const toUser = await findUserByName(to);
+  const { _id } = socket.decoded;
+  let isBlocked = await checkBlockById(_id);
+    if(isBlocked) {
+      return callback(false, 'blocked');
+    }
   if(toUser) {
     io.to(toUser._id.toString()).emit('poke message', {
       type: 'poke',
@@ -59,19 +67,21 @@ const pokeMessage = (io, socket) => async ({from, to, room}, callback) => {
   }
 }
 
-const privateMessage = (io, socket) => async ({ roomName, msg, from, to, color, bold, messageType }, fn) => {
+const privateMessage = (io, socket) => async ({ roomName, msg, from, to, color, bold, messageType }, callback) => {
   try {
     const { _id } = socket.decoded;
     const date = Date.now();
-    console.log(msg, messageType, roomName)
+    let isBlocked = await checkBlockById(_id);
+    if(isBlocked) {
+      return callback(false, 'blocked');
+    }
     if(messageType !== 'image') {
       let isForbiddenMessage = await hasFobiddenWord(msg);
       if(isForbiddenMessage) {
         let user = await findUserById(_id);
         let userIp = await getIp(room, _id);
         await banUser(io, socket)({ip: userIp, to: user.username, role: 'admin'});
-        console.log('forbidden')
-        return callback(false);
+        return callback(false, 'forbidden');
       }
     }
     
@@ -91,7 +101,7 @@ const privateMessage = (io, socket) => async ({ roomName, msg, from, to, color, 
       let socketIds = await io.of('/').in(roomName).allSockets();
       socketIdArr = Array.from(socketIds);
       if(socketIdArr.length < 2) {
-        fn(false);
+        callback(false, 'logout');
         socket.leave(roomName);
         return;
       }
@@ -122,11 +132,11 @@ const privateMessage = (io, socket) => async ({ roomName, msg, from, to, color, 
             roomName
           }, (res) => {
             if(res)
-              fn(newChat);
+            callback(newChat);
         });
       } else {
         console.log('no user to receive private')
-        fn(false);
+        callback(false, 'logout');
       }
     }
     

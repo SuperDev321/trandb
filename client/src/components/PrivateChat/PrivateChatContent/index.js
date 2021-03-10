@@ -133,7 +133,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const PrivateChat = ({ me, to, sendMessage, active, setActive, initMessages, deleteChat, roomName }, ref) => {
+const PrivateChat = ({ me, to, sendMessage, active, setActive, initMessages, deleteChat, roomName, globalBlocks }, ref) => {
     const rndRef = useRef(null);
     const winRef = useRef(null);
     const [messages, setMessages] = useState([]);
@@ -143,6 +143,8 @@ const PrivateChat = ({ me, to, sendMessage, active, setActive, initMessages, del
     const [unRead, setUnRead] = useState(0);
     const [isFocus, setIsFocus] = useState(false);
     const [error, setError] = useState(false);
+    const [blocked, setBlocked] = useState(false);
+    const [withBlocked, setWithBlocked] = useState(false);
     const [privateKey, setPrivateKey] = useState(null);
     const [rndWidth, setRndWidth] = useState(defaultWidth);
     const [rndHeight, setRndHeight] = useState(defaultHeight);
@@ -206,10 +208,18 @@ const PrivateChat = ({ me, to, sendMessage, active, setActive, initMessages, del
         },
     }));
 
-    // useEffect(() => {
-    //     let key = randomstring.generate(8);
-    //     setPrivateKey(key);
-    // })
+    useEffect(() => {
+        if(Array.isArray(globalBlocks) && globalBlocks.includes(to)) {
+            setWithBlocked(true);            
+        } else {
+            setWithBlocked(false);
+        }
+        if(Array.isArray(globalBlocks) && globalBlocks.includes(me.username)) {
+            setBlocked(true);
+        } else {
+            setBlocked(false);
+        }
+    }, [globalBlocks])
 
     // useEffect(() => {
     //     getPrivateMessages({from: me.username, to},
@@ -307,12 +317,12 @@ const PrivateChat = ({ me, to, sendMessage, active, setActive, initMessages, del
                 </div>
                 <div className={classes.main}>
                     <div className={classes.content}>
-                        <PrivateMessageList messages={messages} me={me}/>
+                        <PrivateMessageList messages={messages} withBlocked={withBlocked} blocked={blocked} me={me}/>
                         { error &&
                             <div className={classes.errorContent}>This user logged out, message delivery failed.Please close this chat.</div>
                         }
                     </div>
-                    <ChatForm to={to} sendMessage={sendMessage} onFocus={onFocus} onBlur={onBlur} roomName={roomName}
+                    <ChatForm to={to} blocked={blocked} sendMessage={sendMessage} onFocus={onFocus} onBlur={onBlur} roomName={roomName}
                         type='private'
                     />
                 </div>

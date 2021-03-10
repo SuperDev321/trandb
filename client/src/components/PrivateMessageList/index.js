@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import propTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
 import StyledMessage from '../Message/StyledMessage'
@@ -76,12 +76,26 @@ const useListStyles = makeStyles((theme) => ({
 }))
 
 
-const PrivateMessageList = ({messages, me}) => {
+const PrivateMessageList = ({messages, me, blocked, withBlocked}) => {
     const classes = useListStyles();
     const listRef = useRef();
+    const [messagesToShow, setMessagesToShow] = useState([]);
+
+    useEffect(() => {
+        let filteredMessages = messages;
+        if(blocked && !withBlocked) {
+            filteredMessages = filteredMessages.filter((item) => (item.from !== me.username));
+        } else if(!blocked && withBlocked) {
+            filteredMessages = filteredMessages.filter((item) => (item.username == me.username));
+        } else if(blocked && withBlocked) {
+            filteredMessages = [];
+        }
+        setMessagesToShow(filteredMessages);
+    }, [messages, blocked, withBlocked])
+
     useEffect(() => {
         setScrollTop();
-    }, [messages]);
+    }, [messagesToShow]);
     const setScrollTop = () => {
         if (listRef.current) {
             console.log('private scroll')
@@ -90,8 +104,8 @@ const PrivateMessageList = ({messages, me}) => {
     }
     return (
         <div className={classes.root} ref={listRef}>
-            { messages &&
-                messages.map((message, index) => (
+            { messagesToShow &&
+                messagesToShow.map((message, index) => (
                     <StyledMessage message={message} mine={Boolean(message.from === me.username)} key={index}
                     />
                 ))

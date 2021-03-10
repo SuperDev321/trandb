@@ -1,6 +1,6 @@
 import React, { useState, useContext } from "react";
 import { useHistory } from "react-router-dom";
-import UserContext from "../../context/UserContext";
+// import UserContext from "../../context/UserContext";
 import Axios from "axios";
 // import ErrorNotice from "../misc/ErrorNotice";
 import {
@@ -18,7 +18,8 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import { makeStyles } from '@material-ui/core/styles';
 import { ValidatorForm, TextValidator} from 'react-material-ui-form-validator';
 import { useToasts } from 'react-toast-notifications';
-import config from '../../config'
+import config from '../../config';
+import UserContext from "../../context/UserContext";
 const useStyles = makeStyles((theme) => ({
   paper: {
     marginTop: theme.spacing(8),
