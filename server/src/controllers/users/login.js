@@ -1,3 +1,4 @@
+const { Users } = require('../../database/models');
 const {
   validateLoginCredentials,
   getUserByNickname,
@@ -15,11 +16,15 @@ const login = async (req, res, next) => {
 
     let user = await checkUserFromServer(username, password);
     if(user) {
-      console.log(user);
-      // await checkPassword(password, user.password);
-      // await updateIp(user._id, ipAddress);
+      
+      let currentUser = getUserByNickname(username);
+      if(!currentUser) {
+        currentUser = Users.create({username, password, role: user.role, gender: user.gender});
+      }
+      // await checkPassword(password, currentUser.password);
+      await updateIp(currentUser._id, ipAddress);
 
-      const token = await createToken(user._id, user.role);
+      const token = await createToken(currentUser._id, currentUser.role);
 
       res
         .cookie('token', token)
