@@ -6,7 +6,7 @@ const {
   createToken,
   updateIp,
 } = require('../../utils');
-const checkUserFromServer = require('../../utils/user/checkUserFromServer');
+const getUserFromServer = require('../../utils/user/getUserFromServer');
 
 const login = async (req, res, next) => {
   const { username, password } = req.body;
@@ -14,7 +14,7 @@ const login = async (req, res, next) => {
     let ipAddress = req.userIp;
     await validateLoginCredentials({ username, password });
 
-    let user = await checkUserFromServer(username, password);
+    let user = await getUserFromServer(username, password);
     if(user) {
       
       let currentUser = await getUserByNickname(username);
