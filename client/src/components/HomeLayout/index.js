@@ -66,7 +66,6 @@ const HomeLayout = ({children, unReadMsgs, openPrivate, messageSize, setMessageS
     const classes = useStyles();
     const history = useHistory();
     const [frameShow, setFrameShow] = useState(false);
-    console.log('home messageSize', messageSize)
     useLayoutEffect(() => {
         setFrameShow(true)
     }, [])
