@@ -47,19 +47,8 @@ export default function Admin({ ...rest }) {
   // const [color, setColor] = React.useState("blue");
   // const [fixedClasses, setFixedClasses] = React.useState("dropdown show");
   const [mobileOpen, setMobileOpen] = React.useState(false);
-  // const handleImageClick = image => {
-  //   setImage(image);
-  // };
-  // const handleColorClick = color => {
-  //   setColor(color);
-  // };
-  // const handleFixedClick = () => {
-  //   if (fixedClasses === "dropdown") {
-  //     setFixedClasses("dropdown show");
-  //   } else {
-  //     setFixedClasses("dropdown");
-  //   }
-  // };
+
+  const [activeRoutes, setActiveRoutes] = useState([]);
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
@@ -71,6 +60,11 @@ export default function Admin({ ...rest }) {
       setMobileOpen(false);
     }
   };
+
+  React.useEffect(() => {
+    let activeRoutes = routes.map((prop) => (!prop.super || (prop.super && superAdmin)));
+    setActiveRoutes(activeRoutes);
+  }, [])
   // initialize and destroy the PerfectScrollbar plugin
   React.useEffect(() => {
     if (navigator.platform.indexOf("Win") > -1) {
@@ -89,10 +83,11 @@ export default function Admin({ ...rest }) {
       window.removeEventListener("resize", resizeFunction);
     };
   }, [mainPanel]);
+
   return (
     <div className={classes.wrapper}>
       <Sidebar
-        routes={routes}
+        routes={activeRoutes}
         logoText={"VS"}
         logoBody={"TRAND CHAT"}
         image={bgImage}
@@ -103,7 +98,7 @@ export default function Admin({ ...rest }) {
       />
       <div className={classes.mainPanel} ref={mainPanel}>
         <Navbar
-          routes={routes}
+          routes={activeRoutes}
           superAdmin={superAdmin}
           handleDrawerToggle={handleDrawerToggle}
           {...rest}
@@ -112,8 +107,8 @@ export default function Admin({ ...rest }) {
           <div className={classes.content}>
             <div className={classes.container}>
             <Switch>
-              {routes.map((prop, key) => {
-                if (prop.layout === "/admin" && (!prop.super || (prop.super && superAdmin))) {
+              {activeRoutes.map((prop, key) => {
+                if (prop.layout === "/admin") {
                 //   console.log('ok')
                   return (
                     <Route
