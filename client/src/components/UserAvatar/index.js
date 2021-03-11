@@ -17,7 +17,7 @@ const UserAvatar = ({avatar}) => {
         <Avatar
             className={classes.root}
             src={ avatar ?
-                config.main_site_url+'img/avatars/'+avatar:
+                config.main_site_url+avatar:
                 '/img/default_avatar.png'
             }
             alt='user avatar'
