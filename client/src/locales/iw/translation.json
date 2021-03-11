@@ -117,7 +117,10 @@
     "default": "default",
     "sign_up": "הירשם",
     "create_new": "צור חשבון חדש",
-    "already_login": "האם כבר יש לך חשבון? התחברות"
+    "already_login": "האם כבר יש לך חשבון? התחברות",
+    "already_exist": "משתמש זה כבר רשום",
+    "forbidden": "שם משתמש זה אסור",
+    "unknown_error": "הכניסה נכשלה, אנא נסה שוב מאוחר יותר"
   },
   "UserActionArea": {
     "sent_broadcast_request": "שלחת בקשת צפיה ל- {{owner}}, נא להמתין לתגובה",

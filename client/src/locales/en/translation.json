@@ -116,7 +116,10 @@
     "default": "default",
     "create_new": "Create a new account",
     "sign_up": "Sign up",
-    "already_login": "Already have an account? Login"
+    "already_login": "Already have an account? Login",
+    "already_exist": "This user is already registered",
+    "forbidden": "This username is forbidden",
+    "unknown_error": "Login failed, please try again later"
   },
   "UserActionArea": {
     "sent_broadcast_request": "Your request to view was sent to {{owner}}, Please wait for response",
