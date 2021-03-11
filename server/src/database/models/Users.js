@@ -21,7 +21,8 @@ const userSchema = new Schema({
   role: String,
   ip: String,
   isInChat: Boolean,
-  created_at: Date
+  avatar: String,
+  created_at: Date,
 });
 
 const Users = model('Users', userSchema);
