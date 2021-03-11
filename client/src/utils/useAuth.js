@@ -7,7 +7,7 @@ const useAuth = () => {
   const [username, setUsername] = useState('');
   const [gender, setGender] = useState(null);
   const [avatar, setAvatar] = useState(null);
-  const [role, setRole] = useState('user');
+  const [role, setRole] = useState('normal');
   const [prevUrl, setPrevUrl] = useState(null);
 
   useEffect(() => {
@@ -17,8 +17,10 @@ const useAuth = () => {
         if (data === 'un-auth') {
           setLoading(false);
         } else {
-          if (data.role === 'admin') setRole('admin');
-          if (data.role === 'guest') setRole('guest');
+          if (data.role === 'super_admin') setRole('super_admin');
+          else if (data.role === 'admin') setRole('admin');
+          else if (data.role === 'guest') setRole('guest');
+          else setRole('normal');
           if(data.gender === 'female') setGender('female');
           else setGender('female');
           if(data.avatar) setAvatar(data.avatar);

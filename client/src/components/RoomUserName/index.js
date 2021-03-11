@@ -128,7 +128,7 @@ const RoomUserName = ({user, role, roomName,
     }
     const handleBan = (username) => {
         setAnchorEl(null);
-        if(role === 'admin') {
+        if(role === 'admin' || role === 'super_admin') {
             setOpenBan(true);
         } else {
             setTimeout(() => {
@@ -206,8 +206,8 @@ const RoomUserName = ({user, role, roomName,
                             <Notifications />&nbsp;{t('UserActionArea.poke')}
                         </Button>
                         <Divider />
-                        { ((role === 'admin' || role === 'owner' || role === 'moderator')
-                            && (user.role !== 'admin') && (user.role !== 'owner')) ?
+                        { ((role === 'super_admin' || role === 'admin' || role === 'owner' || role === 'moderator')
+                            && (user.role !== 'super_admin') && (user.role !== 'admin') && (user.role !== 'owner')) ?
                             <>
                             <Button size="small"
                                 className={`${classes.cardButton} ${classes.kick}`}
@@ -253,7 +253,7 @@ const RoomUserName = ({user, role, roomName,
                 }
             </Card>
         </Popover>
-        {role === 'admin' && <BanModal open={openBan} setOpen={setOpenBan} initVal={{name: user.username}}
+        {(role === 'admin' || role === 'super_admin')&& <BanModal open={openBan} setOpen={setOpenBan} initVal={{name: user.username}}
             roomName={roomName}
         />
         }

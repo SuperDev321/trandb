@@ -1,3 +1,4 @@
+require('dotenv').config();
 const db = require('../../database/serverDbConnection');
 const bcrypt = require('bcrypt');
 const getUserFromServer = async (username, password) => {
@@ -27,10 +28,12 @@ const getUserFromServer = async (username, password) => {
                     user.gender = 'female';
                 }
                 if (user.top_group !== null) {
-                    if (user.top_group === 7) {
-                        user.role = 'admin';
-                    } else if (user.top_group === 8) {
-                        user.role = 'super_admin';
+                    if (user.top_group > 6) {
+                        if(user.username == process.env.SUPER_ADMIN_NAME) {
+                            user.role = 'super_admin';
+                        } else
+                            user.role = 'admin';
+
                     } else {
                         user.role = 'normal';
                     }
