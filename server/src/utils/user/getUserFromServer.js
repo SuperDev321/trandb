@@ -13,8 +13,8 @@ const getUserFromServer = async (username, password) => {
             if(err) {
                 return reject('db_error');
             }
-            let user = last_user[0];
             if (last_user.length !== 0) {
+                let user = last_user[0];
                 const pwd = user.password.replace("$2y$", "$2a$");
                 if (!bcrypt.compareSync(password, pwd) && !bcrypt.compareSync(password, user.password)) {
                     return reject('password_error');
@@ -33,11 +33,14 @@ const getUserFromServer = async (username, password) => {
                             user.role = 'super_admin';
                         } else
                             user.role = 'admin';
-
                     } else {
                         user.role = 'normal';
                     }
-
+                    delete user.top_group;
+                }
+                if(user.thumb) {
+                    user.avatar = user.thumb;
+                    delete user.thumb;
                 }
                 return resolve(user);
             } else {
