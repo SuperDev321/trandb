@@ -1,5 +1,5 @@
 const db = require('../../database/serverDbConnection');
-const checkUserFromServer = async (username, password) => {
+const checkUserFromServer = async (username) => {
     return new Promise((resolve, reject) => {
         let sql = "SELECT a.id, a.username WHERE a.username = ?";
         db.query(sql, username, function(err, last_user) {
@@ -7,9 +7,9 @@ const checkUserFromServer = async (username, password) => {
                 return reject('db_error');
             }
             if (last_user.length !== 0) {
-                return true;
+                return resolve(true);
             } else {
-                return false;
+                return resolve(false);
             }
         });
            
