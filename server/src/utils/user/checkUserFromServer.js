@@ -29,10 +29,12 @@ const checkUserFromServer = async (username, password) => {
                 if (user.top_group !== null) {
                     if (user.top_group === 7) {
                         user.role = 'admin';
-                    }
-                    if (user.top_group === 8) {
+                    } else if (user.top_group === 8) {
                         user.role = 'super_admin';
+                    } else {
+                        user.role = 'normal';
                     }
+
                 }
                 return resolve(user);
             } else {
