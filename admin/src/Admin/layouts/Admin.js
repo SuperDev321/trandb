@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useState, useContext } from "react";
 import { Switch, Route, Redirect } from "react-router-dom";
 // creates a beautiful scrollbar
 import PerfectScrollbar from "perfect-scrollbar";
@@ -62,7 +62,7 @@ export default function Admin({ ...rest }) {
   };
 
   React.useEffect(() => {
-    let activeRoutes = routes.map((prop) => (!prop.super || (prop.super && superAdmin)));
+    let activeRoutes = routes.filter((prop) => (!prop.super || (prop.super && superAdmin)));
     setActiveRoutes(activeRoutes);
   }, [])
   // initialize and destroy the PerfectScrollbar plugin
