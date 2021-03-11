@@ -99,11 +99,6 @@ export default function AppMenu() {
                 onClick={handleToggle}
             >
                 <UserAvatar avatar={avatar} />
-                {/* { avatar ?
-                    <Avatar src={avatar} alt="avatar" className={classes.avatar}/>
-                    :
-                    <Avatar src="/img/default_avatar.png" alt="male" className={classes.avatar}/>
-                } */}
                 <span className={classes.username}>
                     {username}
                 </span>
