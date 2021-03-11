@@ -23,6 +23,7 @@ import {UserContext} from '../../context';
 import { handleLogin, handleGuestLogin } from '../../utils';
 import OutlinedButton from '../../components/OutlinedButton';
 import CustomTextField from '../../components/CustomTextField';
+import config from '../../config';
 
 
 
@@ -142,7 +143,7 @@ const Login = () => {
         validationSchema: loginValidationSchema,
         onSubmit: (values) => {
             // alert(JSON.stringify(values, null, 2));
-            handleLogin(values, () => {setAuth(true);setRedirectToReferrer(true);}, (msg) => { setError(msg) } );
+            handleLogin(values, () => {setAuth(true);setRedirectToReferrer(true);}, (error) => { setError(t('LoginPage.'+error)) } );
         },
     });
 
@@ -153,7 +154,7 @@ const Login = () => {
         },
         validationSchema: guestValidationSchema,
         onSubmit: (values) => {
-            handleGuestLogin(values,() => {setAuth(true);setRedirectToReferrer(true);}, (msg) => { setError(msg)} );
+            handleGuestLogin(values,() => {setAuth(true);setRedirectToReferrer(true);}, (error) => { setError(t('LoginPage.'+error))} );
         },
     });
 
@@ -231,7 +232,10 @@ const Login = () => {
                                 <Link
                                     className={classes.sigupLink}
                                     component="button"
-                                    onClick={() => { history.push('/signup') }}
+                                    onClick={() => {
+                                        // history.push('/signup');
+                                        window.open(config.main_site_url + 'register')
+                                    }}
                                     variant="body2"
                                 >
                                     {t('LoginPage.create_new')}

@@ -16,7 +16,7 @@ const guestLogin = async (req, res, next) => {
             return res
             .status(400)
             .json({
-                error: 'Already exist',
+                error: 'already_exist',
                 message: 'This nickname is already registered.'
             });
         }
@@ -25,7 +25,7 @@ const guestLogin = async (req, res, next) => {
             return res
                 .status(400)
                 .json({
-                    error: 'Bad request',
+                    error: 'forbidden',
                     message: 'This nickname is not allowed'
                 })
         }

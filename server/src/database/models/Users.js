@@ -14,10 +14,7 @@ const userSchema = new Schema({
     type: String,
     required: true
   },
-  password: {
-    type: String,
-    required: true
-  },
+  password: String,
   role: String,
   ip: String,
   isInChat: Boolean,

@@ -9,11 +9,14 @@ const handleLogin = async (credentials, successCallback, errCallback) => {
     let errMessage;
 
     if (err.response.status) {
-      errMessage = err.response.data.message;
+      if(err.response.data.error === 'forbidden' || err.response.data.error === 'already_exist' )
+        errMessage = err.response.data.error;
+      else {
+        errMessage = 'unknown_error';
+      }
     } else {
-      errMessage = 'Something went wrong, please try again later';
+      errMessage = 'unknown_error';
     }
-
     errCallback(errMessage);
   }
 };
