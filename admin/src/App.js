@@ -63,7 +63,7 @@ export default function App() {
     {
       loading? null:
       <BrowserRouter>
-        <UserContext.Provider value={{ auth, username, superAdmin: true }}>
+        <UserContext.Provider value={{ auth, username, superAdmin: superAdmin }}>
           <ToastProvider autoDismissTimeout={3000} autoDismiss={true}>
             <div className="container">
               <Switch>
