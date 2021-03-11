@@ -4,6 +4,7 @@ const http = require('http');
 const https = require("https");
 const { join } = require('path');
 const fs = require('fs');
+const config = require('./config');
 const express = require('express');
 const socketIO = require('socket.io');
 const compression = require('compression');
@@ -11,22 +12,21 @@ const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const dbConnection = require('./database/dbConnection');
 const router = require('./router');
-const { RateLimiterMemory } = require('rate-limiter-flexible');
+// const { RateLimiterMemory } = require('rate-limiter-flexible');
 const {ioHandler, adminIoHandler} = require('./io');
-const { verifyToken, findUserById } = require('./utils');
+const { verifyToken, findUserById, createAdminUser, initSetting } = require('./utils');
 const cors = require('cors');
-// const options = {
-//   key: fs.readFileSync(config.ssl_key),
-//   cert: fs.readFileSync(config.ssl_cert)
-// };
+const options = {
+  key: fs.readFileSync(config.ssl_key),
+  cert: fs.readFileSync(config.ssl_cert)
+};
 
 const app = express();
-const server = http.createServer(app);
+const server = https.createServer(options, app);
 const io = socketIO(server);
 const initRooms = require('./utils/room/initRooms')
 const fileUpload = require('express-fileupload');
 const cookie = require('cookie');
-const createAdminUser = require('./utils/user/createAdminUser');
 initRooms();
 // app.disabled('x-powered-by');
 // app.enable('trust proxy');   
@@ -44,19 +44,16 @@ app.use('/api', router);
 
 if (process.env.NODE_ENV === 'production') {
     app.use(express.static(join(__dirname, '..', '..', 'client', 'build')));
+    app.all('admin/*', (req, res) =>
+        res.sendFile(join(__dirname, '..', '..', 'admin', 'build', 'index.html'))
+    );
     app.all('*', (req, res) =>
         res.sendFile(join(__dirname, '..', '..', 'client', 'build', 'index.html'))
     );
 }
-const rateLimiter = new RateLimiterMemory({
-    points: 6,
-    duration: 1,
-});
 io.use(async (socket, next) => {
     try {
         // const token = (socket.request.headers.cookie + ';').match(/(?<=token=)(.*?)(?=;)/)[0];
-        console.log('socket connect')
-        await rateLimiter.consume(socket.handshake.address)
         const cookies = cookie.parse(socket.request.headers.cookie || '');
         const token = (cookies&&cookies.token)?cookies.token:'ok';
         // const token = cookies.token
@@ -72,36 +69,7 @@ io.use(async (socket, next) => {
 }).on('connection', ioHandler(io));
 
 
-// io.of('/admin').use(async (socket, next) => {
-//     const cookies = cookie.parse(socket.request.headers.cookie || '');
-//     const token = (cookies&&cookies.token)?cookies.token:'ok';
-//     const decoded = await verifyToken(token);
-//     const user = await findUserById(decoded._id);
-//     if(user.role === 'admin') {
-//         next();
-//     } else {
-//         next(new Error('forbidden'));
-//     }
-// }).on('connection', adminIoHandler(io));
-
 createAdminUser({username: 'rafa', email: 'rafa@gmail.com',password: '12345678', gender: 'male'});
-let listeners = app.listeners('');
-// io.removeAllListeners('request');
-// io.use(async (err, req, res, next) => {
-//     console.log('mid')
-//     if(req.socket)
-//     console.log('ip',req.connection.remoteAddress);
-//     res.statusCode = 429;
-//     res.end('Too many requst');
-// })
-
-// listeners.map((listener) => {
-    
-//     app.on('request', listener);
-// })
-// let newlisteners = server.listeners('request');
-console.log(listeners)
-
-
+initSetting();
 
 module.exports = { server, app, dbConnection };
