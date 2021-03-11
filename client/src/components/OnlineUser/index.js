@@ -222,7 +222,7 @@ const OnlineUser = ({roomName, username, user, role, isMuted, isBlocked,
                         isMuted={isMuted}
                         isBlocked={isBlocked}
                     />
-                    { user.role === 'admin' &&
+                    {( user.role === 'admin' || user.role === 'super_admin') &&
                         <StarRounded className={classes.adminStar} />
                     }
                     { user.role === 'owner' &&
