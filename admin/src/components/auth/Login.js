@@ -49,7 +49,7 @@ export default function Login() {
   const [password, setPassword] = useState(() => '');
   const [error, setError] = useState();
 
-  const { setUserData } = useContext(UserContext);
+  const { setUserData, setAuth } = useContext(UserContext);
   const history = useHistory();
 
   const submit = async (e) => {
@@ -61,7 +61,7 @@ export default function Login() {
         loginUser
       );
       if(response.status === 200)
-        history.push("/admin/dashboard");
+        setAuth(true);
     } catch (err) {
       addToast(err.response.data.msg, {
         appearance: 'error',
