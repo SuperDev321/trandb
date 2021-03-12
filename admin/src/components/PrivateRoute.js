@@ -8,7 +8,7 @@ const PrivateRoute = ({ component, path }) => {
   const location = useLocation();
   return <Route path={path} component={auth && component}>{
     !auth &&
-    <Redirect to={{pathname:"admin/login", state: {from: location}}}/>}</Route>;
+    <Redirect to="/admin/login"/>}</Route>;
 };
 
 // PrivateRoute.propTypes = {
