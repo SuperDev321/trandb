@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import classNames from "classnames";
 // @material-ui/core components
 import { makeStyles } from "@material-ui/core/styles";
@@ -9,17 +9,20 @@ import Paper from "@material-ui/core/Paper";
 import ClickAwayListener from "@material-ui/core/ClickAwayListener";
 import Hidden from "@material-ui/core/Hidden";
 import Poppers from "@material-ui/core/Popper";
-
+import axios from 'axios';
 // core components
 import Button from "Admin/components/CustomButtons/Button.js";
 
 import styles from "Admin/assets/jss/material-dashboard-react/components/headerLinksStyle.js";
+import UserContext from "context/UserContext";
+import config from "config";
 
 const useStyles = makeStyles(styles);
 
 export default function AdminNavbarLinks() {
   const classes = useStyles();
   const [openProfile, setOpenProfile] = React.useState(null);
+  const { userData, setUserData, setAuth  }= useContext(UserContext); 
   // const handleClickNotification = event => {
   //   if (openNotification && openNotification.contains(event.target)) {
   //     setOpenNotification(null);
@@ -40,6 +43,15 @@ export default function AdminNavbarLinks() {
   const handleCloseProfile = () => {
     setOpenProfile(null);
   };
+  const logout = () => {
+    setUserData({
+      token: undefined,
+      user: undefined,
+    });
+    localStorage.setItem("auth-token", "");
+    setAuth(false);
+    axios.get(config.server_url+'/api/logout');
+  };
   return (
     <div>
       <div className={classes.manager}>
@@ -52,8 +64,8 @@ export default function AdminNavbarLinks() {
           onClick={handleClickProfile}
           className={classes.buttonLink}
         >
-          <img className={classes.icons} src="/img/default_avatar.png" alt="Avatar img" />
-          <p style={{textTransform: 'initial'}}>&nbsp; rafa</p>
+          <img className={classes.icons} src={(userData && userData.avatar)? config.main_site_url+userData.avatar:"/img/default_avatar.png"} alt="Avatar img" />
+          <p style={{textTransform: 'initial'}}>&nbsp;{(userData && userData.username)? userData.username: ''} </p>
           <Hidden mdUp implementation="css">
             <p className={classes.linkText}>Profile</p>
           </Hidden>
@@ -83,7 +95,7 @@ export default function AdminNavbarLinks() {
                 <ClickAwayListener onClickAway={handleCloseProfile}>
                   <MenuList role="menu">
                     <MenuItem
-                      onClick={handleCloseProfile}
+                      onClick={logout}
                       className={classes.dropdownItem}
                     >
                       Logout

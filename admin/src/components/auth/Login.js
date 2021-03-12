@@ -45,9 +45,9 @@ export default function Login() {
   const classes = useStyles();
   const { addToast } = useToasts()
 
-  const [email, setEmail] = useState(() => '');
+  const [username, setUsername] = useState(() => '');
   const [password, setPassword] = useState(() => '');
-  // const [error, setError] = useState();
+  const [error, setError] = useState();
 
   const { setUserData } = useContext(UserContext);
   const history = useHistory();
@@ -55,9 +55,9 @@ export default function Login() {
   const submit = async (e) => {
     e.preventDefault();
     try {
-      const loginUser = { email, password };
+      const loginUser = { username, password };
       const loginRes = await Axios.post(
-        `${config.server_url}/users/login`,
+        `${config.server_url}/api/login`,
         loginUser
       );
       setUserData({
@@ -65,7 +65,7 @@ export default function Login() {
         user: loginRes.data.user,
       });
       localStorage.setItem("auth-token", loginRes.data.token);
-      history.push("/profile");
+      history.push("/admin/dashboard");
     } catch (err) {
       addToast(err.response.data.msg, {
         appearance: 'error',
@@ -90,15 +90,15 @@ export default function Login() {
             margin="normal"
             required
             fullWidth
-            id="email"
-            label="Email Address"
-            name="email"
-            autoComplete="email"
+            id="name"
+            label="Username"
+            name="name"
+            autoComplete="name"
             autoFocus
-            onChange={(e) => setEmail(e.target.value)}
-            value = {email}
-            validators={['required', 'isEmail']}
-            errorMessages={['this field is required', 'email is not valid']}
+            onChange={(e) => setUsername(e.target.value)}
+            value = {username}
+            validators={['required']}
+            errorMessages={['this field is required']}
           />
           <TextValidator
             variant="outlined"

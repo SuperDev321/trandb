@@ -1,9 +1,10 @@
 import React, { useContext } from "react";
 import { useHistory } from "react-router-dom";
 import {UserContext} from "../../context/UserContext";
-
+import axios from 'axios';
+import config from "config";
 export default function AuthOptions() {
-  const { userData, setUserData } = useContext(UserContext);
+  const { userData, setUserData, setAuth } = useContext(UserContext);
 
   const history = useHistory();
 
@@ -15,6 +16,8 @@ export default function AuthOptions() {
       user: undefined,
     });
     localStorage.setItem("auth-token", "");
+    setAuth(false);
+    axios.get(config.server_url+'/api/logout');
   };
 
   return (
