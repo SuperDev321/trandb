@@ -34,6 +34,7 @@ export default function App() {
           if(data.username) userData.username = data.username;
           if(data.gender) userData.gender = data.gender;
           if(data.avatar) userData.avatar = data.avatar;
+          setUserData(data);
           setLoading(false);
         }
       }
