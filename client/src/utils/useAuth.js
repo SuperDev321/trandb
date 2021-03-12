@@ -24,6 +24,7 @@ const useAuth = () => {
           if(data.gender === 'female') setGender('female');
           else setGender('female');
           if(data.avatar) setAvatar(data.avatar);
+          else setAvatar(null);
           setUsername(data.username);
           setAuth(true);
           setLoading(false);
