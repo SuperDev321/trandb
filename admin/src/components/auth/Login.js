@@ -56,16 +56,12 @@ export default function Login() {
     e.preventDefault();
     try {
       const loginUser = { username, password };
-      const loginRes = await Axios.post(
+      let response = await Axios.post(
         `${config.server_url}/api/login`,
         loginUser
       );
-      setUserData({
-        token: loginRes.data.token,
-        user: loginRes.data.user,
-      });
-      localStorage.setItem("auth-token", loginRes.data.token);
-      history.push("/admin/dashboard");
+      if(response.status === 200)
+        history.push("/admin/dashboard");
     } catch (err) {
       addToast(err.response.data.msg, {
         appearance: 'error',
