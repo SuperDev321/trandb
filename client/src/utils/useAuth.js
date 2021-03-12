@@ -39,6 +39,7 @@ const useAuth = () => {
     setAuth(false);
     setUsername('');
     setRole('user');
+    setAvatar(null);
   };
 
   return { auth, setAuth, gender, avatar, username, role, loading, setLoading, removeCurrentUser, prevUrl, setPrevUrl };
