@@ -26,6 +26,7 @@ export default function App() {
         } else {
           if (data.role === 'admin'){
             setAuth(true);
+            setSuperAdmin(false);
           }else if( data.role === 'super_admin') {
             setAuth(true);
             setSuperAdmin(true);
