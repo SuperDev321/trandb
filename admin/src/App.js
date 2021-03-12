@@ -6,6 +6,7 @@ import Register from "./components/auth/Register";
 import UserContext from "./context/UserContext";
 import { ToastProvider } from 'react-toast-notifications';
 import PrivateRoute from './components/PrivateRoute';
+import PublicRoute from './components/PublicRoute';
 import "./style.css";
 
 import Admin from "./Admin/layouts/Admin.js";
@@ -72,7 +73,7 @@ export default function App() {
           <ToastProvider autoDismissTimeout={3000} autoDismiss={true}>
             <div className="container">
               <Switch>
-                <Route path="/admin/login" component={Login} />
+                <PublicRoute path="/admin/login" component={Login} />
                 {/* <Route path="/register" component={Register} /> */}
                 <PrivateRoute path="/admin" component={Admin} />
                 {/* <Redirect from="/admin" to="admin/dashboard" /> */}
