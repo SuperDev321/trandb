@@ -1,6 +1,4 @@
-const { createError } = require('..');
 const { Bans } = require('../../database/models');
-const findUserById = require('../user/findUserById');
 const ipInt = require('ip-to-int');
 const isIp = require('is-ip');
 
@@ -8,6 +6,8 @@ const checkBan = async (room, username, ip) => {
     let ipNum = null;
     if(isIp.v4(ip)) {
         ipNum = ipInt(ip).toInt();
+    } else if(Number.isInteger(ip)) {
+        ipNum = ip;
     }
     if(username) {
         let nameBan = await Bans.findOne({
