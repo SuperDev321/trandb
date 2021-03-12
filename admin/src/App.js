@@ -18,11 +18,18 @@ export default function App() {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const removeUserData = () => {
+    setSuperAdmin(false);
+    setUserData(null);    
+  }
+
   useEffect(() => {
     const checkLoggedIn = async () => {
       const { data } = await axios.get(`${config.server_url}/api/checkToken`);
         if (data === 'un-auth') {
           setLoading(false);
+          setSuperAdmin(false);
+          setUserData(null);
         } else {
           if (data.role === 'admin'){
             setAuth(true);

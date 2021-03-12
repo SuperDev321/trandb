@@ -64,7 +64,7 @@ export default function Admin({ ...rest }) {
   React.useEffect(() => {
     let activeRoutes = routes.filter((prop) => (!prop.super || (prop.super && superAdmin)));
     setActiveRoutes(activeRoutes);
-  }, [])
+  }, [superAdmin])
   // initialize and destroy the PerfectScrollbar plugin
   React.useEffect(() => {
     if (navigator.platform.indexOf("Win") > -1) {
