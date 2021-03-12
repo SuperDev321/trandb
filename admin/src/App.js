@@ -14,7 +14,7 @@ import config from './config'
 export default function App() {
   const [auth, setAuth] = useState(null);
   const [superAdmin, setSuperAdmin] = useState(false);
-  const [username, setUsername] = useState('');
+  const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -29,7 +29,11 @@ export default function App() {
             setAuth(true);
             setSuperAdmin(true);
           }
-          if(data.username) setUsername(data.username);
+          let userData = {};
+
+          if(data.username) userData.username = data.username;
+          if(data.gender) userData.gender = data.gender;
+          if(data.avatar) userData.avatar = data.avatar;
           setLoading(false);
         }
       }
@@ -63,7 +67,7 @@ export default function App() {
     {
       loading? null:
       <BrowserRouter>
-        <UserContext.Provider value={{ auth, username, superAdmin: superAdmin }}>
+        <UserContext.Provider value={{ auth, userData, setUserData, setAuth, superAdmin: superAdmin }}>
           <ToastProvider autoDismissTimeout={3000} autoDismiss={true}>
             <div className="container">
               <Switch>

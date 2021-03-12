@@ -22,6 +22,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { pink } from '@material-ui/core/colors';
 import BanModal from '../Modals/BanModal';
 import {getSocket} from '../../utils'
+import config from '../../config';
 const useStyles = makeStyles((theme) => ({
     username: {
         fontWeight: 'bold',
@@ -177,7 +178,7 @@ const RoomUserName = ({user, role, roomName,
                 >
                     <Avatar alt="User Avatar" src={
                         user.avatar
-                        ? user.avatar
+                        ? config.main_site_url+user.avatar
                         :'/img/default_avatar.png'
                     } />
                     <span>{user.username}</span>
