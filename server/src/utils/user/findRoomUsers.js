@@ -24,7 +24,7 @@ const findRoomUsers = async (room, myRole) => {
                     console.log('no')
                 }
             }
-            return {_id, username, gender, role: userRole, ip};    
+            return {_id, username, gender, role: userRole, ip, avatar};    
         }// ({_id, username, gender, role, avatar }));
         );
         return usersInfo;

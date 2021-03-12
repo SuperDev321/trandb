@@ -19,6 +19,7 @@ import {QuestionAnswer,
     StarRounded
 } from '@material-ui/icons';
 import RoomUserName from '../RoomUserName';
+import config from '../../config';
 const useStyles = makeStyles((theme) => ({
     listItem: {
         display: 'flex',
@@ -194,7 +195,9 @@ const OnlineUser = ({roomName, username, user, role, isMuted, isBlocked,
                     badgeContent={(isMuted || isBlocked) && <Block fontSize="small" />}
                 >
                     <Avatar alt="User avatar" src={
-                            user.gender === 'male' ? '/img/male.png': '/img/female.png'
+                            user.avatar
+                            ?config.main_site_url+user.avatar 
+                            :user.gender === 'male' ? '/img/male.png': '/img/female.png'
                         } 
                         className={classes.avatar}
                     />

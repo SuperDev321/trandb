@@ -40,7 +40,7 @@ const joinRoom = (io, socket) => async ({ room, password }, callback) => {
         
         const messages = await Chats.find({ room, type: 'public' }).sort({date: -1}).limit(30);
         const usersInfo = await findRoomUsers(room, user.role);
-        let onlineUsers = await Promise.all(usersInfo.map(async ({_id, username, ip, role, gender}) => {
+        let onlineUsers = await Promise.all(usersInfo.map(async ({_id, username, ip, role, gender, avatar}) => {
             let item = {};
             let blocked = await checkBlock(room, username, ip);
             item.blocked = blocked;
@@ -51,6 +51,7 @@ const joinRoom = (io, socket) => async ({ room, password }, callback) => {
             item.username = username;
             item.role = role;
             item.gender = gender;
+            item.avatar = avatar;
             return item;
         }));
 
@@ -70,7 +71,8 @@ const joinRoom = (io, socket) => async ({ room, password }, callback) => {
                             role: user.role,
                             gender: user.gender,
                             // ip: ipInt(user.ip).toIP(),
-                            blocked
+                            blocked,
+                            avatar: user.avatar
                         }
                     });
                 }
@@ -112,7 +114,7 @@ const rejoinRoom = (io, socket) => async ({ room, type }, callback) => {
             // let {welcomeMessage} = await Rooms.findOne({name: room});
             const messages = await Chats.find({ room, type: 'public' }).sort({date: -1}).limit(30);
             const usersInfo = await findRoomUsers(room, user.role);
-            let onlineUsers = await Promise.all(usersInfo.map(async ({_id, username, ip, role, gender}) => {
+            let onlineUsers = await Promise.all(usersInfo.map(async ({_id, username, ip, role, gender, avatar}) => {
                 let item = {};
                 let blocked = await checkBlock(room, username, ip);
                 item.blocked = blocked;
@@ -123,6 +125,7 @@ const rejoinRoom = (io, socket) => async ({ room, type }, callback) => {
                 item.username = username;
                 item.role = role;
                 item.gender = gender;
+                item.avatar = avatar;
                 return item;
             }));
             socket.emit('init room', {messages, onlineUsers, room: {name: room}}, (data)=> {
@@ -133,6 +136,7 @@ const rejoinRoom = (io, socket) => async ({ room, type }, callback) => {
                             username: user.username,
                             role: user.role,
                             gender: user.gender,
+                            avart: user.avatar
                             // ip: ipInt(user.ip).toIP()
                         }});
                 }
