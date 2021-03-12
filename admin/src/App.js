@@ -61,7 +61,7 @@ export default function App() {
     // };
 
     checkLoggedIn();
-  }, []);
+  }, [auth]);
 
 
   return (

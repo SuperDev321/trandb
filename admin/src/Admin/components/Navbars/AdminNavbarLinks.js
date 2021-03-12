@@ -43,14 +43,14 @@ export default function AdminNavbarLinks() {
   const handleCloseProfile = () => {
     setOpenProfile(null);
   };
-  const logout = () => {
+  const logout = async () => {
+    await axios.get(config.server_url+'/api/logout');
     setUserData({
-      token: undefined,
-      user: undefined,
+      avatar: undefined,
+      username: undefined,
     });
-    localStorage.setItem("auth-token", "");
     setAuth(false);
-    axios.get(config.server_url+'/api/logout');
+    
   };
   return (
     <div>
