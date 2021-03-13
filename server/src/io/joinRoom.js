@@ -60,7 +60,7 @@ const joinRoom = (io, socket) => async ({ room, password }, callback) => {
         const blocks = await getBlocks(room);
         let blocked = await checkBlock(room, user.username, user.ip);
         socket.emit('init room',
-            {messages, onlineUsers, room: {name: room, welcomeMessage: roomInfo.welcomeMessage}, blocks},
+            {messages, onlineUsers, room: {name: room, welcomeMessage: roomInfo.welcomeMessage}, blocks, globalBlocks},
             (data)=> {
                 if(data === 'success') {
                     
@@ -106,8 +106,8 @@ const rejoinRoom = (io, socket) => async ({ room, type }, callback) => {
             let user = await Users.findOne({_id});
             let isBan = await checkBan(room, user.username, user.ip);
             if(isBan) {
-                callback(false, 'baned');
-                return;
+                return callback(false, 'baned');
+                
             }
             let result = await Rooms.updateOne({ name: room }, { $addToSet: { users: _id } });
             socket.join(room);
@@ -128,7 +128,9 @@ const rejoinRoom = (io, socket) => async ({ room, type }, callback) => {
                 item.avatar = avatar;
                 return item;
             }));
-            socket.emit('init room', {messages, onlineUsers, room: {name: room}}, (data)=> {
+            let globalBlocks = await getGlobalBlocks();
+            let blocks = await getBlocks(room);
+            socket.emit('init room', {messages, onlineUsers, room: {name: room}, globalBlocks, blocks}, (data)=> {
                 if(data === 'success' && result && result.nModified) {
                     io.to(room).emit('joined room', {room, onlineUsers: usersInfo,
                         joinedUser: {

@@ -44,13 +44,14 @@ export default function AdminNavbarLinks() {
     setOpenProfile(null);
   };
   const logout = async () => {
-    await axios.get(config.server_url+'/api/logout');
-    setUserData({
-      avatar: undefined,
-      username: undefined,
-    });
-    setAuth(false);
-    
+    let res = await axios.get(config.server_url+'/api/logout');
+    if(res.status === 200) {
+      setUserData({
+        avatar: undefined,
+        username: undefined,
+      });
+      setAuth(false);
+    }
   };
   return (
     <div>

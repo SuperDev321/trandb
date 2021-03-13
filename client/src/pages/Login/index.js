@@ -159,7 +159,6 @@ const Login = () => {
     });
 
     if (redirectToReferrer) {
-        console.log(from)
         return <Redirect to={from} />;
     }
     return (

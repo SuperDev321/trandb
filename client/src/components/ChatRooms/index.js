@@ -439,7 +439,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                 let usernames = await onlineUsers.map((item) => (item.username));
                 if(usernames.includes(username)) {
                     // console.log('username: ', username);
-                    setNewInfo({ type: 'init room', payload: { room, onlineUsers, messages, blocks}});
+                    setNewInfo({ type: 'init room', payload: { room, onlineUsers, messages, blocks, globalBlocks}});
                 }
             });
             socket.on('joined room',async ({room, onlineUsers, joinedUser}) => {
@@ -604,6 +604,9 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
         switch(newInfo.type) {
             case 'init room':
                 if(roomsRef.current && newInfo.payload.room) {
+                    if(newInfo.payload.globalBlocks) {
+                        setGlobalBlocks(globalBlocks);
+                    }
                     let sameRoom = await roomsRef.current.find((room) => (room.name === newInfo.payload.room.name));
                     if(!sameRoom) {
                         let usernames = await newInfo.payload.onlineUsers.map((item) => (item.username));
@@ -618,7 +621,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                                 messages = [wcMsg, ...messages];
                             }
                             
-                            let newRoomObject = new RoomObject(newInfo.payload.room.name, messages, newInfo.payload.onlineUsers, newInfo.payload.blocks,);
+                            let newRoomObject = new RoomObject(newInfo.payload.room.name, messages, newInfo.payload.onlineUsers, newInfo.payload.blocks);
                             roomsRef.current.push(newRoomObject);
                             setRoomIndex(roomsRef.current.length-1);
                             return;
@@ -630,8 +633,11 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                     } else {
                         let usernames = await newInfo.payload.onlineUsers.map((item) => (item.username));
                         if(username && usernames.includes(username)) {
+                            if(newInfo.payload.blocks) {
+                                sameRoom.updateBlocks(blocks);
+                            }
                             if(newInfo.payload.onlineUsers) {
-                                let users = newInfo.payload.onlineUsers.map((user) => ({...user, muted: false}))
+                                let users = newInfo.payload.onlineUsers.map((user) => ({...user}))
                                 sameRoom.users = users;
                             }
                             if(newInfo.payload.messages) {
