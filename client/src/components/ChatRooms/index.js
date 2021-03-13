@@ -434,7 +434,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
             socket.on('connect_error', (err) => {
                 console.log(err)
             })
-            socket.on('init room', async ({room, onlineUsers, messages, blocks}, fn) => {
+            socket.on('init room', async ({room, onlineUsers, messages, blocks, globalBlocks}, fn) => {
                 fn('success');
                 let usernames = await onlineUsers.map((item) => (item.username));
                 if(usernames.includes(username)) {
@@ -672,6 +672,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                         if(sameRoom.name === currentRoomName) {
                             setCurrentRoomMessages([...sameRoom.messages]);
                             setCurrentRoomUsers([...sameRoom.users]);
+                            setCurrentRoomBlocks([...sameRoom.blocks]);
                         }
                     }
                 }
