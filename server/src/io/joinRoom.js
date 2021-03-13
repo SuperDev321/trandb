@@ -55,7 +55,6 @@ const joinRoom = (io, socket) => async ({ room, password }, callback) => {
             return item;
         }));
 
-        const roomBlocks = await getRoomBlocks(room);
         const globalBlocks = await getGlobalBlocks();
         const blocks = await getBlocks(room);
         let blocked = await checkBlock(room, user.username, user.ip);
