@@ -605,7 +605,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
             case 'init room':
                 if(roomsRef.current && newInfo.payload.room) {
                     if(newInfo.payload.globalBlocks) {
-                        setGlobalBlocks(globalBlocks);
+                        setGlobalBlocks(newInfo.payload.globalBlocks);
                     }
                     let sameRoom = await roomsRef.current.find((room) => (room.name === newInfo.payload.room.name));
                     if(!sameRoom) {
@@ -634,7 +634,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                         let usernames = await newInfo.payload.onlineUsers.map((item) => (item.username));
                         if(username && usernames.includes(username)) {
                             if(newInfo.payload.blocks) {
-                                sameRoom.updateBlocks(blocks);
+                                sameRoom.updateBlocks(newInfo.payload.blocks);
                             }
                             if(newInfo.payload.onlineUsers) {
                                 let users = newInfo.payload.onlineUsers.map((user) => ({...user}))
