@@ -120,6 +120,8 @@
     "already_login": "האם כבר יש לך חשבון? התחברות",
     "already_exist": "משתמש זה כבר רשום",
     "forbidden": "שם משתמש זה אסור",
+    "confirm_error": "משתמש זה חסום בשרת",
+    "username_error": "משתמש זה אינו בשרת",
     "unknown_error": "הכניסה נכשלה, אנא נסה שוב מאוחר יותר"
   },
   "UserActionArea": {

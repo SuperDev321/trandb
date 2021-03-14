@@ -119,6 +119,8 @@
     "already_login": "Already have an account? Login",
     "already_exist": "This user is already registered",
     "forbidden": "This username is forbidden",
+    "confirm_error": "This user is blocked on server",
+    "username_error": "This user is not on server",
     "unknown_error": "Login failed, please try again later"
   },
   "UserActionArea": {

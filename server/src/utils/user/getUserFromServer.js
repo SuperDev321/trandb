@@ -3,7 +3,7 @@ const db = require('../../database/serverDbConnection');
 const bcrypt = require('bcrypt');
 const getUserFromServer = async (username, password) => {
     return new Promise((resolve, reject) => {
-        let sql = "SELECT a.id, a.username, a.password, IF(ISNULL(b.value), 'male', b.value) as gender, c.group_id as top_group, IF(ISNULL(d.thumb), '', d.thumb) as thumb ";
+        let sql = "SELECT a.id, a.username, a.password, a.registerDate, a.block, IF(ISNULL(b.value), 'male', b.value) as gender, c.group_id as top_group, IF(ISNULL(d.thumb), '', d.thumb) as thumb ";
         sql += 'FROM ixt0j_users a ';
         sql += 'LEFT JOIN ixt0j_community_fields_values b ON a.id = b.user_id AND b.field_id = 2 ';
         sql += 'LEFT JOIN ixt0j_user_usergroup_map c ON a.id = c.user_id ';
@@ -11,7 +11,7 @@ const getUserFromServer = async (username, password) => {
         sql += 'WHERE a.username = ? ORDER BY c.group_id DESC LIMIT 1';
         db.query(sql, username, function(err, last_user) {
             if(err) {
-                return reject('db_error');
+                return reject('db_error', err);
             }
             if (last_user.length !== 0) {
                 let user = last_user[0];
