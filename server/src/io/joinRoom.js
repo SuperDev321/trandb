@@ -137,7 +137,7 @@ const rejoinRoom = (io, socket) => async ({ room, type }, callback) => {
                             username: user.username,
                             role: user.role,
                             gender: user.gender,
-                            avart: user.avatar
+                            avatar: user.avatar
                             // ip: ipInt(user.ip).toIP()
                         }});
                 }
