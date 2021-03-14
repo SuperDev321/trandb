@@ -18,6 +18,9 @@ import PrivateMessageList from '../../PrivateMessageList';
 import {getPrivateMessages} from '../../../utils';
 import {ReactComponent as Maximium} from './square.svg'
 import {ReactComponent as Restore} from './restore.svg';
+import Axios from 'axios';
+import config from '../../../config';
+import getUser from '../../../utils/getUser';
 
 const defaultHeight = 250;
 const defaultWidth = 350;
@@ -136,6 +139,7 @@ const useStyles = makeStyles((theme) => ({
 const PrivateChat = ({ me, to, sendMessage, active, setActive, initMessages, deleteChat, roomName, globalBlocks }, ref) => {
     const rndRef = useRef(null);
     const winRef = useRef(null);
+    const [avatar, setAvatar] = useState(null);
     const [messages, setMessages] = useState([]);
     const [hide, setHide] = useState(false);
     const [min, setMin] = useState(false);
@@ -233,6 +237,16 @@ const PrivateChat = ({ me, to, sendMessage, active, setActive, initMessages, del
     // }, [me, to])
 
     useEffect(() => {
+        getUser(username, (data) => {
+            if(data && data.avatar) {
+                setAvatar(data.avatar);
+            }
+        }, (err) => {
+        console.log(err)
+        })
+    }, [to])
+
+    useEffect(() => {
         if(initMessages.length) {
             setUnRead(initMessages.length)
         }
@@ -287,7 +301,7 @@ const PrivateChat = ({ me, to, sendMessage, active, setActive, initMessages, del
                         className={classes.badge}
                     >
                         <Avatar className={classes.smallAvatar}
-                            src='/img/default_avatar.png'
+                            src={avatar? config.main_site_url+avatar: '/img/default_avatar.png'}
                         />
                     </Badge>
                     <div id="private-header" className={`private-header ${classes.headerContent}`} >{to}</div>
