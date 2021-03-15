@@ -8,7 +8,7 @@ const getUserByName = async (req, res, next) => {
             let {_id, avatar, gender, role} = await findUserByName(username);
             return res
             .status(200)
-            .json({_id, username, avatar, gender, role});
+            .json({data: {_id, username, avatar, gender, role}});
         }
     } catch (err) {
         console.log(err)
