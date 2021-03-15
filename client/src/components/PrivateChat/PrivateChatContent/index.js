@@ -238,11 +238,15 @@ const PrivateChat = ({ me, to, sendMessage, active, setActive, initMessages, del
 
     useEffect(() => {
         getUser(to, (data) => {
+            console.log('private user',data);
             if(data && data.avatar) {
                 setAvatar(data.avatar);
+            } else {
+                setAvatar(null);
             }
         }, (err) => {
-        console.log(err)
+            console.log(err);
+            setAvatar(null);
         })
     }, [to])
 
