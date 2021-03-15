@@ -6,7 +6,9 @@ const getUserByName = async (req, res, next) => {
         const {username} = req.params;
         if(username) {
             let {_id, avatar, gender, role} = await findUserByName(username);
-            return res.json({_id, username, avatar, gender, role});
+            return res
+            .status(200)
+            .json({_id, username, avatar, gender, role});
         }
     } catch (err) {
         console.log(err)
