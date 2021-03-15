@@ -62,6 +62,12 @@ const useStyles = makeStyles((theme) => ({
         
         minWidth: 0
     },
+    avatarBadge: {
+        '& .MuiBadge-badge': {
+           width: theme.spacing(3),
+            height: theme.spacing(3), 
+        }
+    },
     camera: {
         color: '#e6e6e6',
     },
@@ -191,7 +197,7 @@ const OnlineUser = ({roomName, username, user, role, isMuted, isBlocked,
                 }</Avatar>
                 <StyledBadge
                     className={classes.avatarBadge}
-                    badgeContent={(isMuted || isBlocked) && <Block fontSize="small" />}
+                    badgeContent={(isMuted || isBlocked) && <Block  />}
                 >
                     <Avatar alt="User avatar" src={
                             user.avatar
