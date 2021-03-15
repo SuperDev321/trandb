@@ -8,7 +8,7 @@ const handleLogin = async (credentials, successCallback, errCallback) => {
     let errMessage;
 
     if (err.response.status) {
-      if(err.response.data.error === 'forbidden' || err.response.data.error === 'already_exist' )
+      if(err.response.data.error)
         errMessage = err.response.data.error;
       else {
         errMessage = 'unknown_error';

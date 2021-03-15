@@ -34,8 +34,13 @@ const login = async (req, res, next) => {
         .json({ statusCode: 200, message: 'logged in successfully' });
     }
   } catch (err) {
-    console.log(err)
-    next(err);
+    if(err === 'confirm_error' || err === 'username_error') {
+      res
+        .status(400)
+        .json({  error: err });
+    } else {
+      next(err);
+    }
   }
 };
 

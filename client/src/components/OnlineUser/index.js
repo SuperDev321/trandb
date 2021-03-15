@@ -55,11 +55,10 @@ const useStyles = makeStyles((theme) => ({
                 return blue[500];
             }
         }
-        
     },
     avatar: {
-        width: theme.spacing(2.5),
-        height: theme.spacing(2.5),
+        width: theme.spacing(3),
+        height: theme.spacing(3),
         
         minWidth: 0
     },
