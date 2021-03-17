@@ -111,18 +111,20 @@ const MyMessage = ({user, roomName, message, messageSize, role, font_size, userA
     return (
       <div className={classes.message}>
         <div className={classes.messageContent}>
-          <span className={classes.sender}><RoomUserName
-            user={user}
-            roomName={roomName}
-            isMine={username === user.username}
-            displayYou={false}
-            changeMuteState={changeMuteState}
-            sendPokeMessage={sendPokeMessage}
-            kickUser={kickUser}
-            banUser={banUser}
-            addOrOpenPrivate={addOrOpenPrivate}
-            role={role}
-          />
+          <span className={classes.sender}>
+            <RoomUserName
+              user={user}
+              roomName={roomName}
+              isMine={username === user.username}
+              displayYou={false}
+              changeMuteState={changeMuteState}
+              sendPokeMessage={sendPokeMessage}
+              kickUser={kickUser}
+              banUser={banUser}
+              addOrOpenPrivate={addOrOpenPrivate}
+              role={role}
+              isBlocked={false}
+            />
             <span>:&nbsp;</span></span>
             <>
             { (message.messageType === 'image') ?

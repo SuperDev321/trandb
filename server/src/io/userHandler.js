@@ -1,6 +1,6 @@
 const ipToInt = require('ip-to-int');
 const { Rooms, Users } = require('../database/models');
-const { getRoomPermission, findUserByName, banByUser, banByNameAndIp, checkBan, findRoomUsers, getBlocks, getGlobalBlocks } = require("../utils");
+const { getRoomPermission, findUserByName, banByUser, banByNameAndIp, checkBan, findRoomUsers, getBlocks, getGlobalBlocks, getGlobalBlocksWithIp } = require("../utils");
 const {addBlock, removeBlock, getUserIp, getRoomBlocks, checkBlock} = require('../utils');
 const kickUser = (io, socket) => async ({room, to}) => {
     console.log('kick')
@@ -38,7 +38,7 @@ const banUser = (io, socket) => async ({room , ip, to, role}) => {
         const userToBan = await findUserByName(to);
         if(role) {
             let res = null;
-            let userIp = ipToInt(userToBan.ip).toIP();
+            let userIp = userToBan.ip? ipToInt(userToBan.ip).toIP(): null;
             if(role === 'admin' && ip) {
                 res = await banByNameAndIp(room, to, ip);
             } else {
@@ -118,30 +118,16 @@ const banUserByAdmin = (io, socket) => async ({ room , ip, fromIp, toIp, to}) =>
 const blockUser = (io, socket) => async ({room, username}, callback) => {
     const {_id, role} = socket.decoded;
     const myRole = await getRoomPermission(room, _id);
-    if(myRole === 'admin' || myRole === 'owner' || myRole === 'moderator') {
+    if(myRole === 'super_admin' || myRole === 'admin' || myRole === 'owner' || myRole === 'moderator') {
         let userToBlock = await findUserByName(username);
         let userIp = ipToInt(userToBlock.ip).toIP();
         let result = await addBlock(room, userToBlock.username, userIp, myRole);
         if(result) {
-            const usersInfo = await findRoomUsers(room, myRole);
-            // let onlineUsers = await Promise.all(usersInfo.map(async ({username, ip, role, gender}) => {
-            //     let item = {};
-            //     let blocked = await checkBlock(room, username, ip);
-            //     item.blocked = blocked;
-            //     // if(myRole === 'admin' || myRole === 'super-admin') {
-            //     item.ip = ipToInt(ip).toIP();
-            //     // }
-            //     item.username = username;
-            //     item.role = role;
-            //     item.gender = gender;
-            //     return item;
-            // }));
-            
             if(myRole === 'admin' || myRole === 'super_admin') {
-                const blocks = await getGlobalBlocks();
+                const blocks = await getGlobalBlocksWithIp();
                 io.emit('update global block', {blocks});
             } else {
-                const blocks = await getBlocks(room);
+                const blocks = await getRoomBlocks(room);
                 console.log('emit update block')
                 io.to(room).emit('update block', {room, blocks});
             }
@@ -183,7 +169,7 @@ const unBlockUser = (io, socket) => async ({room, username}, callback) => {
                 const blocks = await getGlobalBlocks();
                 io.emit('update global block', {blocks});
             } else {
-                const blocks = await getBlocks(room);
+                const blocks = await getRoomBlocks(room);
                 console.log('emit update block')
                 io.to(room).emit('update block', {room, blocks});
             }

@@ -74,30 +74,6 @@ class RoomObject  {
         if(Array.isArray(blocks)) {
             this.blocks = blocks;
         }
-        // let mutes = null;
-        // let item = window.localStorage.getItem('mutes');
-        // if(item) mutes = JSON.parse(item);
-        // if(!Array.isArray(mutes)) mutes = null;
-        // if(mutes) {
-        //     let myMutes = mutes.filter((value) => (value.room === this.name));
-        //     mutes = myMutes.map(({user})=> (user));
-        // } else {
-        //     mutes = [];
-        // }
-        // if(Array.isArray(blocks)) {
-        //     mutes = [...mutes, ...blocks];
-        //     this.users = this.users.map((user) => {
-        //         if(blocks.includes(user.username)) {
-        //             user.blocked = true;
-        //         } else {
-        //             user.blocked = false;
-        //         }
-        //     })
-        // }
-        
-        // let muteSet = new Set(mutes);
-        // this.mutes = Array.from(muteSet);
-        // console.log(this.mutes)
     }
     
     setMessages(messages) {
@@ -113,7 +89,6 @@ class RoomObject  {
         this.mutes = [...mutes];
     }
     addMute(mute) {
-        console.log(this.mutes)
         this.mutes = [...this.mutes, mute];
     }
     toogleMute(mute) {
@@ -126,7 +101,7 @@ class RoomObject  {
     deleteMute(mute) {
         // let user = this.users.find((item) => (item.username === mute));
         // if(!user.blocked) {
-            this.mutes = this.mutes.filter((item) => (item !== mute));
+            this.mutes = this.mutes.filter((item) => (item && (item.username !== mute.username) && (item.ip !== mute.ip)));
             return true;
         // } else {
         //     return false;

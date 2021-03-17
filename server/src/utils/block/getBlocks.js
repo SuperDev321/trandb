@@ -1,6 +1,27 @@
-const {Blocks, Users} = require("../../database/models")
-const getRoomBlocks = (roomName) => {
-    let blocks = Blocks.find({room: roomName, type: 'room'});
+const {Blocks, Users} = require("../../database/models");
+const ipInt = require('ip-to-int');
+const getRoomBlocks = async (roomName) => {
+    if(roomName && roomName !== '') {
+        let blocks = await Blocks.find({room: roomName, type: 'room'});
+        blocks = blocks.map(({ip, username}) => {
+            let realIp = ip? ipInt(ip).toIP(): null;
+    
+            return {ip: realIp, username};
+        })
+        return blocks;
+    } else {
+        return [];
+    }
+}
+
+const getGlobalBlocksWithIp = async () => {
+    let blocks = await Blocks.find({type: 'all'});
+    blocks = blocks.map(({ip, username}) => {
+        let realIp = ip? ipInt(ip).toIP(): null;
+
+        return {ip: realIp, username};
+    })
+    console.log('blocks', blocks);
     return blocks;
 }
 
@@ -57,4 +78,4 @@ const getBlocks = async (roomName) => {
     return blockedUsers;
 }
 
-module.exports = { getRoomBlocks, getGlobalBlocks, getBlocks };
+module.exports = { getRoomBlocks, getGlobalBlocks, getBlocks, getGlobalBlocksWithIp };

@@ -1,16 +1,19 @@
 const { Chats } = require('../database/models');
 const { findRoomUsers, findUserByName, isForbidden, hasFobiddenWord, getIp, banByUser, banByNameAndIp, findUserById, checkBlockById } = require('../utils');
 const {banUserByAdmin, banUser} = require('./userHandler');
+const ipInt = require('ip-to-int');
 const publicMessage = (io, socket) => async ({ msg, room, from, color, bold, type, messageType }, callback) => {
   try {
     const { _id } = socket.decoded;
     const date = Date.now();
-    console.log(msg, messageType)
+    let user = await findUserById(_id);
+    if(!user) {
+      return callback(false);
+    }
+    let userIp = user.ip? ipInt(user.ip).toIP(): null;
     if(messageType !== 'image') {
       let isForbiddenMessage = await hasFobiddenWord(msg);
       if(isForbiddenMessage) {
-        let user = await findUserById(_id);
-        let userIp = await getIp(room, _id);
         await banUser(io, socket)({ip: userIp, to: user.username, role: 'admin'});
         return callback(false);
       }
@@ -24,6 +27,7 @@ const publicMessage = (io, socket) => async ({ msg, room, from, color, bold, typ
       type: 'public',
       messageType,
       from,
+      ip: userIp,
       room,
       color,
       bold,
@@ -40,6 +44,7 @@ const publicMessage = (io, socket) => async ({ msg, room, from, color, bold, typ
         date: newChat.date,
         color: newChat.color,
         bold: newChat.bold,
+        ip: newChat.ip,
         messageType: newChat.messageType
     });
   } catch (err) {
@@ -50,6 +55,11 @@ const publicMessage = (io, socket) => async ({ msg, room, from, color, bold, typ
 const pokeMessage = (io, socket) => async ({from, to, room}, callback) => {
   const toUser = await findUserByName(to);
   const { _id } = socket.decoded;
+  let user = await findUserById(_id);
+  if(!user) {
+    return callback(false);
+  }
+  let userIp = user.ip? ipInt(user.ip).toIP(): null;
   let isBlocked = await checkBlockById(_id);
     if(isBlocked) {
       return callback(false, 'blocked');
@@ -59,7 +69,8 @@ const pokeMessage = (io, socket) => async ({from, to, room}, callback) => {
       type: 'poke',
       room,
       from,
-      to
+      to,
+      ip: userIp
     });
     callback('success');
   } else {

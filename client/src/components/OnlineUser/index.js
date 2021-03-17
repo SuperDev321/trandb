@@ -145,10 +145,10 @@ const OnlineUser = ({roomName, username, user, role, isMuted, isBlocked,
             addOrOpenPrivate(user);
         }, 0);
     }
-    const handleMute = (username) => {
+    const handleMute = () => {
         setAnchorEl(null);
         setTimeout(() => {
-            changeMuteState(roomName, username);
+            changeMuteState(roomName, user);
         }, 0)
     }
     const handleKick = (username) => {

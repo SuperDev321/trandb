@@ -84,22 +84,10 @@ const MessagesList = ({ users, messages, role, userAction, roomName, changeMuteS
         }
     }
     const defaultColor = currentTheme === 'normal'? '#000': '#fff';
-    // useEffect(() => {
-    //     // const handleScroll = () => {
-    //     //     if(messagesRef.current.scrollHeight + messagesRef.current.scrollTop - messagesRef.current.clientHeight <= 2) {
-    //     //         addItems();
-    //     //     }
-    //     // }
-    //     messagesRef.current.addEventListener('scroll', handleScroll)
-    //     return () => messagesRef.current.removeEventListener('scroll', handleScroll)
-    // }, [currentItems])
 
     useEffect(() => {
         if(messages.length) {
-            console.log(messageNum, messages.length)
             if(messages.length > messageNum) {
-            // setCount({prev: 0, next: itemUnit})
-            // setCurrentItems(messages.slice(0, count.next));
             setCurrentItems(messages.slice(0, messageNum));
             } else {
                 setCurrentItems(messages)

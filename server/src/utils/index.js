@@ -27,7 +27,7 @@ const banByUser = require('./ban/banByUser');
 const banByNameAndIp = require('./ban/banByNameAndIp');
 const checkBan = require('./ban/checkBan');
 const getAllBans = require('./ban/getBans');
-const {getRoomBlocks, getGlobalBlocks, getBlocks} = require('./block/getBlocks');
+const {getRoomBlocks, getGlobalBlocks, getBlocks, getGlobalBlocksWithIp} = require('./block/getBlocks');
 const checkBlock = require('./block/checkBlock');
 const checkBlockById = require('./block/checkBlockById');
 const addBlock = require('./block/addBlock');
@@ -67,6 +67,7 @@ module.exports = {
   getAllBans,
   getGlobalBlocks,
   getRoomBlocks,
+  getGlobalBlocksWithIp,
   getBlocks,
   checkBlock,
   checkBlockById,

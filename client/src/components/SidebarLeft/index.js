@@ -92,7 +92,7 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 
-const SideBarLeft = ({ roomName, username, mutes, blocks, globalBlocks, unReadInfo, changeMuteState, sendPokeMessage, kickUser, banUser,
+const SideBarLeft = ({ roomName, username, mutes, blocks, globalBlocks, changeMuteState, sendPokeMessage, kickUser, banUser,
     users,
     addOrOpenPrivate,
      cameraState, openCamera, closeCamera }) => {
@@ -118,7 +118,9 @@ const SideBarLeft = ({ roomName, username, mutes, blocks, globalBlocks, unReadIn
     }, [searchText, users])
 
     const isMuted = (user) => {
-        if(mutes && mutes.includes(user.username)) {
+        let mutedNames = Array.isArray(mutes)? mutes.map((item) => ((item&&item.username)? item.username: null)): [];
+        let mutedIps =  Array.isArray(mutes)? mutes.map((item) => ((item&&item.ip)? item.ip: null)): [];
+        if( mutedNames.includes(user.username) || mutedIps.includes(user.ip)) {
             return true;
         } else {
             return false;
@@ -126,7 +128,15 @@ const SideBarLeft = ({ roomName, username, mutes, blocks, globalBlocks, unReadIn
     }
 
     const isBlocked = (user) => {
-        if(blocks.includes(user.username) || globalBlocks.includes(user.username)) {
+        let blockedNames = blocks.map((item) => (item.username? item.username: null));
+        let globalBlockedNames = globalBlocks.map((item) => (item.username? item.username: null));
+        blockedNames = [...blockedNames, ...globalBlockedNames];
+        let blockedIps = blocks.map((item) => (item.ip? item.username: null));
+        let globalBlockedIps = globalBlocks.map((item) => (item.ip? item.ip: null));
+        blockedIps = [...blockedIps, ...globalBlockedIps];
+        if((user.username && (blockedNames.includes(user.username)))
+            || (user.ip && (blockedIps.includes(user.ip)))
+        ) {
             return true;
         } else {
             return false;

@@ -138,6 +138,8 @@
     "view_profile": "View profile",
     "kick_from_room": "Kick from room",
     "ban_from_room": "Ban from room",
+    "block_this_person": "Block this person",
+    "unblock_this_person": "Unblock this person",
     "mute_this_person": "Mute this person",
     "unmute_this_person": "Unmute this person",
     "default": "default"

@@ -7,7 +7,7 @@ const checkBan = async (room, username, ip) => {
     if(isIp.v4(ip)) {
         ipNum = ipInt(ip).toInt();
     } else if(ip) {
-        ipNum = ipInt(parseIint(ip)).toInt();
+        ipNum = (parseInt(ip).toString());
     }
     if(username) {
         let nameBan = await Bans.findOne({
@@ -17,7 +17,7 @@ const checkBan = async (room, username, ip) => {
             ]
         });
         if(nameBan) {
-            return true;
+            return {isBan: true, banType: nameBan.room? true : false};
         }
     }
     if(ipNum) {
@@ -52,10 +52,10 @@ const checkBan = async (room, username, ip) => {
             ]
         });
         if(ipBan) {
-            return true;
+            return {isBan: true, banType: ipBan.room? true : false};;
         }
     }
-    return false;
+    return {isBan: false};
 };
 
 module.exports = checkBan;
