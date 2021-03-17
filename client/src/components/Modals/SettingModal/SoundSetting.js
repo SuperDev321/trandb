@@ -40,7 +40,7 @@ const SoundSetting = ({enablePokeSound, setEnablePokeSound, enablePrivateSound, 
 
     return (
         <div className={classes.root}>
-            <FormGroup column>
+            <FormGroup column="true">
                 <FormControlLabel
                     control={<GreenCheckbox checked={enablePublicSound} onChange={handleChangePublic} name="publicSound" />}
                     label={t('SettingModal.public_message')}

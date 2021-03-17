@@ -42,7 +42,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
     // current room index
     const [roomIndex, setRoomIndex] = useState(null);
 
-    const [roomsInfo, setRoomsInfo] = useState([]);
+    const [roomsInfo, setRoomsInfo] = useState(null);
     const [currentRoom, setCurrentRoom] = useState(null);
     const [currentRoomMessages, setCurrentRoomMessages] = useState([]);
     const [currentRoomUsers, setCurrentRoomUsers] = useState([]);
@@ -104,7 +104,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
         }
     }
     // mute or unmute user
-    const changeMuteState = (roomName, usernameToMute, isMuted) => {
+    const changeMuteState = (roomName, userToMute, isMuted) => {
         let room = roomsRef.current.find((item) => (item.name === roomName));
         if(room) {
             
@@ -112,22 +112,28 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
             
             // let localMute = mutes.find((item) => (item.room === roomName && item.user === usernameToMute))
             if(isMuted) {
-                let newMutes = mutes.filter((item) => (item.room !== roomName || item.user !== usernameToMute));
+                let newMutes = mutes.filter((item) => (
+                    item.room !== roomName ||
+                    item.username !== userToMute.username ||
+                    (item.ip && userToMute.ip && (item.ip !== userToMute.ip))
+                ));
                 setMutes(newMutes);
                 // if(!userInfo || (userInfo && !userInfo.blocked)) {
-                if(!room.deleteMute(usernameToMute)) {
+                if(!room.deleteMute(userToMute)) {
                     enqueueSnackbar('This user was blocked', {variant: 'error'});
                 }
                 // }
                 
             } else {
-                let localMute = mutes.find((item) => (item.room === roomName && item.user === usernameToMute))
+                let localMute = mutes.find((item) => (item.room === roomName
+                    && item.username === userToMute.username
+                    && item.ip === userToMute.ip))
                 if(!localMute) {
-                    let newMutes = [...mutes, {room: roomName, user: usernameToMute}];
+                    let newMutes = [...mutes, {room: roomName, username: userToMute.username, ip: userToMute.ip}];
                     setMutes(newMutes);
                 }
                 // if(!userInfo || (userInfo && !userInfo.blocked)) {
-                    room.addMute(usernameToMute);
+                    room.addMute(userToMute);
                 // }
                 
             }
@@ -422,8 +428,9 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                 } else {
                     socket.emit('join room', { room }, (result, message) => {
                         if(!result) {
-                            enqueueSnackbar(message, {variant: 'error'});
-                            setRoomIndex(0);
+                            if(message)
+                                enqueueSnackbar(t('ChatApp.'+message, {roomName: room}), {variant: 'error'});
+                            setRoomsInfo([]);
                         }
                     });
                 }
@@ -605,6 +612,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
             case 'init room':
                 if(roomsRef.current && newInfo.payload.room) {
                     if(newInfo.payload.globalBlocks) {
+                        console.log('global blocks', newInfo.payload.globalBlocks);
                         setGlobalBlocks(newInfo.payload.globalBlocks);
                     }
                     let sameRoom = await roomsRef.current.find((room) => (room.name === newInfo.payload.room.name));
@@ -658,7 +666,6 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                         if(username && usernames.includes(username)) {
                             if(newInfo.payload.onlineUsers && newInfo.payload.joinedUser) {
                                 let joinedUser = newInfo.payload.joinedUser;
-                                
                                 if(sameRoom.addOnlineUser(joinedUser) && username !== joinedUser.username && enableSysMessage) {
                                     let sysMsg = {
                                         type: 'system',
@@ -760,6 +767,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                     else { // kick you
                         // remove all room
                         roomsRef.current = [];
+                        setRoomIndex(0);
                         setRoomsInfo([]);
                         let alertText = t('ChatApp.error_admin_ban_all_room');
                         enqueueSnackbar(alertText, {variant: 'error'});
@@ -841,10 +849,10 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
     }, [newInfo]);
 
     useEffect(() => {
-        if(roomsRef.current.length > 0 && roomsRef.current.length < roomIndex + 1) {
-            setRoomIndex(roomsRef.current.length - 1)
-        } else if( roomsRef.current.length === 0 && roomIndex !== null) {
+        if(roomsInfo && roomsInfo.length === 0) {
             history.push('/');
+        } else if(roomsRef.current.length > 0 && roomsRef.current.length < roomIndex + 1) {
+            setRoomIndex(roomsRef.current.length - 1)
         } else {
             if(roomsRef.current[roomIndex]) {
                 setCurrentRoomUsers([...roomsRef.current[roomIndex].users]);
@@ -854,7 +862,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                 setCurrentRoomBlocks(roomsRef.current[roomIndex].blocks);
             }
         }
-    }, [roomsInfo, roomIndex])
+    }, [roomsInfo])
 
     useEffect(() => {
         if(roomsRef.current.length > 0 && roomsRef.current.length > roomIndex) {
@@ -866,7 +874,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
             let infos = roomsRef.current.map(({name, unReadMessages}) => ({name, unReadMessages}));
             setRoomsInfo(infos);
         }
-    }, [roomIndex]);
+    }, [roomIndex, currentRoomName]);
 
     useEffect(() => {
         if(currentRoom) {
@@ -946,8 +954,8 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                     >
                         <MenuIcon />
                     </IconButton>
-                    <StyledTabs value={roomIndex && roomsInfo.length > roomIndex && roomIndex} variant="scrollable" onChange={handleChangeRoom}>
-                        { roomsInfo.length>0 &&
+                    <StyledTabs value={(roomIndex && roomsInfo && (roomsInfo.length > roomIndex))? roomIndex : 0} variant="scrollable" onChange={handleChangeRoom}>
+                        {roomsInfo && roomsInfo.length>0 &&
                             roomsInfo.map((item, index) => (
                                 <StyledTab
                                     key={index} label={<span>{item.name}</span>}

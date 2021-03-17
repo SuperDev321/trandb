@@ -86,8 +86,38 @@ const ChatRoom = ({roomName, users, messages, mutes, blocks, globalBlocks, sendM
     }, [users, username])
 
     useEffect(() => {
+        let blockedNames = blocks.map((item) => ((item && item.username)? item.username: null));
+        let globalBlockedNames = globalBlocks.map((item) => ((item && item.username)? item.username: null));
+        blockedNames = [...blockedNames, ...globalBlockedNames];
+
+        let blockedIps = blocks.map((item) => ((item && item.ip)? item.username: null));
+        let globalBlockedIps = globalBlocks.map((item) => ((item && item.ip)? item.ip: null));
+        blockedIps = [...blockedIps, ...globalBlockedIps];
+
+        let mutedNames = mutes.map((item) => ((item && item.username)? item.username: null));
+        let mutedIps = mutes.map((item) => ((item && item.ip)? item.ip: null));
+
         if(messages && messages.length > 0) {
-            let unMutedMessages = messages.filter(({from}) => (!( (from) && ((mutes && mutes.includes(from)) || (blocks &&  blocks.includes(from)) || ( globalBlocks && globalBlocks.includes(from))))));
+            let unMutedMessages = messages.filter(({from, ip}) => {
+                
+                if(ip && blockedIps.includes(ip)) {
+                    return false;
+                }
+                if(!from) {
+                    return true;
+                }
+                if(blockedNames.includes(from)) {
+                    return false;
+                }
+                if(mutedNames.includes(from)) {
+                    return false;
+                }
+                if(mutedIps.includes(ip)) {
+                    return false;
+                }
+                
+                return true;
+            });
             setMessagesToShow(unMutedMessages);
         }
     }, [messages, mutes, blocks, globalBlocks])

@@ -17,6 +17,7 @@ const chatSchema = new Schema({
     type: String,
     required: true,
   },
+  ip: String,
   to: {
     type: String,
   },

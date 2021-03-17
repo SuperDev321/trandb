@@ -86,16 +86,15 @@ const RoomUserName = ({user, role, roomName,
     const handleClose = () => {
         setAnchorEl(null);
     };
-    const handleMute = (username) => {
+    const handleMute = () => {
         setAnchorEl(null);
         setTimeout(() => {
-            changeMuteState(roomName, username, isMuted);
+            changeMuteState(roomName, user, isMuted);
         }, 0)
     }
     //block a user
-    const blockUser = (roomName, username) => {
-        console.log('block user', roomName, username)
-        socket.emit('block user', {room: roomName, username},
+    const blockUser = () => {
+        socket.emit('block user', {room: roomName, username: user.username},
         (result, message) => {
             if(!result) {
                 // enqueueSnackbar(message, {variant: 'error'});
@@ -104,7 +103,7 @@ const RoomUserName = ({user, role, roomName,
     } 
     const unBlockUser = (roomName, username) => {
 
-        socket.emit('unblock user', {room: roomName, username},
+        socket.emit('unblock user', {room: roomName, username: user.username},
             (result, message) => {
                 if(!result) {
                     // enqueueSnackbar(message, {variant: 'error'});
@@ -121,20 +120,20 @@ const RoomUserName = ({user, role, roomName,
         }
         setAnchorEl(null);
     }
-    const handleKick = (username) => {
+    const handleKick = () => {
         setAnchorEl(null);
         setTimeout(() => {
-            kickUser(roomName, username);
+            kickUser(roomName, user.username);
         }, 0)
     }
-    const handleBan = (username) => {
+    const handleBan = () => {
         setAnchorEl(null);
         if(role === 'admin' || role === 'super_admin') {
             setOpenBan(true);
         } else {
             setTimeout(() => {
                 if(role)
-                banUser(roomName, username);
+                banUser(roomName, user);
             }, 0);
         }
     }
@@ -212,14 +211,14 @@ const RoomUserName = ({user, role, roomName,
                             <>
                             <Button size="small"
                                 className={`${classes.cardButton} ${classes.kick}`}
-                                fullWidth onClick={() => { handleBan(user.username) }}
+                                fullWidth onClick={() => { handleBan() }}
                                 name={user.username}
                             >
                                 {t('UserActionArea.ban_from_room')}
                             </Button>
                             <Button size="small"
                                     className={`${classes.cardButton} ${classes.kick}`}
-                                    fullWidth onClick={() => { handleKick(user.username) }}
+                                    fullWidth onClick={() => { handleKick() }}
                                     name={user.username}
                                 >
                                     {t('UserActionArea.kick_from_room')}
@@ -230,9 +229,9 @@ const RoomUserName = ({user, role, roomName,
                                 name={user.username}
                             >
                             {
-                                user.blocked
-                                ? t('UserActionArea.unmute_this_person')
-                                : t('UserActionArea.mute_this_person')
+                                isBlocked
+                                ? t('UserActionArea.unblock_this_person')
+                                : t('UserActionArea.block_this_person')
                             }
                             </Button>
                             </>
@@ -240,7 +239,7 @@ const RoomUserName = ({user, role, roomName,
                             (
                             <Button size="small"
                                 className={`${classes.cardButton} ${classes.mute}`}
-                                fullWidth onClick={() => { handleMute(user.username) }}
+                                fullWidth onClick={() => { handleMute() }}
                                 name={user.username}
                             >
                             {

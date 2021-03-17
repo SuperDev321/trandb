@@ -1,6 +1,6 @@
 const { Rooms, Chats, Users } = require('../database/models');
 
-const { findRoomUsers, checkBan, getRoomBlocks, getGlobalBlocks, checkBlock, getBlocks } = require('../utils');
+const { findRoomUsers, checkBan, getRoomBlocks, getGlobalBlocksWithIp, checkBlock } = require('../utils');
 const ipInt = require('ip-to-int');
 const joinRoom = (io, socket) => async ({ room, password }, callback) => {
     try {
@@ -29,9 +29,9 @@ const joinRoom = (io, socket) => async ({ room, password }, callback) => {
             }
         }
         let user = await Users.findOne({_id});
-        let isBan = await checkBan(room, user.username, user.ip);
+        let {isBan, banType} = await checkBan(room, user.username, user.ip);
         if(isBan) {
-            return callback(false, 'You are banned from this room.')
+            return callback(false, banType? 'banned_from_owner': 'banned_from_admin');
         }
         let result = await Rooms.updateOne({ name: room }, { $addToSet: { users: _id} });
         
@@ -45,7 +45,7 @@ const joinRoom = (io, socket) => async ({ room, password }, callback) => {
             let blocked = await checkBlock(room, username, ip);
             item.blocked = blocked;
             // if(user.role === 'admin' || user.role === 'super-admin') {
-            // item.ip = ipInt(ip).toIP();
+            item.ip = ipInt(ip).toIP();
             // }
             item._id = _id;
             item.username = username;
@@ -55,8 +55,8 @@ const joinRoom = (io, socket) => async ({ room, password }, callback) => {
             return item;
         }));
 
-        const globalBlocks = await getGlobalBlocks();
-        const blocks = await getBlocks(room);
+        const globalBlocks = await getGlobalBlocksWithIp();
+        const blocks = await getRoomBlocks(room);
         let blocked = await checkBlock(room, user.username, user.ip);
         socket.emit('init room',
             {messages, onlineUsers, room: {name: room, welcomeMessage: roomInfo.welcomeMessage}, blocks, globalBlocks},
@@ -69,7 +69,7 @@ const joinRoom = (io, socket) => async ({ room, password }, callback) => {
                             username: user.username,
                             role: user.role,
                             gender: user.gender,
-                            // ip: ipInt(user.ip).toIP(),
+                            ip: ipInt(user.ip).toIP(),
                             blocked,
                             avatar: user.avatar
                         }
@@ -103,9 +103,9 @@ const rejoinRoom = (io, socket) => async ({ room, type }, callback) => {
         // }
         if(type === 'public') {
             let user = await Users.findOne({_id});
-            let isBan = await checkBan(room, user.username, user.ip);
+            let {isBan, banType} = await checkBan(room, user.username, user.ip);
             if(isBan) {
-                return callback(false, 'baned');
+                return callback(false, banType? 'banned_from_owner': 'banned_from_admin');
                 
             }
             let result = await Rooms.updateOne({ name: room }, { $addToSet: { users: _id } });
@@ -118,7 +118,7 @@ const rejoinRoom = (io, socket) => async ({ room, type }, callback) => {
                 let blocked = await checkBlock(room, username, ip);
                 item.blocked = blocked;
                 // if(user.role === 'admin' || user.role === 'super-admin') {
-                // item.ip = ipInt(ip).toIP();
+                item.ip = ipInt(ip).toIP();
                 // }
                 item._id = _id;
                 item.username = username;
@@ -137,8 +137,8 @@ const rejoinRoom = (io, socket) => async ({ room, type }, callback) => {
                             username: user.username,
                             role: user.role,
                             gender: user.gender,
-                            avatar: user.avatar
-                            // ip: ipInt(user.ip).toIP()
+                            avatar: user.avatar,
+                            ip: ipInt(user.ip).toIP()
                         }});
                 }
             });
