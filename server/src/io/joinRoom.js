@@ -5,23 +5,6 @@ const ipInt = require('ip-to-int');
 const joinRoom = (io, socket) => async ({ room, password }, callback) => {
     try {
         const { _id, role } = socket.decoded;
-        // let ip = socket.client.request.headers['cf-connecting-ip'] || socket.client.request.headers['x-forwarded-for'] || socket.client.request.connection.remoteAddress
-        // if(isIp(ip)) {
-        //     if(!isIp.v4(ip)) {
-        //         var address = new Address6(ip);
-        //         var teredo = address.inspectTeredo();
-        //         ip = teredo.client4;
-        //     }
-        //     if (ip.substr(0, 7) === '::ffff:') {
-        //         ip = ip.substr(7);
-        //     }
-        // } else {
-        //     ip = '10.10.10.10';
-        // }
-        // console.log(ip)
-        // console.log(socket.rooms);
-        // console.log('joining room:', room, _id);
-        // console.log(io)
         let roomInfo = await Rooms.findOne({name: room});
         if(roomInfo.password && roomInfo.password !== '') {
             if(password !== roomInfo.password) {

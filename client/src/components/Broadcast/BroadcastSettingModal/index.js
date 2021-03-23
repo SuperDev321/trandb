@@ -17,6 +17,8 @@ import {
 import TextField from '@material-ui/core/TextField';
 import VideocamIcon from '@material-ui/icons/Videocam';
 import { useTranslation } from 'react-i18next';
+import useDevices from './useDevices';
+import VideoDeviceView from './VideoDeviceView';
 const drawerWidth = 240;
 const useStyles = makeStyles((theme) => ({
     cameraBtn: {
@@ -28,29 +30,14 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export default function BroadcastSetting({users}) {
-    const classes = useStyles();
-    const [open, setOpen] = useState(false);
-    const [devices, setDevices] = useState(null);
+
+function BroadcastSettingModal({users, ...modalProps}) {
+    
+    
+    const {data: devices, error: deviceError, status: deviceStatus} = useDevices();
     const [usersState, setUsersState] = useState(null);
     const { t } = useTranslation();
-    const handleClickOpen = () => {
-        // console.log('users', users)
-        setOpen(true);
-    };
-
-    const handleClose = () => {
-        setOpen(false);
-    };
-
-    const handleOK = () => {
-        if(usersState) {
-            let usersChecked = usersState.filter((state) => (state.checked));
-            // console.log(usersChecked);
-        }
-        setOpen(false);
-    }
-
+    
     const handleUserStateChange = (event) => {
         if(usersState) {
             let states = [...usersState];
@@ -59,32 +46,28 @@ export default function BroadcastSetting({users}) {
             setUsersState(states);
         }
     };
-
-    const getDevices = () => {
-        let devices = navigator.mediaDevices.enumerateDevices();
-        // console.log(devices);
-        return devices;
-    }
-
-    useEffect(() => {
-        // let devices = getDevices();
-        let audioDevices = [];
-        let videoDevices = [];
-        // if(devices && devices.length) {
-        //     for (let index = 0; index < devices.length; index++) {
-        //         const element = devices[index];
-        //         if (element.deviceId != "default" && element.deviceId != "communications") {
-        //             if (element.kind == "audioinput") {
-        //               audioDevices.push({deviceId: element.deviceId, label: element.label, groupId: element.groupId});
-        //             } else if (element.kind == "videoinput") {
-        //               videoDevices.push({deviceId: element.deviceId, label: element.label, groupId: element.groupId});
-        //             }
-        //         }
-        //     }
-        // }
-        // console.log(audioDevices);
-        // console.log(videoDevices);
-    })
+    // useEffect(() => {
+    //     if(open)
+    //         getDevices()
+    //         .then((devices) => {
+    //             let audioDevices = [];
+    //             let videoDevices = [];
+    //             if(devices && devices.length) {
+    //                 for (let index = 0; index < devices.length; index++) {
+    //                     const element = devices[index];
+    //                     if (element.deviceId != "default" && element.deviceId != "communications") {
+    //                         if (element.kind == "audioinput") {
+    //                             audioDevices.push({deviceId: element.deviceId, label: element.label, groupId: element.groupId});
+    //                         } else if (element.kind == "videoinput") {
+    //                             videoDevices.push({deviceId: element.deviceId, label: element.label, groupId: element.groupId});
+    //                         }
+    //                     }
+    //                 }
+    //             }
+    //             console.log(audioDevices);
+    //             console.log(videoDevices);
+    //         });
+    // }, [open])
 
     useEffect(() => {
         // console.log('users',users);
@@ -94,24 +77,40 @@ export default function BroadcastSetting({users}) {
         }
     }, [users])
 
+    const devicesDOM = () => {
+        if (deviceStatus === 'idle') {
+            return 'Submit a pokemon'
+        } else if (deviceStatus === 'pending') {
+            return null;
+        } else if (deviceStatus === 'rejected') {
+            return deviceError;
+        } else if (deviceStatus === 'resolved') {
+            return (
+                <>
+                { devices && devices.map((item, index) => (
+                    <FormControlLabel key={index}
+                        control={<Checkbox name={item.groupId} />}
+                        label={item.label}
+                    />
+                ))
+                }
+                </>
+            )
+        } else {
+            throw new Error('This should be impossible');
+        }
+    }
+    
+    
+
     return (
-        <div>
-        <Button fullWidth
-                color="primary"
-                variant="contained"
-                onClick={handleClickOpen}
-                className={classes.cameraBtn}
-            >{t('SidebarLeft.start_broadcasting')}
-                &nbsp;
-                <VideocamIcon />
-        </Button>
-        <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
+        <Dialog {...modalProps} >
             <DialogTitle id="form-dialog-title">Turn on devices to broadcast</DialogTitle>
-            <DialogContent>
+            <DialogContent style={{display: 'flex', flexDirection: 'column'}}>
             {/* <DialogContentText>
                 Select users to broadcast
             </DialogContentText> */}
-            <FormControl component="fieldset" className={classes.formControl}>
+            <FormControl>
                 <FormLabel component="legend">Select users to broadcast</FormLabel>
                 <FormGroup>
                 { usersState && usersState.map((item, index) => (
@@ -123,17 +122,65 @@ export default function BroadcastSetting({users}) {
                     
                 }
                 </FormGroup>
+            
             </FormControl>
+            <FormControl>
+                <FormLabel component="legend">Select devices to broadcast</FormLabel>
+                <FormGroup>
+                    { 
+                        devicesDOM()
+                    }
+                </FormGroup>
+            </FormControl>
+            <VideoDeviceView />
             </DialogContent>
             <DialogActions>
-            <Button onClick={handleClose} color="primary">
+            <Button color="primary">
                 Cancel
             </Button>
-            <Button onClick={handleOK} color="primary">
+            <Button color="primary">
                 OK
             </Button>
             </DialogActions>
         </Dialog>
-    </div>
     );
 }
+
+
+const BroadcastSetting = ({users}) => {
+    const classes = useStyles();
+    const [open, setOpen] = useState(false);
+    const handleClickOpen = () => {
+        // console.log('users', users)
+        setOpen(true);
+    };
+    const handleClose = () => {
+        setOpen(false);
+    };
+    const { t } = useTranslation();
+    // const handleOK = () => {
+    //     if(usersState) {
+    //         let usersChecked = usersState.filter((state) => (state.checked));
+    //         // console.log(usersChecked);
+    //     }
+    //     setOpen(false);
+    // }
+    return (
+        <div>
+            <Button fullWidth
+                            color="primary"
+                            variant="contained"
+                            onClick={handleClickOpen}
+                            className={classes.cameraBtn}
+                        >{t('SidebarLeft.start_broadcasting')}
+                            &nbsp;
+                    <VideocamIcon />
+            </Button>
+            { open
+                ?<BroadcastSettingModal users={users} open={open} open={open} onClose={handleClose} aria-labelledby="form-dialog-title"/>
+                :null
+            }
+        </div>
+    )
+}
+export default BroadcastSetting;

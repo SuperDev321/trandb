@@ -99,13 +99,14 @@ const ChatRoom = ({roomName, users, messages, mutes, blocks, globalBlocks, sendM
 
         if(messages && messages.length > 0) {
             let unMutedMessages = messages.filter(({from, ip}) => {
+                if(!from) {
+                    return true;
+                }
                 
                 if(ip && blockedIps.includes(ip)) {
                     return false;
                 }
-                if(!from) {
-                    return true;
-                }
+                
                 if(blockedNames.includes(from)) {
                     return false;
                 }
