@@ -4,28 +4,30 @@ const LogManager = require('../constructors/logManager');
 const ipInt = require('ip-to-int');
 const disconnectSocket = async (io, socket) => {
     const rooms = [...socket.rooms];
-    console.log('disconnect rooms', socket.rooms)
+    
     // socket.rooms returns an object where key and value are the same
     // first key is socket id, second key is rooms name
     const { _id } = socket.decoded;
     let user = await Users.findOne({_id});
     if(user) {
         await Users.updateOne({_id}, {isInChat: false});
-        LogManager.saveLogInfo(ipInt(user.ip).toIP(), user.username, user.role, 'disconnect');
+        console.log('disconnect rooms', socket.rooms, user.username)
     }
     for (let index = 0; index < rooms.length; index++) {
         const room = rooms[index];
         if(room) {
             await Rooms.updateOne({ name: room }, { $pull: { users: _id }});
             const usersInfo = await findRoomUsers(room);
+            socket.leave(room);
             io.to(room).emit('leave room', {room, onlineUsers: usersInfo, leavedUser: _id});
-            console.log('disconnect event', _id)
         }
     }
+    LogManager.saveLogInfo(ipInt(user.ip).toIP(), user.username, user.role, 'disconnect');
 }
 
 const socketDisconnect = (io, socket) => async (reason) => {
     try {
+        console.log(reason)
         // if(reason === 'ping timeout') {
         //     let state = false;
         //     socket.emit('hey', null, (response) => {

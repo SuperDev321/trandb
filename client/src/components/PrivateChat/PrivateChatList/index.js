@@ -10,12 +10,12 @@ const PrivateChatList = ({sendMessage, readMsg ,me, globalBlocks}, ref) => {
     const setActive = (roomName) => {
         setActiveChat(roomName);
     }
-    const addNewChat = useCallback((toUsername, unReadMsg, roomName) => {
+    const addNewChat = useCallback((to, unReadMsg, roomName) => {
         let privateChat = chatList.find((item) => (item.roomName === roomName));
         if(!privateChat) {
             let ref = createRef();
             elRefs.current.push({key: roomName, ref});
-            let chatInfo = {to: toUsername, roomName, initVal: {messages: unReadMsg, roomName}};
+            let chatInfo = {to: to.username, ip: to.ip, roomName, initVal: {messages: unReadMsg, roomName}};
             setChatList([...chatList, chatInfo]);
             setActiveChat(roomName);
         }
@@ -53,7 +53,7 @@ const PrivateChatList = ({sendMessage, readMsg ,me, globalBlocks}, ref) => {
             return rooms;
         },
         addChat: (to, roomName) => {
-            addNewChat(to.username, [], roomName);
+            addNewChat(to, [], roomName);
         },
         openChat: (to) => {
             return openChat(to.username);
@@ -69,7 +69,7 @@ const PrivateChatList = ({sendMessage, readMsg ,me, globalBlocks}, ref) => {
                     return false;
                 }
             } else {
-                addNewChat(message.from, [message], roomName);
+                addNewChat({username: message.from, ip: message.ip}, [message], roomName);
             }
             return false;
         },
@@ -86,6 +86,7 @@ const PrivateChatList = ({sendMessage, readMsg ,me, globalBlocks}, ref) => {
                 <PrivateChatContent key={item.to.username}
                     ref={elRefs.current[index].ref}
                     me={me} to={item.to}
+                    ip={item.ip}
                     initMessages={item.initVal.messages}
                     sendMessage={sendMessage}
                     deleteChat={deleteChat}

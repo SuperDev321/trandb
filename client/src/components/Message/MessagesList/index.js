@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback, useContext } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef, useCallback, useContext } from 'react';
 import propTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
 import ClientMessage from '../ClientMessage';
@@ -98,9 +98,9 @@ const MessagesList = ({ users, messages, role, userAction, roomName, changeMuteS
         
     }, [messages]);
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         setScrollTop();
-    }, [currentItems])
+    })
 
     return (
         <>

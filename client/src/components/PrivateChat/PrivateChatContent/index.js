@@ -136,7 +136,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const PrivateChat = ({ me, to, sendMessage, active, setActive, initMessages, deleteChat, roomName, globalBlocks }, ref) => {
+const PrivateChat = ({ me, to, ip, sendMessage, active, setActive, initMessages, deleteChat, roomName, globalBlocks }, ref) => {
     const rndRef = useRef(null);
     const winRef = useRef(null);
     const [avatar, setAvatar] = useState(null);
@@ -213,7 +213,9 @@ const PrivateChat = ({ me, to, sendMessage, active, setActive, initMessages, del
     }));
 
     useEffect(() => {
-        if(Array.isArray(globalBlocks) && globalBlocks.includes(to)) {
+        let globalBlockedNames = globalBlocks?.map(item => ((item && item.username)? item.username: null));
+        let globalBlockedIps = globalBlocks?.map(item => ((item && item.ip)? item.ip: null));
+        if(globalBlockedNames?.includes(to) || globalBlockedIps?.includes(ip)) {
             setWithBlocked(true);            
         } else {
             setWithBlocked(false);

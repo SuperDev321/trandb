@@ -11,10 +11,8 @@ const LogManager = require('../constructors/logManager');
 const ipInt = require('ip-to-int');
 const isIp = require('is-ip')
 const ioHandler = (io) => async (socket) => {
-
   let socketIds = await io.of('/').in(socket.decoded._id).allSockets();
   if(socketIds.size === 0) {
-    console.log('connected', socket.decoded._id, socketIds);
     socket.join(socket.decoded._id);
   } else {
     socket.emit('repeat connection');
