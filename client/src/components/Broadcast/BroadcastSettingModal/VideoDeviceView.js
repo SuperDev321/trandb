@@ -4,7 +4,9 @@ const getStream = async () => {
     return navigator.mediaDevices.getUserMedia({
         audio: true,
         video: true
-    });
+    })
+    .then((stream) => stream)
+    .catch((error) => ('error'))
 }
 
 function asyncReducer(state, action) {
@@ -43,6 +45,7 @@ const useStream = (initialState) => {
             dispatch({type: 'resolved', data})
           },
           error => {
+            console.log(error)
             dispatch({type: 'rejected', error})
           },
         )

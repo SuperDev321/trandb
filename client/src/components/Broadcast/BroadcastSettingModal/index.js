@@ -79,7 +79,7 @@ function BroadcastSettingModal({users, ...modalProps}) {
 
     const devicesDOM = () => {
         if (deviceStatus === 'idle') {
-            return 'Submit a pokemon'
+            return null;
         } else if (deviceStatus === 'pending') {
             return null;
         } else if (deviceStatus === 'rejected') {
@@ -87,7 +87,7 @@ function BroadcastSettingModal({users, ...modalProps}) {
         } else if (deviceStatus === 'resolved') {
             return (
                 <>
-                { devices && devices.map((item, index) => (
+                { devices?.map((item, index) => (
                     <FormControlLabel key={index}
                         control={<Checkbox name={item.groupId} />}
                         label={item.label}

@@ -4,7 +4,10 @@ const getDevices = async () => {
     return navigator.mediaDevices.enumerateDevices()
     .then((devices) => {
         return devices.filter((device) => ((device.deviceId != "default" && device.deviceId != "communications") && (device.kind==='audioinput' || device.kind==='videoinput' )));
-    });
+    })
+    .catch((err) => {
+      return err;
+    })
 }
 
 function asyncReducer(state, action) {
