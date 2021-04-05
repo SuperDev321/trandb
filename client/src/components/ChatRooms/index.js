@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useRef, forwardRef, useImperativeHandle } from 'react';
+import React, { useState, useCallback, useEffect, useContext, useRef, forwardRef, useImperativeHandle } from 'react';
 import {
     AppBar,
     Card,
@@ -20,10 +20,11 @@ import {StyledTab , StyledTabs} from '../StyledTab';
 import DisconnectModal from '../Modals/DisconncetModal'
 import RoomObject from '../../utils/roomObject';
 import {UserContext, SettingContext} from '../../context';
-import { getSocket, useLocalStorage, isPrivateRoom } from '../../utils';
+import { socket, mediaSocket, useLocalStorage, isPrivateRoom } from '../../utils';
 import {useAudio} from 'react-use';
 import { useTranslation, withTranslation, Trans } from 'react-i18next';
 import SeparateLine from '../SeparateLine';
+import {MediaClient, mediaEvents, mediaType} from '../../utils';
 
 const ChatRooms = ({room, addUnReadMsg}, ref) => {
     const classes = useStyles();
@@ -36,12 +37,11 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
     };
-    const socket = getSocket();
     // roomObject array
     const roomsRef = useRef([]);
+    const mediaClientRef = useRef(null);
     // current room index
     const [roomIndex, setRoomIndex] = useState(null);
-
     const [roomsInfo, setRoomsInfo] = useState(null);
     const [currentRoom, setCurrentRoom] = useState(null);
     const [currentRoomMessages, setCurrentRoomMessages] = useState([]);
@@ -49,6 +49,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
     const [currentRoomName, setCurrentRoomName] = useState(null);
     const [currentRoomBlocks, setCurrentRoomBlocks] = useState([]);
     const [currentRoomMutes, setCurrentRoomMutes] = useState([]);
+    const [currentRemoteStreams, setCurrentRemoteStreams] = useState([]);
     const [globalBlocks, setGlobalBlocks] = useState([]);
 
     // receive new message
@@ -79,7 +80,8 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
     });
     const peersRef = useRef([]);
     // video stream objects
-    const [currentStreams, setCurrentStreams] = useState([]);
+    const [remoteStreams, setRemoteStreams] = useState([]);
+
     const { enqueueSnackbar, closeSnackbar } = useSnackbar();
     
     useImperativeHandle(ref, () => ({
@@ -201,6 +203,22 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
     const leaveFromPrivate = (roomName) => {
         socket.emit('leave private', roomName);
     }
+
+    useEffect(() => {
+        let mediaObj = new MediaClient(username);
+        mediaObj.on(mediaEvents.onChangeConsume, (data) => {
+            console.log('consume callback', data);
+            let streams = mediaObj.getStreams();
+            setRemoteStreams(streams);
+        })
+        mediaClientRef.current = mediaObj;
+    }, [username])
+
+    useEffect(() => {
+        let currentStreams = remoteStreams.filter(({room_id}) => (room_id === currentRoomName));
+        setCurrentRemoteStreams(currentStreams);
+    }, [currentRoomName, remoteStreams]);
+
     // send poke message
     const sendPokeMessage = (roomName, userToSend) => {
         socket.emit('poke message', {from: username, to: userToSend, room: roomName}, (response) => {
@@ -223,144 +241,12 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
         });
         
     }
- /*********************************  camera   ******************************************/
-    const createPeer = (userToSignal, callerID, room, stream) => {
-        const peer = new Peer({
-            initiator: true,
-            trickle: false,
-            config: { iceServers: [
-                { urls: 'stun:stun.l.google.com:19302' }, 
-                { urls: 'stun:global.stun.twilio.com:3478?transport=udp' }
-            ] },
-            sdpTransform: function (sdp) { return sdp },
-            stream: stream,
-        });
-
-        peer.on('signal', signal => {
-            socket.emit('sending video signal', { from: callerID, to: userToSignal, room, signal });
-        })
-
-        peer.on('close', () => {
-            removeMyStream(room.name);
-        })
-
-        peer.on('error', (err) => {
-            removeMyStream(room.name);
-        })
-        return peer;
-    }
-
-    const addPeer = async (incomingSignal, callerID, room) => {
-        const peer = new Peer({
-            initiator: false,
-            trickle: false,
-            config: { iceServers: [
-                { urls: 'stun:stun.l.google.com:19302' }, 
-                { urls: 'stun:global.stun.twilio.com:3478?transport=udp' }
-            ] },
-            sdpTransform: function (sdp) { return sdp },
-        })
-
-        peer.signal(incomingSignal);
-
-        peer.on('signal', signal => {
-            // console.log('return video signal')
-            socket.emit('returning video signal', { from: username, to: callerID, room: room.name,  signal});
-        })
-
-        peer.on('stream', stream => {
-            // console.log('success stream', stream, room);
-            addStream(room.name, callerID, stream);
-            // setRemoteStreams([...remoteStreams, {room, streamID: callerID, stream}]);
-        })
-
-        peer.on('close', () => {
-            // console.log('close video');
-            removeStream(room.name, callerID);
-            // setRemoteStreams(newStreams);
-        })
-
-        peer.on('error', (err) => {
-            // console.log('peer error', err);
-            removeStream(room.name, callerID);
-        })
-    }
-    // add a new stream to room object
-    const addStream = (roomName, callerID, stream) => {
-        let room = roomsRef.current.find((item) => (item.name === roomName));
-        room.remoteStreams.push({streamID: callerID, stream});
-        if(roomName === currentRoom.name) {
-            setCurrentRoom({...room});
-        }
-    }
-    // remove a stream form room object
-    const removeStream = (roomName, streamID) => {
-        let room = roomsRef.current.find((item) => (item.name === roomName));
-        const newStreams = room.remoteStreams.filter((item) => (item.streamID !== streamID));
-        room.remoteStreams = newStreams;
-        if(roomName === currentRoom.name) {
-            setCurrentRoom({...room});
-        }
-    }
-    const removeMyStream = (roomName) => {
-        let room = roomsRef.current.find((item) => (item.name === roomName));
-        if(room) {
-            room.myStream = null;
-            room.cameraState = false;
-            if(roomName === currentRoom.name) {
-                setCurrentRoom({...room});
-            }
-        }
-    }
-    // open my camera
-    const openCamera = async () => {
-        // console.log('open camera');
-        navigator.getUserMedia = (navigator.getUserMedia ||
-            navigator.webkitGetUserMedia ||
-            navigator.mozGetUserMedia ||
-            navigator.msGetUserMedia);
-        // console.log(navigator.mediaDevices.getUserMedia)
-        // console.log(navigator.getUserMedia)
-        // console.log(navigator.mediaDevices.enumerateDevices())
-        let stream = await navigator.mediaDevices.getUserMedia({
-            audio: true,
-            video: true
-        });
-        // console.log(stream);
-        let room = roomsRef.current[roomIndex];
-        // setCameraState(true);
-        // setMyStream({room: room.name, stream});
-        room.cameraState = true;
-        room.myStream = stream;
-        room.users.forEach((user) => {
-            // console.log(user, username);
-            if(user.username !== username) {
-                const peer = createPeer(
-                    user.username,
-                    username,
-                    room.name,
-                    stream
-                );
-                peersRef.current.push({room: room.name, peerID: user.username ,peer});
-            }
-        });
-        setCurrentRoom({...room});
-        // console.log(room);
-        // console.log('set current room to open camera');
-    }
-    const closeCamera = () => {
-        let roomObject = roomsRef.current[roomIndex];
-        // console.log('set current room to close room', roomObject, peersRef.current);
-        if(roomObject) {
-            if(peersRef.current.length > 0) {
-                peersRef.current.forEach((item) => {if(item.room === room) item.peer.destroy()});
-                peersRef.current = peersRef.current.filter((item) => (item.room !== room));
-            }
-            roomObject.myStream = null;
-            roomObject.cameraState = false;
-            console.log('set current rooom due to close camera')
-            setCurrentRoom({...roomObject});
-            // console.log('set current room to close room', roomObject);
+    const startBroadcast = (roomName, devices) => {
+       
+        if(mediaClientRef.current) {
+            devices.map(({type, deviceId}) => {
+                mediaClientRef.current.produce(type, roomName, deviceId);
+            })
         }
     }
 /*************************************************************** */
@@ -631,8 +517,11 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                             
                             let newRoomObject = new RoomObject(newInfo.payload.room.name, messages, newInfo.payload.onlineUsers, newInfo.payload.blocks);
                             roomsRef.current.push(newRoomObject);
+                            if(mediaClientRef.current) {
+                                await mediaClientRef.current.createRoom(newInfo.payload.room.name);
+                                await mediaClientRef.current.join(newInfo.payload.room.name);
+                            }
                             setRoomIndex(roomsRef.current.length-1);
-                            return;
                         } else {
                             // remove this room
                             let newRooms = await(roomsRef.current.filter((room) => (room.name !== newInfo.payload.room)));
@@ -811,23 +700,23 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                 }
                 
                 break;
-            case 'video':
-                // console.log('process video')
-                let { from, room, signal } = newInfo.payload;
-                let roomObject = roomsRef.current.find((item) => (item.name === room));
-                if(roomObject) {
-                    addPeer(signal, from, roomObject);
-                }
-                break;
-            case 'return video':
-                // console.log('return video',newInfo.payload)
-                let item = peersRef.current.find((p) => (p.room === newInfo.payload.room && p.peerID === newInfo.payload.from));
-                // console.log(peersRef.current);
-                if(item) {
-                    // console.log(item);
-                    item.peer.signal(newInfo.payload.signal);
-                }
-                break;
+            // case 'video':
+            //     // console.log('process video')
+            //     let { from, room, signal } = newInfo.payload;
+            //     let roomObject = roomsRef.current.find((item) => (item.name === room));
+            //     if(roomObject) {
+            //         addPeer(signal, from, roomObject);
+            //     }
+            //     break;
+            // case 'return video':
+            //     // console.log('return video',newInfo.payload)
+            //     let item = peersRef.current.find((p) => (p.room === newInfo.payload.room && p.peerID === newInfo.payload.from));
+            //     // console.log(peersRef.current);
+            //     if(item) {
+            //         // console.log(item);
+            //         item.peer.signal(newInfo.payload.signal);
+            //     }
+            //     break;
             default:
                 break;
         }
@@ -876,19 +765,19 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
         }
     }, [roomIndex, currentRoomName]);
 
-    useEffect(() => {
-        if(currentRoom) {
-            let curStreams = [];
-            if(currentRoom.myStream) {
-                curStreams.push(currentRoom.myStream);
-            }
-            if(currentRoom.remoteStreams && currentRoom.remoteStreams.length) {
-                let curRemoteStreams = currentRoom.remoteStreams.map((item) => (item.stream))
-                curStreams = [...curStreams, ...curRemoteStreams];
-            }
-            setCurrentStreams(curStreams);
-        }
-    }, [currentRoom])
+    // useEffect(() => {
+    //     if(currentRoom) {
+    //         let curStreams = [];
+    //         if(currentRoom.myStream) {
+    //             curStreams.push(currentRoom.myStream);
+    //         }
+    //         if(currentRoom.remoteStreams && currentRoom.remoteStreams.length) {
+    //             let curRemoteStreams = currentRoom.remoteStreams.map((item) => (item.stream))
+    //             curStreams = [...curStreams, ...curRemoteStreams];
+    //         }
+    //         setCurrentStreams(curStreams);
+    //     }
+    // }, [currentRoom])
 
     // sound setting
     useEffect(() => {
@@ -936,8 +825,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                         // setPrivateTo={setPrivateTo}
                         addOrOpenPrivate={addOrOpenPrivate}
                         cameraState={currentRoom && currentRoom.cameraState}
-                        openCamera = {openCamera}
-                        closeCamera = {closeCamera}
+                        startBroadcast={startBroadcast}
                         username={username}
                     />  
                 </div>
@@ -986,8 +874,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                             // setPrivateTo={setPrivateTo}
                             addOrOpenPrivate={addOrOpenPrivate}
                             cameraState={currentRoom && currentRoom.cameraState}
-                            openCamera = {openCamera}
-                            closeCamera = {closeCamera}
+                            startBroadcast={startBroadcast}
                             username={username}
                             />
                         </Card>
@@ -996,9 +883,9 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                
                 <main className={classes.main}>
                     <div className={classes.content}>
-                    { currentRoom && roomIndex !== null  &&
-                        <VideoList streams={currentStreams}/>
-                    }
+                    {/* { currentRoom && roomIndex !== null  && */}
+                        <VideoList streams={currentRemoteStreams}/>
+                    {/* } */}
                     {/* { currentRoom && roomIndex !== null && */}
                         <ChatRoomContent
                             roomName={currentRoomName}

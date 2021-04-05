@@ -15,7 +15,7 @@ import CustomTextField from '../../CustomTextField';
 import OutlinedButton from '../../OutlinedButton';
 import useStyles from './styles';
 import IpMaskInput from '../../IpMaskInput';
-import { getSocket } from '../../../utils';
+import { socket } from '../../../utils';
 import Axios from 'axios';
 import config from '../../../config';
 
@@ -29,8 +29,6 @@ export default function BanModal({open, setOpen, initVal, roomName}) {
     // const [toIp, setToIp] = useState(initVal.ip?initVal.ip: '');
     // const [fromIp, setFromIp] = useState(initVal.ip?initVal.ip: ''); 
     // const [ipSel, setIpSel] = useState(true);
-    const socket = getSocket();
-    
     useEffect(() => {
         if(initVal.name && open) {
             Axios.get(`${config.server_url}/api/users/`+initVal.name+'/ip')

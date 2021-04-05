@@ -94,7 +94,7 @@ const useStyles = makeStyles((theme) => ({
 
 const SideBarLeft = ({ roomName, username, mutes, blocks, globalBlocks, changeMuteState, sendPokeMessage, kickUser, banUser,
     users,
-    addOrOpenPrivate,
+    addOrOpenPrivate, startBroadcast,
      cameraState, openCamera, closeCamera }) => {
     const classes = useStyles();
     const [searchText, setSearchText] = useState('');
@@ -145,7 +145,7 @@ const SideBarLeft = ({ roomName, username, mutes, blocks, globalBlocks, changeMu
 
     return (
         <div className={classes.root}>
-            <BroadcastSetting users={users} className={classes.cameraBtn}/>
+            <BroadcastSetting users={users} roomName={roomName} className={classes.cameraBtn} startBroadcast={startBroadcast} />
             <SeparateLine />
             <div className={classes.roomInfo}>
                 <span className={classes.roomName}>{roomName}</span>

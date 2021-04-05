@@ -12,7 +12,7 @@ import { useSnackbar } from 'notistack';
 import { useTranslation } from 'react-i18next';
 import CustomTextField from '../../CustomTextField';
 import OutlinedButton from '../../OutlinedButton';
-import {getSocket} from '../../../utils';
+import {socket} from '../../../utils';
 const StyledDialog = withStyles((theme) => ({
     root: {
         direction: 'ltr'
@@ -36,7 +36,6 @@ const PasswordModal = ({room, open, setOpen, onClose}) => {
         setOpen(false);
     };
     const { t } = useTranslation();
-    const socket = getSocket();
     const handleJoin = () => {
         socket.emit('join room' , {room, password}, (result, message) => {
             if(result) {

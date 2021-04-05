@@ -1,5 +1,5 @@
 import Peer from 'simple-peer';
-import { getSocket } from '../utils';
+import { socket } from '../utils';
 class RoomObject  {
     constructor(name, messages, users, blocks) {
         this.name = name;
@@ -134,7 +134,6 @@ class RoomObject  {
     }
 
     openCamera = async () => {
-        let socket = getSocket();
         let stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
         this.streams.push(stream);
         const peer = new Peer({

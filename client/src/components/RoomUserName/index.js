@@ -21,7 +21,7 @@ import {useTranslation} from 'react-i18next';
 import { makeStyles } from '@material-ui/core/styles';
 import { pink } from '@material-ui/core/colors';
 import BanModal from '../Modals/BanModal';
-import {getSocket} from '../../utils'
+import {socket} from '../../utils'
 import config from '../../config';
 const useStyles = makeStyles((theme) => ({
     username: {
@@ -70,7 +70,6 @@ const RoomUserName = ({user, role, roomName,
 }) => { 
     const classes = useStyles();
     const {t} = useTranslation();
-    const socket = getSocket();
     const [anchorEl, setAnchorEl] = React.useState(null);
     const [openBan, setOpenBan] = React.useState(false);
     const handleClickPrivateChat = (event) => {

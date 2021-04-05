@@ -4,6 +4,23 @@ const socket = io(`${config.server_url}`,{
     autoConnect: false,
 });
 
+const mediaSocket = io(`${config.media_server_url}`,{
+    autoConnect: true,
+});
+
+
+mediaSocket.request = function request(type, data = {}) {
+    return new Promise((resolve, reject) => {
+        mediaSocket.emit(type, data, (data) => {
+        if (data.error) {
+            reject(data.error)
+        } else {
+            resolve(data)
+        }
+        })
+    })
+}
+
 // const adminSocket = io({
 //     autoConnect: false,
 // })
@@ -35,9 +52,6 @@ const socket = io(`${config.server_url}`,{
 //     socket.removeAllListeners();
 //     socket.close();
 // }
+mediaSocket.open();
 
-const getSocket = () => {
-    return socket;
-}
-
-export { getSocket };
+export { socket, mediaSocket };
