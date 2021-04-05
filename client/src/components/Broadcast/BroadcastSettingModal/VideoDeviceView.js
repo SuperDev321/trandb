@@ -1,13 +1,15 @@
-import React, { useEffect, useReducer } from 'react';
+import React, { useEffect, useReducer, useCallback } from 'react';
 
-const getStream = async () => {
-    return navigator.mediaDevices.getUserMedia({
-        audio: true,
-        video: true
+const getStream = (audioDevice, videoDevice) => {
+   return navigator.mediaDevices.getUserMedia({
+      audio: audioDevice? {
+        deviceId: audioDevice
+      }: false,
+      video: videoDevice? {
+        deviceId: videoDevice
+      }: false,
     })
-    .then((stream) => stream)
-    .catch((error) => ('error'))
-}
+};
 
 function asyncReducer(state, action) {
     switch (action.type) {
@@ -26,15 +28,16 @@ function asyncReducer(state, action) {
     }
   }
 
-const useStream = (initialState) => {
+const useStream = ({audioDevice, videoDevice}) => {
+  console.log(audioDevice, videoDevice)
     const [state, dispatch] = React.useReducer(asyncReducer, {
         data: null,
         status: 'idle',
         error: null,
-        ...initialState
     });
 
     const {data, status, error} = state;
+    
     const run = React.useCallback(promise => {
         if (!promise) {
           return
@@ -54,8 +57,10 @@ const useStream = (initialState) => {
       }, []);
 
       React.useEffect(() => {
-        run(getStream())
-      }, [getStream, run])
+        if(!audioDevice && !videoDevice) return;
+        console.log('stream effect',getStream, run, audioDevice, videoDevice)
+        run(getStream(audioDevice, videoDevice))
+      }, [run, audioDevice, videoDevice])
     
     return {
         error,
@@ -64,23 +69,47 @@ const useStream = (initialState) => {
     }
 }
 
-const VideoDeviceView = ({audioState, videoState}) => {
-    
-
+const VideoDeviceView = ({audioDevice, videoDevice}) => {
     const userVideo = React.useRef(null);
-    const userAudio = React.useRef(null);
-    const {stream: data, status, error} = useStream();
+    // const userAudio = React.useRef(null);
+    const {data: stream, status, error} = useStream({audioDevice, videoDevice});
+    // useEffect(() => {
+    //     if(!audioDevice && !videoDevice) return;
+    //     navigator.mediaDevices.getUserMedia({
+    //         audio: audioDevice? {
+    //           deviceId: audioDevice
+    //         }: false,
+    //         audio: videoDevice? {
+    //           deviceId: videoDevice
+    //         }: false,
+    //     }).then((stream) => {
+    //         if(userVideo.current) {
+    //             userVideo.current.srcObject = stream;
+    //         }
+    //     })
+    //     .catch(err => {
+    //       console.log(err);
+    //     })
+    //     return () => {
+    //       if(userVideo.current.srcObject) {
+    //         let stream = userVideo.current.srcObject;
+    //         stream.getTracks().forEach(function(track) {
+    //           track.stop();
+    //           console.log('return video', track)
+    //         });
+    //         console.log('return video')
+    //         userVideo.current = null;
+    //       }
+    //     }
+    // }, [audioDevice, videoDevice])
+
     useEffect(() => {
-        navigator.mediaDevices.getUserMedia({
-            audio: true,
-            video: true
-        }).then((stream) => {
-            if(userVideo.current) {
-                userVideo.current.srcObject = stream;
-            }
-        })
-        
-    }, [])
+      if(stream && status === 'resolved' && userVideo.current) {
+        userVideo.current.srcObject = stream;
+      }
+    }, [stream, status])
+
+
 
     if(status === 'pending' || status === 'idle') {
         return null;

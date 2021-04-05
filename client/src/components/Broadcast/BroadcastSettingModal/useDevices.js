@@ -3,7 +3,24 @@ import React, { useReducer } from 'react';
 const getDevices = async () => {
     return navigator.mediaDevices.enumerateDevices()
     .then((devices) => {
-        return devices.filter((device) => ((device.deviceId != "default" && device.deviceId != "communications") && (device.kind==='audioinput' || device.kind==='videoinput' )));
+        let audioDevices = [];
+        let videoDevices = [];
+        if(devices && devices.length) {
+            for (let index = 0; index < devices.length; index++) {
+                const element = devices[index];
+                if (element.deviceId != "default" && element.deviceId != "communications") {
+                    if (element.kind == "audioinput") {
+                        audioDevices.push({deviceId: element.deviceId, label: element.label, groupId: element.groupId});
+                    } else if (element.kind == "videoinput") {
+                        videoDevices.push({deviceId: element.deviceId, label: element.label, groupId: element.groupId});
+                    }
+                }
+            }
+        }
+        return {
+            audioDevices,
+            videoDevices
+        }
     })
     .catch((err) => {
       return err;

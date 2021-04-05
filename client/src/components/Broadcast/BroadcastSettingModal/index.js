@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
+import {mediaType} from '../../../utils'
 import {
     Button,
     Dialog,
@@ -11,8 +12,10 @@ import {
     FormControlLabel,
     FormGroup,
     FormLabel,
-    FormHelperText,
     Checkbox,
+    InputLabel,
+    Select,
+    MenuItem
 } from '@material-ui/core';
 import TextField from '@material-ui/core/TextField';
 import VideocamIcon from '@material-ui/icons/Videocam';
@@ -31,10 +34,14 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-function BroadcastSettingModal({users, ...modalProps}) {
+function BroadcastSettingModal({roomName, startBroadcast, users, ...modalProps}) {
     
     
     const {data: devices, error: deviceError, status: deviceStatus} = useDevices();
+    const [audioDevices, setAudioDevices] = useState([]);
+    const [videoDevices, setVideoDevices] = useState([]);
+    const [currentAudioDevice, setCurrentAudioDevice] = useState(null);
+    const [currentVideoDevice, setCurrentVideoDevice] = useState(null);
     const [usersState, setUsersState] = useState(null);
     const { t } = useTranslation();
     
@@ -46,29 +53,7 @@ function BroadcastSettingModal({users, ...modalProps}) {
             setUsersState(states);
         }
     };
-    // useEffect(() => {
-    //     if(open)
-    //         getDevices()
-    //         .then((devices) => {
-    //             let audioDevices = [];
-    //             let videoDevices = [];
-    //             if(devices && devices.length) {
-    //                 for (let index = 0; index < devices.length; index++) {
-    //                     const element = devices[index];
-    //                     if (element.deviceId != "default" && element.deviceId != "communications") {
-    //                         if (element.kind == "audioinput") {
-    //                             audioDevices.push({deviceId: element.deviceId, label: element.label, groupId: element.groupId});
-    //                         } else if (element.kind == "videoinput") {
-    //                             videoDevices.push({deviceId: element.deviceId, label: element.label, groupId: element.groupId});
-    //                         }
-    //                     }
-    //                 }
-    //             }
-    //             console.log(audioDevices);
-    //             console.log(videoDevices);
-    //         });
-    // }, [open])
-
+    
     useEffect(() => {
         // console.log('users',users);
         if(users) {
@@ -76,6 +61,24 @@ function BroadcastSettingModal({users, ...modalProps}) {
             setUsersState(states);
         }
     }, [users])
+
+    const handleClickOK = () => {
+        const devices = [];
+        if(currentAudioDevice) {
+            devices.push({
+                type: mediaType.audio,
+                deviceId: currentAudioDevice
+            });
+        }
+        if(currentVideoDevice) {
+            devices.push({
+                type: mediaType.video,
+                deviceId: currentVideoDevice
+            });
+        }
+        startBroadcast(roomName, devices);
+        modalProps.onClose();
+    }
 
     const devicesDOM = () => {
         if (deviceStatus === 'idle') {
@@ -85,15 +88,37 @@ function BroadcastSettingModal({users, ...modalProps}) {
         } else if (deviceStatus === 'rejected') {
             return deviceError;
         } else if (deviceStatus === 'resolved') {
+            let { audioDevices, videoDevices } = devices;
             return (
                 <>
-                { devices?.map((item, index) => (
-                    <FormControlLabel key={index}
-                        control={<Checkbox name={item.groupId} />}
-                        label={item.label}
-                    />
-                ))
-                }
+                    <FormControl>
+                        <InputLabel id="audio-select-helper-label">Audio</InputLabel>
+                        <Select
+                            labelId="audio-select-helper-label"
+                            id="audio-select-helper"
+                            value={currentAudioDevice}
+                            onChange={(e) => {console.log('change event');setCurrentAudioDevice(e.target.value)}}
+                        >
+                            { audioDevices?.map((item, index) => (
+                                <MenuItem value={item.deviceId} key={index}>{item.label}</MenuItem>
+                            ))
+                            }
+                        </Select>
+                    </FormControl>
+                    <FormControl>
+                        <InputLabel id="video-select-helper-label">Video</InputLabel>
+                        <Select
+                            labelId="video-select-helper-label"
+                            id="video-select-helper"
+                            value={currentVideoDevice}
+                            onChange={(e) => setCurrentVideoDevice(e.target.value)}
+                        >
+                            { videoDevices?.map((item, index) => (
+                                <MenuItem value={item.deviceId} key={index}>{item.label}</MenuItem>
+                            ))
+                            }
+                        </Select>
+                    </FormControl>
                 </>
             )
         } else {
@@ -132,13 +157,13 @@ function BroadcastSettingModal({users, ...modalProps}) {
                     }
                 </FormGroup>
             </FormControl>
-            <VideoDeviceView />
+            <VideoDeviceView audioDevice={currentAudioDevice} videoDevice={currentVideoDevice} />
             </DialogContent>
             <DialogActions>
-            <Button color="primary">
+            <Button color="primary" onClick={modalProps.onClose}>
                 Cancel
             </Button>
-            <Button color="primary">
+            <Button color="primary" onClick={handleClickOK}>
                 OK
             </Button>
             </DialogActions>
@@ -147,7 +172,7 @@ function BroadcastSettingModal({users, ...modalProps}) {
 }
 
 
-const BroadcastSetting = ({users}) => {
+const BroadcastSetting = ({users, startBroadcast, roomName}) => {
     const classes = useStyles();
     const [open, setOpen] = useState(false);
     const handleClickOpen = () => {
@@ -177,7 +202,7 @@ const BroadcastSetting = ({users}) => {
                     <VideocamIcon />
             </Button>
             { open
-                ?<BroadcastSettingModal users={users} open={open} open={open} onClose={handleClose} aria-labelledby="form-dialog-title"/>
+                ?<BroadcastSettingModal roomName={roomName} users={users} open={open} onClose={handleClose} aria-labelledby="form-dialog-title" startBroadcast={startBroadcast}/>
                 :null
             }
         </div>

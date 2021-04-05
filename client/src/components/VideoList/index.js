@@ -38,12 +38,11 @@ const UserVideo = ({stream}) => {
 
 const VideoList = ({streams}) => {
     const classes = useStyles();
-    // console.log(streams)
+    console.log(streams)
 
     return (
         <div className={classes.root}>
-        { streams &&
-            streams.map((stream, index) => (
+        { streams?.map(({stream}, index) => (
                 <UserVideo stream={stream} key={index}/>
             ))
         }
