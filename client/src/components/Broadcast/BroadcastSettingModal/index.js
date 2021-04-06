@@ -40,8 +40,8 @@ function BroadcastSettingModal({roomName, startBroadcast, users, ...modalProps})
     const {data: devices, error: deviceError, status: deviceStatus} = useDevices();
     const [audioDevices, setAudioDevices] = useState([]);
     const [videoDevices, setVideoDevices] = useState([]);
-    const [currentAudioDevice, setCurrentAudioDevice] = useState(null);
-    const [currentVideoDevice, setCurrentVideoDevice] = useState(null);
+    const [currentAudioDevice, setCurrentAudioDevice] = useState('');
+    const [currentVideoDevice, setCurrentVideoDevice] = useState('');
     const [usersState, setUsersState] = useState(null);
     const { t } = useTranslation();
     
@@ -135,7 +135,7 @@ function BroadcastSettingModal({roomName, startBroadcast, users, ...modalProps})
             {/* <DialogContentText>
                 Select users to broadcast
             </DialogContentText> */}
-            <FormControl>
+            {/* <FormControl>
                 <FormLabel component="legend">Select users to broadcast</FormLabel>
                 <FormGroup>
                 { usersState && usersState.map((item, index) => (
@@ -148,7 +148,7 @@ function BroadcastSettingModal({roomName, startBroadcast, users, ...modalProps})
                 }
                 </FormGroup>
             
-            </FormControl>
+            </FormControl> */}
             <FormControl>
                 <FormLabel component="legend">Select devices to broadcast</FormLabel>
                 <FormGroup>
@@ -172,12 +172,16 @@ function BroadcastSettingModal({roomName, startBroadcast, users, ...modalProps})
 }
 
 
-const BroadcastSetting = ({users, startBroadcast, roomName}) => {
+const BroadcastSetting = ({users, startBroadcast, stopBroadcast, cameraState, roomName}) => {
     const classes = useStyles();
     const [open, setOpen] = useState(false);
     const handleClickOpen = () => {
         // console.log('users', users)
-        setOpen(true);
+        if(!cameraState) {
+            setOpen(true);
+        } else {
+            stopBroadcast(roomName);
+        }
     };
     const handleClose = () => {
         setOpen(false);
@@ -197,7 +201,9 @@ const BroadcastSetting = ({users, startBroadcast, roomName}) => {
                             variant="contained"
                             onClick={handleClickOpen}
                             className={classes.cameraBtn}
-                        >{t('SidebarLeft.start_broadcasting')}
+                        >{ cameraState ? t('SidebarLeft.stop_broadcasting'):
+                            t('SidebarLeft.start_broadcasting')
+                        }
                             &nbsp;
                     <VideocamIcon />
             </Button>

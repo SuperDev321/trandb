@@ -49,8 +49,12 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
     const [currentRoomName, setCurrentRoomName] = useState(null);
     const [currentRoomBlocks, setCurrentRoomBlocks] = useState([]);
     const [currentRoomMutes, setCurrentRoomMutes] = useState([]);
-    const [currentRemoteStreams, setCurrentRemoteStreams] = useState([]);
     const [globalBlocks, setGlobalBlocks] = useState([]);
+    // video stream objects
+    const [remoteStreams, setRemoteStreams] = useState([]);
+    const [currentRemoteStreams, setCurrentRemoteStreams] = useState([]);
+    const [localStreamTmp, setLocalStreamTmp] = useState(null);
+    const [currentLocalStream, setCurrentLocalStream] = useState(null);
 
     // receive new message
     const [newMessage, setNewMessage] = useState([]);
@@ -79,8 +83,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
         autoPlay: false ,
     });
     const peersRef = useRef([]);
-    // video stream objects
-    const [remoteStreams, setRemoteStreams] = useState([]);
+    
 
     const { enqueueSnackbar, closeSnackbar } = useSnackbar();
     
@@ -211,13 +214,47 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
             let streams = mediaObj.getStreams();
             setRemoteStreams(streams);
         })
+        mediaObj.on(mediaEvents.onChangeProduce, (data) => {
+            console.log('local video change', data, currentRoomName);
+            let {room_id, type} = data;
+            switch(type) {
+                case 'start':
+                    let stream = mediaObj.getLocalStream(room_id);
+                    setLocalStreamTmp({stream, room_id});
+                    break;
+                case 'close':
+                    console.log('close local video')
+                    break;
+                case 'close audio':
+                    console.log('pause audio')
+                    break;
+            }
+        })
         mediaClientRef.current = mediaObj;
-    }, [username])
+    }, [])
 
     useEffect(() => {
         let currentStreams = remoteStreams.filter(({room_id}) => (room_id === currentRoomName));
         setCurrentRemoteStreams(currentStreams);
     }, [currentRoomName, remoteStreams]);
+
+    useEffect(() => {
+        if(currentRoomName && mediaClientRef.current) {
+           let stream = mediaClientRef.current.getLocalStream(currentRoomName);
+           setCurrentLocalStream(stream);
+        }
+        
+    }, [currentRoomName]);
+
+    useEffect(() => {
+        if(localStreamTmp) {
+           let {room_id, stream} = localStreamTmp;
+            if(room_id === currentRoomName && stream) {
+                setCurrentLocalStream(stream);
+            } 
+        }
+        
+    }, [localStreamTmp]);
 
     // send poke message
     const sendPokeMessage = (roomName, userToSend) => {
@@ -242,13 +279,20 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
         
     }
     const startBroadcast = (roomName, devices) => {
-       
+       console.log('startBroadcast', roomName, devices)
         if(mediaClientRef.current) {
             devices.map(({type, deviceId}) => {
                 mediaClientRef.current.produce(type, roomName, deviceId);
             })
         }
     }
+    const stopBroadcast = (roomName) => {
+        console.log('startBroadcast', roomName)
+        if(mediaClientRef.current) {
+            mediaClientRef.current.closeProducer(null, roomName);
+            setCurrentLocalStream(null);
+        }
+     }
 /*************************************************************** */
     // useEffect(() => {
     //     if(room) {
@@ -700,29 +744,9 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                 }
                 
                 break;
-            // case 'video':
-            //     // console.log('process video')
-            //     let { from, room, signal } = newInfo.payload;
-            //     let roomObject = roomsRef.current.find((item) => (item.name === room));
-            //     if(roomObject) {
-            //         addPeer(signal, from, roomObject);
-            //     }
-            //     break;
-            // case 'return video':
-            //     // console.log('return video',newInfo.payload)
-            //     let item = peersRef.current.find((p) => (p.room === newInfo.payload.room && p.peerID === newInfo.payload.from));
-            //     // console.log(peersRef.current);
-            //     if(item) {
-            //         // console.log(item);
-            //         item.peer.signal(newInfo.payload.signal);
-            //     }
-            //     break;
             default:
                 break;
         }
-        // setCurrentRoom({...roomsRef.current[roomIndex]});
-        // setCurrentRoomMessages([...roomsRef.current[roomIndex].messages]);
-        // setCurrentRoomUsers([...roomsRef.current[roomIndex].users]);
         let infos = roomsRef.current.map(({name, unReadMessages}) => ({name, unReadMessages}));
         setRoomsInfo(infos); 
     }
@@ -824,8 +848,9 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                         // setOpenPrivate={setOpenPrivate}
                         // setPrivateTo={setPrivateTo}
                         addOrOpenPrivate={addOrOpenPrivate}
-                        cameraState={currentRoom && currentRoom.cameraState}
+                        cameraState={(currentLocalStream !== null)}
                         startBroadcast={startBroadcast}
+                        stopBroadcast={stopBroadcast}
                         username={username}
                     />  
                 </div>
@@ -873,20 +898,22 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                             // setOpenPrivate={setOpenPrivate}
                             // setPrivateTo={setPrivateTo}
                             addOrOpenPrivate={addOrOpenPrivate}
-                            cameraState={currentRoom && currentRoom.cameraState}
+                            cameraState={(currentLocalStream !== null)}
                             startBroadcast={startBroadcast}
+                            stopBroadcast={stopBroadcast}
                             username={username}
                             />
                         </Card>
                     }
                 </Hidden>
-               
+
                 <main className={classes.main}>
                     <div className={classes.content}>
                     {/* { currentRoom && roomIndex !== null  && */}
-                        <VideoList streams={currentRemoteStreams}/>
+                        <VideoList streams={currentRemoteStreams} localStream={currentLocalStream} />
                     {/* } */}
                     {/* { currentRoom && roomIndex !== null && */}
+                    <SeparateLine orientation="vertical" style={{height: 'auto'}} />
                         <ChatRoomContent
                             roomName={currentRoomName}
                             username={username}
