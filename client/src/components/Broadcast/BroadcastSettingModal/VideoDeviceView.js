@@ -58,7 +58,6 @@ const useStream = ({audioDevice, videoDevice}) => {
 
       React.useEffect(() => {
         if(!audioDevice && !videoDevice) return;
-        console.log('stream effect',getStream, run, audioDevice, videoDevice)
         run(getStream(audioDevice, videoDevice))
       }, [run, audioDevice, videoDevice])
     
@@ -106,6 +105,15 @@ const VideoDeviceView = ({audioDevice, videoDevice}) => {
     useEffect(() => {
       if(stream && status === 'resolved' && userVideo.current) {
         userVideo.current.srcObject = stream;
+      }
+      return () => {
+        if(userVideo.current && userVideo.current.srcObject) {
+          console.log('stop tracks')
+          userVideo.current.srcObject.getTracks().forEach(function (track) {
+            track.stop();
+          });
+          userVideo.current.srcObject = null;
+        }
       }
     }, [stream, status])
 

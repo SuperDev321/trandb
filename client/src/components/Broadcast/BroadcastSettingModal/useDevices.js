@@ -3,6 +3,7 @@ import React, { useReducer } from 'react';
 const getDevices = async () => {
     return navigator.mediaDevices.enumerateDevices()
     .then((devices) => {
+      console.log(devices, 'media devices')
         let audioDevices = [];
         let videoDevices = [];
         if(devices && devices.length) {
@@ -23,6 +24,7 @@ const getDevices = async () => {
         }
     })
     .catch((err) => {
+      console.log(err)
       return err;
     })
 }
