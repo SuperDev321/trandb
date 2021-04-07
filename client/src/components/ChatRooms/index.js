@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useContext, useRef, forwardRef, useImperativeHandle } from 'react';
+import React, { useState, useLayoutEffect, useEffect, useContext, useRef, forwardRef, useImperativeHandle } from 'react';
 import {
     AppBar,
     Card,
@@ -51,7 +51,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
     const [currentRoomMutes, setCurrentRoomMutes] = useState([]);
     const [globalBlocks, setGlobalBlocks] = useState([]);
     // video stream objects
-    const [remoteStreams, setRemoteStreams] = useState([]);
+    const [remoteStreamsTmp, setRemoteStreamsTmp] = useState(null);
     const [currentRemoteStreams, setCurrentRemoteStreams] = useState([]);
     const [localStreamTmp, setLocalStreamTmp] = useState(null);
     const [currentLocalStream, setCurrentLocalStream] = useState(null);
@@ -82,7 +82,24 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
         src: '/media/private.mp3',
         autoPlay: false ,
     });
-    const peersRef = useRef([]);
+    useEffect(() => {
+        let mediaObj = new MediaClient(username);
+        mediaObj.on(mediaEvents.onChangeConsume, (data) => {
+            let {room_id} = data;
+            let streams = mediaObj.getRemoteStreams(room_id);
+            setRemoteStreamsTmp({streams, room_id});
+        })
+        mediaObj.on(mediaEvents.startStream, (data) => {
+            let {room_id} = data;
+            let stream = mediaObj.getLocalStream(room_id);
+            setLocalStreamTmp({stream, room_id});
+        })
+        mediaClientRef.current = mediaObj;
+
+        return () => {
+            mediaClientRef.current = null;
+        }
+    }, [])
     
 
     const { enqueueSnackbar, closeSnackbar } = useSnackbar();
@@ -92,6 +109,8 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
             addOrOpenPrivate(userToChat);
         }
     }));
+
+    
 
     const handleChangeRoom = (event, newValue) => {
         setRoomIndex(newValue);
@@ -207,41 +226,14 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
         socket.emit('leave private', roomName);
     }
 
-    useEffect(() => {
-        let mediaObj = new MediaClient(username);
-        mediaObj.on(mediaEvents.onChangeConsume, (data) => {
-            console.log('consume callback', data);
-            let streams = mediaObj.getStreams();
-            setRemoteStreams(streams);
-        })
-        mediaObj.on(mediaEvents.onChangeProduce, (data) => {
-            console.log('local video change', data, currentRoomName);
-            let {room_id, type} = data;
-            switch(type) {
-                case 'start':
-                    let stream = mediaObj.getLocalStream(room_id);
-                    setLocalStreamTmp({stream, room_id});
-                    break;
-                case 'close':
-                    console.log('close local video')
-                    break;
-                case 'close audio':
-                    console.log('pause audio')
-                    break;
-            }
-        })
-        mediaClientRef.current = mediaObj;
-    }, [])
-
-    useEffect(() => {
-        let currentStreams = remoteStreams.filter(({room_id}) => (room_id === currentRoomName));
-        setCurrentRemoteStreams(currentStreams);
-    }, [currentRoomName, remoteStreams]);
+    
 
     useEffect(() => {
         if(currentRoomName && mediaClientRef.current) {
            let stream = mediaClientRef.current.getLocalStream(currentRoomName);
+           let remoteStreams = mediaClientRef.current.getRemoteStreams(currentRoomName);
            setCurrentLocalStream(stream);
+           setCurrentRemoteStreams(remoteStreams);
         }
         
     }, [currentRoomName]);
@@ -253,8 +245,16 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                 setCurrentLocalStream(stream);
             } 
         }
-        
     }, [localStreamTmp]);
+
+    useEffect(() => {
+        if(remoteStreamsTmp) {
+           let {room_id, streams} = remoteStreamsTmp;
+            if(room_id === currentRoomName && streams) {
+                setCurrentRemoteStreams([...streams]);
+            } 
+        }
+    }, [remoteStreamsTmp]);
 
     // send poke message
     const sendPokeMessage = (roomName, userToSend) => {
@@ -278,16 +278,10 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
         });
         
     }
-    const startBroadcast = (roomName, devices) => {
-       console.log('startBroadcast', roomName, devices)
-        if(mediaClientRef.current) {
-            devices.map(({type, deviceId}) => {
-                mediaClientRef.current.produce(type, roomName, deviceId);
-            })
-        }
+    const startBroadcast = (roomName, videoDeviceId, audioDeviceId) => {
+        mediaClientRef.current.produce(roomName, videoDeviceId, audioDeviceId);
     }
     const stopBroadcast = (roomName) => {
-        console.log('startBroadcast', roomName)
         if(mediaClientRef.current) {
             mediaClientRef.current.closeProducer(null, roomName);
             setCurrentLocalStream(null);

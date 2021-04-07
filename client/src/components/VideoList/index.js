@@ -57,13 +57,12 @@ const useVideoStyles = makeStyles((theme) => ({
     }
 }));
 
-const UserVideo = ({stream, controlVideo}) => {
+const LocalVideo = ({stream}) => {
     const userVideo = useRef();
     const classes = useVideoStyles();
     useEffect(() => {
         if(stream && userVideo.current) {
             userVideo.current.srcObject = stream;
-            // console.log('user stream', stream);
         }
     }, [stream])
     return (
@@ -82,7 +81,7 @@ const UserVideo = ({stream, controlVideo}) => {
                 </div>
             </div>
             <div className={classes.content}>
-                <video ref={userVideo} autoPlay  style={{width: '100%', padding: '5px'}} />
+                <video ref={userVideo} autoPlay style={{width: '100%', padding: '5px'}} />
             </div>
             
         </div>
@@ -90,17 +89,57 @@ const UserVideo = ({stream, controlVideo}) => {
     )
 }
 
-const VideoList = ({streams, localStream}) => {
+const UserVideo = ({streamSet, controlVideo}) => {
+    const userVideo = useRef();
+    const userAudio = useRef();
+    const classes = useVideoStyles();
+    useEffect(() => {
+        if(streamSet && userVideo.current) {
+            if(streamSet.audio) {
+                userAudio.current.srcObject = streamSet.audio;
+            }
+            if(streamSet.video) {
+                userVideo.current.srcObject = streamSet.video;
+            }
+            // console.log('user stream', stream);
+        }
+    }, [streamSet])
+    return (
+        <div className={classes.root}>
+            <div className={classes.actionField}>
+                <div className={classes.actionHeader}>
+                    <IconButton aria-label="delete" color="secondary" >
+                        <CloseIcon />
+                    </IconButton>
+                </div>
+                <div className={classes.flexGrower}></div>
+                <div className={classes.actionFooter}>
+                    <IconButton aria-label="pause" color="secondary">
+                        <PauseIcon />
+                    </IconButton>
+                </div>
+            </div>
+            <div className={classes.content}>
+                <video ref={userVideo} autoPlay  style={{width: '100%', padding: '5px'}} />
+                <audio ref={userAudio} autoPlay />
+            </div>
+            
+        </div>
+        
+    )
+}
+
+const VideoList = ({streams, localStream, controlVideo}) => {
     const classes = useStyles();
-    // console.log('localStream', localStream)
+    console.log('remotestreams', streams)
 
     return (
         <div className={classes.root}>{
             localStream?
-             <UserVideo stream={localStream} /> : null
+             <LocalVideo stream={localStream} /> : null
         }
-        { streams?.map(({stream}, index) => (
-                <UserVideo stream={stream} key={index}/>
+        { streams?.map(({streamSet}, index) => (
+                <UserVideo streamSet={streamSet} key={index}/>
             ))
         }
         </div>
