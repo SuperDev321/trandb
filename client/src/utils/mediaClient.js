@@ -1,4 +1,3 @@
-import { LabelRounded, ViewStreamSharp } from '@material-ui/icons';
 import * as mediasoupClient from 'mediasoup-client';
 import {mediaSocket as socket} from './socketHandler';
 
@@ -26,6 +25,7 @@ const _EVENTS = {
 class MediaClient {
 
     constructor(name, successCallback = null) {
+        console.log('media client constructor')
         this.name = name
         this.producerTransports = new Map();
         this.consumerTransports = new Map();
@@ -72,17 +72,21 @@ class MediaClient {
 
     async join(room_id) {
         try {
+            console.log('joininig room ', room_id)
             let result = await socket.request('join', {
                 name: this.name,
                 room_id
             });
-            console.log(result);
+            console.log('joininig room2 ', room_id)
+
             const data = await socket.request('getRouterRtpCapabilities', room_id);
             let device = await this.loadDevice(data)
             this.devices.set(room_id, device);
+            console.log('joininig room 3', room_id)
             await this.initTransports(device, room_id)
-            
-            socket.emit('getProducers', room_id)
+            console.log('joininig room 4', room_id)
+            socket.request('getProducers', room_id);
+            console.log('inited ', room_id);
         } catch (e) {
             console.log(e);
         }
@@ -120,7 +124,7 @@ class MediaClient {
                 return;
             }
 
-            let producerTransport = device.createSendTransport(data);
+            const producerTransport = await device.createSendTransport(data);
             this.producerTransports.set(room_id, producerTransport);
 
             producerTransport.on('connect', async ({
@@ -189,7 +193,7 @@ class MediaClient {
             }
 
             // only one needed
-            let consumerTransport = await device.createRecvTransport(data);
+            const consumerTransport = await device.createRecvTransport(data);
             
             consumerTransport.on('connect', function ({
                 dtlsParameters
@@ -224,7 +228,6 @@ class MediaClient {
             });
             this.consumerTransports.set(room_id, consumerTransport);
         }
-        console.log('init done');
     }
 
     initSockets() {
@@ -259,9 +262,6 @@ class MediaClient {
 
 
     }
-
-
-
 
     //////// MAIN FUNCTIONS /////////////
 
@@ -453,6 +453,7 @@ class MediaClient {
         const {
             rtpCapabilities
         } = device;
+        console.log('consume request', consumerTransport.id, this.consumerTransports);
         const data = await socket.request('consume', {
             rtpCapabilities,
             consumerTransportId: consumerTransport.id, // might be 
@@ -657,8 +658,30 @@ class MediaClient {
         //     track.stop()
         // })
         // elem.parentNode.removeChild(elem)
+        let consumerInfo = this.consumers.get(consumer_id);
+        if(consumerInfo) {
+            let {kind, room_id, name} = consumerInfo;
+            let roomStreams = this.remoteStreams.get(room_id);
+            if(roomStreams) {
+                let streamSet = roomStreams.get(name);
+                if(streamSet) {
+                    let stream = streamSet[kind];
+                    if(stream) {
+                        stream.getTracks().forEach((track) => {
+                            track.stop();
+                        });
+                    }
+                    delete streamSet[kind];
+                }
+                if(Object.keys(streamSet).length === 0) {
+                    roomStreams.delete(name);
+                }
+            }
+            this.consumers.delete(consumer_id);
+            this.event(_EVENTS.onChangeConsume, {room_id})
+        }
 
-        this.consumers.delete(consumer_id);
+        
         // this.event(_EVENTS.onChangeConsume, {room_id})
     }
 
@@ -683,13 +706,12 @@ class MediaClient {
         }.bind(this)
 
         if (!offline) {
-            socket.request('exitRoom', this.room_id).then(e => console.log(e)).catch(e => console.warn(e)).finally(function () {
+            socket.request('exit').then(e => console.log(e)).catch(e => console.warn(e)).finally(function () {
                 clean()
             }.bind(this))
         } else {
             clean()
         }
-        this.event(_EVENTS.exitRoom)
     }
 
     ///////  HELPERS //////////
@@ -726,7 +748,6 @@ class MediaClient {
     }
 
     getRemoteStreams(room_id) {
-        
         if(this.remoteStreams.has(room_id)) {
             let roomStreams = this.remoteStreams.get(room_id);
             let streamSets = [];

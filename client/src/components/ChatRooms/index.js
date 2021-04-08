@@ -86,8 +86,11 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
         let mediaObj = new MediaClient(username);
         mediaObj.on(mediaEvents.onChangeConsume, (data) => {
             let {room_id} = data;
-            let streams = mediaObj.getRemoteStreams(room_id);
-            setRemoteStreamsTmp({streams, room_id});
+            setTimeout(() => {
+                let streams = mediaObj.getRemoteStreams(room_id);
+                setRemoteStreamsTmp({streams, room_id});
+            }, 1000);
+            
         })
         mediaObj.on(mediaEvents.startStream, (data) => {
             let {room_id} = data;
@@ -97,7 +100,11 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
         mediaClientRef.current = mediaObj;
 
         return () => {
-            mediaClientRef.current = null;
+            if(mediaClientRef.current) {
+                mediaClientRef.current.exit();
+                mediaClientRef.current = null;
+            }
+            
         }
     }, [])
     
@@ -555,11 +562,12 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                             
                             let newRoomObject = new RoomObject(newInfo.payload.room.name, messages, newInfo.payload.onlineUsers, newInfo.payload.blocks);
                             roomsRef.current.push(newRoomObject);
+                            setRoomIndex(roomsRef.current.length-1);
                             if(mediaClientRef.current) {
                                 await mediaClientRef.current.createRoom(newInfo.payload.room.name);
                                 await mediaClientRef.current.join(newInfo.payload.room.name);
                             }
-                            setRoomIndex(roomsRef.current.length-1);
+                            console.log('media init done')
                         } else {
                             // remove this room
                             let newRooms = await(roomsRef.current.filter((room) => (room.name !== newInfo.payload.room)));
@@ -772,7 +780,9 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
     }, [roomsInfo])
 
     useEffect(() => {
+        console.log('change room index', roomIndex, roomsRef.current.length)
         if(roomsRef.current.length > 0 && roomsRef.current.length > roomIndex) {
+            
             roomsRef.current[roomIndex].messages = [ ...roomsRef.current[roomIndex].unReadMessages, ...roomsRef.current[roomIndex].messages];
             roomsRef.current[roomIndex].unReadMessages = [];
             setCurrentRoomMessages([...roomsRef.current[roomIndex].messages]);
