@@ -101,7 +101,6 @@ const UserVideo = ({streamSet, controlVideo}) => {
             if(streamSet.video) {
                 userVideo.current.srcObject = streamSet.video;
             }
-            // console.log('user stream', stream);
         }
     }, [streamSet])
     return (
@@ -131,15 +130,13 @@ const UserVideo = ({streamSet, controlVideo}) => {
 
 const VideoList = ({streams, localStream, controlVideo}) => {
     const classes = useStyles();
-    console.log('remotestreams', streams)
-
     return (
         <div className={classes.root}>{
             localStream?
-             <LocalVideo stream={localStream} /> : null
+                <LocalVideo stream={localStream} /> : null
         }
-        { streams?.map(({streamSet}, index) => (
-                <UserVideo streamSet={streamSet} key={index}/>
+        { streams?.map(({streamSet, name}, index) => (
+                <UserVideo streamSet={streamSet} key={name}/>
             ))
         }
         </div>
