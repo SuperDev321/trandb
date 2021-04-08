@@ -63,20 +63,7 @@ function BroadcastSettingModal({roomName, startBroadcast, users, ...modalProps})
     }, [users])
 
     const handleClickOK = () => {
-        const devices = [];
-        if(currentAudioDevice) {
-            devices.push({
-                type: mediaType.audio,
-                deviceId: currentAudioDevice
-            });
-        }
-        if(currentVideoDevice) {
-            devices.push({
-                type: mediaType.video,
-                deviceId: currentVideoDevice
-            });
-        }
-        startBroadcast(roomName, devices);
+        startBroadcast(roomName, currentVideoDevice, currentAudioDevice);
         modalProps.onClose();
     }
 

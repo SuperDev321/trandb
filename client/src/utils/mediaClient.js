@@ -1,4 +1,4 @@
-import { LabelRounded } from '@material-ui/icons';
+import { LabelRounded, ViewStreamSharp } from '@material-ui/icons';
 import * as mediasoupClient from 'mediasoup-client';
 import {mediaSocket as socket} from './socketHandler';
 
@@ -16,6 +16,7 @@ const _EVENTS = {
     stopAudio: 'stopAudio',
     startScreen: 'startScreen',
     stopScreen: 'stopScreen',
+    startStream: 'startStream',
     onChangeConsume: 'onChangeConsume',
     onChangeProduce: 'onChangeProduce'
 }
@@ -34,8 +35,8 @@ class MediaClient {
         this.consumers = new Map()
         this.producers = new Map()
 
-        this.remoteStreams = [];
-        this.localStream = null;
+        this.remoteStreams = new Map();
+        this.localStreams = new Map();
 
         this.producer = null;
         /**
@@ -70,19 +71,22 @@ class MediaClient {
     }
 
     async join(room_id) {
-        socket.request('join', {
-            name: this.name,
-            room_id
-        }).then(async (e) => {
-            console.log(e)
+        try {
+            let result = await socket.request('join', {
+                name: this.name,
+                room_id
+            });
+            console.log(result);
             const data = await socket.request('getRouterRtpCapabilities', room_id);
             let device = await this.loadDevice(data)
             this.devices.set(room_id, device);
             await this.initTransports(device, room_id)
+            
             socket.emit('getProducers', room_id)
-        }).catch(e => {
-            console.log(e)
-        })
+        } catch (e) {
+            console.log(e);
+        }
+        console.log('joined room ', room_id)
     }
 
     async loadDevice(routerRtpCapabilities) {
@@ -123,12 +127,12 @@ class MediaClient {
                 dtlsParameters
             }, callback, errback) => {
                 socket.request('connectTransport', {
-                        dtlsParameters,
-                        transport_id: data.id,
-                        room_id
-                    })
-                    .then(callback)
-                    .catch(errback)
+                    dtlsParameters,
+                    transport_id: data.id,
+                    room_id
+                })
+                .then(callback)
+                .catch(errback)
             });
 
             producerTransport.on('produce', async ({
@@ -186,10 +190,11 @@ class MediaClient {
 
             // only one needed
             let consumerTransport = await device.createRecvTransport(data);
-            this.consumerTransports.set(room_id, consumerTransport);
+            
             consumerTransport.on('connect', function ({
                 dtlsParameters
             }, callback, errback) {
+                console.log('cosumer transport connect request', socket);
                 socket.request('connectTransport', {
                         transport_id: consumerTransport.id,
                         dtlsParameters,
@@ -198,13 +203,13 @@ class MediaClient {
                     .then(callback)
                     .catch(errback);
             }.bind(this));
-
             consumerTransport.on('connectionstatechange', async (state) => {
                 switch (state) {
                     case 'connecting':
                         break;
 
                     case 'connected':
+                        console.log('consumer transport connected')
                         //remoteVideo.srcObject = await stream;
                         //await socket.request('resume');
                         break;
@@ -217,8 +222,9 @@ class MediaClient {
                         break;
                 }
             });
+            this.consumerTransports.set(room_id, consumerTransport);
         }
-
+        console.log('init done');
     }
 
     initSockets() {
@@ -243,7 +249,7 @@ class MediaClient {
                     producer_name,
                     room_id
                 } of data) {
-                await this.consume(producer_id, producer_name, room_id)
+                await this.consume(producer_id, producer_name, room_id);
             }
         }.bind(this))
 
@@ -260,210 +266,187 @@ class MediaClient {
     //////// MAIN FUNCTIONS /////////////
 
 
-    async produce(type, room_id, deviceId = null) {
+    async produce(room_id, videoDeviceId = null ,audioDeviceId = null) {
         
         let mediaConstraints = {}
-        let audio = false
-        switch (type) {
-            case mediaType.audio:
-                mediaConstraints = {
-                    audio: {
-                        deviceId: deviceId
-                    },
-                    video: false
-                }
-                audio = true
-                break
-            case mediaType.video:
-                mediaConstraints = {
-                    audio: false,
-                    video: {
-                        width: {
-                            min: 640,
-                            ideal: 1920
-                        },
-                        height: {
-                            min: 400,
-                            ideal: 1080
-                        },
-                        deviceId: deviceId
-                        /*aspectRatio: {
-                            ideal: 1.7777777778
-                        }*/
-                    }
-                }
-                break
-            default:
-                return
+        mediaConstraints = {
+            audio: audioDeviceId? {
+                deviceId: audioDeviceId
+            }: false,
+            video: videoDeviceId? {
+                deviceId: videoDeviceId,
+                width: {
+                    min: 640,
+                    ideal: 1920
+                },
+                height: {
+                    min: 400,
+                    ideal: 1080
+                },
+            }: false
         }
-        console.log('produce1', type, room_id, deviceId)
+        // let audio = false
+        // switch (type) {
+        //     case mediaType.audio:
+        //         mediaConstraints = {
+        //             audio: {
+        //                 deviceId: deviceId
+        //             },
+        //             video: false
+        //         }
+        //         audio = true
+        //         break
+        //     case mediaType.video:
+        //         mediaConstraints = {
+        //             audio: false,
+        //             video: {
+        //                 width: {
+        //                     min: 640,
+        //                     ideal: 1920
+        //                 },
+        //                 height: {
+        //                     min: 400,
+        //                     ideal: 1080
+        //                 },
+        //                 deviceId: deviceId
+        //                 /*aspectRatio: {
+        //                     ideal: 1.7777777778
+        //                 }*/
+        //             }
+        //         }
+        //         break
+        //     default:
+        //         return
+        // }
+        console.log(this.devices)
         let device = this.devices.get(room_id);
-        console.log('produce2', type, room_id, deviceId)
         if(!device) {
             console.error('cannot find device');
             return;
         }
-        console.log('produce3', type, room_id, deviceId)
-        if (!device.canProduce('video') && !audio) {
+        if (!device.canProduce('video')) {
             console.error('cannot produce video');
             return;
         }
-        console.log('produce4', type, room_id, deviceId)
-        // if (this.producerLabel.has(type)) {
-        //     console.log('producer already exists for this type ' + type)
-        //     return
-        // }
-        console.log('mediacontraints:',mediaConstraints)
         let stream;
         try {
             stream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
-            console.log(navigator.mediaDevices.getSupportedConstraints())
+            // console.log(navigator.mediaDevices.getSupportedConstraints())
 
-            const track = audio ? stream.getAudioTracks()[0] : stream.getVideoTracks()[0]
-            const params = {
-                track
+            const videoTrack = stream.getVideoTracks()[0];
+            const videoParams = {
+                track: videoTrack
             };
-            if (!audio) {
-                params.encodings = [{
-                        rid: 'r0',
-                        maxBitrate: 100000,
-                        //scaleResolutionDownBy: 10.0,
-                        scalabilityMode: 'S1T3'
-                    },
-                    {
-                        rid: 'r1',
-                        maxBitrate: 300000,
-                        scalabilityMode: 'S1T3'
-                    },
-                    {
-                        rid: 'r2',
-                        maxBitrate: 900000,
-                        scalabilityMode: 'S1T3'
-                    }
-                ];
-                params.codecOptions = {
-                    videoGoogleStartBitrate: 1000
-                };
-            }
+            // if (!audio) {
+            videoParams.encodings = [{
+                    rid: 'r0',
+                    maxBitrate: 100000,
+                    //scaleResolutionDownBy: 10.0,
+                    scalabilityMode: 'S1T3'
+                },
+                {
+                    rid: 'r1',
+                    maxBitrate: 300000,
+                    scalabilityMode: 'S1T3'
+                },
+                {
+                    rid: 'r2',
+                    maxBitrate: 900000,
+                    scalabilityMode: 'S1T3'
+                }
+            ];
+            videoParams.codecOptions = {
+                videoGoogleStartBitrate: 1000
+            };
 
             let producerTransport = this.producerTransports.get(room_id);
             if(!producerTransport) return;
-            let producer = await producerTransport.produce(params)
+            let videoProducer = await producerTransport.produce(videoParams)
 
-            this.producers.set(producer.id, {
-                producer,
-                room_id,
-                type
+            videoProducer.on('trackended', () => {
+                this.closeProducer(videoProducer.id, room_id)
             })
+
+            videoProducer.on('transportclose', () => {
+                console.log('producer transport close')
+                this.removeRoomProducers(room_id);
+            })
+
+            videoProducer.on('close', () => {
+                this.removeRoomProducers(room_id);
+            })
+            this.producers.set(videoProducer.id, {
+                producer: videoProducer,
+                room_id,
+            })
+            let audioProducer = null;
+            if(audioDeviceId) {
+                let audioTrack = stream.getAudioTracks()[0];
+                let audioParams = {
+                    track: audioTrack,
+                    videoGoogleStartBitrate: 1000
+                }
+                audioProducer = await producerTransport.produce(audioParams);
+                audioProducer.on('trackended', () => {
+                    this.closeProducer(audioProducer.id, room_id)
+                })
+    
+                audioProducer.on('transportclose', () => {
+                    console.log('producer transport close')
+                    this.producers.delete(audioProducer.id);
+                    this.event(_EVENTS.stopAudio, {room_id});
+                })
+    
+                audioProducer.on('close', () => {
+                    this.producers.delete(audioProducer.id);
+                    this.event(_EVENTS.stopAudio, {room_id});
+                })
+                this.producers.set(audioProducer.id, {
+                    producer: audioProducer,
+                    room_id,
+                })
+            }
 
             let label = this.producerLabels.get(room_id);
             if(label) {
-                if(type === mediaType.audio) {
-                    this.producerLabels.set(room_id, {
-                        audio: producer.id,
-                        ...label
-                    })
-                } else {
-                    this.producerLabels.set(room_id, {
-                        video: producer.id,
-                        ...label
-                    })
-                }
-                
-            } else {
-                if(type === mediaType.audio) {
-                    this.producerLabels.set(room_id, {
-                        audio: producer.id,
-                    })
-                } else {
-                    this.producerLabels.set(room_id, {
-                        video: producer.id,
-                    })
-                }
+                this.producerLabels.delete(room_id);
             }
-
-            producer.on('trackended', () => {
-                this.closeProducer(producer.id, room_id)
+            this.producerLabels.set(room_id, {
+                audio: audioProducer? audioProducer.id: null,
+                video: videoProducer? videoProducer.id: null
             })
-
-            producer.on('transportclose', () => {
-                console.log('producer transport close')
-                // if (!audio) {
-                //     elem.srcObject.getTracks().forEach(function (track) {
-                //         track.stop()
-                //     })
-                //     elem.parentNode.removeChild(elem)
-                // }
-                
-                if(!audio) {
-                    this.removeRoomProducers(room_id);
-                } else {
-                    this.producers.delete(producer.id);
-                    this.event(_EVENTS.onChangeProduce, 'audio close');
-                }
-            })
-
-            producer.on('close', () => {
-                console.log('closing producer')
-                // if (!audio) {
-                //     elem.srcObject.getTracks().forEach(function (track) {
-                //         track.stop()
-                //     })
-                //     elem.parentNode.removeChild(elem)
-                // }
-                if(!audio) {
-                    this.removeRoomProducers(room_id);
-                } else {
-                    this.producers.delete(producer.id);
-                    this.event(_EVENTS.onChangeProduce, 'audio close');
-                }
-            })
-            this.event(_EVENTS.onChangeProduce, {type: 'start', room_id});
-            // this.producerLabel.set(type, this.producer.id)
-
-            // switch (type) {
-            //     case mediaType.audio:
-            //         this.event(_EVENTS.startAudio, {room_id})
-            //         break
-            //     case mediaType.video:
-            //         this.event(_EVENTS.startVideo, {room_id});
-            //         break
-            //     default:
-            //         return
-            //         break;
-            // }
+            console.log('start local stream', stream)
+            this.startStream(room_id, stream);
+            // this.event(_EVENTS.onChangeProduce, {type: 'start', room_id});
         } catch (err) {
             console.log(err)
         }
     }
 
     async consume(producer_id, producer_name, room_id) {
-        this.getConsumeStream(producer_id, room_id).then(function (data) {
+        this.getConsumer(producer_id, room_id).then((data) => {
             if(!data) return;
             let {
                 consumer,
                 kind,
                 name
             } = data;
-            this.consumers.set(consumer.id, {
-                consumer,
-                kind,
-                room_id,
-                name
+            consumer.on('trackended', ()  => {
+                console.log('remote consumer track ended')
+                this.removeConsumer(consumer.id)
             })
-            consumer.on('trackended', function () {
+            consumer.on('transportclose', ()  => {
+                console.log('remote consumer track transport close')
                 this.removeConsumer(consumer.id)
-            }.bind(this))
-            consumer.on('transportclose', function () {
-                this.removeConsumer(consumer.id)
-            }.bind(this))
-            this.event(_EVENTS.onChangeConsume, {room_id});
-        }.bind(this))
+            })
+            this.addConsumer(room_id, producer_name, kind, consumer);
+        })
+       
     }
 
-    async getConsumeStream(producerId, room_id) {
-        let device = await this.devices.get(room_id);
-        let consumerTransport = await this.consumerTransports.get(room_id);
+    async getConsumer(producerId, room_id) {
+        const device = this.devices.get(room_id);
+        const consumerTransport = this.consumerTransports.get(room_id);
         if(!device || !consumerTransport) {
             return false;
         }
@@ -491,20 +474,63 @@ class MediaClient {
             rtpParameters,
             codecOptions,
         })
-        const stream = new MediaStream();
-        stream.addTrack(consumer.track);
         return {
             consumer,
-            stream,
+            // stream,
             kind,
             name
         }
     }
 
+    async addConsumer(room_id, name, kind, consumer) {
+        this.consumers.set(consumer.id, {
+            consumer,
+            kind,
+            room_id,
+            name
+        });
+        const track = consumer.track;
+        
+        if(this.remoteStreams.has(room_id)) {
+            const roomStreams = this.remoteStreams.get(room_id);
+            if(roomStreams.has(name)) {
+                let streamSet = roomStreams.get(name);
+                if(streamSet && streamSet[kind]) {
+                    streamSet[kind].addTrack(track);
+                } else {
+                    const stream = new MediaStream();
+                    stream.addTrack(track);
+                    if(!streamSet) {
+                        streamSet = {};
+                    }
+                    streamSet[kind] = stream;
+                    roomStreams.set(name, streamSet);
+                }
+                
+            } else {
+                const stream = new MediaStream();
+                stream.addTrack(track);
+                const streamSet = {};
+                streamSet[kind] = stream;
+                roomStreams.set(name, streamSet);
+            }
+        } else {
+            const stream = new MediaStream();
+            stream.addTrack(track);
+            const newRoomStreams = new Map();
+            const streamSet = {};
+            streamSet[kind] = stream;
+            newRoomStreams.set(name, streamSet);
+            this.remoteStreams.set(room_id, newRoomStreams);
+        }
+        this.event(_EVENTS.onChangeConsume, {room_id});
+
+    }
+
     removeRoomProducers(room_id) {
         let label = this.producerLabels.get(room_id);
         if(!label) {
-            console.log('there i no room ', room_id);
+            console.log('there is no room ', room_id);
         }
         if(label.audio) {
             this.producers.delete(label.audio);
@@ -577,24 +603,52 @@ class MediaClient {
 
     }
 
-    pauseProducer(type) {
-        if (!this.producerLabel.has(type)) {
-            console.log('there is no producer for this type ' + type)
+    pauseProducer(room_id) {
+        if (!this.producerLabels.has(room_id)) {
+            console.log('there is no producer for this type ' + room_id)
             return
         }
-        let producer_id = this.producerLabel.get(type)
-        this.producers.get(producer_id).pause()
+        let label = this.producerLabels.get(room_id);
+        if(label) {
+            let {audio: audioId, video: videoId} = label;
+            if(audioId) {
+                let audioProducer = this.producers.get(audioId);
+                if(audioProducer && audioProducer.producer) {
+                    audioProducer.producer.pause();
+                }
+            }
+            if(videoId) {
+                let videoProducer = this.producers.get(videoId);
+                if(videoProducer && videoProducer.producer) {
+                    videoProducer.producer.pause();
+                }
+            }
+        }
+        
 
     }
 
-    resumeProducer(type) {
-        if (!this.producerLabel.has(type)) {
-            console.log('there is no producer for this type ' + type)
+    resumeProducer(room_id) {
+        if (!this.producerLabels.has(room_id)) {
+            console.log('there is no producer for this type ' + room_id)
             return
         }
-        let producer_id = this.producerLabel.get(type)
-        this.producers.get(producer_id).resume()
-
+        let label = this.producerLabels.get(room_id);
+        if(label) {
+            let {audio: audioId, video: videoId} = label;
+            if(audioId) {
+                let audioProducer = this.producers.get(audioId);
+                if(audioProducer && audioProducer.producer) {
+                    audioProducer.producer.resume();
+                }
+            }
+            if(videoId) {
+                let videoProducer = this.producers.get(videoId);
+                if(videoProducer && videoProducer.producer) {
+                    videoProducer.producer.resume();
+                }
+            }
+        }
     }
 
     removeConsumer(consumer_id, room_id) {
@@ -605,7 +659,7 @@ class MediaClient {
         // elem.parentNode.removeChild(elem)
 
         this.consumers.delete(consumer_id);
-        this.event(_EVENTS.onChangeConsume, {room_id})
+        // this.event(_EVENTS.onChangeConsume, {room_id})
     }
 
     exit(offline = false) {
@@ -659,53 +713,97 @@ class MediaClient {
         this.eventListeners.get(evt).push(callback)
     }
 
-    getStreams() {
-        let consumers = Array.from(this.consumers.values());
-        // let roomConsmers = consumers.filter((item) => (item.room_id === room_id));
-        // let streams = consumers.map(({stream, kind, room_id, name}) => ({stream, kind, room_id, name}));
-        let videoConsumers = consumers.filter(({kind})=> (kind==='video'));
+    startStream(room_id, stream) {
+        if(this.localStreams.has(room_id)) {
+            let stream = this.localStreams.get(room_id);
+            stream.getTracks().forEach((track) => {
+                track.stop()
+            });
+            this.localStreams.delete(room_id);
+        }
+        this.localStreams.set(room_id, stream);
+        this.event(_EVENTS.startStream, {room_id});
+    }
 
-        let newStreams = videoConsumers.map(({consumer, name, room_id}) => {
-            const newStream = new MediaStream();
-            let audioConsumer = consumers.find((item) => (item.room_id === room_id && item.name === name));
-            if(audioConsumer && audioConsumer.track) {
-                newStream.addTrack(audioConsumer.track);
-            }
-            let videoTrack = consumer.track;
-            newStream.addTrack(videoTrack);
-            return {
-                stream: newStream,
-                room_id,
-                name,
-            }
-        })
-        console.log(newStreams);
-        return newStreams;
+    getRemoteStreams(room_id) {
+        
+        if(this.remoteStreams.has(room_id)) {
+            let roomStreams = this.remoteStreams.get(room_id);
+            let streamSets = [];
+            roomStreams.forEach((value, key) => {
+                streamSets.push({
+                    name: key,
+                    streamSet: value
+                })
+            })
+            console.log('get remote streams', streamSets);
+            return streamSets;
+        } else {
+            return [];
+        }
+        // let consumers = Array.from(this.consumers.values());
+        // // let roomConsmers = consumers.filter((item) => (item.room_id === room_id));
+        // // let streams = consumers.map(({stream, kind, room_id, name}) => ({stream, kind, room_id, name}));
+        // let videoConsumers = consumers.filter((item)=> (item.room_id === room_id && item.kind === 'video'));
+        // console.log('remote consumers', consumers)
+        // let newStreams = videoConsumers.map(({consumer, name}) => {
+        //     const newStream = new MediaStream();
+        //     let audioConsumerInfo = consumers.find((item) => (item.room_id === room_id && item.name === name && item.kind === 'audio'));
+            
+        //     if(audioConsumerInfo && audioConsumerInfo.consumer) {
+        //         console.log('sound track',audioConsumerInfo.consumer.track );
+        //         newStream.addTrack(audioConsumerInfo.consumer.track);
+        //     }
+        //     let videoTrack = consumer.track;
+        //     newStream.addTrack(videoTrack);
+        //     return {
+        //         stream: newStream,
+        //         name,
+        //     }
+        // })
+        // return newStreams;
+        // if(this.remoteStreams.has(room_id)) {
+        //     this.remoteStreams.forEach((value, key) => {
+        //         let {stream} = value;
+        //         stream.getTracks().forEach((track) => {
+        //             track.stop()
+        //         });
+        //     });
+        //     this.remoteStreams.clear();
+        // }
     }
 
     getLocalStream (room_id) {
-        let label = this.producerLabels.get(room_id);
-        console.log('get local stream', label)
-        if(label) {
-            let videoId= label.video;
-            let audioId = label.audio;
-            let videoProducerInfo = this.producers.get(videoId);
-            if(!videoProducerInfo || !videoProducerInfo.producer) {
-                return null;
-            }
-            let videoTrack = videoProducerInfo.producer.track;
-            let stream = new MediaStream();
-            stream.addTrack(videoTrack);
+        // let label = this.producerLabels.get(room_id);
+        
+        // if(label) {
+        //     let videoId= label.video;
+        //     let audioId = label.audio;
+        //     console.log('get local stream', videoId, audioId, this.producers)
+        //     let videoProducerInfo = this.producers.get(videoId);
+        //     if(!videoProducerInfo || !videoProducerInfo.producer) {
+        //         return null;
+        //     }
+        //     let videoTrack = videoProducerInfo.producer.track;
+        //     let stream = new MediaStream();
+        //     stream.addTrack(videoTrack);
 
-            if(audioId) {
-                let audioProducerInfo = this.producers.get(audioId);
-                if(audioProducerInfo && audioProducerInfo.track) {
-                    stream.addTrack(audioProducerInfo.track);
-                }
-            }
-            return stream;
+        //     if(audioId) {
+        //         let audioProducerInfo = this.producers.get(audioId);
+        //         console.log('add sound track', audioProducerInfo)
+        //         if(audioProducerInfo && audioProducerInfo.producer) {
+                    
+        //             stream.addTrack(audioProducerInfo.producer.track);
+        //         }
+        //     }
+        //     return stream;
+        // }
+        if(this.localStreams.has(room_id)) {
+            return this.localStreams.get(room_id);
+        } else {
+            return null;
         }
-        return null;
+        
     }
 
 
