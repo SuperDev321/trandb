@@ -148,7 +148,7 @@ function BroadcastSettingModal({roomName, startBroadcast, users, ...modalProps})
             <FormControl>
                 <FormControlLabel
                     control={<Checkbox checked={lock} onChange={(e) => setLock(e.target.checked)} name="lockCheckbox" />}
-                    label="Secondary"
+                    label="Lock"
                 />
             </FormControl>
             <VideoDeviceView audioDevice={currentAudioDevice} videoDevice={currentVideoDevice} />
