@@ -93,7 +93,7 @@ const useStyles = makeStyles((theme) => ({
 
 
 const SideBarLeft = ({ roomName, username, mutes, blocks, globalBlocks, changeMuteState, sendPokeMessage, kickUser, banUser,
-    users,
+    users, broadcastingUsers,
     addOrOpenPrivate, startBroadcast, stopBroadcast,
     cameraState, openCamera, closeCamera }) => {
     const classes = useStyles();
@@ -109,13 +109,25 @@ const SideBarLeft = ({ roomName, username, mutes, blocks, globalBlocks, changeMu
 
 
     useEffect(() => {
+        let filteredUsers = users;
         if(searchText) {
-            let filteredUsers = users.filter((item) => (item.username.includes(searchText)));
-            setSideUsers(filteredUsers);
+            filteredUsers = filteredUsers.filter((item) => (item.username.includes(searchText)));
         } else {
-            setSideUsers(users);
+            
         }
-    }, [searchText, users])
+        // let sideUsers = filteredUsers.map((user) => {
+        //     let broadcasting = false;
+        //     if(Array.isArray(broadcastingUsers) && broadcastingUsers.includes(user.username)) {
+        //         broadcasting = true
+        //     }
+        //     return {
+        //         broadcasting,
+        //         ...user
+        //     }
+        // })
+        // console.log('sideUsers', sideUsers);
+        setSideUsers(filteredUsers);
+    }, [searchText, users, broadcastingUsers])
 
     const isMuted = (user) => {
         let mutedNames = Array.isArray(mutes)? mutes.map((item) => ((item&&item.username)? item.username: null)): [];
@@ -143,6 +155,19 @@ const SideBarLeft = ({ roomName, username, mutes, blocks, globalBlocks, changeMu
         }
     }
 
+    const isBroadcasting = (user) => {
+        if(user.username === username) {
+            return cameraState;
+        } else {
+            
+            if(Array.isArray(broadcastingUsers) && broadcastingUsers.includes(user.username)) {
+                return true
+            }
+            return false;
+        }
+        
+    }
+
     return (
         <div className={classes.root}>
             <BroadcastSetting cameraState={cameraState} users={users} roomName={roomName} className={classes.cameraBtn}
@@ -165,6 +190,7 @@ const SideBarLeft = ({ roomName, username, mutes, blocks, globalBlocks, changeMu
                                 user={user} key={index}
                                 isMuted={isMuted(user)}
                                 isBlocked = {isBlocked(user)}
+                                isBroadcasting={isBroadcasting(user)}
                                 addOrOpenPrivate={addOrOpenPrivate}
                                 changeMuteState={changeMuteState}
                                 sendPokeMessage={sendPokeMessage}

@@ -38,6 +38,7 @@ function BroadcastSettingModal({roomName, startBroadcast, users, ...modalProps})
     
     
     const {data: devices, error: deviceError, status: deviceStatus} = useDevices();
+    const [lock, setLock] = useState(false);
     const [audioDevices, setAudioDevices] = useState([]);
     const [videoDevices, setVideoDevices] = useState([]);
     const [currentAudioDevice, setCurrentAudioDevice] = useState('');
@@ -63,7 +64,7 @@ function BroadcastSettingModal({roomName, startBroadcast, users, ...modalProps})
     }, [users])
 
     const handleClickOK = () => {
-        startBroadcast(roomName, currentVideoDevice, currentAudioDevice);
+        startBroadcast(roomName, lock, currentVideoDevice, currentAudioDevice);
         modalProps.onClose();
     }
 
@@ -143,6 +144,12 @@ function BroadcastSettingModal({roomName, startBroadcast, users, ...modalProps})
                         devicesDOM()
                     }
                 </FormGroup>
+            </FormControl>
+            <FormControl>
+                <FormControlLabel
+                    control={<Checkbox checked={lock} onChange={(e) => setLock(e.target.checked)} name="lockCheckbox" />}
+                    label="Secondary"
+                />
             </FormControl>
             <VideoDeviceView audioDevice={currentAudioDevice} videoDevice={currentVideoDevice} />
             </DialogContent>

@@ -9,7 +9,7 @@ import {
     Divider,
     Badge,
 } from '@material-ui/core';
-import { deepOrange, pink, blue } from '@material-ui/core/colors';
+import { deepOrange, pink, blue, green, grey } from '@material-ui/core/colors';
 import {QuestionAnswer,
     AccountCircleOutlined,
     Videocam,
@@ -125,7 +125,7 @@ const StyledBadge = withStyles((theme) => ({
     />
 ))
 
-const OnlineUser = ({roomName, username, user, role, isMuted, isBlocked,
+const OnlineUser = ({roomName, username, user, role, isMuted, isBlocked, isBroadcasting,
         changeMuteState, sendPokeMessage, kickUser, banUser,
         // , setOpenPrivate, setPrivateTo
         addOrOpenPrivate,
@@ -207,7 +207,10 @@ const OnlineUser = ({roomName, username, user, role, isMuted, isBlocked,
                         className={classes.avatar}
                     />
                 </StyledBadge>
-                <Videocam className={classes.camera} />
+                <Videocam className={classes.camera}
+                    // color={(user && user.broadcasting)? 'primary': 'disabled'}
+                    style={{ color: (isBroadcasting)? green[300]:grey[200] }}
+                />
                 <div className={classes.username}
                 // onClick={handleClick}
                 >
