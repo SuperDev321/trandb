@@ -29,7 +29,6 @@ function asyncReducer(state, action) {
   }
 
 const useStream = ({audioDevice, videoDevice}) => {
-  console.log(audioDevice, videoDevice)
     const [state, dispatch] = React.useReducer(asyncReducer, {
         data: null,
         status: 'idle',
