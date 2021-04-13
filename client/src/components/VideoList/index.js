@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import {
     IconButton
@@ -7,6 +7,9 @@ import CloseIcon from '@material-ui/icons/Close';
 import PauseIcon from '@material-ui/icons/Pause';
 import PlayCircleFilledIcon from '@material-ui/icons/PlayCircleFilled';
 import LockIcon from '@material-ui/icons/Lock';
+
+import SeparateLine from '../SeparateLine';
+import { UserContext } from '../../context';
 const useStyles = makeStyles((theme) => ({
     root: {
         display: 'flex',
@@ -25,14 +28,17 @@ const useStyles = makeStyles((theme) => ({
         },
         background: 'rgba(0, 0, 0, 0.04)',
         boxShadow: '1px 1px 6px 0px rgb(0 0 0 / 20%)',
+        color: theme.palette.textColor.main
     }
 }));
 
 const useVideoStyles = makeStyles((theme) => ({
     root: {
+        margin: 5
+    },
+    mediaContent: {
         width: 350,
         position: 'relative',
-        margin: 5,
     },
     overlay: {
         position: 'absolute',
@@ -40,7 +46,7 @@ const useVideoStyles = makeStyles((theme) => ({
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
-        zIndex: 100,
+        zIndex: 10,
         opacity: 0,
         '&:hover': {
             opacity: 1
@@ -64,56 +70,67 @@ const useVideoStyles = makeStyles((theme) => ({
     },
     flexGrower: {
         flexGrow: 1
+    },
+    username: {
+        display: 'flex',
+        justifyContent: 'center',
+        fontSize: '1rem',
+        fontWeight: 500,
     }
 }));
 
-const LocalVideo = ({stream, locked}) => {
-    const userVideo = useRef();
-    const classes = useVideoStyles();
-    useEffect(() => {
-        if(stream && userVideo.current) {
-            userVideo.current.srcObject = stream;
-        }
-    }, [stream])
+// const LocalVideo = ({stream, locked}) => {
+//     const userVideo = useRef();
+//     const classes = useVideoStyles();
+//     useEffect(() => {
+//         if(stream && userVideo.current) {
+//             userVideo.current.srcObject = stream;
+//         }
+//     }, [stream])
 
-    if(!stream) {
-        return null
-    }
+//     if(!stream) {
+//         return null
+//     }
 
-    return (
-        <div className={classes.root}>
-            <div className={classes.overlay}>
-                <div className={classes.overlayHeader}>
-                    <div>
-                        <IconButton aria-label="delete" color="secondary" >
-                            <CloseIcon />
-                        </IconButton>
-                    </div>
-                    <div className={classes.streamInfos}>
-                    { locked?
-                        <IconButton aria-label="lock" color="secondary" >
-                            <LockIcon />
-                        </IconButton>
-                        :
-                        null
-                    }
-                    </div>
-                </div>
-                <div className={classes.flexGrower}></div>
-                <div className={classes.overlayFooter}>
-                    <IconButton aria-label="pause" color="secondary">
-                        <PauseIcon />
-                    </IconButton>
-                </div>
-            </div>
-            <div className={classes.content}>
-                <video ref={userVideo} autoPlay style={{width: '100%'}} />
-            </div>
-            
-        </div>
+//     return (
+//         <div className={classes.root}>
+//             <div className={classes.mediaContent}>
+//                 <div className={classes.overlay}>
+//                     <div className={classes.overlayHeader}>
+//                         <div>
+//                             <IconButton aria-label="delete" color="secondary" >
+//                                 <CloseIcon />
+//                             </IconButton>
+//                         </div>
+//                         <div className={classes.streamInfos}>
+//                         { locked?
+//                             <IconButton aria-label="lock" color="secondary" >
+//                                 <LockIcon />
+//                             </IconButton>
+//                             :
+//                             null
+//                         }
+//                         </div>
+//                     </div>
+//                     <div className={classes.flexGrower}></div>
+//                     <div className={classes.overlayFooter}>
+//                         <IconButton aria-label="pause" color="secondary">
+//                             <PauseIcon />
+//                         </IconButton>
+//                     </div>
+//                 </div>
+//                 <div className={classes.content}>
+//                     <video ref={userVideo} autoPlay style={{width: '100%'}} />
+//                 </div>
+                
+//             </div>
+//             <div className={classes.username}>
+//                 {name}
+//             </div>
+//         </div>
         
-    )
-}
+//     )
+// }
 
 const UserVideo = ({stream, locked, name, controlVideo}) => {
     const userVideo = useRef();
@@ -175,43 +192,56 @@ const UserVideo = ({stream, locked, name, controlVideo}) => {
                 }
             }
         }
+        return () => {
+            stream.getTracks().forEach((track) => {
+                track.stop();
+            })
+        }
     }, [stream])
     
     return (
         <div className={classes.root}>
-            <div className={classes.overlay}>
-                <div className={classes.overlayHeader}>
-                    <div>
-                        <IconButton aria-label="delete" color="secondary" >
-                            <CloseIcon />
-                        </IconButton>
+            <div className={classes.mediaContent}>
+                <div className={classes.overlay}>
+                    <div className={classes.overlayHeader}>
+                        <div>
+                            <IconButton aria-label="delete" color="secondary" >
+                                <CloseIcon />
+                            </IconButton>
+                        </div>
+                        <div className={classes.streamInfos}>
+                        { locked?
+                            <IconButton aria-label="lock" color="secondary" >
+                                <LockIcon />
+                            </IconButton>
+                            :
+                            null
+                        }
+                        </div>
                     </div>
-                    <div className={classes.streamInfos}>
-                    { locked?
-                        <IconButton aria-label="lock" color="secondary" >
-                            <LockIcon />
+                    <div className={classes.flexGrower}></div>
+                    <div className={classes.overlayFooter}>
+                    { playing?
+                        <IconButton aria-label="pause" color="secondary" onClick={handlePause}>
+                            <PauseIcon />
                         </IconButton>
                         :
-                        null
+                        <IconButton aria-label="play" color="secondary" onClick={handlePlay}>
+                            <PlayCircleFilledIcon />
+                        </IconButton>
                     }
                     </div>
                 </div>
-                <div className={classes.flexGrower}></div>
-                <div className={classes.overlayFooter}>
-                { playing?
-                    <IconButton aria-label="pause" color="secondary" onClick={handlePause}>
-                        <PauseIcon />
-                    </IconButton>
-                    :
-                    <IconButton aria-label="play" color="secondary" onClick={handlePlay}>
-                        <PlayCircleFilledIcon />
-                    </IconButton>
-                }
+                <div className={classes.content}>
+                    <video ref={userVideo} autoPlay style={{width: '100%'}} >
+                        <p>Any HTML content</p>
+                    </video>
+                    {/* <audio ref={userAudio} autoPlay /> */}
                 </div>
+                
             </div>
-            <div className={classes.content}>
-                <video ref={userVideo} autoPlay style={{width: '100%'}} />
-                {/* <audio ref={userAudio} autoPlay /> */}
+            <div className={classes.username}>
+                {name}
             </div>
         </div>
     )
@@ -222,12 +252,17 @@ const VideoList = ({streams: remoteStreams, localStream, controlVideo}) => {
 
     const locked = localStream?.locked;
     const stream = localStream?.stream;
+    const {username} = useContext(UserContext);
     
     return (
         <div className={classes.root}>
-            <LocalVideo stream={stream} locked={locked} />
+        { localStream ?
+            <UserVideo stream={stream} locked={locked} name={username} controls/>
+            :null
+        }
+            <SeparateLine style={{width: '100%'}} />
             { remoteStreams?.map(({stream, name, locked}, index) => (
-                    <UserVideo stream={stream} key={name} locked={locked} />
+                    <UserVideo stream={stream} key={name} locked={locked} name={name} />
                 ))
             }
         </div>

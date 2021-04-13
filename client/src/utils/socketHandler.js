@@ -4,14 +4,14 @@ const socket = io(`${config.server_url}`,{
     autoConnect: false,
 });
 
-const mediaSocket = io(`${config.media_server_url}`,{
-    autoConnect: true,
-});
+// const mediaSocket = io(`${config.media_server_url}`,{
+//     autoConnect: true,
+// });
 
 
-mediaSocket.request = function request(type, data = {}) {
+socket.request = function request(type, data = {}) {
     return new Promise((resolve, reject) => {
-        mediaSocket.emit(type, data, (data) => {
+        socket.emit(type, data, (data) => {
         if (data.error) {
             reject(data.error)
         } else {
@@ -52,6 +52,5 @@ mediaSocket.request = function request(type, data = {}) {
 //     socket.removeAllListeners();
 //     socket.close();
 // }
-mediaSocket.open();
 
-export { socket, mediaSocket };
+export { socket };

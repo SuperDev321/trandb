@@ -16,7 +16,9 @@ import {QuestionAnswer,
     Block,
     Check,
     Notifications,
-    StarRounded
+    StarRounded,
+    Visibility,
+    VisibilityOff
 } from '@material-ui/icons';
 import RoomUserName from '../RoomUserName';
 import config from '../../config';
@@ -125,7 +127,7 @@ const StyledBadge = withStyles((theme) => ({
     />
 ))
 
-const OnlineUser = ({roomName, username, user, role, isMuted, isBlocked, isBroadcasting,
+const OnlineUser = ({roomName, username, user, role, isMuted, isBlocked, isBroadcasting, isViewer,
         changeMuteState, sendPokeMessage, kickUser, banUser,
         // , setOpenPrivate, setPrivateTo
         addOrOpenPrivate,
@@ -207,6 +209,14 @@ const OnlineUser = ({roomName, username, user, role, isMuted, isBlocked, isBroad
                         className={classes.avatar}
                     />
                 </StyledBadge>
+                {
+                    isViewer
+                    ?
+                    <Visibility style={{ color: green[300] }}/>
+                    :
+                    <VisibilityOff style={{ color: grey[200] }}/>
+                }
+                
                 <Videocam className={classes.camera}
                     // color={(user && user.broadcasting)? 'primary': 'disabled'}
                     style={{ color: (isBroadcasting)? green[300]:grey[200] }}

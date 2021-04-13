@@ -56,6 +56,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
     const [localStreamTmp, setLocalStreamTmp] = useState(null);
     const [currentLocalStream, setCurrentLocalStream] = useState(null);
     const [currentBroadcastingUsers, setCurrentBroadcastingUsers] = useState([]);
+    const [currentViewers, setCurrentViewers] = useState([]);
 
     // receive new message
     const [newMessage, setNewMessage] = useState([]);
@@ -99,6 +100,18 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
             let stream = mediaObj.getLocalStream(room_id);
             setLocalStreamTmp({stream, room_id});
         })
+
+        mediaObj.on(mediaEvents.stopStream, (data) => {
+            console.log('stopstream event');
+            let {room_id} = data;
+            setLocalStreamTmp({stream: null, room_id});
+        })
+
+        mediaObj.on(mediaEvents.changeViewers, (data) => {
+            let {room_id} = data;
+            setMediaEvent({room_id, event: 'view'});
+        })
+
         mediaClientRef.current = mediaObj;
 
         return () => {
@@ -239,10 +252,12 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
 
     useEffect(() => {
         if(currentRoomName && mediaClientRef.current) {
-           let stream = mediaClientRef.current.getLocalStream(currentRoomName);
+           let localStream = mediaClientRef.current.getLocalStream(currentRoomName);
            let remoteStreams = mediaClientRef.current.getRemoteStreams(currentRoomName);
-           setCurrentLocalStream(stream);
+           let viewers = mediaClientRef.current.getViewers(currentRoomName);
+           setCurrentLocalStream(localStream);
            setCurrentRemoteStreams([...remoteStreams]);
+           setCurrentViewers(viewers);
         }
         
     }, [currentRoomName]);
@@ -250,7 +265,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
     useEffect(() => {
         if(localStreamTmp) {
            let {room_id, stream} = localStreamTmp;
-            if(room_id === currentRoomName && stream) {
+            if(room_id === currentRoomName) {
                 setCurrentLocalStream(stream);
             } 
         }
@@ -273,6 +288,11 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                         console.log('consumer change event')
                         setCurrentBroadcastingUsers(liveUsers);
                     }
+                    break;
+                case 'view':
+                    let viewers = mediaClientRef.current.getViewers(room_id);
+                    console.log('viewer change event');
+                    setCurrentViewers(viewers);
                     break;
                 default:
                     break;
@@ -459,15 +479,15 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                 console.log('connect_error', err);
             })
 
-            socket.io.on('reconnect', () => {
+            socket.io.on('reconnect',() => {
                 let roomNames = roomsRef.current.map((room) => (room.name));
                 let privateRooms = privateListRef.current ? privateListRef.current.getPrivateRooms(): [];
-                roomNames.map((roomName) => {
-                    socket.emit('rejoin room',{room: roomName, type: 'public'}, (result) => {
+                roomNames.map(async (roomName) => {
+                    socket.emit('rejoin room',{room: roomName, type: 'public'}, (result, error) => {
                         if(result) {
                             console.log('rejoin success') 
                         } else {
-                            console.log('rejoin fail')
+                            console.log('rejoin fail', error)
                         }
                         
                     })
@@ -560,7 +580,6 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
             case 'init room':
                 if(roomsRef.current && newInfo.payload.room) {
                     if(newInfo.payload.globalBlocks) {
-                        console.log('global blocks', newInfo.payload.globalBlocks);
                         setGlobalBlocks(newInfo.payload.globalBlocks);
                     }
                     let sameRoom = await roomsRef.current.find((room) => (room.name === newInfo.payload.room.name));
@@ -580,11 +599,8 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                             let newRoomObject = new RoomObject(newInfo.payload.room.name, messages, newInfo.payload.onlineUsers, newInfo.payload.blocks);
                             roomsRef.current.push(newRoomObject);
                             setRoomIndex(roomsRef.current.length-1);
-                            if(mediaClientRef.current) {
-                                await mediaClientRef.current.createRoom(newInfo.payload.room.name);
-                                console.log(mediaClientRef.current)
-                                await mediaClientRef.current.join(newInfo.payload.room.name);
-                            }
+                            console.log('user joined, so start media join', mediaClientRef.current)
+                            
                             console.log('media init done')
                         } else {
                             // remove this room
@@ -608,6 +624,12 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                             let newRooms = await(roomsRef.current.filter((room) => (room.name !==newInfo.payload.room)));
                             roomsRef.current = newRooms;
                         }
+                    }
+                    if(mediaClientRef.current) {
+                        await mediaClientRef.current.init();
+                        await mediaClientRef.current.createRoom(newInfo.payload.room.name);
+                        console.log(mediaClientRef.current)
+                        await mediaClientRef.current.join(newInfo.payload.room.name);
                     }
                 }
                 break;
@@ -859,6 +881,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                     <SideBarLeft
                         users={currentRoomUsers}
                         broadcastingUsers={currentBroadcastingUsers}
+                        viewers={currentViewers}
                         changeMuteState={changeMuteState}
                         sendPokeMessage={sendPokeMessage}
                         kickUser={kickUser}
@@ -910,6 +933,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                             <SideBarLeft 
                             users={currentRoomUsers}
                             broadcastingUsers={currentBroadcastingUsers}
+                            viewers={currentViewers}
                             changeMuteState={changeMuteState}
                             sendPokeMessage={sendPokeMessage}
                             kickUser={kickUser}

@@ -11,7 +11,7 @@ export { default as RoomObject } from './roomObject';
 export { MediaClient, _EVENTS as mediaEvents, mediaType } from './mediaClient';
 export { default as handleCreateRoom } from './handleCreateRoom';
 export { default as getPrivateMessages } from './getPrivateMessages';
-export { socket, mediaSocket } from './socketHandler';
+export { socket } from './socketHandler';
 export { default as getRoomDetail } from './getRoomDetail';
 export { default as isPrivateRoom } from './isPrivateRoom';
 export { default as getUserDetail } from './getUserDetail';
