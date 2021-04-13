@@ -18,6 +18,7 @@ const joinRoom = (io, socket) => async ({ room, password }, callback) => {
         }
         let result = await Rooms.updateOne({ name: room }, { $addToSet: { users: _id} });
         
+
         socket.join(room);
         callback(true)
         
@@ -84,15 +85,16 @@ const rejoinRoom = (io, socket) => async ({ room, type }, callback) => {
         // } else {
         //     ip = '10.10.10.10';
         // }
+        
         if(type === 'public') {
             let user = await Users.findOne({_id});
             let {isBan, banType} = await checkBan(room, user.username, user.ip);
             if(isBan) {
                 return callback(false, banType? 'banned_from_owner': 'banned_from_admin');
-                
             }
             let result = await Rooms.updateOne({ name: room }, { $addToSet: { users: _id } });
             socket.join(room);
+            
             // let {welcomeMessage} = await Rooms.findOne({name: room});
             const messages = await Chats.find({ room, type: 'public' }).sort({date: -1}).limit(30);
             const usersInfo = await findRoomUsers(room, user.role);
@@ -110,8 +112,10 @@ const rejoinRoom = (io, socket) => async ({ room, type }, callback) => {
                 item.avatar = avatar;
                 return item;
             }));
-            let globalBlocks = await getGlobalBlocks();
-            let blocks = await getBlocks(room);
+            
+            let globalBlocks = await getGlobalBlocksWithIp();
+            let blocks = await getRoomBlocks(room);
+            let blocked = await checkBlock(room, user.username, user.ip);
             socket.emit('init room', {messages, onlineUsers, room: {name: room}, globalBlocks, blocks}, (data)=> {
                 if(data === 'success' && result && result.nModified) {
                     io.to(room).emit('joined room', {room, onlineUsers: usersInfo,
@@ -120,8 +124,9 @@ const rejoinRoom = (io, socket) => async ({ room, type }, callback) => {
                             username: user.username,
                             role: user.role,
                             gender: user.gender,
-                            avatar: user.avatar,
-                            ip: ipInt(user.ip).toIP()
+                            ip: ipInt(user.ip).toIP(),
+                            blocked,
+                            avatar: user.avatar
                         }});
                 }
             });
@@ -132,7 +137,7 @@ const rejoinRoom = (io, socket) => async ({ room, type }, callback) => {
         }
         return callback(false, 'type_error')
     } catch (err) {
-        callback(false)
+        callback(false, err)
     }
 };
 module.exports = {joinRoom, rejoinRoom};

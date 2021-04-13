@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { fade, makeStyles } from '@material-ui/core/styles';
 import {
     Divider,
@@ -93,7 +93,7 @@ const useStyles = makeStyles((theme) => ({
 
 
 const SideBarLeft = ({ roomName, username, mutes, blocks, globalBlocks, changeMuteState, sendPokeMessage, kickUser, banUser,
-    users, broadcastingUsers,
+    users, broadcastingUsers, viewers,
     addOrOpenPrivate, startBroadcast, stopBroadcast,
     cameraState, openCamera, closeCamera }) => {
     const classes = useStyles();
@@ -155,18 +155,29 @@ const SideBarLeft = ({ roomName, username, mutes, blocks, globalBlocks, changeMu
         }
     }
 
-    const isBroadcasting = (user) => {
+    const isBroadcasting = useCallback((user) => {
         if(user.username === username) {
             return cameraState;
         } else {
-            
             if(Array.isArray(broadcastingUsers) && broadcastingUsers.includes(user.username)) {
                 return true
             }
             return false;
         }
         
-    }
+    }, [broadcastingUsers, cameraState]);
+
+    const isViewer = useCallback((user) => {
+        if(user.username === username) {
+            return cameraState;
+        } else {
+            if(Array.isArray(viewers) && viewers.includes(user.username)) {
+                return true
+            }
+            return false;
+        }
+        
+    }, [viewers, cameraState]);
 
     return (
         <div className={classes.root}>
@@ -191,6 +202,7 @@ const SideBarLeft = ({ roomName, username, mutes, blocks, globalBlocks, changeMu
                                 isMuted={isMuted(user)}
                                 isBlocked = {isBlocked(user)}
                                 isBroadcasting={isBroadcasting(user)}
+                                isViewer={isViewer(user)}
                                 addOrOpenPrivate={addOrOpenPrivate}
                                 changeMuteState={changeMuteState}
                                 sendPokeMessage={sendPokeMessage}
