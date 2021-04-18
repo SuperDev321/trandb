@@ -15,7 +15,8 @@ import {
     Block,
     Check,
     Notifications,
-    StarRounded
+    StarRounded,
+    VisibilityOff
 } from '@material-ui/icons';
 import {useTranslation} from 'react-i18next';
 import { makeStyles } from '@material-ui/core/styles';
@@ -62,7 +63,8 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 const RoomUserName = ({user, role, roomName,
-    changeMuteState, sendPokeMessage, kickUser, banUser,addOrOpenPrivate, isMine, displayYou, isMuted, isBlocked
+    changeMuteState, sendPokeMessage, kickUser, banUser,addOrOpenPrivate, viewBroadcast, stopBroadcastTo,
+    isMine, displayYou, isMuted, isBlocked
     // open,
     // anchorEl,
     // setAnchorEl,
@@ -150,6 +152,21 @@ const RoomUserName = ({user, role, roomName,
         }, 0)
         
     }
+
+    const view = () => {
+        setAnchorEl(null);
+        setTimeout(() => {
+            viewBroadcast(roomName, user._id, user.username);
+        }, 0);
+    }
+
+    const stopView = () => {
+        setAnchorEl(null);
+        setTimeout(() => {
+            stopBroadcastTo(roomName, user._id);
+        }, 0);
+    }
+
     const open = Boolean(anchorEl);
 
     return (
@@ -203,6 +220,20 @@ const RoomUserName = ({user, role, roomName,
                             onClick={() => {sendPoke()}}
                         >
                             <Notifications />&nbsp;{t('UserActionArea.poke')}
+                        </Button>
+                        <Button size="small" fullWidth
+                            color="primary"
+                            className={classes.cardButton}
+                            onClick={() => {view()}}
+                        >
+                            <Videocam />&nbsp;{t('UserActionArea.view')}
+                        </Button>
+                        <Button size="small" fullWidth
+                            color="primary"
+                            className={classes.cardButton}
+                            onClick={() => {stopView()}}
+                        >
+                            <VisibilityOff />&nbsp;{t('UserActionArea.stopView')}
                         </Button>
                         <Divider />
                         { ((role === 'super_admin' || role === 'admin' || role === 'owner' || role === 'moderator')

@@ -26,6 +26,8 @@ import { useTranslation, withTranslation, Trans } from 'react-i18next';
 import SeparateLine from '../SeparateLine';
 import {MediaClient, mediaEvents, mediaType} from '../../utils';
 
+import {permissionRequest} from './notification';
+
 const ChatRooms = ({room, addUnReadMsg}, ref) => {
     const classes = useStyles();
     const { t, i18n } = useTranslation();
@@ -123,6 +125,23 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
         }
     }, [])
     
+    const controlVideo = (data) => {
+        let {type, name} = data;
+        if(mediaClientRef.current) {
+            switch(type) {
+                case 'close':
+                    if(name === username) {
+                        mediaClientRef.current.closeProducer(null, currentRoomName);
+                    } else {
+                        mediaClientRef.current.removeRemoteStream(name, null, currentRoomName);
+                    }
+                    break;
+                default:
+                    break;
+            }
+            
+        }
+    }
 
     const { enqueueSnackbar, closeSnackbar } = useSnackbar();
     
@@ -131,8 +150,6 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
             addOrOpenPrivate(userToChat);
         }
     }));
-
-    
 
     const handleChangeRoom = (event, newValue) => {
         setRoomIndex(newValue);
@@ -248,7 +265,17 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
         socket.emit('leave private', roomName);
     }
 
-    
+    const viewBroadcast = (roomName, userId, username) => {
+        if(mediaClientRef.current) {
+            mediaClientRef.current.reqeustView(roomName, userId, username);
+        }
+    }
+
+    const stopBroadcastTo = (roomName, userId) => {
+        if(mediaClientRef.current) {
+            mediaClientRef.current.stopView(roomName, userId);
+        }
+    }
 
     useEffect(() => {
         if(currentRoomName && mediaClientRef.current) {
@@ -257,7 +284,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
            let viewers = mediaClientRef.current.getViewers(currentRoomName);
            setCurrentLocalStream(localStream);
            setCurrentRemoteStreams([...remoteStreams]);
-           setCurrentViewers(viewers);
+           setCurrentViewers([...viewers]);
         }
         
     }, [currentRoomName]);
@@ -291,8 +318,8 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                     break;
                 case 'view':
                     let viewers = mediaClientRef.current.getViewers(room_id);
-                    console.log('viewer change event');
-                    setCurrentViewers(viewers);
+                    console.log('viewer change event', viewers);
+                    setCurrentViewers([...viewers]);
                     break;
                 default:
                     break;
@@ -457,6 +484,11 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
             socket.on('return video signal', payload => {
                 setNewInfo({type: 'return video', payload});
             });
+
+            socket.on('view request', ({username, roomName}, callback) => {
+                console.log('get view request')
+                permissionRequest(username, roomName, callback);
+            })
 
             socket.on('join error', payload => {
                joinErrorHandler(payload);
@@ -897,6 +929,8 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                         cameraState={(currentLocalStream !== null)}
                         startBroadcast={startBroadcast}
                         stopBroadcast={stopBroadcast}
+                        stopBroadcastTo={stopBroadcastTo}
+                        viewBroadcast={viewBroadcast}
                         username={username}
                     />  
                 </div>
@@ -949,6 +983,8 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                             cameraState={(currentLocalStream !== null)}
                             startBroadcast={startBroadcast}
                             stopBroadcast={stopBroadcast}
+                            stopBroadcastTo={stopBroadcastTo}
+                            viewBroadcast={viewBroadcast}
                             username={username}
                             />
                         </Card>
@@ -958,7 +994,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                 <main className={classes.main}>
                     <div className={classes.content}>
                     {/* { currentRoom && roomIndex !== null  && */}
-                        <VideoList streams={currentRemoteStreams} localStream={currentLocalStream} />
+                        <VideoList  streams={currentRemoteStreams} localStream={currentLocalStream} controlVideo={controlVideo}/>
                     {/* } */}
                     {/* { currentRoom && roomIndex !== null && */}
                     <SeparateLine orientation="vertical" style={{height: 'auto'}} />

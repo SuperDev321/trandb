@@ -12,7 +12,7 @@ const {
   createRoom, getProducers, getRouterRtpCapabilities,
   createWebRtcTransport, connectTransport, produce, consume, resume,
   producerClosed, roomProducersClosed, joinMedia, createMediaRoom,
-  startView, stopView
+  startView, stopView, viewRequest, stopBroadcastTo
 } = require('./mediasoup.js');
 
 const ipInt = require('ip-to-int');
@@ -72,6 +72,8 @@ const ioHandler = (io) => async (socket) => {
     socket.on('roomProducersClosed', roomProducersClosed(socket));
     socket.on('start view', startView(io, socket));
     socket.on('stop view', stopView(io, socket));
+    socket.on('view request', viewRequest(io, socket));
+    socket.on('stop broadcast', stopBroadcastTo(io, socket));
 
     socket.on('error', (err) => {
       console.log(err);

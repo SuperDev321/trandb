@@ -128,7 +128,7 @@ const StyledBadge = withStyles((theme) => ({
 ))
 
 const OnlineUser = ({roomName, username, user, role, isMuted, isBlocked, isBroadcasting, isViewer,
-        changeMuteState, sendPokeMessage, kickUser, banUser,
+        changeMuteState, sendPokeMessage, kickUser, banUser, viewBroadcast, stopBroadcastTo,
         // , setOpenPrivate, setPrivateTo
         addOrOpenPrivate,
     }) => {
@@ -232,6 +232,7 @@ const OnlineUser = ({roomName, username, user, role, isMuted, isBlocked, isBroad
                         displayYou={true}
                         changeMuteState={changeMuteState}
                         sendPokeMessage={sendPokeMessage}
+                        viewBroadcast={viewBroadcast}
                         kickUser={kickUser}
                         banUser={banUser}
                         addOrOpenPrivate={addOrOpenPrivate}
@@ -242,6 +243,7 @@ const OnlineUser = ({roomName, username, user, role, isMuted, isBlocked, isBroad
                         handleClose={handleClose}
                         isMuted={isMuted}
                         isBlocked={isBlocked}
+                        stopBroadcastTo={stopBroadcastTo}
                     />
                     {( user.role === 'admin' || user.role === 'super_admin') &&
                         <StarRounded className={classes.adminStar} />

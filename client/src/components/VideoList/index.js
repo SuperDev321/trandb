@@ -149,6 +149,14 @@ const UserVideo = ({stream, locked, name, controlVideo}) => {
             userVideo.current.pause();
         }
     }
+    const handleClose = () => {
+        let data = {
+            type: 'close',
+            name
+        }
+        console.log('close video', data)
+        controlVideo(data);
+    }
 
     useEffect(() => {
         if(stream && userVideo.current) {
@@ -192,11 +200,6 @@ const UserVideo = ({stream, locked, name, controlVideo}) => {
                 }
             }
         }
-        return () => {
-            stream.getTracks().forEach((track) => {
-                track.stop();
-            })
-        }
     }, [stream])
     
     return (
@@ -205,7 +208,7 @@ const UserVideo = ({stream, locked, name, controlVideo}) => {
                 <div className={classes.overlay}>
                     <div className={classes.overlayHeader}>
                         <div>
-                            <IconButton aria-label="delete" color="secondary" >
+                            <IconButton aria-label="delete" color="secondary" onClick={handleClose}>
                                 <CloseIcon />
                             </IconButton>
                         </div>
@@ -234,7 +237,6 @@ const UserVideo = ({stream, locked, name, controlVideo}) => {
                 </div>
                 <div className={classes.content}>
                     <video ref={userVideo} autoPlay style={{width: '100%'}} >
-                        <p>Any HTML content</p>
                     </video>
                     {/* <audio ref={userAudio} autoPlay /> */}
                 </div>
@@ -257,12 +259,12 @@ const VideoList = ({streams: remoteStreams, localStream, controlVideo}) => {
     return (
         <div className={classes.root}>
         { localStream ?
-            <UserVideo stream={stream} locked={locked} name={username} controls/>
+            <UserVideo stream={stream} locked={locked} name={username} controls controlVideo={controlVideo}/>
             :null
         }
             <SeparateLine style={{width: '100%'}} />
             { remoteStreams?.map(({stream, name, locked}, index) => (
-                    <UserVideo stream={stream} key={name} locked={locked} name={name} />
+                    <UserVideo stream={stream} key={index} locked={locked} name={name} controlVideo={controlVideo} />
                 ))
             }
         </div>

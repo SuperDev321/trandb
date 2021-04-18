@@ -93,7 +93,7 @@ const useStyles = makeStyles((theme) => ({
 
 
 const SideBarLeft = ({ roomName, username, mutes, blocks, globalBlocks, changeMuteState, sendPokeMessage, kickUser, banUser,
-    users, broadcastingUsers, viewers,
+    users, broadcastingUsers, viewers, viewBroadcast, stopBroadcastTo,
     addOrOpenPrivate, startBroadcast, stopBroadcast,
     cameraState, openCamera, closeCamera }) => {
     const classes = useStyles();
@@ -103,6 +103,7 @@ const SideBarLeft = ({ roomName, username, mutes, blocks, globalBlocks, changeMu
     const {t} = useTranslation();
 
     useEffect(() => {
+        console.log(users);
         let me = users.find((item) => (item.username === username));
         if(me) setRole(me.role);
     }, [users, username])
@@ -203,6 +204,8 @@ const SideBarLeft = ({ roomName, username, mutes, blocks, globalBlocks, changeMu
                                 isBlocked = {isBlocked(user)}
                                 isBroadcasting={isBroadcasting(user)}
                                 isViewer={isViewer(user)}
+                                viewBroadcast={viewBroadcast}
+                                stopBroadcastTo={stopBroadcastTo}
                                 addOrOpenPrivate={addOrOpenPrivate}
                                 changeMuteState={changeMuteState}
                                 sendPokeMessage={sendPokeMessage}
