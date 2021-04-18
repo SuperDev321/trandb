@@ -1,8 +1,10 @@
 module.exports = class Peer {
-    constructor(socket_id, name) {
+    constructor(socket_id, name, room_id, io) {
         this.id = socket_id
         this.name = name
         this.locked = false;
+        this.io = io;
+        this.room_id = room_id;
         this.transports = new Map()
         this.consumers = new Map()
         this.producers = new Map()
@@ -69,10 +71,10 @@ module.exports = class Peer {
             producerId: producer_id
         })
 
-        consumer.on('transportclose', function() {
-            console.log(`---consumer transport close--- name: ${this.name} consumer_id: ${consumer.id}`)
-            this.consumers.delete(consumer.id)
-        }.bind(this))
+        // consumer.on('transportclose', function() {
+        //     console.log(`---consumer transport close--- name: ${this.name} consumer_id: ${consumer.id}`)
+        //     this.consumers.delete(consumer.id)
+        // }.bind(this))
 
         
 
@@ -122,14 +124,23 @@ module.exports = class Peer {
         this.transports.forEach(transport => transport.close())
     }
 
-    removeConsumer(consumer_id) {
+    getProducerIdOfConsumer(consumer_id) {
         let consumerInfo = this.consumers.get(consumer_id);
         let producerId = null;
         if(consumerInfo) {
             producerId = consumerInfo.producerId;
+            return producerId;
         }
+        
+    }
+    removeConsumer(consumer_id) {
+        // let consumerInfo = this.consumers.get(consumer_id);
+        // let producerId = null;
+        // if(consumerInfo) {
+        //     producerId = consumerInfo.producerId;
+        // }
         this.consumers.delete(consumer_id);
-        return producerId;
+        return true;
     }
 
 }

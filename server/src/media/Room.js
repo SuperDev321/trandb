@@ -26,7 +26,8 @@ module.exports = class Room {
                     producer_name: peer.name,
                     producer_socket_id: peer.id,
                     room_id: this.id,
-                    locked: peer.locked
+                    locked: peer.locked,
+                    kind: producer._data.kind
                 })
             })
         })
@@ -112,7 +113,11 @@ module.exports = class Room {
         }
         console.log('--consume--', consumer_transport_id);
         let {consumer, params} = await this.peers.get(socket_id).createConsumer(consumer_transport_id, producer_id, rtpCapabilities)
-        
+        consumer.on('transportclose',async function() {
+            console.log(`---consumer transport close--- name: ${this.name} consumer_id: ${consumer.id}`)
+            // this.consumers.delete(consumer.id)
+            await this.closeConsumer(socket_id, consumer.id);
+        }.bind(this))
         consumer.on('producerclose', function(){
             console.log(`---consumer closed--- due to producerclose event  name:${this.peers.get(socket_id).name} consumer_id: ${consumer.id}`)
             this.peers.get(socket_id).removeConsumer(consumer.id)
@@ -136,17 +141,26 @@ module.exports = class Room {
         this.peers.get(socket_id).closeProducer(producer_id)
     }
 
-    closeConsumer(socket_id, consumer_id) {
-        let producerId = this.peers.get(socket_id).removeConsumer(consumer_id);
-        let producerList = this.getProducerListForPeer();
-        let producerInfo = producerList.find(({producer_id}) => (producer_id === producerId));
-        if(producerInfo) {
-            let {producer_socket_id, producer_id} = producerInfo;
-            let {name} = params;
-            if(producer_socket_id) {
-                socket.to(producer_socket_id).emit('stop view', {name, producer_id, room_id});
+    async closeConsumer(socket_id, consumer_id) {
+        let peer = this.peers.get(socket_id);
+        if(peer) {
+            let name = peer.name;
+            let producerId = peer.getProducerIdOfConsumer(consumer_id);
+            let producerList = this.getProducerListForPeer();
+            let producerInfo = producerList.find(({producer_id}) => (producer_id === producerId));
+            if(producerInfo) {
+                let {producer_socket_id, producer_id, producer_name, kind} = producerInfo;
+                if(kind == 'video') {
+                    this.io.to(producer_socket_id).emit('stop view', {
+                        name,
+                        producer_id: producerInfo.producer_id,
+                        room_id: producerInfo.room_id
+                    });
+                }
             }
+            peer.removeConsumer(consumer_id);
         }
+        
     }
 
     closeAllProducers(socket_id) {

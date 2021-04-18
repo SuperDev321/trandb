@@ -19,15 +19,16 @@ const joinMedia = (io, socket) =>  ({
     name
 }, cb) => {
 
-    console.log('---user joined--- \"' + room_id + '\": ' + name)
+    console.log('---user joined--- \"' + room_id + '\": ' + name + socket.id)
     if (!roomList.has(room_id)) {
         return cb({
             error: 'room does not exist'
         })
     }
-    roomList.get(room_id).addPeer(new Peer(socket.id, name))
+    roomList.get(room_id).addPeer(new Peer(socket.id, name, room_id, io))
 
-    cb(roomList.get(room_id).toJson())
+    // cb(roomList.get(room_id).toJson())
+    cb(true);
 };
 
 const getProducers = (io, socket) => (room_id) => {
@@ -178,6 +179,39 @@ const stopView = (io, socket) => ({room_id, name, socket_id}) => {
     })
 }
 
+const viewRequest = (io, socket) => async ({roomName, username, targetId}, callback) => {
+    let socketIds = await io.of('/').in(roomName).allSockets();
+    let socketToPrivate = null;
+    socketIds.forEach((element) => {
+        let socket = io.sockets.sockets.get(element);
+        if(targetId === socket.decoded._id) {
+            socketToPrivate = socket;
+        }
+    });
+    socketToPrivate.emit('view request', {
+        roomName,
+        username,
+    }, (result) => {
+        callback(result);
+    });
+}
+
+// stop streaming for this person
+const stopBroadcastTo = (io, socket) => async({room_id, name, targetId}) => {
+    let socketIds = await io.of('/').in(room_id).allSockets();
+    let socketToPrivate = null;
+    socketIds.forEach((element) => {
+        let socket = io.sockets.sockets.get(element);
+        if(targetId === socket.decoded._id) {
+            socketToPrivate = socket;
+        }
+    });
+    socketToPrivate.emit('stop broadcast', {
+        room_id,
+        name,
+    });
+}
+
 // socket.on('exitRoom', async (room_id, callback) => {
 //     console.log(`---exit room--- name: ${roomList.get(room_id) && roomList.get(room_id).getPeers().get(socket.id).name}`)
 //     if (!roomList.has(room_id)) {
@@ -237,5 +271,7 @@ module.exports = {
     producerClosed,
     roomProducersClosed,
     startView,
-    stopView
+    stopView,
+    viewRequest,
+    stopBroadcastTo
 }
