@@ -1,31 +1,21 @@
 import React, { useReducer } from 'react';
 
-const getDevices = async () => {
-    return navigator.mediaDevices.enumerateDevices()
-    .then((devices) => {
-        let audioDevices = [];
-        let videoDevices = [];
-        if(devices && devices.length) {
-            for (let index = 0; index < devices.length; index++) {
-                const element = devices[index];
-                if (element.deviceId != "default" && element.deviceId != "communications") {
-                    if (element.kind == "audioinput") {
-                        audioDevices.push({deviceId: element.deviceId, label: element.label, groupId: element.groupId});
-                    } else if (element.kind == "videoinput") {
-                        videoDevices.push({deviceId: element.deviceId, label: element.label, groupId: element.groupId});
-                    }
-                }
-            }
-        }
-        console.log(audioDevices, videoDevices)
+const getUserMedia = async () => {
+    navigator.getUserMedia = navigator.getUserMedia ||
+    navigator.webkitGetUserMedia ||
+    navigator.mozGetUserMedia;
+    return navigator.mediaDevices.getUserMedia({
+        audio: true,
+        video: true
+    })
+    .then((stream) => {
         return {
-            audioDevices,
-            videoDevices
+            stream
         }
     })
     .catch((err) => {
-      console.log(err)
-      return err;
+        console.log(err)
+        return err;
     })
 }
 
@@ -46,7 +36,7 @@ function asyncReducer(state, action) {
     }
   }
 
-const useDevices = (initialState) => {
+const useDefaultMedia = (initialState) => {
     const [state, dispatch] = React.useReducer(asyncReducer, {
         data: null,
         status: 'idle',
@@ -62,7 +52,10 @@ const useDevices = (initialState) => {
         dispatch({type: 'pending'})
         promise.then(
           data => {
-            dispatch({type: 'resolved', data})
+              setTimeout(() => {
+                dispatch({type: 'resolved', data})
+              }, 300)
+            
           },
           error => {
             dispatch({type: 'rejected', error})
@@ -73,15 +66,14 @@ const useDevices = (initialState) => {
       }, []);
 
       React.useEffect(() => {
-        run(getDevices())
-      }, [getDevices, run])
+        run(getUserMedia())
+      }, [getUserMedia, run])
     
     return {
         error,
         status,
         data,
-        run,
     }
 }
 
-export default useDevices;
+export default useDefaultMedia;

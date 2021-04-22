@@ -1,6 +1,9 @@
 import React, { useEffect, useReducer, useCallback } from 'react';
-
+import Loading from './Loading'
 const getStream = (audioDevice, videoDevice) => {
+    window.stream && window.stream.getTracks().forEach(function (a) {
+        a.stop()
+    });
    return navigator.mediaDevices.getUserMedia({
       audio: audioDevice? {
         deviceId: audioDevice
@@ -57,6 +60,7 @@ const useStream = ({audioDevice, videoDevice}) => {
 
       React.useEffect(() => {
         if(!audioDevice && !videoDevice) return;
+        if(audioDevice === 'default' || videoDevice === 'default') return;
         run(getStream(audioDevice, videoDevice))
       }, [run, audioDevice, videoDevice])
     
@@ -119,13 +123,17 @@ const VideoDeviceView = ({audioDevice, videoDevice}) => {
 
 
     if(status === 'pending' || status === 'idle') {
-        return null;
+        return (
+            <div style={{display: 'flex', justifyContent: 'center', width: '100%', height: '300px'}}>
+                <Loading />
+            </div>
+        );
     } else if(status === 'rejected') {
         return error;
     } else if(status === 'resolved')
         return (
-            <div style={{display: 'flex', justifyContent: 'center'}}>
-                <video ref={userVideo} style={{width: '200px', padding: '5px',}} autoPlay/>
+            <div style={{display: 'flex', justifyContent: 'center', width: '100%', height: '300px'}}>
+                <video ref={userVideo} style={{width: '100%', height: '100%', padding: '5px',}} autoPlay/>
             </div>
         )
     else {

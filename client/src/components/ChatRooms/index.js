@@ -123,7 +123,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
             }
             
         }
-    }, [])
+    }, [username])
     
     const controlVideo = (data) => {
         let {type, name} = data;
@@ -631,9 +631,6 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                             let newRoomObject = new RoomObject(newInfo.payload.room.name, messages, newInfo.payload.onlineUsers, newInfo.payload.blocks);
                             roomsRef.current.push(newRoomObject);
                             setRoomIndex(roomsRef.current.length-1);
-                            console.log('user joined, so start media join', mediaClientRef.current)
-                            
-                            console.log('media init done')
                         } else {
                             // remove this room
                             let newRooms = await(roomsRef.current.filter((room) => (room.name !== newInfo.payload.room)));
@@ -660,7 +657,6 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                     if(mediaClientRef.current) {
                         await mediaClientRef.current.init();
                         await mediaClientRef.current.createRoom(newInfo.payload.room.name);
-                        console.log(mediaClientRef.current)
                         await mediaClientRef.current.join(newInfo.payload.room.name);
                     }
                 }

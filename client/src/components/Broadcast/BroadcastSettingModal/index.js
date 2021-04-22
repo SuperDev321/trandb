@@ -22,6 +22,9 @@ import VideocamIcon from '@material-ui/icons/Videocam';
 import { useTranslation } from 'react-i18next';
 import useDevices from './useDevices';
 import VideoDeviceView from './VideoDeviceView';
+import useDefaultMedia from './useDefaultMedia';
+import DevicesSelector from './DevicesSelector';
+import Loading from './Loading'
 const drawerWidth = 240;
 const useStyles = makeStyles((theme) => ({
     cameraBtn: {
@@ -31,143 +34,87 @@ const useStyles = makeStyles((theme) => ({
         background: theme.palette.primary.main,
         width: drawerWidth-10
     },
+    dialog: {
+        '& .MuiPaper-root': {
+            minWidth: 300,
+            minHeight: 200
+        }
+    }
 }));
 
 
 function BroadcastSettingModal({roomName, startBroadcast, users, ...modalProps}) {
     
+    const {error, status, data} = useDefaultMedia();
     
-    const {data: devices, error: deviceError, status: deviceStatus} = useDevices();
     const [lock, setLock] = useState(false);
-    const [audioDevices, setAudioDevices] = useState([]);
-    const [videoDevices, setVideoDevices] = useState([]);
     const [currentAudioDevice, setCurrentAudioDevice] = useState('');
     const [currentVideoDevice, setCurrentVideoDevice] = useState('');
     const [usersState, setUsersState] = useState(null);
     const { t } = useTranslation();
     
-    const handleUserStateChange = (event) => {
-        if(usersState) {
-            let states = [...usersState];
-            let userState = states.find((state) => (state.username === event.target.name));
-            userState.checked = event.target.checked;
-            setUsersState(states);
-        }
-    };
-    
-    useEffect(() => {
-        // console.log('users',users);
-        if(users) {
-            let states = users.map((user) => ({...user, checked: true}));
-            setUsersState(states);
-        }
-    }, [users])
-
     const handleClickOK = () => {
         startBroadcast(roomName, lock, currentVideoDevice, currentAudioDevice);
         modalProps.onClose();
     }
 
-    const devicesDOM = () => {
-        if (deviceStatus === 'idle') {
-            return null;
-        } else if (deviceStatus === 'pending') {
-            return null;
-        } else if (deviceStatus === 'rejected') {
-            return deviceError;
-        } else if (deviceStatus === 'resolved') {
-            let { audioDevices, videoDevices } = devices;
-            return (
-                <>
-                    <FormControl>
-                        <InputLabel id="audio-select-helper-label">Audio</InputLabel>
-                        <Select
-                            labelId="audio-select-helper-label"
-                            id="audio-select-helper"
-                            value={currentAudioDevice}
-                            onChange={(e) => {console.log('change event');setCurrentAudioDevice(e.target.value)}}
-                        >
-                            { audioDevices?.map((item, index) => (
-                                <MenuItem value={item.deviceId} key={index}>{item.label}</MenuItem>
-                            ))
-                            }
-                        </Select>
-                    </FormControl>
-                    <FormControl>
-                        <InputLabel id="video-select-helper-label">Video</InputLabel>
-                        <Select
-                            labelId="video-select-helper-label"
-                            id="video-select-helper"
-                            value={currentVideoDevice}
-                            onChange={(e) => setCurrentVideoDevice(e.target.value)}
-                        >
-                            { videoDevices?.map((item, index) => (
-                                <MenuItem value={item.deviceId} key={index}>{item.label}</MenuItem>
-                            ))
-                            }
-                        </Select>
-                    </FormControl>
-                </>
-            )
-        } else {
-            throw new Error('This should be impossible');
-        }
-    }
-    
-    
+    useEffect(() => {
+        if(status === 'resolved' && data) {
+            const {stream} = data;
+            console.log(stream)
+            const audioTrack = stream.getAudioTracks()[0];
+            const videoTrack = stream.getVideoTracks()[0];
+            const audioDevice = audioTrack.getCapabilities().deviceId;
+            const videoDevice = videoTrack.getCapabilities().deviceId;
+            console.log('current devices', audioDevice, videoDevice)
+            setCurrentAudioDevice(audioDevice);
+            setCurrentVideoDevice(videoDevice);
 
-    return (
-        <Dialog {...modalProps} >
-            <DialogTitle id="form-dialog-title">Turn on devices to broadcast</DialogTitle>
-            <DialogContent style={{display: 'flex', flexDirection: 'column'}}>
-            {/* <DialogContentText>
-                Select users to broadcast
-            </DialogContentText> */}
-            {/* <FormControl>
-                <FormLabel component="legend">Select users to broadcast</FormLabel>
-                <FormGroup>
-                { usersState && usersState.map((item, index) => (
-                    <FormControlLabel key={index}
-                        control={<Checkbox checked={item.checked} onChange={handleUserStateChange} name={item.username} />}
-                        label={item.username}
+        }
+    }, [status, data])
+
+    if (status === 'idle') {
+        return <Loading />;
+    } else if (status === 'pending') {
+        return <Loading />;
+    } else if (status === 'rejected') {
+        return error;
+    } else if (status === 'resolved') {
+        return (
+            <>
+                <DialogTitle id="form-dialog-title">Turn on devices to broadcast</DialogTitle>
+                <DialogContent style={{display: 'flex', flexDirection: 'column'}}>
+                    <DevicesSelector
+                        audio={currentAudioDevice}
+                        video={currentVideoDevice}
+                        setAudio = {(device) => setCurrentAudioDevice(device)} 
+                        setVideo = {(device) => setCurrentVideoDevice(device)}
                     />
-                ))
-                    
-                }
-                </FormGroup>
-            
-            </FormControl> */}
-            <FormControl>
-                <FormLabel component="legend">Select devices to broadcast</FormLabel>
-                <FormGroup>
-                    { 
-                        devicesDOM()
-                    }
-                </FormGroup>
-            </FormControl>
-            <FormControl>
-                <FormControlLabel
-                    control={<Checkbox checked={lock} onChange={(e) => setLock(e.target.checked)} name="lockCheckbox" />}
-                    label="Lock"
-                />
-            </FormControl>
-            <VideoDeviceView audioDevice={currentAudioDevice} videoDevice={currentVideoDevice} />
-            </DialogContent>
-            <DialogActions>
-            <Button color="primary" onClick={modalProps.onClose}>
-                Cancel
-            </Button>
-            <Button color="primary" onClick={handleClickOK}>
-                OK
-            </Button>
-            </DialogActions>
-        </Dialog>
-    );
+                    <FormControl>
+                        <FormControlLabel
+                            control={<Checkbox checked={lock} onChange={(e) => setLock(e.target.checked)} name="lockCheckbox" />}
+                            label="Lock"
+                        />
+                    </FormControl>
+                    <VideoDeviceView audioDevice={currentAudioDevice} videoDevice={currentVideoDevice} />
+                </DialogContent>
+                <DialogActions>
+                <Button color="primary" onClick={modalProps.onClose}>
+                    Cancel
+                </Button>
+                <Button color="primary" onClick={handleClickOK}>
+                    OK
+                </Button>
+                </DialogActions>
+            </>
+        );
+    }
 }
 
 
 const BroadcastSetting = ({users, startBroadcast, stopBroadcast, cameraState, roomName}) => {
     const classes = useStyles();
+    
     const [open, setOpen] = useState(false);
     const handleClickOpen = () => {
         // console.log('users', users)
@@ -202,7 +149,12 @@ const BroadcastSetting = ({users, startBroadcast, stopBroadcast, cameraState, ro
                     <VideocamIcon />
             </Button>
             { open
-                ?<BroadcastSettingModal roomName={roomName} users={users} open={open} onClose={handleClose} aria-labelledby="form-dialog-title" startBroadcast={startBroadcast}/>
+                ?
+                <Dialog fullWidth
+                    maxWidth='sm'
+                    className={classes.dialog} aria-labelledby="form-dialog-title"  open={open} onClose={handleClose}>
+                    <BroadcastSettingModal roomName={roomName} users={users} startBroadcast={startBroadcast} onClose={handleClose}/>
+                </Dialog>
                 :null
             }
         </div>
