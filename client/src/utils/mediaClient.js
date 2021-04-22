@@ -80,6 +80,7 @@ class MediaClient {
     }
 
     async join(room_id) {
+        console.log('join media', room_id, this.name)
         try {
             let result = await socket.request('joinMedia', {
                 name: this.name,

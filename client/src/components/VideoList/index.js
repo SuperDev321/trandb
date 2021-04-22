@@ -10,6 +10,9 @@ import LockIcon from '@material-ui/icons/Lock';
 
 import SeparateLine from '../SeparateLine';
 import { UserContext } from '../../context';
+
+import useAnalysis from './useAnalysis'
+import SoundMeter from './SoundMeter'
 const useStyles = makeStyles((theme) => ({
     root: {
         display: 'flex',
@@ -26,7 +29,7 @@ const useStyles = makeStyles((theme) => ({
             outline: 'none',
             borderRadius: '5px',
         },
-        background: 'rgba(0, 0, 0, 0.04)',
+        background: '#f5f5f5',
         boxShadow: '1px 1px 6px 0px rgb(0 0 0 / 20%)',
         color: theme.palette.textColor.main
     }
@@ -66,7 +69,9 @@ const useVideoStyles = makeStyles((theme) => ({
     },
     content: {
         width: '100%',
-        lineHeight: 0
+        lineHeight: 0,
+        display: 'flex',
+        position: 'relative'
     },
     flexGrower: {
         flexGrow: 1
@@ -132,12 +137,12 @@ const useVideoStyles = makeStyles((theme) => ({
 //     )
 // }
 
-const UserVideo = ({stream, locked, name, controlVideo}) => {
+const UserVideo = ({stream, locked, name, controlVideo, muted}) => {
     const userVideo = useRef();
     // const userAudio = useRef();
     const classes = useVideoStyles();
     const [playing, setPlaying] = useState(false);
-
+    const {data} = useAnalysis(stream);
     const handlePlay = () => {
         if(userVideo.current) {
             userVideo.current.play();
@@ -154,7 +159,6 @@ const UserVideo = ({stream, locked, name, controlVideo}) => {
             type: 'close',
             name
         }
-        console.log('close video', data)
         controlVideo(data);
     }
 
@@ -162,7 +166,6 @@ const UserVideo = ({stream, locked, name, controlVideo}) => {
         if(stream && userVideo.current) {
             
             if(stream) {
-                console.log('load new stream')
                 userVideo.current.srcObject = stream;
                 // userVideo.current.load();
                 // userVideo.current.play();
@@ -171,18 +174,15 @@ const UserVideo = ({stream, locked, name, controlVideo}) => {
                 console.log("Error streaming ref");
             }
             userVideo.current.onpause = function() {
-                console.log('onpause')
                 setPlaying(false);
             }
 
             userVideo.current.onplay = function() {
-                console.log('onplay')
                 setPlaying(true);
             }
 
 
             userVideo.current.oncanplay = function() {
-                console.log('canplay event')
                 var playPromise = userVideo.current.play();
 
                 if (playPromise !== undefined) {
@@ -236,9 +236,10 @@ const UserVideo = ({stream, locked, name, controlVideo}) => {
                     </div>
                 </div>
                 <div className={classes.content}>
-                    <video ref={userVideo} autoPlay style={{width: '100%'}} >
+                    <video ref={userVideo} autoPlay style={{width: '100%'}} muted={muted}>
                     </video>
                     {/* <audio ref={userAudio} autoPlay /> */}
+                    <SoundMeter size={data} />
                 </div>
                 
             </div>
@@ -259,7 +260,7 @@ const VideoList = ({streams: remoteStreams, localStream, controlVideo}) => {
     return (
         <div className={classes.root}>
         { localStream ?
-            <UserVideo stream={stream} locked={locked} name={username} controls controlVideo={controlVideo}/>
+            <UserVideo stream={stream} locked={locked} name={username} controls controlVideo={controlVideo} muted/>
             :null
         }
             <SeparateLine style={{width: '100%'}} />
