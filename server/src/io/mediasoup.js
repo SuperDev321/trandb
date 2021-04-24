@@ -173,6 +173,7 @@ const startView = (io, socket) => ({room_id, name, socket_id}) => {
 }
 
 const stopView = (io, socket) => ({room_id, name, socket_id}) => {
+    
     socket.to(socket_id).emit('stop view', {
         room_id,
         name
@@ -180,6 +181,7 @@ const stopView = (io, socket) => ({room_id, name, socket_id}) => {
 }
 
 const viewRequest = (io, socket) => async ({roomName, username, targetId}, callback) => {
+    
     let socketIds = await io.of('/').in(roomName).allSockets();
     let socketToPrivate = null;
     socketIds.forEach((element) => {
@@ -188,10 +190,36 @@ const viewRequest = (io, socket) => async ({roomName, username, targetId}, callb
             socketToPrivate = socket;
         }
     });
+
+    if(!socketToPrivate) {
+        return callback(false, 'no broadcaster')
+    }
+    let room = roomList.get(roomName);
+    if(!room) {
+        return callback(false, 'no media room');
+    }
+
+    let peer = room.peers.get(socketToPrivate.id);
+    if(!peer) {
+        return callback(false, 'no peer');
+    }
+    if(peer.checkBlock(username)) {
+        return callback(false, 'blocked')
+    }
+
+    if(peer.checkAllow(username)) {
+        return callback(true);
+    }
+    
     socketToPrivate.emit('view request', {
         roomName,
         username,
     }, (result) => {
+        if(!result) {
+            peer.addBlock(username);
+        } else {
+            peer.addAllow(username);
+        }
         callback(result);
     });
 }
@@ -206,6 +234,16 @@ const stopBroadcastTo = (io, socket) => async({room_id, name, targetId}) => {
             socketToPrivate = socket;
         }
     });
+    if(!socketToPrivate) {
+        return callback(false, 'no broadcaster')
+    }
+    let room = roomList.get(room_id);
+    if(room) {
+        let peer = room.peers.get(socketToPrivate.id);
+        if(peer) {
+            peer.addBlock(name);
+        }
+    }
     socketToPrivate.emit('stop broadcast', {
         room_id,
         name,

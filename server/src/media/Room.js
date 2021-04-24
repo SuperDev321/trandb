@@ -183,8 +183,6 @@ module.exports = class Room {
         return this.peers
     }
 
-
-
     toJson() {
         return {
             id: this.id,

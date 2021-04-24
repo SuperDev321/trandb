@@ -267,7 +267,20 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
 
     const viewBroadcast = (roomName, userId, username) => {
         if(mediaClientRef.current) {
-            mediaClientRef.current.reqeustView(roomName, userId, username);
+            mediaClientRef.current.reqeustView(roomName, userId, username,
+            (locked) => {
+                if(locked) {
+                    enqueueSnackbar(t('ChatApp.pending_permission_request', {username}), {variant: 'info'});
+                }
+            },
+            (result) => {
+                if(result) {
+                    enqueueSnackbar(t('ChatApp.owner_permission_granted', {username}), {variant: 'info'});
+                } else {
+                    enqueueSnackbar(t('ChatApp.owner_permission_denied', {username}), {variant: 'info'});
+                }
+            });
+            
         }
     }
 
@@ -922,7 +935,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                         // setOpenPrivate={setOpenPrivate}
                         // setPrivateTo={setPrivateTo}
                         addOrOpenPrivate={addOrOpenPrivate}
-                        cameraState={(currentLocalStream !== null)}
+                        cameraState={currentLocalStream? (currentLocalStream.locked? 'locked': true): false}
                         startBroadcast={startBroadcast}
                         stopBroadcast={stopBroadcast}
                         stopBroadcastTo={stopBroadcastTo}

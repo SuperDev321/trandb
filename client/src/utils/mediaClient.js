@@ -529,9 +529,7 @@ class MediaClient {
         this.event(_EVENTS.onChangeConsume, {room_id});
     }
 
-    reqeustView(room_id, user_id, name) {
-        console.log('view broadcast')
-
+    reqeustView(room_id, user_id, name, fn1, fn2) {
         let consumersArr = Array.from(this.consumers.values());
         let roomConsumers = consumersArr.filter((item) => (item.room_id === room_id));
         if(roomConsumers) {
@@ -540,7 +538,7 @@ class MediaClient {
                 let {locked} = videoConsumer;
                 console.log(videoConsumer, locked)
                 if(locked) {
-                    console.log('view broadcast')
+                    fn1(true);
                     socket.emit('view request', {
                         roomName: room_id,
                         username: this.name,
@@ -551,7 +549,7 @@ class MediaClient {
                         } else {
                             console.log('deney view request');
                         }
-                        
+                        fn2(result);                        
                     })
                 } else {
                     this.addRemoteStream(room_id, name);
@@ -939,7 +937,7 @@ class MediaClient {
     getLiveUsers(room_id) {
         let consumersArr = Array.from(this.consumers.values());
         let roomConsmers = consumersArr.filter((item) => (item.room_id === room_id));
-        let liveUsers = roomConsmers.map(({name}) => (name));
+        let liveUsers = roomConsmers.map(({name, locked}) => ({name, locked}));
         return liveUsers;
     }
 

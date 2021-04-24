@@ -9,7 +9,7 @@ import {
     Divider,
     Badge,
 } from '@material-ui/core';
-import { deepOrange, pink, blue, green, grey } from '@material-ui/core/colors';
+import { deepOrange, pink, blue, green, grey, yellow } from '@material-ui/core/colors';
 import {QuestionAnswer,
     AccountCircleOutlined,
     Videocam,
@@ -18,7 +18,8 @@ import {QuestionAnswer,
     Notifications,
     StarRounded,
     Visibility,
-    VisibilityOff
+    VisibilityOff,
+    Lock
 } from '@material-ui/icons';
 import RoomUserName from '../RoomUserName';
 import config from '../../config';
@@ -221,6 +222,14 @@ const OnlineUser = ({roomName, username, user, role, isMuted, isBlocked, isBroad
                     // color={(user && user.broadcasting)? 'primary': 'disabled'}
                     style={{ color: (isBroadcasting)? green[300]:grey[200] }}
                 />
+                { isBroadcasting === 'locked'?
+                    <Lock className={classes.camera}
+                        // color={(user && user.broadcasting)? 'primary': 'disabled'}
+                        style={{ color: yellow[700], fontSize: 17 }}
+                    />
+                    :null
+                }
+                
                 <div className={classes.username}
                 // onClick={handleClick}
                 >

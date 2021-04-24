@@ -9,9 +9,7 @@ const getUserMedia = async () => {
         video: true
     })
     .then((stream) => {
-        return {
-            stream
-        }
+        return stream
     })
     .catch((err) => {
         console.log(err)
@@ -52,9 +50,13 @@ const useDefaultMedia = (initialState) => {
         dispatch({type: 'pending'})
         promise.then(
           data => {
+            if(data) {
               setTimeout(() => {
                 dispatch({type: 'resolved', data})
               }, 300)
+            } else {
+              dispatch({type: 'rejected', error: 'no device'})
+            }
             
           },
           error => {

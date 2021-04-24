@@ -6,19 +6,20 @@ const useAnalysis = (stream) => {
     const analyser = useRef(null);
     const dataArray = useRef(null);
     const source = useRef(null);
-    const [audioData, setAudioData] = useState(null);
     const rafId = useRef(null);
     const [data, setData] = useState(0);
 
     const tick = () => {
-        analyser.current.getByteFrequencyData(dataArray.current);
-        let sum = 0;
-        dataArray.current.forEach((value) => {
-            sum += value;
-        });
-        sum /= dataArray.current.length
-        setData(Math.floor(sum));
-        rafId.current = requestAnimationFrame(tick);
+        if(analyser.current) {
+            analyser.current.getByteFrequencyData(dataArray.current);
+            let sum = 0;
+            dataArray.current.forEach((value) => {
+                sum += value;
+            });
+            sum /= dataArray.current.length
+            setData(Math.floor(sum));
+            rafId.current = requestAnimationFrame(tick);
+        }
     }
 
     useEffect(() => {
