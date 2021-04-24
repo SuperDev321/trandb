@@ -59,7 +59,7 @@ function BroadcastSettingModal({roomName, startBroadcast, users, ...modalProps})
     }
 
     useEffect(() => {
-        if(status === 'resolved' && data) {
+        if((status === 'resolved') && data) {
             const stream = data;
             if(stream) {
                 const audioTrack = stream.getAudioTracks()[0];
