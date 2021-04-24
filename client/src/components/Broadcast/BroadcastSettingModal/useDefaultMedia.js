@@ -8,13 +8,13 @@ const getUserMedia = async () => {
         audio: true,
         video: true
     })
-    .then((stream) => {
-        return stream
-    })
-    .catch((err) => {
-        console.log(err)
-        return err;
-    })
+    // .then((stream) => {
+    //     return stream
+    // })
+    // .catch((err) => {
+    //     console.log(err)
+    //     return err;
+    // })
 }
 
 function asyncReducer(state, action) {
