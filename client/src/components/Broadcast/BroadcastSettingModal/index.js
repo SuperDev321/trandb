@@ -59,11 +59,12 @@ function BroadcastSettingModal({roomName, startBroadcast, users, ...modalProps})
     }
 
     useEffect(() => {
-        if(status === 'resolved' && data) {
-            const stream = data;
-            if(stream) {
-                const audioTrack = stream.getAudioTracks()[0];
-                const videoTrack = stream.getVideoTracks()[0];
+        console.log(status, error, data);
+        if((status === 'resolved') && data) {
+            if(data) {
+                console.log(data);
+                const audioTrack = data.getAudioTracks()[0];
+                const videoTrack = data.getVideoTracks()[0];
                 const audioDevice = audioTrack.getSettings().deviceId;
                 const videoDevice = videoTrack.getSettings().deviceId;
                 setCurrentAudioDevice(audioDevice);
@@ -77,7 +78,7 @@ function BroadcastSettingModal({roomName, startBroadcast, users, ...modalProps})
     } else if (status === 'pending') {
         return <Loading />;
     } else if (status === 'rejected') {
-        return error;
+        return <div>Can not find devices</div>;
     } else if (status === 'resolved') {
         return (
             <>
