@@ -11,13 +11,16 @@ import LockIcon from '@material-ui/icons/Lock';
 import SeparateLine from '../SeparateLine';
 import { UserContext } from '../../context';
 
-import useAnalysis from './useAnalysis'
-import SoundMeter from './SoundMeter'
+import useAnalysis from './useAnalysis';
+import SoundMeter from './SoundMeter';
+import VolumnControl from './VolumnControl';
 const useStyles = makeStyles((theme) => ({
     root: {
         display: 'flex',
         alignItems: 'center',
         flexDirection: 'column',
+        scrollbarWidth: 'thin',
+        scrollbarColor: `#585B5E #ecdbdb00`,
         '&::-webkit-scrollbar': {
             width: '5px',
         },
@@ -31,7 +34,8 @@ const useStyles = makeStyles((theme) => ({
         },
         background: '#f5f5f5',
         boxShadow: '1px 1px 6px 0px rgb(0 0 0 / 20%)',
-        color: theme.palette.textColor.main
+        color: theme.palette.textColor.main,
+        overflowY: 'auto',
     }
 }));
 
@@ -64,7 +68,7 @@ const useVideoStyles = makeStyles((theme) => ({
     },
     overlayFooter: {
         display: 'flex',
-        justifyContent: 'center',
+        justifyContent: 'flex-start',
         alignItems: 'center'
     },
     content: {
@@ -77,10 +81,17 @@ const useVideoStyles = makeStyles((theme) => ({
         flexGrow: 1
     },
     username: {
-        display: 'flex',
-        justifyContent: 'center',
+        position: 'absolute',
+        top: 5,
+        left: 5,
+        // display: 'flex',
+        // justifyContent: 'center',
         fontSize: '1rem',
         fontWeight: 500,
+        color: '#f5f5f5'
+    },
+    iconButton: {
+        color: '#f5f5f5'
     }
 }));
 
@@ -143,9 +154,15 @@ const UserVideo = ({stream, locked, name, controlVideo, muted}) => {
     const classes = useVideoStyles();
     const [playing, setPlaying] = useState(false);
     const {data} = useAnalysis(stream);
+    const [volume, setVolume] = useState(0);
+
+    const echo = data*volume/100;
+ 
     const handlePlay = () => {
         if(userVideo.current) {
             userVideo.current.play();
+            console.log(userVideo.current.volume)
+            setVolume(userVideo.current.volume*100)
         }
     }
 
@@ -160,6 +177,13 @@ const UserVideo = ({stream, locked, name, controlVideo, muted}) => {
             name
         }
         controlVideo(data);
+    }
+
+    const handleChangeVolume = (event, newValue) => {
+        setVolume(newValue);
+        if(userVideo.current) {
+            userVideo.current.volume = newValue/100;
+        }
     }
 
     useEffect(() => {
@@ -184,10 +208,11 @@ const UserVideo = ({stream, locked, name, controlVideo, muted}) => {
 
             userVideo.current.oncanplay = function() {
                 var playPromise = userVideo.current.play();
-
+                
                 if (playPromise !== undefined) {
                     playPromise
                     .then(_ => {
+                        setVolume(userVideo.current.volume*100);
                         // Automatic playback started!
                         // Show playing UI.
                         console.log("audio played auto");
@@ -208,44 +233,45 @@ const UserVideo = ({stream, locked, name, controlVideo, muted}) => {
                 <div className={classes.overlay}>
                     <div className={classes.overlayHeader}>
                         <div>
-                            <IconButton aria-label="delete" color="secondary" onClick={handleClose}>
+                            <IconButton aria-label="delete" className={classes.iconButton} onClick={handleClose}>
                                 <CloseIcon />
                             </IconButton>
                         </div>
                         <div className={classes.streamInfos}>
-                        { locked?
-                            <IconButton aria-label="lock" color="secondary" >
+                        {/* { locked?
+                            <IconButton aria-label="lock" className={classes.iconButton} >
                                 <LockIcon />
                             </IconButton>
                             :
                             null
-                        }
+                        } */}
                         </div>
                     </div>
                     <div className={classes.flexGrower}></div>
                     <div className={classes.overlayFooter}>
                     { playing?
-                        <IconButton aria-label="pause" color="secondary" onClick={handlePause}>
+                        <IconButton aria-label="pause" className={classes.iconButton} onClick={handlePause}>
                             <PauseIcon />
                         </IconButton>
                         :
-                        <IconButton aria-label="play" color="secondary" onClick={handlePlay}>
+                        <IconButton aria-label="play" className={classes.iconButton} onClick={handlePlay}>
                             <PlayCircleFilledIcon />
                         </IconButton>
                     }
+                        <VolumnControl value={volume} handleChange={handleChangeVolume} />
                     </div>
                 </div>
                 <div className={classes.content}>
                     <video ref={userVideo} autoPlay style={{width: '100%'}} muted={muted}>
                     </video>
                     {/* <audio ref={userAudio} autoPlay /> */}
-                    <SoundMeter size={data} />
+                    <SoundMeter size={echo} />
                 </div>
-                
+                <div className={classes.username}>
+                    {name}
+                </div>
             </div>
-            <div className={classes.username}>
-                {name}
-            </div>
+            
         </div>
     )
 }

@@ -25,7 +25,7 @@ import VideoDeviceView from './VideoDeviceView';
 import useDefaultMedia from './useDefaultMedia';
 import DevicesSelector from './DevicesSelector';
 import Loading from './Loading'
-const drawerWidth = 240;
+const drawerWidth = 260;
 const useStyles = makeStyles((theme) => ({
     cameraBtn: {
         borderRadius: 20,
@@ -60,16 +60,15 @@ function BroadcastSettingModal({roomName, startBroadcast, users, ...modalProps})
 
     useEffect(() => {
         if(status === 'resolved' && data) {
-            const {stream} = data;
-            console.log(stream)
-            const audioTrack = stream.getAudioTracks()[0];
-            const videoTrack = stream.getVideoTracks()[0];
-            const audioDevice = audioTrack.getCapabilities().deviceId;
-            const videoDevice = videoTrack.getCapabilities().deviceId;
-            console.log('current devices', audioDevice, videoDevice)
-            setCurrentAudioDevice(audioDevice);
-            setCurrentVideoDevice(videoDevice);
-
+            const stream = data;
+            if(stream) {
+                const audioTrack = stream.getAudioTracks()[0];
+                const videoTrack = stream.getVideoTracks()[0];
+                const audioDevice = audioTrack.getSettings().deviceId;
+                const videoDevice = videoTrack.getSettings().deviceId;
+                setCurrentAudioDevice(audioDevice);
+                setCurrentVideoDevice(videoDevice);
+            }
         }
     }, [status, data])
 

@@ -128,7 +128,7 @@ const SideBarLeft = ({ roomName, username, mutes, blocks, globalBlocks, changeMu
         // })
         // console.log('sideUsers', sideUsers);
         setSideUsers(filteredUsers);
-    }, [searchText, users, broadcastingUsers])
+    }, [searchText, users])
 
     const isMuted = (user) => {
         let mutedNames = Array.isArray(mutes)? mutes.map((item) => ((item&&item.username)? item.username: null)): [];
@@ -160,8 +160,18 @@ const SideBarLeft = ({ roomName, username, mutes, blocks, globalBlocks, changeMu
         if(user.username === username) {
             return cameraState;
         } else {
-            if(Array.isArray(broadcastingUsers) && broadcastingUsers.includes(user.username)) {
-                return true
+            if(Array.isArray(broadcastingUsers)) {
+                let result = broadcastingUsers.find(({name}) => (name === user.username));
+                if(result) {
+                    if(result.locked) {
+                        return 'locked';
+                    } else {
+                        return true;
+                    }
+                    
+                } else {
+                    return false;
+                }
             }
             return false;
         }

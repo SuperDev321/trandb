@@ -26,9 +26,10 @@ import {
 const useStyles = makeStyles((theme) => ({
     root: {
         height: '100%',
-        width: '100%',
+        // width: '100%',
         overflow: 'hidden',
         display: 'flex',
+        flexGrow: 1,
         flexDirection: 'column',
     },
     content: {

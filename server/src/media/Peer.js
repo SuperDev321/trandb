@@ -8,6 +8,8 @@ module.exports = class Peer {
         this.transports = new Map()
         this.consumers = new Map()
         this.producers = new Map()
+        this.blocks = new Set();
+        this.allows = new Set();
     }
 
 
@@ -68,7 +70,7 @@ module.exports = class Peer {
 
         this.consumers.set(consumer.id, {
             consumer,
-            producerId: producer_id
+            producerId: producer_id,
         })
 
         // consumer.on('transportclose', function() {
@@ -87,7 +89,8 @@ module.exports = class Peer {
                 kind: consumer.kind,
                 rtpParameters: consumer.rtpParameters,
                 type: consumer.type,
-                producerPaused: consumer.producerPaused
+                producerPaused: consumer.producerPaused,
+                refused: false
             }
         }
     }
@@ -99,7 +102,6 @@ module.exports = class Peer {
             console.warn(e)
         }
     
-        
         this.producers.delete(producer_id)
     }
 
@@ -122,6 +124,8 @@ module.exports = class Peer {
 
     close() {
         this.transports.forEach(transport => transport.close())
+        this.blocks.clear();
+        this.allows.clear();
     }
 
     getProducerIdOfConsumer(consumer_id) {
@@ -143,4 +147,25 @@ module.exports = class Peer {
         return true;
     }
 
+    addBlock(name) {
+        this.blocks.add(name);
+    }
+
+    addAllow(name) {
+        this.allows.add(name);
+    }
+    checkBlock(name) {
+        if(this.blocks.has(name)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    checkAllow(name) {
+        if(this.allows.has(name)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }
