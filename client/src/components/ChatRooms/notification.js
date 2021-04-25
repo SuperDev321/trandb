@@ -71,6 +71,37 @@ const PermissionNoticeEl = ({username, roomName, noticeKey, callback, closeNotic
     )
 }
 
+const PermissionSendedEl = ({username, roomName, noticeKey, callback, closeNotice}) => {
+    const classes = useStyles();
+    const { t, i18n } = useTranslation();
+    const message = t('ChatApp.system_user_request_video_permission', {username, roomName});
+    const handleClickAccept = () => {
+        callback(true);
+        closeNotice(noticeKey);
+    }
+    const handleClickDeney = () => {
+        callback(false);
+        closeNotice(noticeKey);
+    }
+
+    return (
+        <div className={classes.root}>
+        <div className={classes.messageContent}>
+          <span style={{maxWidth: "85%"}}>{message}</span>
+          <Close onClick={() => closeNotice(noticeKey)} className="icon icon-alert-close" size="20px"
+                 style={{color: "white"}}/>
+        </div>
+        <div className={classes.confirmArea}>
+          <Button variant="contained" color="primary" size="small" onClick={handleClickAccept}
+                  className={classes.btnOK}>{t('ChatApp.accept')}</Button>
+          <Button variant="contained" size="small" onClick={handleClickDeney}
+                  className={classes.btnCancel}>{t('ChatApp.deny')}</Button>
+        </div>
+      </div>
+    )
+}
+
+
 
 const permissionRequest = (username, roomName, callback) => {
     const key = Date.now();
