@@ -529,7 +529,15 @@ class MediaClient {
         this.event(_EVENTS.onChangeConsume, {room_id});
     }
 
-    reqeustView(room_id, user_id, name, fn1, fn2) {
+    requestView(room_id, user_id, name, fn1, fn2) {
+
+        let roomStream = this.remoteStreams.get(room_id);
+        if(roomStream) {
+            let streamInfo = roomStream.get(name);
+            if(streamInfo && streamInfo.stream && (streamInfo.name === name)) {
+                return fn1(false);
+            }
+        }
         let consumersArr = Array.from(this.consumers.values());
         let roomConsumers = consumersArr.filter((item) => (item.room_id === room_id));
         if(roomConsumers) {

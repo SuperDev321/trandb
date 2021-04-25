@@ -267,10 +267,12 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
 
     const viewBroadcast = (roomName, userId, username) => {
         if(mediaClientRef.current) {
-            mediaClientRef.current.reqeustView(roomName, userId, username,
-            (locked) => {
-                if(locked) {
+            mediaClientRef.current.requestView(roomName, userId, username,
+            (result) => {
+                if(result) {
                     enqueueSnackbar(t('ChatApp.pending_permission_request', {username}), {variant: 'info'});
+                } else {
+                    enqueueSnackbar(t('You already see this camera', {username}), {variant: 'info'});
                 }
             },
             (result) => {
