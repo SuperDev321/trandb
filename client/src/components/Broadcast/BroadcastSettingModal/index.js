@@ -59,15 +59,20 @@ function BroadcastSettingModal({roomName, startBroadcast, users, ...modalProps})
     }
 
     useEffect(() => {
+        console.log(status, error, data);
         if((status === 'resolved') && data) {
-            const stream = data;
-            if(stream) {
-                const audioTrack = stream.getAudioTracks()[0];
-                const videoTrack = stream.getVideoTracks()[0];
-                const audioDevice = audioTrack.getSettings().deviceId;
-                const videoDevice = videoTrack.getSettings().deviceId;
-                setCurrentAudioDevice(audioDevice);
-                setCurrentVideoDevice(videoDevice);
+            if(data) {
+                console.log(data);
+                const audioTrack = data?.getAudioTracks()[0];
+                const videoTrack = data?.getVideoTracks()[0];
+                if(audioTrack) {
+                    const audioDevice = audioTrack.getSettings().deviceId;
+                    setCurrentAudioDevice(audioDevice);
+                }
+                if(videoTrack) {
+                    const videoDevice = videoTrack.getSettings().deviceId;
+                    setCurrentVideoDevice(videoDevice);
+                }
             }
         }
     }, [status, data])
@@ -76,9 +81,11 @@ function BroadcastSettingModal({roomName, startBroadcast, users, ...modalProps})
         return <Loading />;
     } else if (status === 'pending') {
         return <Loading />;
-    } else if (status === 'rejected') {
-        return error;
-    } else if (status === 'resolved') {
+    }
+    // } else if (status === 'rejected') {
+        // return <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>Can not find devices</div>;
+    // } else if (status === 'resolved') {
+    else {
         return (
             <>
                 <DialogTitle id="form-dialog-title">Turn on devices to broadcast</DialogTitle>

@@ -207,9 +207,9 @@ const viewRequest = (io, socket) => async ({roomName, username, targetId}, callb
         return callback(false, 'blocked')
     }
 
-    if(peer.checkAllow(username)) {
-        return callback(true);
-    }
+    // if(peer.checkAllow(username)) {
+    //     return callback(true);
+    // }
     
     socketToPrivate.emit('view request', {
         roomName,

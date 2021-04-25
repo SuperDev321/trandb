@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useContext } from 'react';
+import React, { useState, useEffect, useRef, useContext, useCallback } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import {
     IconButton
@@ -14,11 +14,16 @@ import { UserContext } from '../../context';
 import useAnalysis from './useAnalysis';
 import SoundMeter from './SoundMeter';
 import VolumnControl from './VolumnControl';
+
+const VideoFieldWidth = 350;
+
 const useStyles = makeStyles((theme) => ({
     root: {
         display: 'flex',
-        alignItems: 'center',
-        flexDirection: 'column',
+        flexWrap: 'wrap',
+        alignContent: 'flex-start',
+        // alignItems: 'center',
+        // flexDirection: 'column',
         scrollbarWidth: 'thin',
         scrollbarColor: `#585B5E #ecdbdb00`,
         '&::-webkit-scrollbar': {
@@ -36,15 +41,42 @@ const useStyles = makeStyles((theme) => ({
         boxShadow: '1px 1px 6px 0px rgb(0 0 0 / 20%)',
         color: theme.palette.textColor.main,
         overflowY: 'auto',
+        width: `${VideoFieldWidth}px !important`,
+
+
     }
 }));
 
 const useVideoStyles = makeStyles((theme) => ({
     root: {
-        margin: 5
+        padding: 5,
+        width: props => {
+            if(props.total && props.num) {
+                switch(props.total) {
+                    case 1:
+                    case 2:
+                        return VideoFieldWidth;
+                    case 3:
+                        if(props.num === 1) {
+                            return VideoFieldWidth;
+                        } else {
+                            return VideoFieldWidth /2;
+                        }
+                    case 4:
+                    case 5:
+                    case 6:
+                    case 7:
+                    case 8:
+                        return VideoFieldWidth /2;
+                    default:
+                        return VideoFieldWidth/3;
+                }
+            } else {
+                return VideoFieldWidth
+            }
+        },
     },
     mediaContent: {
-        width: 350,
         position: 'relative',
     },
     overlay: {
@@ -88,7 +120,8 @@ const useVideoStyles = makeStyles((theme) => ({
         // justifyContent: 'center',
         fontSize: '1rem',
         fontWeight: 500,
-        color: '#f5f5f5'
+        color: '#f5f5f5',
+        background: 'rgba(71, 71, 71, 0.329)'
     },
     iconButton: {
         color: '#f5f5f5'
@@ -148,10 +181,10 @@ const useVideoStyles = makeStyles((theme) => ({
 //     )
 // }
 
-const UserVideo = ({stream, locked, name, controlVideo, muted}) => {
+const UserVideo = ({stream, locked, name, controlVideo, muted, total, streamNum}) => {
     const userVideo = useRef();
     // const userAudio = useRef();
-    const classes = useVideoStyles();
+    const classes = useVideoStyles({total, num: streamNum});
     const [playing, setPlaying] = useState(false);
     const {data} = useAnalysis(stream);
     const [volume, setVolume] = useState(0);
@@ -194,20 +227,20 @@ const UserVideo = ({stream, locked, name, controlVideo, muted}) => {
                 // userVideo.current.load();
                 // userVideo.current.play();
             }
-            userVideo.current.onerror = function() {
+            userVideo.current.onerror = () => {
                 console.log("Error streaming ref");
             }
-            userVideo.current.onpause = function() {
+            userVideo.current.onpause = () => {
                 setPlaying(false);
             }
 
-            userVideo.current.onplay = function() {
+            userVideo.current.onplay = () => {
                 setPlaying(true);
             }
 
 
-            userVideo.current.oncanplay = function() {
-                var playPromise = userVideo.current.play();
+            userVideo.current.oncanplay = () => {
+                var playPromise = userVideo.current?.play();
                 
                 if (playPromise !== undefined) {
                     playPromise
@@ -282,16 +315,38 @@ const VideoList = ({streams: remoteStreams, localStream, controlVideo}) => {
     const locked = localStream?.locked;
     const stream = localStream?.stream;
     const {username} = useContext(UserContext);
+
+    const streamLength = useCallback(() => {
+        let len = 0;
+        if(remoteStreams) {
+            len += remoteStreams.length;
+        }
+        if(localStream) {
+            len ++;
+        }
+        return len;
+    }, [remoteStreams, localStream]);
+
+    if(!streamLength()) return null;
     
     return (
         <div className={classes.root}>
         { localStream ?
-            <UserVideo stream={stream} locked={locked} name={username} controls controlVideo={controlVideo} muted/>
+            <UserVideo stream={stream}
+                locked={locked} name={username} controls controlVideo={controlVideo} muted
+                total={streamLength()}
+                streamNum = {1}
+            />
             :null
         }
-            <SeparateLine style={{width: '100%'}} />
+            {/* <SeparateLine style={{width: '100%'}} /> */}
             { remoteStreams?.map(({stream, name, locked}, index) => (
-                    <UserVideo stream={stream} key={index} locked={locked} name={name} controlVideo={controlVideo} />
+                    <UserVideo
+                        stream={stream} key={index} locked={locked} name={name}
+                        controlVideo={controlVideo}
+                        total={streamLength()}
+                        streamNum = {localStream? 2+index: 1+index}
+                    />
                 ))
             }
         </div>
