@@ -8,12 +8,12 @@ const {sendSignal, returnSignal} = require('./videoHandler');
 const socketDisconnect = require('./disconnect');
 const { Users } = require('../database/models');
 const LogManager = require('../constructors/logManager');
-const {
-  createRoom, getProducers, getRouterRtpCapabilities,
-  createWebRtcTransport, connectTransport, produce, consume, resume,
-  producerClosed, roomProducersClosed, joinMedia, createMediaRoom,
-  startView, stopView, viewRequest, stopBroadcastTo
-} = require('./mediasoup.js');
+// const {
+//   createRoom, getProducers, getRouterRtpCapabilities,
+//   createWebRtcTransport, connectTransport, produce, consume, resume,
+//   producerClosed, roomProducersClosed, joinMedia, createMediaRoom,
+//   startView, stopView, viewRequest, stopBroadcastTo
+// } = require('./mediasoup.js');
 
 const ipInt = require('ip-to-int');
 const isIp = require('is-ip')
@@ -59,21 +59,23 @@ const ioHandler = (io) => async (socket) => {
     socket.on('block user', blockUser(io, socket));
     socket.on('unblock user', unBlockUser(io, socket));
     // video events
-    socket.on('joinMedia', joinMedia(io, socket));
-    socket.on('createMediaRoom', createMediaRoom(io, socket));
-    socket.on('getProducers', getProducers(io, socket));
-    socket.on('getRouterRtpCapabilities', getRouterRtpCapabilities(io, socket));
-    socket.on('createWebRtcTransport', createWebRtcTransport(io, socket));
-    socket.on('connectTransport', connectTransport(io, socket));
-    socket.on('produce', produce(io, socket));
-    socket.on('consume', consume(io, socket));
-    socket.on('resume', resume());
-    socket.on('producerClosed', producerClosed());
-    socket.on('roomProducersClosed', roomProducersClosed(socket));
-    socket.on('start view', startView(io, socket));
-    socket.on('stop view', stopView(io, socket));
-    socket.on('view request', viewRequest(io, socket));
-    socket.on('stop broadcast', stopBroadcastTo(io, socket));
+    // socket.on('joinMedia', joinMedia(io, socket));
+    socket.on('createMediaRoom', () => {
+      console.log('create media room event')
+    });
+    // socket.on('getProducers', getProducers(io, socket));
+    // socket.on('getRouterRtpCapabilities', getRouterRtpCapabilities(io, socket));
+    // socket.on('createWebRtcTransport', createWebRtcTransport(io, socket));
+    // socket.on('connectTransport', connectTransport(io, socket));
+    // socket.on('produce', produce(io, socket));
+    // socket.on('consume', consume(io, socket));
+    // socket.on('resume', resume());
+    // socket.on('producerClosed', producerClosed());
+    // socket.on('roomProducersClosed', roomProducersClosed(socket));
+    // socket.on('start view', startView(io, socket));
+    // socket.on('stop view', stopView(io, socket));
+    // socket.on('view request', viewRequest(io, socket));
+    // socket.on('stop broadcast', stopBroadcastTo(io, socket));
 
     socket.on('error', (err) => {
       console.log(err);

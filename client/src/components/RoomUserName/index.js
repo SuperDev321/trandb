@@ -163,7 +163,7 @@ const RoomUserName = ({user, role, roomName,
     const stopView = () => {
         setAnchorEl(null);
         setTimeout(() => {
-            stopBroadcastTo(roomName, user._id);
+            stopBroadcastTo(roomName, user._id, user.username);
         }, 0);
     }
 

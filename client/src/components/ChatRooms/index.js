@@ -118,7 +118,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
 
         return () => {
             if(mediaClientRef.current) {
-                mediaClientRef.current.exit();
+                mediaClientRef.current.exit(true);
                 mediaClientRef.current = null;
             }
             
@@ -286,9 +286,10 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
         }
     }
 
-    const stopBroadcastTo = (roomName, userId) => {
+    const stopBroadcastTo = (roomName, userId, name) => {
+        console.log('stop view', roomName, userId)
         if(mediaClientRef.current) {
-            mediaClientRef.current.stopView(roomName, userId);
+            mediaClientRef.current.stopView(roomName, userId, name);
         }
     }
 
@@ -365,7 +366,12 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
         
     }
     const startBroadcast = (roomName, lock, videoDeviceId, audioDeviceId) => {
-        mediaClientRef.current.produce(roomName, lock, videoDeviceId, audioDeviceId);
+        if(mediaClientRef.current && mediaClientRef.current._isOpen) {
+            mediaClientRef.current.produce(roomName, lock, videoDeviceId, audioDeviceId);
+        } else {
+            enqueueSnackbar('You are not ready to broadcast', {variant: 'error'});
+        }
+        
     }
     const stopBroadcast = (roomName) => {
         if(mediaClientRef.current) {
@@ -429,8 +435,9 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
 
     // socket events
     useEffect(() => {
-        if(username && socket) {
+        if(username && socket && mediaSocket) {
             let result = socket.open();
+            mediaSocket.open();
             isPrivateRoom(room, ({isPrivate}) => {
                 if(isPrivate) {
                    setRoomNameForPassword(room);
@@ -500,10 +507,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                 setNewInfo({type: 'return video', payload});
             });
 
-            socket.on('view request', ({username, roomName}, callback) => {
-                console.log('get view request')
-                permissionRequest(username, roomName, callback);
-            })
+            
 
             socket.on('join error', payload => {
                joinErrorHandler(payload);
@@ -566,9 +570,16 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                 history.push('/');
             })
 
+            mediaSocket.on('view request', ({username, roomName}, callback) => {
+                console.log('get view request')
+                permissionRequest(username, roomName, callback);
+            })
+
             return () => {
                 socket.removeAllListeners();
                 socket.close();
+                mediaSocket.removeAllListeners();
+                mediaSocket.close();
             };
         }
     }, [socket, username]);

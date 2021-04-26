@@ -1,5 +1,5 @@
 import React, { useEffect, useReducer, useCallback } from 'react';
-import Loading from './Loading'
+import Loading from '../../Loading'
 const getStream = (audioDevice, videoDevice) => {
     window.stream && window.stream.getTracks().forEach(function (a) {
         a.stop()
