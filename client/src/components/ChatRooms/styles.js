@@ -12,9 +12,6 @@ const useStyles = makeStyles((theme) => ({
     mainWrapper: {
         flexGrow: 1,
         overflow: 'hidden',
-        // margin: '1px',
-        // marginBottom: 0,
-        // marginRight: 0,
         position: 'relative',
     },
     main: {
