@@ -37,6 +37,8 @@ class MediaClient {
         this.producers = new Map()
         this.viewers = new Map()
 
+        this.rooms = new Set();
+
         // save remote producers that can consume
         this.remoteProducers = new Map();
 
@@ -91,11 +93,39 @@ class MediaClient {
             const data = await mediaSocket.request('getRouterRtpCapabilities', room_id);
             let device = await this.loadDevice(data)
             this.devices.set(room_id, device);
-            await this.initTransports(device, room_id)
+            await this.initTransports(device, room_id);
+            this.rooms.add(room_id);
             mediaSocket.request('getProducers', room_id);
         } catch (e) {
             console.log(e);
         }
+    }
+
+    exitRoom(room_id) {
+        this.rooms.delete(room_id);
+        this.devices.delete(room_id);
+        let consumerTransport = this.consumerTransports.get(room_id);
+        if(consumerTransport) {
+            consumerTransport.close();
+        }
+        let producerTransport = this.producerTransports.get(room_id);
+        if(producerTransport) {
+            producerTransport.close();
+        }
+        let producerInfo = this.producers.get(room_id);
+        if(producerInfo && producerInfo.producer) {
+            producerInfo.producer.close();
+        }
+        let consumerArr = Array.from(this.consumers.values())
+        consumerArr.forEach((item) => {
+            if(item && (item.room_id === room_id)) {
+                if(item.consumer) {
+                    item.consumer.close();
+                }
+                this.consumers.delete(item.consumer.id);
+            }
+        })
+
     }
 
     async loadDevice(routerRtpCapabilities) {
@@ -286,10 +316,31 @@ class MediaClient {
             this.removeRemoteStream(name, null, room_id);
         })
 
-        mediaSocket.on('disconnect' ,function () {
-            console.log('mediasoup disconnect event')
-            this.exit(true)
+        mediaSocket.on('disconnect' ,function (reason) {
+            if (reason === "io server disconnect") {
+                // the disconnection was initiated by the server, you need to reconnect manually
+                mediaSocket.connect();
+            }
         }.bind(this))
+
+        mediaSocket.on('connect_error' ,function () {
+            setTimeout(() => {
+                mediaSocket.connect();
+            }, 1000);
+        }.bind(this))
+
+        mediaSocket.io.on('reconnect', async () => {
+            console.log('media socket reconnect');
+
+            this.rooms.forEach(async (room) => {
+                await this.createRoom(room);
+                await this.join(room);
+            })
+        })
+
+        mediaSocket.io.on('reconnect_attempt', () => {
+            console.log('reconnect_attempt');
+        })
 
 
     }
@@ -301,18 +352,22 @@ class MediaClient {
         let mediaConstraints = {}
         mediaConstraints = {
             audio: audioDeviceId? {
-                deviceId: audioDeviceId
+                deviceId: {
+                    exact: audioDeviceId
+                }
             }: false,
             video: videoDeviceId? {
-                deviceId: videoDeviceId,
-                width: {
-                    min: 640,
-                    ideal: 2000
+                deviceId: {
+                    exact: videoDeviceId,
                 },
-                height: {
-                    min: 400,
-                    ideal: 1000
-                },
+                // width: {
+                //     min: 640,
+                //     ideal: 2000
+                // },
+                // height: {
+                //     min: 400,
+                //     ideal: 1000
+                // },
             }: false
         }
         let device = this.devices.get(room_id);
@@ -326,8 +381,11 @@ class MediaClient {
         }
         let stream;
         try {
+            navigator.getUserMedia = (navigator.getUserMedia ||
+                navigator.webkitGetUserMedia ||
+                navigator.mozGetUserMedia ||
+                navigator.msGetUserMedia);
             stream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
-            // console.log(navigator.mediaDevices.getSupportedConstraints())
 
             const videoTrack = stream.getVideoTracks()[0];
             const videoParams = {
@@ -541,7 +599,7 @@ class MediaClient {
         let consumersArr = Array.from(this.consumers.values());
         let roomConsumers = consumersArr.filter((item) => (item.room_id === room_id));
         if(roomConsumers) {
-            let videoConsumer = roomConsumers.find((item) => (item.kind === 'video'));
+            let videoConsumer = roomConsumers.find((item) => (item.kind === 'video' && item.name === name));
             if(videoConsumer) {
                 let {locked, socket_id} = videoConsumer;
                 console.log(videoConsumer, locked, socket_id)
@@ -573,13 +631,13 @@ class MediaClient {
         let socket_id = null;
         let locked = null;
         let consumersArr = Array.from(this.consumers.values());
-        let roomConsumers = consumersArr.filter((item) => (item.room_id === room_id));
+        let roomConsumers = consumersArr.filter((item) => (item.room_id === room_id && item.name === name));
         roomConsumers.forEach((item) => {
             if(item.kind === 'video') {
                 locked = item.locked;
                 videoTrack = item.consumer.track;
                 socket_id = item.socket_id
-            } else {
+            } else if(item.kind === 'audio'){
                 audioTrack = item.consumer.track;
             }
         })

@@ -3,7 +3,7 @@ const createError = require('../createError');
 
 const createRoom = async (room, userRole) => {
   console.log('create room', room)
-  if (userRole !== 'super_admin' && userRole !== 'admin' && userRole !== 'user') {
+  if (userRole !== 'super_admin' && userRole !== 'admin' && userRole !== 'normal') {
     throw createError(
       403,
       'Forbidden',

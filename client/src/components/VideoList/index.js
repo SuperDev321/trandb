@@ -62,16 +62,16 @@ const useVideoStyles = makeStyles((theme) => ({
                 switch(props.total) {
                     case 1:
                     case 2:
-                        return VideoFieldWidth;
+                        return VideoFieldWidth - 2;
                     case 3:
                     case 4:
                     case 5:
                     case 6:
                     case 7:
                     case 8:
-                        return VideoFieldWidth /2;
+                        return VideoFieldWidth /2 - 2;
                     default:
-                        return VideoFieldWidth/3;
+                        return VideoFieldWidth/3 - 2;
                 }
             } else {
                 return VideoFieldWidth
@@ -91,9 +91,10 @@ const useVideoStyles = makeStyles((theme) => ({
         flexDirection: 'column',
         zIndex: 10,
         opacity: 0,
+        background: 'rgba(71, 71, 71, 0.329)',
         '&:hover': {
-            opacity: 1
-        }
+            opacity: 1,
+        },
         
     },
     overlayHeader: {
@@ -127,7 +128,9 @@ const useVideoStyles = makeStyles((theme) => ({
         fontSize: '1rem',
         fontWeight: 500,
         color: '#f5f5f5',
-        background: 'rgba(71, 71, 71, 0.329)'
+        zIndex: 11,
+        background: 'rgba(71, 71, 71, 0.329)',
+        
     },
     iconButton: {
         color: '#f5f5f5'
@@ -367,7 +370,7 @@ const VideoList = ({streams: remoteStreams, localStream, controlVideo}) => {
         
         if(localStream) {
             dispatch({type: 'pending'})
-            streams = [{...localStream, name: username},...remoteStreams]
+            streams = [{...localStream, name: username, muted: true},...remoteStreams]
         } else {
             if(remoteStreams) {
                 dispatch({type: 'pending'})
@@ -415,17 +418,6 @@ const VideoList = ({streams: remoteStreams, localStream, controlVideo}) => {
         }
     }
 
-    const streamLength = useCallback(() => {
-        let len = 0;
-        if(remoteStreams) {
-            len += remoteStreams.length;
-        }
-        if(localStream) {
-            len ++;
-        }
-        return len;
-    }, [remoteStreams, localStream]);
-
     const {data: streams, status, error} = state;
 
     if(status === 'idle') {
@@ -439,15 +431,14 @@ const VideoList = ({streams: remoteStreams, localStream, controlVideo}) => {
         { status === 'pending' ?
             <Loading/>
         :
-            streams?.map(({stream, name, locked, zoom}, index) => (
+            streams?.map(({stream, name, locked, zoom, muted}, index) => (
                 <UserVideo
                     stream={stream} key={index} locked={locked} name={name}
                     controlVideo={handleVideo}
-                    total={streamLength()}
-                    streamNum = {1}
                     total={streams.length}
                     zoom={zoom}
-                    streamNum = {localStream? 2+index: 1+index}
+                    muted={muted}
+                    streamNum = {1+index}
                 />
             ))
         }

@@ -366,7 +366,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
         
     }
     const startBroadcast = (roomName, lock, videoDeviceId, audioDeviceId) => {
-        if(mediaClientRef.current && mediaClientRef.current._isOpen) {
+        if(mediaClientRef.current && mediaClientRef.current._isOpen && (mediaClientRef.current.rooms.has(roomName))) {
             mediaClientRef.current.produce(roomName, lock, videoDeviceId, audioDeviceId);
         } else {
             enqueueSnackbar('You are not ready to broadcast', {variant: 'error'});
@@ -526,6 +526,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                 }
             })
 
+            
             socket.on('connect_error', (err) => {
                 console.log('connect_error', err);
             })
@@ -558,7 +559,6 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
 
             socket.io.on('reconnect_attempt', () => {
                 console.log('reconnect_attempt');
-
             })
             socket.on('connect', () => {
                 console.log('connect',socket);
@@ -574,6 +574,24 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                 console.log('get view request')
                 permissionRequest(username, roomName, callback);
             })
+            // mediaSocket.on('disconnect', (reason) => {
+            //     console.log('media socket disconnect', reason);
+            //     mediaSocket.connect();
+            // })
+
+            // mediaSocket.io.on('reconnect', async () => {
+            //     console.log('media socket reconnect');
+
+            //     if(mediaClientRef.current) {
+            //         let rooms = mediaClientRef.current.rooms;
+            //         mediaClientRef.current.init();
+            //         rooms.forEach(async (room) => {
+            //             await mediaClientRef.current.createRoom(room);
+            //             await mediaClientRef.current.join(room);
+            //         })
+            //     }
+            // })
+
 
             return () => {
                 socket.removeAllListeners();
@@ -622,6 +640,9 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
             if(callback) callback(true);
         } else {
             if(callback) callback(false);
+        }
+        if(mediaClientRef.current) {
+            mediaClientRef.current.exitRoom(room);
         }
     }
     // leave room by you

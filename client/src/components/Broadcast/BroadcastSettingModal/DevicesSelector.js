@@ -12,14 +12,13 @@ const DevicesSelector = ({audio, video, setAudio, setVideo}) => {
     const {data: devices, error: deviceError, status: deviceStatus} = useDevices();
     
     useEffect(() => {
-        
         if(audio === 'default' && devices) {
             let {audioDevices} = devices;
-            console.log(audio, audioDevices)
             if(audioDevices && audioDevices.length) {
                 setAudio(audioDevices[0].deviceId);
             }
         }
+        console.log(devices)
     }, [audio, video, devices])
 
     if (deviceStatus === 'idle') {

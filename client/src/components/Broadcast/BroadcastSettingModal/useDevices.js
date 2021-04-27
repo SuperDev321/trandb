@@ -1,6 +1,10 @@
 import React, { useReducer } from 'react';
 
 const getDevices = async () => {
+    navigator.getUserMedia = (navigator.getUserMedia ||
+      navigator.webkitGetUserMedia ||
+      navigator.mozGetUserMedia ||
+      navigator.msGetUserMedia);
     return navigator.mediaDevices.enumerateDevices()
     .then((devices) => {
         let audioDevices = [];
@@ -23,10 +27,10 @@ const getDevices = async () => {
             videoDevices
         }
     })
-    .catch((err) => {
-      console.log(err)
-      return err;
-    })
+    // .catch((err) => {
+    //   console.log(err)
+    //   return err;
+    // })
 }
 
 function asyncReducer(state, action) {
