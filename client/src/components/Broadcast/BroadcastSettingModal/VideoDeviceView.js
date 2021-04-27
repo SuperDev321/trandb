@@ -4,13 +4,29 @@ const getStream = (audioDevice, videoDevice) => {
     window.stream && window.stream.getTracks().forEach(function (a) {
         a.stop()
     });
-   return navigator.mediaDevices.getUserMedia({
+    navigator.getUserMedia = (navigator.getUserMedia ||
+        navigator.webkitGetUserMedia ||
+        navigator.mozGetUserMedia ||
+        navigator.msGetUserMedia);
+    return navigator.mediaDevices.getUserMedia({
       audio: audioDevice? {
-        deviceId: audioDevice
-      }: false,
+        deviceId: {
+            exact: audioDevice
+        }
+      }: void 0,
       video: videoDevice? {
-        deviceId: videoDevice
-      }: false,
+        deviceId: {
+            exact: videoDevice
+        },
+        // width: {
+        //     min: 640,
+        //     ideal: 2000
+        // },
+        // height: {
+        //     min: 400,
+        //     ideal: 1000
+        // },
+      }: void 0,
     })
 };
 
@@ -129,7 +145,7 @@ const VideoDeviceView = ({audioDevice, videoDevice}) => {
             </div>
         );
     } else if(status === 'rejected') {
-        return error;
+        return null;
     } else if(status === 'resolved')
         return (
             <div style={{display: 'flex', justifyContent: 'center', width: '100%', height: '300px'}}>

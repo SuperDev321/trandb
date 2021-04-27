@@ -18,8 +18,10 @@ const useAnalysis = (stream) => {
             });
             sum /= dataArray.current.length
             setData(Math.floor(sum));
-            rafId.current = requestAnimationFrame(tick);
         }
+        setTimeout(() => {
+            rafId.current = requestAnimationFrame(tick);
+        }, 50);
     }
 
     useEffect(() => {

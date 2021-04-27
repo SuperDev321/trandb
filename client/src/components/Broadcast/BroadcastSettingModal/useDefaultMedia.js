@@ -1,9 +1,9 @@
 import React, { useReducer } from 'react';
 
 const getUserMedia = async () => {
-    navigator.getUserMedia = navigator.getUserMedia ||
-    navigator.webkitGetUserMedia ||
-    navigator.mozGetUserMedia;
+    // navigator.getUserMedia = navigator.getUserMedia ||
+    // navigator.webkitGetUserMedia ||
+    // navigator.mozGetUserMedia;
     return navigator.mediaDevices.getUserMedia({
         audio: true,
         video: true

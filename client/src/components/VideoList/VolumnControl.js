@@ -5,6 +5,7 @@ import Slider from '@material-ui/core/Slider';
 import VolumeDown from '@material-ui/icons/VolumeDown';
 import VolumeUp from '@material-ui/icons/VolumeUp';
 
+
 const useStyles = makeStyles({
     root: {
       width: 150,
