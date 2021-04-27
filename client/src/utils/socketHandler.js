@@ -4,9 +4,9 @@ const socket = io(`${config.server_url}`,{
     autoConnect: false,
 });
 
-// const mediaSocket = io(`${config.media_server_url}`,{
-//     autoConnect: true,
-// });
+const mediaSocket = io(`${config.media_server_url}`,{
+    autoConnect: false,
+});
 
 
 socket.request = function request(type, data = {}) {
@@ -21,36 +21,16 @@ socket.request = function request(type, data = {}) {
     })
 }
 
-// const adminSocket = io({
-//     autoConnect: false,
-// })
-// const socketOn = {
+mediaSocket.request = function request(type, data = {}) {
+    return new Promise((resolve, reject) => {
+        mediaSocket.emit(type, data, (data) => {
+        if (data.error) {
+            reject(data.error)
+        } else {
+            resolve(data)
+        }
+        })
+    })
+}
 
-//     // when other user joined to room
-//     joinedRoom: (callback) => {
-//         socket.on('joined room', payload => {
-//             callback(payload);
-//         })
-//     },
-//     roomMessages: (callback) => {
-//         socket.on('room messages', (payload) => {
-//             callback(payload);
-//         })
-//     }
-// }
-
-// const socketEmit = {
-//     joinRoom: (room, callback) => {
-//         socket.emit('join room', {room}, err => callback(err));
-//     },
-//     clientMessage: (message, room, username, date, callback) => {
-//         socket.emit('client message', { message, room, username, date}, err => callback(err));
-//     }
-// }
-
-// const socketClose = () => {
-//     socket.removeAllListeners();
-//     socket.close();
-// }
-
-export { socket };
+export { socket, mediaSocket };

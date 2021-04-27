@@ -4,7 +4,7 @@ const getUserDetail = async (username, successCallback, errCallback) => {
     
     try {console.log('get room detail', username)
         let result = await axios.get(`${config.server_url}/api/user/`+username);
-        console.log(result)
+        console.log(result.data)
         const userInfo = result.data;
         
 

@@ -24,7 +24,7 @@ import useDevices from './useDevices';
 import VideoDeviceView from './VideoDeviceView';
 import useDefaultMedia from './useDefaultMedia';
 import DevicesSelector from './DevicesSelector';
-import Loading from './Loading'
+import Loading from '../../Loading'
 const drawerWidth = 260;
 const useStyles = makeStyles((theme) => ({
     cameraBtn: {

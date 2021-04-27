@@ -5,8 +5,8 @@ import {makeStyles} from '@material-ui/core/styles';
 import {UserContext, SettingContext} from './context';
 import CustomThemeProvider from './themes/cutomThemeProvider'
 import { useAuth, useSetting } from './utils';
-import { Signup, Login, Rooms, ChattingRoom, Admin, RoomSetting, Profile } from './pages';
-import { PublicRoute, PrivateRoute, Loading } from './components';
+import { Signup, Login, Rooms, ChattingRoom, Admin, RoomSetting, Profile, Loading } from './pages';
+import { PublicRoute, PrivateRoute } from './components';
 import CreateRoom from './pages/CreateRoom';
 import BlockUsers from './pages/Admin/BlockUsers';
 import { SnackbarProvider } from 'notistack';

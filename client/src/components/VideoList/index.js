@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useContext, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useContext, useCallback, useReducer } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import {
     IconButton
@@ -14,6 +14,9 @@ import { UserContext } from '../../context';
 import useAnalysis from './useAnalysis';
 import SoundMeter from './SoundMeter';
 import VolumnControl from './VolumnControl';
+import ZoomInIcon from '@material-ui/icons/ZoomIn';
+import ZoomOutIcon from '@material-ui/icons/ZoomOut';
+import Loading from '../Loading';
 
 const VideoFieldWidth = 350;
 
@@ -37,7 +40,7 @@ const useStyles = makeStyles((theme) => ({
             outline: 'none',
             borderRadius: '5px',
         },
-        background: '#f5f5f5',
+        background: theme.palette.background.default,
         boxShadow: '1px 1px 6px 0px rgb(0 0 0 / 20%)',
         color: theme.palette.textColor.main,
         overflowY: 'auto',
@@ -49,19 +52,17 @@ const useStyles = makeStyles((theme) => ({
 
 const useVideoStyles = makeStyles((theme) => ({
     root: {
-        padding: 5,
+        padding: 2,
         width: props => {
+            if(props.zoom) {
+                return VideoFieldWidth;
+            }
             if(props.total && props.num) {
                 switch(props.total) {
                     case 1:
                     case 2:
                         return VideoFieldWidth;
                     case 3:
-                        if(props.num === 1) {
-                            return VideoFieldWidth;
-                        } else {
-                            return VideoFieldWidth /2;
-                        }
                     case 4:
                     case 5:
                     case 6:
@@ -100,14 +101,17 @@ const useVideoStyles = makeStyles((theme) => ({
     },
     overlayFooter: {
         display: 'flex',
-        justifyContent: 'flex-start',
-        alignItems: 'center'
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        direction: 'ltr'
     },
     content: {
         width: '100%',
         lineHeight: 0,
         display: 'flex',
-        position: 'relative'
+        position: 'relative',
+        border: '1px solid',
+        borderColor: theme.palette.separate.main
     },
     flexGrower: {
         flexGrow: 1
@@ -181,10 +185,10 @@ const useVideoStyles = makeStyles((theme) => ({
 //     )
 // }
 
-const UserVideo = ({stream, locked, name, controlVideo, muted, total, streamNum}) => {
+const UserVideo = ({stream, locked, name, controlVideo, muted, total, streamNum, zoom}) => {
     const userVideo = useRef();
     // const userAudio = useRef();
-    const classes = useVideoStyles({total, num: streamNum});
+    const classes = useVideoStyles({total, num: streamNum, zoom});
     const [playing, setPlaying] = useState(false);
     const {data} = useAnalysis(stream);
     const [volume, setVolume] = useState(0);
@@ -202,6 +206,22 @@ const UserVideo = ({stream, locked, name, controlVideo, muted, total, streamNum}
     const handlePause = () => {
         if(userVideo.current) {
             userVideo.current.pause();
+        }
+    }
+
+    const handleZoom = (type) => {
+        if(type) {
+            // zoom out
+            controlVideo({
+                type: 'zoomOut',
+                name
+            })
+        } else {
+            // zoom in
+            controlVideo({
+                type: 'zoomIn',
+                name
+            })
         }
     }
     const handleClose = () => {
@@ -282,13 +302,13 @@ const UserVideo = ({stream, locked, name, controlVideo, muted, total, streamNum}
                     </div>
                     <div className={classes.flexGrower}></div>
                     <div className={classes.overlayFooter}>
-                    { playing?
-                        <IconButton aria-label="pause" className={classes.iconButton} onClick={handlePause}>
-                            <PauseIcon />
+                    { zoom?
+                        <IconButton aria-label="pause" className={classes.iconButton} onClick={() => handleZoom(false)}>
+                            <ZoomOutIcon font="small" />
                         </IconButton>
                         :
-                        <IconButton aria-label="play" className={classes.iconButton} onClick={handlePlay}>
-                            <PlayCircleFilledIcon />
+                        <IconButton aria-label="play" className={classes.iconButton} onClick={() => handleZoom(true)}>
+                            <ZoomInIcon />
                         </IconButton>
                     }
                         <VolumnControl value={volume} handleChange={handleChangeVolume} />
@@ -309,12 +329,88 @@ const UserVideo = ({stream, locked, name, controlVideo, muted, total, streamNum}
     )
 }
 
+function asyncReducer(state, action) {
+    switch (action.type) {
+        case 'pending': {
+            return {status: 'pending', data: null, error: null}
+        }
+        case 'resolved': {
+            return {status: 'resolved', data: action.data, error: null}
+        }
+        case 'rejected': {
+            return {status: 'rejected', data: null, error: action.error}
+        }
+        default: {
+            throw new Error(`Unhandled action type: ${action.type}`)
+        }
+    }
+}
+
 const VideoList = ({streams: remoteStreams, localStream, controlVideo}) => {
     const classes = useStyles();
 
-    const locked = localStream?.locked;
-    const stream = localStream?.stream;
+    // const locked = localStream?.locked;
+    // const stream = localStream?.stream;
     const {username} = useContext(UserContext);
+    const [zoom, setZoom] = useState(null);
+
+    const [state, dispatch] = React.useReducer(asyncReducer, {
+        status: 'idle',
+        data: null,
+        error: null,
+    })
+
+    useEffect(() => {
+        let streams = null;
+        
+        if(localStream) {
+            dispatch({type: 'pending'})
+            streams = [{...localStream, name: username},...remoteStreams]
+        } else {
+            if(remoteStreams) {
+                dispatch({type: 'pending'})
+                streams = [...remoteStreams];
+            } else {
+                return;
+            }
+        }
+        if(zoom) {
+            let zoomStream = streams.find(({name}) => (name === zoom));
+            if(zoomStream) {
+                let unZoomStreams = streams.filter(({name}) => (name !== zoom));
+                streams = [{...zoomStream, zoom: true}, ...unZoomStreams];
+            }
+        }
+        if(streams) {
+            dispatch({type: 'resolved', data: streams})
+        }
+    }, [localStream, remoteStreams, zoom])
+
+    const handleVideo = (payload) => {
+        let {type, name} = payload;
+        switch(type) {
+            case 'zoomIn':
+                if(name) {
+                    if(zoom === name)
+                        setZoom(null);
+                }
+                break;
+            case 'zoomOut':
+                if(name) {
+                    console.log('zoom out', name)
+                    if(zoom !== name)
+                        setZoom(name);
+                }
+                break;
+            case 'close':
+                if(name) {
+                    controlVideo(payload);
+                }
+                break;
+            default:
+                break;
+        }
+    }
 
     const streamLength = useCallback(() => {
         let len = 0;
@@ -327,28 +423,31 @@ const VideoList = ({streams: remoteStreams, localStream, controlVideo}) => {
         return len;
     }, [remoteStreams, localStream]);
 
-    if(!streamLength()) return null;
+    const {data: streams, status, error} = state;
+
+    if(status === 'idle') {
+        return null;
+    }
+
+    if((!streams)||streams.length === 0 ) return null;
     
     return (
         <div className={classes.root}>
-        { localStream ?
-            <UserVideo stream={stream}
-                locked={locked} name={username} controls controlVideo={controlVideo} muted
-                total={streamLength()}
-                streamNum = {1}
-            />
-            :null
+        { status === 'pending' ?
+            <Loading/>
+        :
+            streams?.map(({stream, name, locked, zoom}, index) => (
+                <UserVideo
+                    stream={stream} key={index} locked={locked} name={name}
+                    controlVideo={handleVideo}
+                    total={streamLength()}
+                    streamNum = {1}
+                    total={streams.length}
+                    zoom={zoom}
+                    streamNum = {localStream? 2+index: 1+index}
+                />
+            ))
         }
-            {/* <SeparateLine style={{width: '100%'}} /> */}
-            { remoteStreams?.map(({stream, name, locked}, index) => (
-                    <UserVideo
-                        stream={stream} key={index} locked={locked} name={name}
-                        controlVideo={controlVideo}
-                        total={streamLength()}
-                        streamNum = {localStream? 2+index: 1+index}
-                    />
-                ))
-            }
         </div>
     )
 }

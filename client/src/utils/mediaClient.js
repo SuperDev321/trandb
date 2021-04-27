@@ -1,5 +1,5 @@
 import * as mediasoupClient from 'mediasoup-client';
-import {socket} from './socketHandler';
+import {mediaSocket} from './socketHandler';
 
 const mediaType = {
     audio: 'audioType',
@@ -55,7 +55,7 @@ class MediaClient {
             this.eventListeners.set(evt, [])
         }.bind(this))
         
-        this._isOpen = true;
+        this._isOpen = false;
         // this.createRoom(room_id).then(async function () {
         //     await this.join(name, room_id)
         //     console.log('joined room', room_id, name)
@@ -72,7 +72,8 @@ class MediaClient {
     }
 
     async createRoom(room_id) {
-        await socket.request('createMediaRoom', {
+        console.log(mediaSocket);
+        await mediaSocket.request('createMediaRoom', {
             room_id
         }).catch(err => {
             console.log(err)
@@ -80,18 +81,18 @@ class MediaClient {
     }
 
     async join(room_id) {
-        console.log('join media', room_id, this.name)
+        console.log('join media', room_id, this.name, mediaSocket)
         try {
-            let result = await socket.request('joinMedia', {
+            let result = await mediaSocket.request('joinMedia', {
                 name: this.name,
                 room_id
             });
 
-            const data = await socket.request('getRouterRtpCapabilities', room_id);
+            const data = await mediaSocket.request('getRouterRtpCapabilities', room_id);
             let device = await this.loadDevice(data)
             this.devices.set(room_id, device);
             await this.initTransports(device, room_id)
-            socket.request('getProducers', room_id);
+            mediaSocket.request('getProducers', room_id);
         } catch (e) {
             console.log(e);
         }
@@ -118,7 +119,7 @@ class MediaClient {
 
         // init producerTransport
         {
-            const data = await socket.request('createWebRtcTransport', {
+            const data = await mediaSocket.request('createWebRtcTransport', {
                 forceTcp: false,
                 rtpCapabilities: device.rtpCapabilities,
                 room_id
@@ -134,7 +135,7 @@ class MediaClient {
             producerTransport.on('connect', async ({
                 dtlsParameters
             }, callback, errback) => {
-                socket.request('connectTransport', {
+                mediaSocket.request('connectTransport', {
                     dtlsParameters,
                     transport_id: data.id,
                     room_id
@@ -155,7 +156,7 @@ class MediaClient {
                 try {
                     const {
                         producer_id
-                    } = await socket.request('produce', {
+                    } = await mediaSocket.request('produce', {
                         producerTransportId: producerTransport.id,
                         kind,
                         rtpParameters,
@@ -193,7 +194,7 @@ class MediaClient {
 
         // init consumerTransport
         {
-            const data = await socket.request('createWebRtcTransport', {
+            const data = await mediaSocket.request('createWebRtcTransport', {
                 forceTcp: false,
                 room_id
             });
@@ -208,8 +209,7 @@ class MediaClient {
             consumerTransport.on('connect', function ({
                 dtlsParameters
             }, callback, errback) {
-                console.log('cosumer transport connect request', socket);
-                socket.request('connectTransport', {
+                mediaSocket.request('connectTransport', {
                         transport_id: consumerTransport.id,
                         dtlsParameters,
                         room_id
@@ -225,7 +225,7 @@ class MediaClient {
                     case 'connected':
                         console.log('consumer transport connected')
                         //remoteVideo.srcObject = await stream;
-                        //await socket.request('resume');
+                        //await mediaSocket.request('resume');
                         break;
 
                     case 'failed':
@@ -241,7 +241,7 @@ class MediaClient {
     }
 
     initSockets() {
-        socket.on('consumerClosed', function ({
+        mediaSocket.on('consumerClosed', function ({
             consumer_id,
             room_id
         }) {
@@ -255,7 +255,7 @@ class MediaClient {
          *  producer_socket_id:
          * }]
          */
-        socket.on('newProducers', async function (data) {
+        mediaSocket.on('newProducers', async function (data) {
             for (let {
                     producer_id,
                     producer_name,
@@ -268,25 +268,25 @@ class MediaClient {
             }
         }.bind(this))
 
-        socket.on('start view', (data) => {
+        mediaSocket.on('start view', (data) => {
             let {name, producer_id, room_id} = data;
             this.addViewer(room_id, name);
         })
 
-        socket.on('stop view', (data) => {
+        mediaSocket.on('stop view', (data) => {
             
             let {name, producer_id, room_id} = data;
             console.log('stop view', name, room_id)
             this.deleteViewer(room_id, name);
         })
 
-        socket.on('stop broadcast', (data) => {
+        mediaSocket.on('stop broadcast', (data) => {
             console.log('stop broadcast');
             let {name, room_id} = data;
             this.removeRemoteStream(name, null, room_id);
         })
 
-        socket.on('disconnect' ,function () {
+        mediaSocket.on('disconnect' ,function () {
             console.log('mediasoup disconnect event')
             this.exit(true)
         }.bind(this))
@@ -307,11 +307,11 @@ class MediaClient {
                 deviceId: videoDeviceId,
                 width: {
                     min: 640,
-                    ideal: 1920
+                    ideal: 2000
                 },
                 height: {
                     min: 400,
-                    ideal: 1080
+                    ideal: 1000
                 },
             }: false
         }
@@ -487,7 +487,7 @@ class MediaClient {
         const {
             rtpCapabilities
         } = device;
-        const data = await socket.request('consume', {
+        const data = await mediaSocket.request('consume', {
             rtpCapabilities,
             consumerTransportId: consumerTransport.id, // might be 
             producerId,
@@ -543,14 +543,15 @@ class MediaClient {
         if(roomConsumers) {
             let videoConsumer = roomConsumers.find((item) => (item.kind === 'video'));
             if(videoConsumer) {
-                let {locked} = videoConsumer;
-                console.log(videoConsumer, locked)
+                let {locked, socket_id} = videoConsumer;
+                console.log(videoConsumer, locked, socket_id)
                 if(locked) {
                     fn1(true);
-                    socket.emit('view request', {
+                    mediaSocket.emit('view request', {
                         roomName: room_id,
                         username: this.name,
-                        targetId: user_id
+                        targetId: user_id,
+                        socket_id
                     }, (result) => {
                         if(result) {
                             this.addRemoteStream(room_id, name);
@@ -634,7 +635,7 @@ class MediaClient {
                 });
                 this.remoteStreams.set(room_id, newRoomStreams);
             }
-            socket.emit('start view', {
+            mediaSocket.emit('start view', {
                 room_id,
                 name: this.name,
                 socket_id
@@ -664,11 +665,6 @@ class MediaClient {
     }
 
     closeProducer(type, room_id) {
-        // if (!this.producerLabel.has(type)) {
-        //     console.log('there is no producer for this type ' + type)
-        //     return
-        // }
-        // let producer_id = this.producerLabel.get(type)
         let label = this.producerLabels.get(room_id)
         if(!label) {
             console.log('there is no producer for this room ' + room_id);
@@ -687,7 +683,7 @@ class MediaClient {
                 console.log('there is no producer for this id');
                 return;
             }
-            socket.emit('producerClosed', {
+            mediaSocket.emit('producerClosed', {
                 producer_id,
                 room_id
             })
@@ -698,7 +694,7 @@ class MediaClient {
         } else {
             let audioProducerId = label['audio'];
             let videoProducerId = label['video'];
-            socket.emit('roomProducersClosed', {
+            mediaSocket.emit('roomProducersClosed', {
                 room_id
             });
             let audioProducerInfo = this.producers.get(audioProducerId);
@@ -718,21 +714,6 @@ class MediaClient {
             this.event(_EVENTS.changeViewers, {room_id});
             this.event(_EVENTS.stopStream, {room_id});
         }
-        
-        // switch (type) {
-        //     case mediaType.audio:
-        //         this.event(_EVENTS.stopAudio)
-        //         break
-        //     case mediaType.video:
-        //         this.event(_EVENTS.stopVideo)
-        //         break
-        //     case mediaType.screen:
-        //         this.event(_EVENTS.stopScreen)
-        //         break;
-        //     default:
-        //         return
-        // }
-
     }
 
     pauseProducer(room_id) {
@@ -830,7 +811,7 @@ class MediaClient {
                     //     track.stop();
                     // });
                     roomStreams.delete(name);
-                    socket.emit('stop view', {
+                    mediaSocket.emit('stop view', {
                         room_id,
                         name: this.name,
                         socket_id
@@ -842,14 +823,17 @@ class MediaClient {
     }
 
     stopView(room_id, targetId, name) {
-        socket.request('stop broadcast', {
+        let roomStreams = this.remoteStreams.get(room_id);
+        console.log('stop view', room_id, targetId, name, roomStreams);
+        mediaSocket.request('stop broadcast', {
             room_id,
             name: this.name,
-            targetId
+            targetName: name,
         })
     }
  
     exit(offline = false) {
+        console.log('mediasoup exit')
         let clean = function () {
             this._isOpen = false
             if(this.consumerTransports.size > 0) {
@@ -863,14 +847,23 @@ class MediaClient {
                     transport.close();
                 })
             }
+
+            if(this.producers.size > 0) {
+                console.log('close producers', this.producers)
+                this.producers.forEach((producerInfo) => {
+                    if(producerInfo && producerInfo.producer) {
+                        producerInfo.producer.close();
+                    }
+                })
+            }
                 
-            // socket.off('disconnect')
-            socket.off('newProducers')
-            socket.off('consumerClosed')
+            // mediaSocket.off('disconnect')
+            mediaSocket.off('newProducers')
+            mediaSocket.off('consumerClosed')
         }.bind(this)
 
         if (!offline) {
-            socket.request('exit').then(e => console.log(e)).catch(e => console.warn(e)).finally(function () {
+            mediaSocket.request('exit').then(e => console.log(e)).catch(e => console.warn(e)).finally(function () {
                 clean()
             }.bind(this))
         } else {
