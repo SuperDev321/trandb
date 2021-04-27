@@ -25,6 +25,7 @@ const useStyles = makeStyles((theme) => ({
         display: 'flex',
         flexWrap: 'wrap',
         alignContent: 'flex-start',
+        height: 'calc(100vh - 49px)',
         // alignItems: 'center',
         // flexDirection: 'column',
         scrollbarWidth: 'thin',
@@ -45,8 +46,8 @@ const useStyles = makeStyles((theme) => ({
         color: theme.palette.textColor.main,
         overflowY: 'auto',
         width: `${VideoFieldWidth}px !important`,
-
-
+        border: '1px solid',
+        borderColor: theme.palette.separate.main
     }
 }));
 
@@ -79,6 +80,8 @@ const useVideoStyles = makeStyles((theme) => ({
     },
     mediaContent: {
         position: 'relative',
+        border: '1px solid',
+        borderColor: theme.palette.separate.main
     },
     overlay: {
         position: 'absolute',
@@ -110,8 +113,7 @@ const useVideoStyles = makeStyles((theme) => ({
         lineHeight: 0,
         display: 'flex',
         position: 'relative',
-        border: '1px solid',
-        borderColor: theme.palette.separate.main
+        overflow: 'hidden'
     },
     flexGrower: {
         flexGrow: 1
@@ -383,6 +385,7 @@ const VideoList = ({streams: remoteStreams, localStream, controlVideo}) => {
         }
         if(streams) {
             dispatch({type: 'resolved', data: streams})
+            console.log(streams);
         }
     }, [localStream, remoteStreams, zoom])
 

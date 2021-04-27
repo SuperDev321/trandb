@@ -1016,10 +1016,9 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                 <main className={classes.main}>
                     <div className={classes.content}>
                     {/* { currentRoom && roomIndex !== null  && */}
-                        <VideoList  streams={currentRemoteStreams} localStream={currentLocalStream} controlVideo={controlVideo}/>
                     {/* } */}
                     {/* { currentRoom && roomIndex !== null && */}
-                    <SeparateLine orientation="vertical" style={{height: 'auto'}} />
+                    {/* <SeparateLine orientation="vertical" style={{height: 'auto'}} /> */}
                         <ChatRoomContent
                             roomName={currentRoomName}
                             username={username}
@@ -1042,8 +1041,10 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                     </div>
                 </main>
             </div>
-            <SeparateLine orientation="vertical" style={{height: 'auto'}} />
+            {/* <SeparateLine orientation="vertical" style={{height: 'auto'}} /> */}
+            <VideoList  streams={currentRemoteStreams} localStream={currentLocalStream} controlVideo={controlVideo}/>
         </div>
+
             {/* <PrivateChat open={openPrivate} setOpen={setOpenPrivate}
                 me={{username, avatar, gender}} to={privateTo} room={currentRoom} messages={privateMessgaes}
             /> */}
