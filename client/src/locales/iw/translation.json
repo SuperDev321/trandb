@@ -47,6 +47,7 @@
     "connection_lost": "אופס...נותקת מהשרת!",
     "connection_lost_description": "מנסה להחזיר  את החיבור לשרת.. ...",
     "connection_attempt": "נסיון התחברות מספר: ",
+    "already_in_chat": "אותו משתמש כבר משוחח.",
     "default": "default"
   },
   "AddRoomModal": {
@@ -122,11 +123,13 @@
     "forbidden": "שם משתמש זה אסור",
     "confirm_error": "משתמש זה חסום בשרת",
     "username_error": "משתמש זה אינו בשרת",
+    "password_error": "סיסמא לא נכונה",
     "unknown_error": "הכניסה נכשלה, אנא נסה שוב מאוחר יותר"
   },
   "UserActionArea": {
     "sent_broadcast_request": "שלחת בקשת צפיה ל- {{owner}}, נא להמתין לתגובה",
     "error_not_broadcast_video": "משתמש זה אינו משדר",
+    "error_not_ready_broadcast": "אתה לא מוכן לשדר",
     "error_guest_dont_have_permission": "אורחים אינם מורשים להתחיל שיחה פרטית",
     "you_are_already_watching_the_broadcasting": "אתם כבר צופים במצלמה  זו",
     "error_user_report": "אין לנו מי שיטפל בדיווח שלכם  בבקשה פנו למנהל החדר",
@@ -185,7 +188,8 @@
     "join": "לְהִצְטַרֵף"
   },
   "Message": {
-    "default": "default"
+    "default": "default",
+    "forbidden": "ההודעה שלך נחסמה על ידי מנהל המערכת שלך"
   },
   "PasswordModal": {
     "default": "default",

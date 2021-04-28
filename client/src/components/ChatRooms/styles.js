@@ -66,7 +66,7 @@ const useStyles = makeStyles((theme) => ({
         display: 'flex',
         justifyContent: 'start',
         alignItems: 'center',
-        height: '100%'
+        height: '100%',
     },
     menuButton: {
         [theme.breakpoints.up('sm')]: {

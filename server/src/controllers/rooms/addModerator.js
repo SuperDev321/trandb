@@ -6,7 +6,7 @@ const addModerator = async (req, res, next) => {
     let userData = req.userData;
     let {_id, role} = await Users.findOne({username});
     let {owner} = await Rooms.findOne({_id: roomId});
-    if(role === 'user' && owner.equals(userData._id)) {
+    if(role === 'normal' && owner.equals(userData._id)) {
         let {nModified} = await Rooms.updateOne({ _id: roomId }, { $addToSet: { moderators: [{_id}] } });
         if(nModified > 0) {
             res

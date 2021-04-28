@@ -36,7 +36,8 @@ const useStyles = makeStyles((theme) => ({
         fontSize: 22,
         fontWeight: 'bold',
         paddingRight: 10,
-        textAlign: 'center'
+        textAlign: 'center',
+        overflow: 'hidden'
         // color: theme.palette.menu.color
     },
     usersCount: {

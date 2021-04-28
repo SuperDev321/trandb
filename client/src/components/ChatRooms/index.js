@@ -238,7 +238,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                             if(err === 'logout') {
                                 privateListRef.current.addErrorMessage(roomName);
                             } else if(err === 'forbidden') {
-                                enqueueSnackbar('Forbidden word', {variant: 'error'});
+                                enqueueSnackbar(t('Message.forbidden'), {variant: 'error'});
                             }
                             // enqueueSnackbar(to + ' was out of chat. Please close the private chat with '+ to +'.', {variant: 'error'});
                             
@@ -272,7 +272,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                 if(result) {
                     enqueueSnackbar(t('ChatApp.pending_permission_request', {username}), {variant: 'info'});
                 } else {
-                    enqueueSnackbar(t('You already see this camera', {username}), {variant: 'info'});
+                    enqueueSnackbar(t('UserActionArea.you_are_already_watching_the_broadcasting', {username}), {variant: 'info'});
                 }
             },
             (result) => {
@@ -369,7 +369,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
         if(mediaClientRef.current && mediaClientRef.current._isOpen && (mediaClientRef.current.rooms.has(roomName))) {
             mediaClientRef.current.produce(roomName, lock, videoDeviceId, audioDeviceId);
         } else {
-            enqueueSnackbar('You are not ready to broadcast', {variant: 'error'});
+            enqueueSnackbar(t('UserActionArea.error_not_ready_broadcast'), {variant: 'error'});
         }
         
     }
@@ -566,7 +566,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
 
             socket.on('repeat connection', () => {
                 console.log('repeat connect');
-                enqueueSnackbar('This user already is in chat', {variant: 'error'});
+                enqueueSnackbar(t('ChatApp.already_in_chat'), {variant: 'error'});
                 history.push('/');
             })
 
@@ -702,9 +702,9 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                         }
                     }
                     if(mediaClientRef.current) {
-                        await mediaClientRef.current.init();
-                        await mediaClientRef.current.createRoom(newInfo.payload.room.name);
-                        await mediaClientRef.current.join(newInfo.payload.room.name);
+                        await mediaClientRef.current?.init();
+                        await mediaClientRef.current?.createRoom(newInfo.payload.room.name);
+                        await mediaClientRef.current?.join(newInfo.payload.room.name);
                     }
                 }
                 break;
@@ -990,11 +990,19 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                     >
                         <MenuIcon />
                     </IconButton>
-                    <StyledTabs value={(roomIndex && roomsInfo && (roomsInfo.length > roomIndex))? roomIndex : 0} variant="scrollable" onChange={handleChangeRoom}>
+                    <StyledTabs value={(roomIndex && roomsInfo && (roomsInfo.length > roomIndex))? roomIndex : 0}
+                        variant="scrollable"
+                        scrollButtons="auto"
+                        aria-label='scrollable-auto-tab'
+                        onChange={handleChangeRoom}
+                        aria-label="scrollable force tabs example"
+                    >
                         {roomsInfo && roomsInfo.length>0 &&
                             roomsInfo.map((item, index) => (
                                 <StyledTab
                                     key={index} label={<span>{item.name}</span>}
+                                    id={`scrollable-auto-tabpanel-${index}`}
+                                    aria-labelledby={`scrollable-auto-tab-${index}`}
                                     unRead={item.unReadMessages.length}
                                     onClose={roomsInfo.length < 2 ? null: () => leaveRoomByUser(item.name)}
                                 />
