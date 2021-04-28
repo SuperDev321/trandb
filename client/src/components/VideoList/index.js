@@ -28,24 +28,25 @@ const useStyles = makeStyles((theme) => ({
         height: 'calc(100vh - 49px)',
         // alignItems: 'center',
         // flexDirection: 'column',
-        scrollbarWidth: 'thin',
+        scrollbarWidth: 0,
+        minWidth: `${VideoFieldWidth+2}px !important`,
+        width: `${VideoFieldWidth+2}px !important`,
         scrollbarColor: `#585B5E #ecdbdb00`,
         '&::-webkit-scrollbar': {
-            width: '5px',
+            width: 0,
         },
-        '&::-webkit-scrollbar-track': {
-            '-webkit-box-shadow': 'inset 0 0 6px rgba(0,0,0,0.00)'
-        },
-        '&:hover::-webkit-scrollbar-thumb': {
-            backgroundColor: '#00000017',
-            outline: 'none',
-            borderRadius: '5px',
-        },
+        // '&::-webkit-scrollbar-track': {
+        //     '-webkit-box-shadow': 'inset 0 0 6px rgba(0,0,0,0.00)'
+        // },
+        // '&:hover::-webkit-scrollbar-thumb': {
+        //     backgroundColor: '#00000017',
+        //     outline: 'none',
+        //     borderRadius: '5px',
+        // },
         background: theme.palette.background.default,
         boxShadow: '1px 1px 6px 0px rgb(0 0 0 / 20%)',
         color: theme.palette.textColor.main,
         overflowY: 'auto',
-        width: `${VideoFieldWidth}px !important`,
         border: '1px solid',
         borderColor: theme.palette.separate.main
     }

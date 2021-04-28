@@ -47,7 +47,9 @@
     "connection_lost": "Connection Lost!",
     "connection_lost_description": "The connection to the chat was interrupted. Attempting to reconnect...",
     "connection_attempt": "Connection attempt: ",
+    "already_in_chat": "The same user is already chatting.",
     "default": "default"
+    
   },
   "AddRoomModal": {
     "error1": "You are already in this room",
@@ -121,11 +123,13 @@
     "forbidden": "This username is forbidden",
     "confirm_error": "This user is blocked on server",
     "username_error": "This user is not on server",
+    "password_error": "Wrong password",
     "unknown_error": "Login failed, please try again later"
   },
   "UserActionArea": {
     "sent_broadcast_request": "Your request to view was sent to {{owner}}, Please wait for response",
     "error_not_broadcast_video": "This user didn't create broadcast video",
+    "error_not_ready_broadcast": "You are not ready to broadcast",
     "you_are_already_watching_the_broadcasting": "You are already watching the broadcasting video",
     "error_guest_dont_have_permission": "Guest user can't send private message",
     "error_user_report": "coming soon user report",
@@ -185,7 +189,8 @@
     "join": "Join"
   },
   "Message": {
-    "default": "default"
+    "default": "default",
+    "forbidden": "Your message has been blocked by admin"
   },
   "PasswordModal": {
     "title": "Enter the Password",

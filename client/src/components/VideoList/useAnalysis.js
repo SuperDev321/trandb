@@ -25,7 +25,7 @@ const useAnalysis = (stream) => {
     }
 
     useEffect(() => {
-        let audioTracks = stream.getAudioTracks();
+        let audioTracks = stream?.getAudioTracks();
         if(audioTracks && audioTracks.length) {
             audioContext.current = new (window.AudioContext || window.webkitAudioContext)();
             analyser.current = audioContext.current.createAnalyser();

@@ -14,7 +14,7 @@ const findRoomUsers = async (room, myRole) => {
             //     ip = result.ip;
             // // }
             let userRole = role;
-            if(role === 'user') {
+            if(role === 'normal') {
                 if(_id.equals(owner)) {
                     console.log('set owner')
                     userRole = 'owner';
