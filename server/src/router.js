@@ -55,7 +55,7 @@ router.put('/room/general', withAuth, updateRoomGeneral);
 router.put('/room/media', withAuth, updateRoomMedia);
 router.get('/rooms/:roomName', withAuth, getRoomDetail);
 router.get('/rooms/:roomName/isPrivate', checkRoomPermission);
-router.delete('/rooms/:id', isAdmin ,deleteRoom);
+router.delete('/rooms/:id', withAuth, isAdmin ,deleteRoom);
 router.post('/signup', signup);
 router.post('/login', withIp, login);
 router.post('/login/guest', withIp, guestLogin);
