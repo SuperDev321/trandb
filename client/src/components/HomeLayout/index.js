@@ -66,9 +66,9 @@ const HomeLayout = ({children, unReadMsgs, openPrivate, messageSize, setMessageS
     const classes = useStyles();
     const history = useHistory();
     const [frameShow, setFrameShow] = useState(false);
-    // useLayoutEffect(() => {
-    //     setFrameShow(true)
-    // }, [])
+    useLayoutEffect(() => {
+        setFrameShow(true)
+    }, [])
     
     useEffect(() => {
         const resetMessageSize = async (size) => {
