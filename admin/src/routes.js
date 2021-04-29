@@ -31,6 +31,7 @@ import Ban from "Admin/views/Ban/Ban.js";
 import Words from 'Admin/views/Forbidden';
 import Setting from 'Admin/views/Setting';
 import Quiz from 'Admin/views/Quiz';
+import Log from 'Admin/views/Log';
 
 const dashboardRoutes = [
   {
@@ -78,6 +79,14 @@ const dashboardRoutes = [
     name: "Quiz",
     icon: QuestionAnswerIcon,
     component: Quiz,
+    layout: "/admin",
+    super: true,
+  },
+  {
+    path: "/logs",
+    name: "Logs",
+    icon: QuestionAnswerIcon,
+    component: Log,
     layout: "/admin",
     super: true,
   },
