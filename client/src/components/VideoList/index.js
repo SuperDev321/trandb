@@ -18,7 +18,7 @@ import ZoomInIcon from '@material-ui/icons/ZoomIn';
 import ZoomOutIcon from '@material-ui/icons/ZoomOut';
 import Loading from '../Loading';
 
-const VideoFieldWidth = 350;
+const VideoFieldWidth = 380;
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -75,7 +75,7 @@ const useVideoStyles = makeStyles((theme) => ({
                         return VideoFieldWidth/3 - 2;
                 }
             } else {
-                return VideoFieldWidth
+                return VideoFieldWidth - 2
             }
         },
     },

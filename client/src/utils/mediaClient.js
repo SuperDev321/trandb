@@ -1,6 +1,6 @@
 import * as mediasoupClient from 'mediasoup-client';
 import {mediaSocket} from './socketHandler';
-
+const maxStream = 8;
 const mediaType = {
     audio: 'audioType',
     video: 'videoType',
@@ -648,38 +648,48 @@ class MediaClient {
                 if(roomStreams.has(name)) {
                     let {stream} = roomStreams.get(name);
                     if(stream) {
+                        stream.getTracks().forEach((track) => {
+                            track.stop();
+                        });
                         stream.addTrack(videoTrack);
                         if(audioTrack) {
                             stream.addTrack(audioTrack);
                         }
-                        } else {
-                            const stream = new MediaStream();
-                            stream.addTrack(videoTrack);
-                            if(audioTrack) {
+                    } else {
+                        const stream = new MediaStream();
+                        const time = new Date();
+                        stream.addTrack(videoTrack);
+                        if(audioTrack) {
                             stream.addTrack(audioTrack);
                         }
+                        this.removeOldRemoteStream(room_id);
                         roomStreams.set(name, {
                             stream,
                             locked,
                             name,
-                            socket_id
+                            socket_id,
+                            time
                         });
                     }
                 } else {
                     const stream = new MediaStream();
+                    const time = new Date();
                     stream.addTrack(videoTrack);
                     if(audioTrack) {
                         stream.addTrack(audioTrack);
                     }
+                    this.removeOldRemoteStream(room_id);
                     roomStreams.set(name, {
                         stream,
                         locked,
                         name,
-                        socket_id
+                        socket_id,
+                        time
                     });
                 }
             } else {
                 const stream = new MediaStream();
+                const time = new Date();
                 stream.addTrack(videoTrack);
                 if(audioTrack) {
                     stream.addTrack(audioTrack);
@@ -689,7 +699,8 @@ class MediaClient {
                     stream,
                     locked,
                     socket_id,
-                    name
+                    name,
+                    time
                 });
                 this.remoteStreams.set(room_id, newRoomStreams);
             }
@@ -699,6 +710,35 @@ class MediaClient {
                 socket_id
             });
             this.event(_EVENTS.onChangeRemoteStreams, {room_id});
+        }
+    }
+
+    removeOldRemoteStream(room_id) {
+        let roomStreams = this.remoteStreams.get(room_id);
+        if(roomStreams) {
+            if(roomStreams.size >= maxStream) {
+                let streamArr = Array.from(roomStreams.values());
+                let oldTime = null;
+                let oldName = null
+                streamArr.forEach(({time, name}) => {
+                    if(time) {
+                        if((!oldTime) || (oldTime && oldTime > time)) {
+                            oldTime = time;
+                            oldName = name;
+                        }
+                    }
+                })
+                if(oldName) {
+                    if(roomStreams.has(oldName)) {
+                        // let {stream} = roomStreams.get(oldName);
+                        // stream.getTracks().forEach((track) => {
+                        //     track.stop();
+                        // })
+                        roomStreams.delete(oldName);
+                    }
+                }
+                console.log(roomStreams.values());
+            }
         }
     }
 
