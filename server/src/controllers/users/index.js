@@ -6,6 +6,7 @@ const checkToken = require('./checkToken');
 const logout = require('./logout');
 const getUserByName = require('./getUserByName');
 const getUserDetail = require('./getUserDetail');
+const getUsers = require('./getUsers');
 module.exports = {
   signup,
   login,
@@ -14,5 +15,6 @@ module.exports = {
   checkToken,
   logout,
   getUserByName,
-  getUserDetail
+  getUserDetail,
+  getUsers
 };

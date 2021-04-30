@@ -17,7 +17,10 @@ const {
   updateRoomGeneral,
   updateRoomMedia,
   getPrivateChat,
+  getPublicChat,
+  deleteChat,
   fileUploader,
+  getUsers,
   getUserByName,
   getUserDetail,
   getPublicRoomNames,
@@ -61,8 +64,11 @@ router.post('/login', withIp, login);
 router.post('/login/guest', withIp, guestLogin);
 router.post('/login/google', googleLogin);
 
-router.post('/messages/private', getPrivateChat);
+router.post('/messages/private', withAuth, isAdmin, getPrivateChat);
+router.get('/messages/public/:roomName', withAuth, isAdmin, getPublicChat);
+router.delete('/messages/:id', withAuth, isAdmin, deleteChat);
 
+router.get('/users', getUsers);
 router.get('/user/:username', getUserByName);
 router.get('/users/:userId/rooms', withAuth, getUserRooms);
 router.get('/users/:userId', getUserDetail);
