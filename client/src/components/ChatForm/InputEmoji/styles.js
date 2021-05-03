@@ -131,9 +131,6 @@ const useStyles = makeStyles((theme) => ({
         width: '100%',
       },
       
-      emojiPickerWrapper: {
-        height: '320px',
-      },
       emojiPickerWrapperShow: {
         height: '320px !important',
       },

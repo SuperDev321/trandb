@@ -13,12 +13,9 @@ import {
 import {red} from '@material-ui/core/colors'
 import ChatForm from '../../ChatForm';
 import { Rnd } from "react-rnd";
-import randomstring from "randomstring";
 import PrivateMessageList from '../../PrivateMessageList';
-import {getPrivateMessages} from '../../../utils';
 import {ReactComponent as Maximium} from './square.svg'
 import {ReactComponent as Restore} from './restore.svg';
-import Axios from 'axios';
 import config from '../../../config';
 import getUser from '../../../utils/getUser';
 
@@ -149,15 +146,12 @@ const PrivateChat = ({ me, to, ip, sendMessage, active, setActive, initMessages,
     const [error, setError] = useState(false);
     const [blocked, setBlocked] = useState(false);
     const [withBlocked, setWithBlocked] = useState(false);
-    const [privateKey, setPrivateKey] = useState(null);
-    const [rndWidth, setRndWidth] = useState(defaultWidth);
-    const [rndHeight, setRndHeight] = useState(defaultHeight);
     const classes = useStyles({max});
 
     const handleMinimize = () => {
         let top = winRef.current.getBoundingClientRect().top;
         let width = winRef.current.getBoundingClientRect().width;
-        let height = winRef.current.getBoundingClientRect().height;
+        // let height = winRef.current.getBoundingClientRect().height;
         if(width>400) width = 400;
         if(min) {
             setMin(false);
@@ -240,14 +234,12 @@ const PrivateChat = ({ me, to, ip, sendMessage, active, setActive, initMessages,
 
     useEffect(() => {
         getUser(to, (data) => {
-            console.log('private user',data);
             if(data && data.avatar) {
                 setAvatar(data.avatar);
             } else {
                 setAvatar(null);
             }
         }, (err) => {
-            console.log(err);
             setAvatar(null);
         })
     }, [to])

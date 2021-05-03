@@ -2,6 +2,11 @@ import io from 'socket.io-client';
 import config from '../config'
 const socket = io(`${config.server_url}`,{
     autoConnect: false,
+    transport: ['polling', 'websocket'],
+    timeout: 60000,
+    pingTimeout: 60000,
+    secure: true,
+    reconnectionDelay: 1000
 });
 
 const mediaSocket = io(`${config.media_server_url}`,{

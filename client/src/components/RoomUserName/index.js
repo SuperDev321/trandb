@@ -30,10 +30,8 @@ const useStyles = makeStyles((theme) => ({
         fontSize: '1.1em',
         lineHeight: 1.3,
         cursor: 'pointer',
-        // flexGrow: 1,
         overflow: 'hidden',
         display: 'flex',
-        // alignItems: 'center',
     },
     cardRoot: {
         width: 200,

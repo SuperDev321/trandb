@@ -83,7 +83,7 @@ const PrivateChatList = ({sendMessage, readMsg ,me, globalBlocks}, ref) => {
     return (
         <>
             {chatList.map((item, index) =>
-                <PrivateChatContent key={item.to.username}
+                <PrivateChatContent key={item.to}
                     ref={elRefs.current[index].ref}
                     me={me} to={item.to}
                     ip={item.ip}

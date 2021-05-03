@@ -103,14 +103,13 @@ const RedRadio = withStyles({
 const Login = () => {
     const { state } = useLocation();
     const { from } = state || { from: { pathname: "/" } };
-    const history = useHistory();
     const { setAuth } = useContext(UserContext);
     const classes = useStyles();
     const [selected, setSelected] = useState(false);
     const [guest, setGuest] = useState(false);
     const [error, setError] = useState();
     const [redirectToReferrer, setRedirectToReferrer] = useState(false);
-    const { t, i18n } = useTranslation();
+    const { t } = useTranslation();
     const loginValidationSchema = yup.object({
         username: yup
         .string('Enter your nickname')

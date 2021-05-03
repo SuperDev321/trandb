@@ -1,11 +1,10 @@
 import React, { useState, useRef, useEffect, useContext, useCallback } from 'react';
-import AddIcon from '@material-ui/icons/Add';
 import CloudUploadIcon from '@material-ui/icons/CloudUpload';
 import useStyles from './styles';
 import InputEmoji from './InputEmoji';
 import ColorPicker from './ColorPicker';
-import {EmojiConvertor} from 'emoji-js';
-import { getSocket } from '../../utils';
+// import {EmojiConvertor} from 'emoji-js';
+// import { getSocket } from '../../utils';
 import axios from 'axios';
 import config from '../../config';
 import {UserContext} from '../../context';
@@ -20,22 +19,22 @@ const ChatForm = ({roomName, to, sendMessage, onFocus, onBlur, type, blocked}) =
     const formRef = useRef(null);
     const [userColor, setUserColor] = useState('default');
     const [bold, setBold] = useState(false);
-    const emoji = new EmojiConvertor();
+    // const emoji = new EmojiConvertor();
     const {currentTheme} = useContext(CustomThemeContext);
     const onFinish = (e) => {
         e.preventDefault();
     };
 
-    useEffect(() => {
-        emoji.img_set = 'apple';
-        emoji.img_sets.apple.path = 'https://cdn.jsdelivr.net/gh/iamcal/emoji-data@master/img-apple-64/';
-        emoji.use_sheet = true;
-        emoji.init_env();
-        emoji.supports_css = false;
-        emoji.allow_native = false;
-        emoji.replace_mode = 'img';// 'unified';
-        emoji.use_sheet = true;
-    }, []);
+    // useEffect(() => {
+    //     emoji.img_set = 'apple';
+    //     emoji.img_sets.apple.path = 'https://cdn.jsdelivr.net/gh/iamcal/emoji-data@master/img-apple-64/';
+    //     emoji.use_sheet = true;
+    //     emoji.init_env();
+    //     emoji.supports_css = false;
+    //     emoji.allow_native = false;
+    //     emoji.replace_mode = 'img';// 'unified';
+    //     emoji.use_sheet = true;
+    // }, []);
 
     const sendFileMessage = useCallback((file) => {
         if(blocked) {
@@ -57,7 +56,6 @@ const ChatForm = ({roomName, to, sendMessage, onFocus, onBlur, type, blocked}) =
         })
     }, [roomName, to, type]);
     const handleChangeFile = (files, type) => {
-        console.log('private upload type', type)
         if(files[0]) {
             let file = files[0];
             sendFileMessage(file);
