@@ -98,7 +98,7 @@ const ChatRoom = ({roomName, users, messages, mutes, blocks, globalBlocks, sendM
         let mutedNames = mutes.map((item) => ((item && item.username)? item.username: null));
         let mutedIps = mutes.map((item) => ((item && item.ip)? item.ip: null));
 
-        if(messages && messages.length > 0) {
+        if(Array.isArray(messages)) {
             let unMutedMessages = messages.filter(({from, ip}) => {
                 if(!from) {
                     return true;

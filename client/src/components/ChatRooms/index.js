@@ -1,4 +1,4 @@
-import React, { useState, useLayoutEffect, useEffect, useContext, useRef, forwardRef, useImperativeHandle } from 'react';
+import React, { useState, useCallback, useEffect, useContext, useRef, forwardRef, useImperativeHandle } from 'react';
 import {
     AppBar,
     Card,
@@ -248,7 +248,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                 );
                 
             } else{
-                socket.emit('public message', { type, msg, room: roomName, from: username, color, bold, messageType }, (data) => {
+                socket.emit('public message', { type, msg, room: roomName, from: username, color, bold, messageType }, async (data) => {
                     let sameRoom = roomsRef.current.find((room) => (room.name) === roomName);
                     if(sameRoom && data) {
                         sameRoom.messages = [ data, ...sameRoom.messages,];
@@ -257,10 +257,9 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                         }
                     }
                 });
-                
             }
         }
-    }
+    };
     const leaveFromPrivate = (roomName) => {
         socket.emit('leave private', roomName);
     }

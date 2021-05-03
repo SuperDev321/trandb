@@ -57,7 +57,7 @@ const useVideoStyles = makeStyles((theme) => ({
         padding: 2,
         width: props => {
             if(props.zoom) {
-                return VideoFieldWidth;
+                return VideoFieldWidth - 2;
             }
             if(props.total && props.num) {
                 switch(props.total) {
