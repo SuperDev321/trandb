@@ -16,7 +16,6 @@ const login = async (req, res, next) => {
 
     let user = await getUserFromServer(username, password);
     if(user) {
-      
       let currentUser = await getUserByNickname(username);
       if(!currentUser) {
         currentUser = await Users.create({username, password, role: user.role, gender: user.gender, avatar: user.avatar});
@@ -34,12 +33,15 @@ const login = async (req, res, next) => {
         .json({ statusCode: 200, message: 'logged in successfully' });
     }
   } catch (err) {
-    if(err === 'confirm_error' || err === 'username_error') {
+    console.log(err);
+    if(err === 'confirm_error' || err === 'username_error' || err === 'password_error') {
       res
         .status(400)
         .json({  error: err });
     } else {
-      next(err);
+      res
+        .status(404)
+        .json({error: 'unknown_error'});
     }
   }
 };

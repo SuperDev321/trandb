@@ -40,21 +40,28 @@ const guestLogin = async (req, res, next) => {
                     if(!user) {
                         user = await createUser({ username: newUsername, role: 'guest', gender });
                         break;
+                    } else if(!user.isInChat) {
+                        break;
+                    } else {
+                        continue;
                     }
                 }
             }
         }
         
         await updateIp(user._id, ipAddress);
-        console.log(user)
         const token = await createToken(user._id, 'guest');
 
         res
-            .cookie('token', token)
+            .cookie('token', token, {
+                sameSite: 'none',
+                secure: true,
+                httpOnly: true,
+                
+            })
             .status(200)
             .json({ statusCode: 200, message: 'login with guest successfully' });
     } catch (err) {
-        console.log(err)
         next(err);
     }
 };
