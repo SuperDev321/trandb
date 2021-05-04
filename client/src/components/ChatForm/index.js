@@ -51,10 +51,10 @@ const ChatForm = ({roomName, to, sendMessage, onFocus, onBlur, type, blocked}) =
         .then((response) => {
             if(response.status === 200) {
                 let fileUrl = response.data.photoUrl;
-                sendMessage(roomName, to, null, fileUrl, null, type, 'image');
+                sendMessage(roomName, to, userColor, fileUrl, null, type, 'image');
             }
         })
-    }, [roomName, to, type]);
+    }, [roomName, to, type, userColor]);
     const handleChangeFile = (files, type) => {
         if(files[0]) {
             let file = files[0];
@@ -64,7 +64,7 @@ const ChatForm = ({roomName, to, sendMessage, onFocus, onBlur, type, blocked}) =
     const defaultColor = currentTheme === 'normal'? '#000': '#fff';
     const colorPickBackground = currentTheme === 'normal'? '#fff': '#263238';
 
-    const handleOnEnter = () => {
+    const handleOnEnter = (msg) => {
         let realMsg = msg.trim();
         if(realMsg) {
             if(!blocked) {

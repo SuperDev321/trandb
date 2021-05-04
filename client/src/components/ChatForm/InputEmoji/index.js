@@ -8,6 +8,21 @@ import t from 'prop-types'
 import './styles.css'
 import useStyles from './styles';
 
+function emojiUnicode (emoji) {
+    var comp;
+    if (emoji.length === 1) {
+        comp = emoji.charCodeAt(0);
+    }
+    comp = (
+        (emoji.charCodeAt(0) - 0xD800) * 0x400
+      + (emoji.charCodeAt(1) - 0xDC00) + 0x10000
+    );
+    if (comp < 0) {
+        comp = emoji.charCodeAt(0);
+    }
+    return comp.toString("16");
+};
+
 function InputEmoji ({
     value,
     onChange,
@@ -41,6 +56,7 @@ function InputEmoji ({
     const placeholderRef = useRef(null);
 
     const onSend = () => {
+        replaceAllTextEmojiToString()
         const cleanedText = cleanedTextRef.current
         if (typeof onEnter === 'function') {
             onEnter(cleanedText)
@@ -62,7 +78,7 @@ function InputEmoji ({
             textInputRef.current.focus()
         },
         blur: () => {
-            replaceAllTextEmojiToString()
+            // replaceAllTextEmojiToString()
         }
     }))
 
@@ -83,13 +99,13 @@ function InputEmoji ({
             text = replaceAll(
             text,
             emoji,
-            `<img data-emoji="${emoji}" src="https://cdn.jsdelivr.net/gh/iamcal/emoji-data@master/img-apple-64/png" />`
+            `<img data-emoji="${emoji}" src="https://cdn.jsdelivr.net/gh/iamcal/emoji-data@master/img-apple-64/${emojiUnicode(emoji)}.png" />`
             )
         })
         }
 
         return text
-    }, [allEmojiStyle])
+    }, [])
 
     const updateHTML = useCallback((nextValue) => {
         nextValue = nextValue || value
@@ -110,26 +126,12 @@ function InputEmoji ({
         }
     }, [currentSize, onResize])
 
-    const emitChange = useCallback(() => {
-        setTimeout(() => {
-            replaceAllTextEmojiToString()
-            if (typeof onChange === 'function') {
-                onChange(cleanedTextRef.current);
-                // console.log(cleanedTextRef.current)
-            }
-
-            if (typeof onResize === 'function') {
-                checkAndEmitResize()
-            }
-        }, 0)
-        
-    }, [checkAndEmitResize, onChange, onResize])
-
     useEffect(() => {
         updateHTML()
     }, [updateHTML])
 
     const replaceAllTextEmojiToString = useCallback(() => {
+        console.log(textInputRef.current);
         if (!textInputRef.current) {
             cleanedTextRef.current = ''
         }
@@ -140,7 +142,7 @@ function InputEmoji ({
         const images = Array.prototype.slice.call(container.querySelectorAll('img'))
 
         images.forEach(image => {
-        image.outerHTML = image.dataset.emoji
+            image.outerHTML = image.dataset.emoji
         })
 
         let text = container.innerText
@@ -151,7 +153,23 @@ function InputEmoji ({
 
         checkPlaceholder()
 
-    }, [emitChange])
+    }, [])
+
+    const emitChange = useCallback(() => {
+        // setTimeout(() => {
+        //     replaceAllTextEmojiToString()
+        //     if (typeof onChange === 'function') {
+        //         onChange(cleanedTextRef.current);
+        //         // console.log(cleanedTextRef.current)
+        //     }
+
+        //     if (typeof onResize === 'function') {
+        //         checkAndEmitResize()
+        //     }
+        // }, 0)
+        checkPlaceholder();
+        
+    }, [])
 
     useEffect(() => {
         function handleKeydown (event) {
@@ -166,12 +184,13 @@ function InputEmoji ({
             if (event.keyCode === 13) {
                 event.preventDefault()
                 // console.log('enter')
-                // replaceAllTextEmojiToString()
-                if(cleanedText.trim() === ''){
+                replaceAllTextEmojiToString()
+                if(cleanedTextRef.current.trim() === ''){
                     return
                 }
+                console.log(cleanedTextRef.current);
                 if (typeof onEnter === 'function') {
-                    onEnter(cleanedText)
+                    onEnter(cleanedTextRef.current)
                 }
                 
                 if (cleanOnEnter) {
@@ -193,7 +212,7 @@ function InputEmoji ({
 
         function handleKeyup(event) {
             // replaceAllTextEmojiToStringDebounced()
-            replaceAllTextEmojiToString()
+            // replaceAllTextEmojiToString()
         }
 
         const inputEl = textInputRef.current
@@ -205,7 +224,7 @@ function InputEmoji ({
             inputEl.removeEventListener('keydown', handleKeydown)
             inputEl.removeEventListener('keyup', handleKeyup)
         }
-    }, [onChange, cleanOnEnter, onEnter, updateHTML, replaceAllTextEmojiToString, replaceAllTextEmojiToString, emitChange, maxLength, onKeyDown])
+    }, [cleanOnEnter, onEnter, updateHTML, replaceAllTextEmojiToString, maxLength, onKeyDown])
     // }, [onChange, cleanOnEnter, onEnter, updateHTML, replaceAllTextEmojiToString, replaceAllTextEmojiToStringDebounced, emitChange, maxLength, onKeyDown])
 
     useEffect(() => {
@@ -368,7 +387,7 @@ function InputEmoji ({
         pasteHtmlAtCaret(getImage(emojiObject))
         textInputRef.current.focus()
         
-        emitChange()
+        // emitChange()
 
         if (!keepOpenend) {
             toggleShowPicker()
@@ -382,12 +401,15 @@ function InputEmoji ({
     }
 
     function checkPlaceholder () {
-        const text = cleanedTextRef.current
-
-        if (text !== '' && placeholderRef.current.opacity !== 0) {
-        placeholderRef.current.style.opacity = 0
+        if(textInputRef.current && placeholderRef.current) {
+            const text = textInputRef.current.innerHTML;
+            if (text !== '' && placeholderRef.current.opacity !== 0) {
+                placeholderRef.current.style.opacity = 0
+            } else {
+                placeholderRef.current.style.opacity = 1
+            }
         } else {
-        placeholderRef.current.style.opacity = 1
+
         }
     }
 
