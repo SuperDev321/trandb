@@ -7,7 +7,6 @@ import Picker from 'emoji-picker-react';
 import t from 'prop-types'
 import './styles.css'
 import useStyles from './styles';
-import {useTranslation} from 'react-i18next';
 
 function InputEmoji ({
     value,
@@ -40,33 +39,30 @@ function InputEmoji ({
     const textInputRef = useRef(null)
     const cleanedTextRef = useRef('')
     const placeholderRef = useRef(null);
-    const [load, setLoad] = useState(false);
 
     const onSend = () => {
-        // replaceAllTextEmojiToString()
-        // console.log('send')
         const cleanedText = cleanedTextRef.current
         if (typeof onEnter === 'function') {
             onEnter(cleanedText)
         }
         
         if (cleanOnEnter) {
-        updateHTML('')
+            updateHTML('')
         }
     }
  
     useImperativeHandle(ref, () => ({
         get value () {
-        return cleanedTextRef.current
+            return cleanedTextRef.current
         },
         set value (value) {
-        setValue(value)
+            setValue(value)
         },
         focus: () => {
-        textInputRef.current.focus()
+            textInputRef.current.focus()
         },
         blur: () => {
-        replaceAllTextEmojiToString()
+            replaceAllTextEmojiToString()
         }
     }))
 
@@ -77,13 +73,6 @@ function InputEmoji ({
         placeholderRef.current.style.opacity = 1
         }
     }, [value])
-
-    useEffect(() => {
-        if(showPicker) {
-            setLoad(true);
-        } 
-        
-    }, [showPicker])
 
     const replaceAllTextEmojis = useCallback((text) => {
         let allEmojis = getAllEmojisFromText(text)

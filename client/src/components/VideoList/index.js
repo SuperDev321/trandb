@@ -204,7 +204,6 @@ const UserVideo = ({stream, locked, name, controlVideo, muted, total, streamNum,
     const handlePlay = () => {
         if(userVideo.current) {
             userVideo.current.play();
-            console.log(userVideo.current.volume)
             setVolume(userVideo.current.volume*100)
         }
     }
@@ -254,7 +253,6 @@ const UserVideo = ({stream, locked, name, controlVideo, muted, total, streamNum,
                 // userVideo.current.play();
             }
             userVideo.current.onerror = () => {
-                console.log("Error streaming ref");
             }
             userVideo.current.onpause = () => {
                 setPlaying(false);
@@ -274,12 +272,10 @@ const UserVideo = ({stream, locked, name, controlVideo, muted, total, streamNum,
                         setVolume(userVideo.current.volume*100);
                         // Automatic playback started!
                         // Show playing UI.
-                        console.log("audio played auto");
                     })
                     .catch(error => {
                         // Auto-play was prevented
                         // Show paused UI.
-                        console.log("playback prevented");
                     });
                 }
             }
@@ -389,7 +385,6 @@ const VideoList = ({streams: remoteStreams, localStream, controlVideo}) => {
         }
         if(streams) {
             dispatch({type: 'resolved', data: streams})
-            console.log(streams);
         }
     }, [localStream, remoteStreams, zoom])
 
@@ -404,7 +399,6 @@ const VideoList = ({streams: remoteStreams, localStream, controlVideo}) => {
                 break;
             case 'zoomOut':
                 if(name) {
-                    console.log('zoom out', name)
                     if(zoom !== name)
                         setZoom(name);
                 }

@@ -104,7 +104,6 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
         })
 
         mediaObj.on(mediaEvents.stopStream, (data) => {
-            console.log('stopstream event');
             let {room_id} = data;
             setLocalStreamTmp({stream: null, room_id});
         })
@@ -286,7 +285,6 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
     }
 
     const stopBroadcastTo = (roomName, userId, name) => {
-        console.log('stop view', roomName, userId)
         if(mediaClientRef.current) {
             mediaClientRef.current.stopView(roomName, userId, name);
         }
@@ -320,20 +318,17 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                 case 'remote streams':
                     if(room_id === currentRoomName) {
                         let remoteStreams = mediaClientRef.current.getRemoteStreams(currentRoomName);
-                        console.log('remoteStreams', remoteStreams);
                         setCurrentRemoteStreams([...remoteStreams]);
                     }
                     break;
                 case 'consume':
                     if(room_id === currentRoomName) {
                         let liveUsers = mediaClientRef.current.getLiveUsers(room_id);
-                        console.log('consumer change event')
                         setCurrentBroadcastingUsers(liveUsers);
                     }
                     break;
                 case 'view':
                     let viewers = mediaClientRef.current.getViewers(room_id);
-                    console.log('viewer change event', viewers);
                     setCurrentViewers([...viewers]);
                     break;
                 default:
@@ -513,7 +508,6 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
             })
 
             socket.on('hey', (payload, callback) => {
-                console.log('hey response')
                 callback(true);
             })
 
@@ -560,11 +554,9 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                 console.log('reconnect_attempt');
             })
             socket.on('connect', () => {
-                console.log('connect',socket);
             })
 
             socket.on('repeat connection', () => {
-                console.log('repeat connect');
                 enqueueSnackbar(t('ChatApp.already_in_chat'), {variant: 'error'});
                 history.push('/');
             })
@@ -738,7 +730,6 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                     let sameRoom = await roomsRef.current.find((room) => (room.name === newInfo.payload.room));
                     if(sameRoom) {
                         let leavedUser = newInfo.payload.leavedUser;
-                        console.log('leave user', leavedUser, sameRoom.users)
                         let usernames = await newInfo.payload.onlineUsers.map((item) => (item.username));
                         if(username && usernames.includes(username)) {
                             let leavedUserInfo = sameRoom.users.find((user) => (user._id === leavedUser));
@@ -894,7 +885,6 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
     }, [roomsInfo])
 
     useEffect(() => {
-        console.log('change room index', roomIndex, roomsRef.current.length)
         if(roomsRef.current.length > 0 && roomsRef.current.length > roomIndex) {
             
             roomsRef.current[roomIndex].messages = [ ...roomsRef.current[roomIndex].unReadMessages, ...roomsRef.current[roomIndex].messages];

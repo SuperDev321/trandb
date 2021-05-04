@@ -86,7 +86,6 @@ const useSetting = () => {
   }
 
   const setLanguage = (language) => {
-    console.log('setLanguage', language)
     localStorage.setItem('language', language);
     _setLanguage(language);
     i18n.changeLanguage(language)

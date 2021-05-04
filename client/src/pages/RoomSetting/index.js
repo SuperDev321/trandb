@@ -142,7 +142,6 @@ export default function RoomSetting() {
   useEffect(() => {
     if(room)
       getRoomDetail(room, (data) => {
-        console.log(data)
         const {_id, name, category, description, welcomeMessage, maxUsers, owner, bans, moderators, cover, icon} = data;
         setRoomId(_id);
         setRoomName(name);
@@ -153,7 +152,6 @@ export default function RoomSetting() {
         setOwner(owner);
         setBans(bans);
         setModerators(moderators);
-        // if(owner.username ===)
         setTimeout(() => {
           setLoading(false); 
         }, 1000)
@@ -162,7 +160,7 @@ export default function RoomSetting() {
         enqueueSnackbar('Can not access this setting.', {variant: 'error'});
         
       })
-  }, []);
+  }, [enqueueSnackbar, room]);
 
   const handleTabChange = (event, newValue) => {
     setTab(newValue);

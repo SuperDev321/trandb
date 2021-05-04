@@ -104,7 +104,6 @@ const SideBarLeft = ({ roomName, username, mutes, blocks, globalBlocks, changeMu
     const {t} = useTranslation();
 
     useEffect(() => {
-        console.log(users);
         let me = users.find((item) => (item.username === username));
         if(me) setRole(me.role);
     }, [users, username])
@@ -117,17 +116,6 @@ const SideBarLeft = ({ roomName, username, mutes, blocks, globalBlocks, changeMu
         } else {
             
         }
-        // let sideUsers = filteredUsers.map((user) => {
-        //     let broadcasting = false;
-        //     if(Array.isArray(broadcastingUsers) && broadcastingUsers.includes(user.username)) {
-        //         broadcasting = true
-        //     }
-        //     return {
-        //         broadcasting,
-        //         ...user
-        //     }
-        // })
-        // console.log('sideUsers', sideUsers);
         setSideUsers(filteredUsers);
     }, [searchText, users])
 
