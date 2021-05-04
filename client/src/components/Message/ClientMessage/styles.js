@@ -52,6 +52,7 @@ const useStyles = makeStyles((theme) => ({
     text: {
         display: 'flex',
         alignItems: 'center',
+        flexWrap: 'wrap',
         margin: 0,
         fontSize: '1em',
         '& img.photo': {
@@ -71,6 +72,15 @@ const useStyles = makeStyles((theme) => ({
         '& img': {
             width: 21,
             height: 21
+        },
+        '& a': {
+            cursor: 'pointer',
+            color : '#007bff',
+            textDecoration: 'none',
+            '&:hover': {
+                color : '#0056b3',
+                textDecoration: 'underline',
+            }
         }
     },
     url_underline: {
