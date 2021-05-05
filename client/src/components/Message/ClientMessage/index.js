@@ -61,7 +61,6 @@ const MyMessage = ({user, roomName, message, messageSize, role, font_size, userA
 
     const emojiConverter = (text) => {
         let emojiText =  emoji.replace_unified(text);
-        console.log('emoji converter', text, emojiText)
         return emojiText;
     }
 

@@ -131,7 +131,6 @@ function InputEmoji ({
     }, [updateHTML])
 
     const replaceAllTextEmojiToString = useCallback(() => {
-        console.log(textInputRef.current);
         if (!textInputRef.current) {
             cleanedTextRef.current = ''
         }
@@ -188,7 +187,6 @@ function InputEmoji ({
                 if(cleanedTextRef.current.trim() === ''){
                     return
                 }
-                console.log(cleanedTextRef.current);
                 if (typeof onEnter === 'function') {
                     onEnter(cleanedTextRef.current)
                 }
