@@ -229,7 +229,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
             if(type === 'private') {
                 socket.emit('private message',
                     { type, roomName, msg, from: username, to, color, bold, messageType },
-                    (data, err) => {
+                    async (data, err) => {
                         if(data) {
                             let message = data;
                             privateListRef.current.addMessage(message, roomName);
@@ -246,12 +246,16 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                     }
                 );
                 
-            } else{
+            } else {
+                let time1 = Date.now();
                 socket.emit('public message', { type, msg, room: roomName, from: username, color, bold, messageType }, async (data) => {
                     let sameRoom = roomsRef.current.find((room) => (room.name) === roomName);
                     if(sameRoom && data) {
                         sameRoom.messages = [ data, ...sameRoom.messages,];
                         if(sameRoom.name === currentRoomName) {
+                            let time2 = Date.now();
+                            let delta = time2-time1;
+                            console.log(delta);
                             setCurrentRoomMessages([...sameRoom.messages]);
                         }
                     }
@@ -415,9 +419,9 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                     if(!privateListRef.current.addMessage(newMessage.message, newMessage.message.roomName)) {
                         addUnReadMsg(newMessage.message);
                     }
-                    if(newMessage.callback) {
-                        newMessage.callback(true);
-                    }
+                    // if(newMessage.callback) {
+                    //     newMessage.callback(true);
+                    // }
                     privateAudioControls.seek(0);
                     privateAudioControls.play();
                 }
@@ -484,7 +488,10 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                 setGlobalBlocks(blocks);
             })
             socket.on('room message', (message, callback) => {
-                setNewMessage({message, callback});
+                if(callback) {
+                    callback(true);
+                }
+                setNewMessage({message});
             });
             // socket.on('private message', (message, callback) => {
             // })
