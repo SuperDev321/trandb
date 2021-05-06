@@ -88,7 +88,7 @@ const MessagesList = ({ users, messages, role, userAction, roomName, changeMuteS
     useEffect(() => {
         if(messages.length) {
             if(messages.length > messageNum) {
-            setCurrentItems(messages.slice(0, messageNum));
+                setCurrentItems(messages.slice(0, messageNum));
             } else {
                 setCurrentItems(messages)
             }

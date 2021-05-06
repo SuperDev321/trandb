@@ -1,4 +1,4 @@
-import React, { memo, useState, useRef, useEffect, useImperativeHandle, forwardRef } from 'react';
+import React, { memo, useState, useRef, useEffect, useImperativeHandle, forwardRef, useContext } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import {
     Avatar,
@@ -18,6 +18,7 @@ import {ReactComponent as Maximium} from './square.svg'
 import {ReactComponent as Restore} from './restore.svg';
 import config from '../../../config';
 import getUser from '../../../utils/getUser';
+import { SettingContext } from '../../../context';
 
 const defaultHeight = 250;
 const defaultWidth = 350;
@@ -147,6 +148,8 @@ const PrivateChat = ({ me, to, ip, sendMessage, active, setActive, initMessages,
     const [blocked, setBlocked] = useState(false);
     const [withBlocked, setWithBlocked] = useState(false);
     const classes = useStyles({max});
+    const {messageNum, messageSize} = useContext(SettingContext);
+
 
     const handleMinimize = () => {
         let top = winRef.current.getBoundingClientRect().top;
@@ -196,7 +199,11 @@ const PrivateChat = ({ me, to, ip, sendMessage, active, setActive, initMessages,
             return !hide;
         },
         addMessage: (message, roomName) => {
-            setMessages([...messages, message]);
+            let newMessages = [message, ...messages];
+            if(newMessages.length > messageNum) {
+                newMessages = newMessages.slice(0, messageNum);
+            }
+            setMessages(newMessages);
             if(message.from!==me.username && !isFocus) {
                 setUnRead(unRead+1);
             }
