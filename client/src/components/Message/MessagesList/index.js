@@ -3,6 +3,7 @@ import propTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
 import ClientMessage from '../ClientMessage';
 import SystemMessage from '../SystemMessage';
+import BootMessage from '../BootMessage';
 import {CustomThemeContext} from '../../../themes/cutomThemeProvider';
 import { SettingContext } from '../../../context';
 import { message } from 'antd';
@@ -110,19 +111,23 @@ const MessagesList = ({ users, messages, role, userAction, roomName, changeMuteS
                 currentItems.map(({ _id, from, msg, date, type, color, bold, messageType }, index) => (
                     // <Message key={_id} text={msg} from={from} date={date} />
                     <span key={_id? _id: index}>
-                        { type==='public' &&
-                        <ClientMessage userAction={userAction}
-                            user={getUserFromList(from)}
-                            roomName={roomName}
-                            role={role}
-                            message={{_id, from, msg, date, color, bold, messageType}} font_size={10}
-                            messageSize={messageSize}
-                            changeMuteState={changeMuteState}
-                            sendPokeMessage={sendPokeMessage}
-                            kickUser={kickUser}
-                            banUser={banUser}
-                            addOrOpenPrivate={addOrOpenPrivate}
-                        />
+                        { (type==='public' && messageType === 'general')  &&
+                            <ClientMessage userAction={userAction}
+                                user={getUserFromList(from)}
+                                roomName={roomName}
+                                role={role}
+                                message={{_id, from, msg, date, color, bold, messageType}} font_size={10}
+                                messageSize={messageSize}
+                                changeMuteState={changeMuteState}
+                                sendPokeMessage={sendPokeMessage}
+                                kickUser={kickUser}
+                                banUser={banUser}
+                                addOrOpenPrivate={addOrOpenPrivate}
+                            />
+                        }
+                        {
+                        (type ==='public' && messageType === 'boot') &&
+                            <BootMessage text={msg} />
                         }
                         {
                         (type ==='system' || type === 'poke') &&

@@ -154,7 +154,7 @@ export default function RoomSelector() {
                                 style={{ width: 300 }}
                                 options={activeRooms}
                                 value={room}
-                                onChange={(e, value) => {setRoom(value); console.log(value)}}
+                                onChange={(e, value) => {setRoom(value);}}
                                 renderInput={(params) => <TextField {...params} label="Select room for Logs" margin="normal" />}
                             />
                         </Grid>
