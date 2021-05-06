@@ -226,10 +226,11 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
     }
     const sendMessage = (roomName, to, color, msg, bold, type, messageType) => {
         if (msg) {
-            privateListRef.current.addMessage({
-                type, roomName, msg, from: username, to, color, bold, messageType
-            }, roomName);
+            
             if(type === 'private') {
+                privateListRef.current.addMessage({
+                    type, roomName, msg, from: username, to, color, bold, messageType
+                }, roomName);
                 socket.emit('private message',
                     { type, roomName, msg, from: username, to, color, bold, messageType },
                     async (data, err) => {
@@ -248,7 +249,6 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                         
                     }
                 );
-                
             } else {
                 let time1 = Date.now();
                 socket.emit('public message', { type, msg, room: roomName, from: username, color, bold, messageType }, async (data) => {
