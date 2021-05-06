@@ -226,13 +226,16 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
     }
     const sendMessage = (roomName, to, color, msg, bold, type, messageType) => {
         if (msg) {
+            privateListRef.current.addMessage({
+                type, roomName, msg, from: username, to, color, bold, messageType
+            }, roomName);
             if(type === 'private') {
                 socket.emit('private message',
                     { type, roomName, msg, from: username, to, color, bold, messageType },
                     async (data, err) => {
                         if(data) {
                             let message = data;
-                            privateListRef.current.addMessage(message, roomName);
+                            // privateListRef.current.addMessage(message, roomName);
                         } else {
                             if(err === 'logout') {
                                 privateListRef.current.addErrorMessage(roomName);

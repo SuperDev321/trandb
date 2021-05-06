@@ -53,9 +53,9 @@ import StyledMessage from '../Message/StyledMessage'
 const useListStyles = makeStyles((theme) => ({
     root: {
         display: 'flex',
-        flexDirection: 'column',
+        flexDirection: 'column-reverse',
         overflow: 'auto',
-        height: '100%',
+        maxHeight: '100%',
         flex: '1',
         width: '100%',
         padding: 5,
