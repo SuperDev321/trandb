@@ -27,7 +27,7 @@ const useStyles = makeStyles((theme) => ({
         alignItems: 'center',
         backgroundColor: theme.palette.primary.main,
         flexWrap: 'wrap',
-        minHeight: '50px'
+        height: '50px'
     },
     title: {
         flexGrow: 1,
@@ -79,7 +79,7 @@ const HomeLayout = ({children, unReadMsgs, openPrivate, messageSize, setMessageS
         resetMessageSize(messageSize);
     }, [messageSize])
     return (
-    <div style={{fontSize: messageSize}}>
+    <div style={{fontSize: messageSize, height: '100%'}}>
         <AppBar position="static" className={classes.appBar}>
             <Toolbar  className={classes.title}>
                 <img

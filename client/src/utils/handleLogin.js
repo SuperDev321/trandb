@@ -7,7 +7,7 @@ const handleLogin = async (credentials, successCallback, errCallback) => {
   } catch (err) {
     let errMessage;
 
-    if (err.response.status) {
+    if (err && err.response && err.response.status) {
       if(err.response.data.error)
         errMessage = err.response.data.error;
       else {

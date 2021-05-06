@@ -8,6 +8,7 @@ const useStyles = makeStyles((theme) => ({
         display: 'flex',
         flexGrow: '1',
         width: '100%',
+        height: 'calc(100% - 50px)'
     },
     mainWrapper: {
         flexGrow: 1,
@@ -16,14 +17,15 @@ const useStyles = makeStyles((theme) => ({
     },
     main: {
         flexGrow: 1,
-        height: `calc(100vh - 102px)`,
+        // height: `calc(100vh - 102px)`,
+        height: `calc(100% - 52px)`,
     },
     drawer: {
         [theme.breakpoints.up('sm')]: {
         width: drawerWidth,
         flexShrink: 0,
         },
-        height: `calc(100vh - 50px)`,
+        height: `100%`,
         background: 'transparent',
         borderRadius: '0px',
         // margin: '1px 0 0 0',
@@ -38,7 +40,7 @@ const useStyles = makeStyles((theme) => ({
             width: drawerWidth,
             flexShrink: 0,
         },
-        height: `calc(100vh - 50px)`,
+        height: `100%`,
         position: 'absolute',
         bottom: '0px',
         right: '0px',
@@ -55,7 +57,7 @@ const useStyles = makeStyles((theme) => ({
         },
         boxShadow: '1px 1px 0px 0px rgb(0 0 0 / 0%), 0px 1px 0px 0px rgb(0 0 0 / 5%)',
         background: theme.palette.menu.background,
-        // height: '50px',
+        height: '52px',
         color: theme.palette.textColor.main,
         border: 'solid 1px',
         borderColor: theme.palette.separate.main,

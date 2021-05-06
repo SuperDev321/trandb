@@ -122,7 +122,8 @@ const useStyles = makeStyles((theme) => ({
         display: 'flex',
         alignItems: 'center',
         position: 'relative',
-        width: '100%',
+        flexGrow: 1,
+        height: 'fit-content'
       },
       
       emojiPickerContainer: {
