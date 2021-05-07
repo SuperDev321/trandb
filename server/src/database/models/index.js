@@ -5,7 +5,7 @@ const Bans = require('./Bans');
 const Blocks = require('./Blocks');
 const ForbiddenWords = require('./ForbiddenWords');
 const Settings = require('./Settings');
-const Quizes = require('./Quizes')
+const Boots = require('./Boots')
 
 module.exports = {
   Users,
@@ -15,5 +15,5 @@ module.exports = {
   Blocks,
   ForbiddenWords,
   Settings,
-  Quizes
+  Boots
 };

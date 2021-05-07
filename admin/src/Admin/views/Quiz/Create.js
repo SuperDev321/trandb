@@ -28,21 +28,21 @@ const useStyles = makeStyles(styles);
 export default function Create( {onClose} ) {
   const classes = useStyles();
   const { addToast } = useToasts();
-  const [question, setQuestion] = React.useState('');
+  const [content, setContent] = React.useState('');
   const [answer, setAnswer] = React.useState('');
   const onSubmit = async () => {
     let payload = {};
-    if(question==='' || answer === '') {
-      addToast('Please fill word field', { appearance: 'error' });
+    if(content==='') {
+      addToast('Please fill content field', { appearance: 'error' });
       return;
     }
-    payload.question = question;
-    payload.answer = answer;
     try {
-        const {data: {data}} = await axios.post(`${config.server_url}/api/quizes`, payload);
+        const {data: {data}} = await axios.post(`${config.server_url}/api/boot`, {
+          content
+        });
         onClose();
     } catch (err) {
-        addToast('Can not create this word', { appearance: 'error' });
+        addToast('Can not create this boot', { appearance: 'error' });
         onClose();
     }
   }
@@ -62,13 +62,13 @@ export default function Create( {onClose} ) {
               <Grid item sm={1}>
               </Grid>
               <Grid item sm={2} style={{textAlign: 'right'}}>
-                <p className={classes.cardCategory}>Question</p>
+                <p className={classes.cardCategory}>Content</p>
               </Grid>
               <Grid item sm={9}>
-                <TextField style={{width: '100%'}} value={question} onChange={(e)=>{setQuestion(e.target.value)}} />
+                <TextField style={{width: '100%'}} value={content} onChange={(e)=>{setContent(e.target.value)}} />
               </Grid>
             </Grid>
-            <Grid container spacing={2} style={{marginTop:'20px'}}>
+            {/* <Grid container spacing={2} style={{marginTop:'20px'}}>
               <Grid item sm={1}>
               </Grid>
               <Grid item sm={2} style={{textAlign: 'right'}}>
@@ -77,7 +77,7 @@ export default function Create( {onClose} ) {
               <Grid item sm={9}>
                 <TextField style={{width: '100%'}} value={answer} onChange={(e)=>{setAnswer(e.target.value)}} />
               </Grid>
-            </Grid>
+            </Grid> */}
             <div style={{display:'flex', justifyContent:'space-between', marginTop: '20px', marginBottom: '20px'}}>
               <Button 
                 variant="contained" 

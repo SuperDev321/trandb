@@ -35,8 +35,11 @@ const {
   deleteWord,
   getSetting,
   updateSetting,
-  getQuizes,
-  addQuiz
+  startBoot,
+  stopBoot,
+  addBoot,
+  deleteBoot,
+  getBoots
 } = require('./controllers');
 const getUserIp = require('./controllers/users/getUserIp');
 
@@ -89,8 +92,11 @@ router.get('/admin/rooms', getRoomsAdmin);
 
 router.post('/file_upload', fileUploader);
 
-router.get('/quizes', getQuizes);
-router.post('/quizes', addQuiz);
+router.get('/boots', getBoots);
+router.post('/boot', addBoot);
+router.post('/boot/start', startBoot);
+router.post('/boot/stop', stopBoot);
+router.delete('/boots/:id', deleteBoot);
 
 router.use(clientError);
 router.use(serverError);

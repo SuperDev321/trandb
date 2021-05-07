@@ -52,8 +52,7 @@ function stableSort(array, comparator) {
 
 const headCells = [
   { id: 'no', numeric: false, disablePadding: false, label: 'No'},
-  { id: 'question', numeric: false, disablePadding: false, label: 'Question'},
-  { id: 'answer', numeric: false, disablePadding: false, label: 'Answer'},
+  { id: 'content', numeric: false, disablePadding: false, label: 'Content'},
   // { id: 'action', numeric: true, disablePadding: false, label: 'action'}, 
 ];
 
@@ -161,12 +160,13 @@ export default function Quizes( {onClickNew} ) {
   };
 
   const handleClickDelete = (id) => {
-    Axios.delete(`${config.server_url}/api/quizes/` + id)
+    Axios.delete(`${config.server_url}/api/boots/` + id)
     .then((response) => {
       console.log(response);
       if(response.status === 204) {
         let newRows = rows.filter((row) => (row._id !== id));
         setRows(newRows);
+        addToast('Successfully deleted', { appearance: 'success' })
       }
     })
     .catch((err) => {
@@ -176,8 +176,8 @@ export default function Quizes( {onClickNew} ) {
   }
   React.useEffect(() => {
     const getQuizes = async () => {
-      const result = await Axios.get(`${config.server_url}/api/quizes`);
-      let quizesToShow = result.data.quizes.map((item, index) => ({...item, no: index+1}));
+      const result = await Axios.get(`${config.server_url}/api/boots`);
+      let quizesToShow = result.data.boots.map((item, index) => ({...item, no: index+1}));
       setRows(quizesToShow);
     }
     getQuizes()
@@ -267,10 +267,7 @@ export default function Quizes( {onClickNew} ) {
 	                        {row.no}
 	                      </TableCell>
                         <TableCell align="left">
-	                        {row.question}
-                        </TableCell>
-                        <TableCell align="left">
-                            {row.answer}
+	                        {row.content}
                         </TableCell>
                         <TableCell align="right">
                           <IconButton style={{color:"#f44336"}} onClick={() => {handleClickDelete(row._id)}}>

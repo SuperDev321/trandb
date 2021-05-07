@@ -52,11 +52,32 @@ export default function RunQuiz() {
   const [botRoom, setBotRoom] = useState(null);
   const [activeRooms, setActiveRooms] = useState([]);
 
+  const handleStart = () => {
+    Axios.post(`${config.server_url}/api/boot/start`, {
+      room: botRoom
+    })
+    .then((response) => {
+      if(response.status === 204) {
+        addToast('Successfully started', { appearance: 'success' });
+      }
+    })
+  }
+
+  const handleStop = () => {
+    Axios.post(`${config.server_url}/api/boot/stop`, {
+      room: botRoom
+    })
+    .then((response) => {
+      if(response.status === 204) {
+        addToast('Successfully stoped', { appearance: 'success' });
+      }
+    })
+  }
+
   useEffect(() => {
     Axios.get(`${config.server_url}/api/room/names`)
     .then((response) => {
         if(response.status === 200) {
-            console.log(response.data)
             if(response.data && Array.isArray(response.data.rooms)) {
                 let {rooms} = response.data;
                 let roomNames = rooms.map((room) => (room.name));
@@ -75,11 +96,11 @@ export default function RunQuiz() {
 	          <AssignmentIcon />
 	        </CardIcon>
 	        <div style={{display:'flex', justifyContent:'space-between'}}>
-	        <p className={classes.cardCategory}>Quiz Bot Setting</p>
+	        <p className={classes.cardCategory}>Boot Message Setting</p>
 	        </div>
 	      </CardHeader>
 	      <CardFooter style={{display: 'block'}}>
-	        <Grid container spacing={2} style={{marginBottom:'10px',}}>
+	        {/* <Grid container spacing={2} style={{marginBottom:'10px',}}>
                 <Grid item sm={2}>
                 </Grid>
                 <Grid item xs={12} sm={6}>
@@ -91,7 +112,7 @@ export default function RunQuiz() {
                         
                     </div>
                 </Grid>
-	        </Grid>
+	        </Grid> */}
             <Grid container spacing={2} style={{marginBottom:'10px'}}>
                 <Grid item sm={2}>
                 </Grid>
@@ -100,6 +121,7 @@ export default function RunQuiz() {
                         id="rooms"
                         style={{ width: 300 }}
                         options={activeRooms}
+                        onChange={(e, value) => setBotRoom(value)}
                         renderInput={(params) => <TextField {...params} label="Select room for Quiz bot" margin="normal" />}
                     />
                 </Grid>
@@ -107,8 +129,16 @@ export default function RunQuiz() {
                     <Button
                         variant="contained" 
                         color="primary"
+                        onClick={() => {handleStart()}}
                     >
-                        Run Quiz bot
+                        Start Boot
+                    </Button>
+                    <Button
+                        variant="contained" 
+                        color="secondary"
+                        onClick={() => {handleStop()}}
+                    >
+                        Stop Boot
                     </Button>
                 </Grid>
 	        </Grid>
