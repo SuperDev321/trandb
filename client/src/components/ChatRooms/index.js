@@ -250,19 +250,16 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                     }
                 );
             } else {
-                let time1 = Date.now();
                 socket.emit('public message', { type, msg, room: roomName, from: username, color, bold, messageType }, async (data) => {
-                    let sameRoom = roomsRef.current.find((room) => (room.name) === roomName);
-                    if(sameRoom && data) {
-                        sameRoom.messages = [ data, ...sameRoom.messages,];
-                        if(sameRoom.name === currentRoomName) {
-                            let time2 = Date.now();
-                            let delta = time2-time1;
-                            console.log(delta);
-                            setCurrentRoomMessages([...sameRoom.messages]);
-                        }
-                    }
+                    
                 });
+                let sameRoom = roomsRef.current.find((room) => (room.name) === roomName);
+                if(sameRoom) {
+                    sameRoom.messages = [ { type, msg, room: roomName, from: username, color, bold, messageType }, ...sameRoom.messages,];
+                    if(sameRoom.name === currentRoomName) {
+                        setCurrentRoomMessages([...sameRoom.messages]);
+                    }
+                }
             }
         }
     };
