@@ -33,7 +33,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
     const { t, i18n } = useTranslation();
     const history= useHistory();
     const [mobileOpen, setMobileOpen] = useState(false);
-    const { username, avatar, gender } = useContext(UserContext);
+    const { username, avatar, gender, role } = useContext(UserContext);
     const {enablePokeSound, enablePrivateSound, enablePublicSound, enableSysMessage} = useContext(SettingContext);
     const [mutes, setMutes] = useLocalStorage('mutes', []);
     const handleDrawerToggle = () => {
@@ -156,11 +156,13 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
     // add a private modal to private list
     const addOrOpenPrivate = (to) => {
         if(!privateListRef.current.openChat(to)) {
-            socket.emit('open private', {from: username, to: to.username}, (roomName) => {
+            socket.emit('open private', {from: username, to: to.username, role}, (roomName, err) => {
                 if(roomName) {
                     privateListRef.current.addChat(to, roomName);
                 } else {
-                    console.log('private chat error');
+                    if(err === 'private_error_guest') {
+                        enqueueSnackbar(t('UserActionArea.error_guest_dont_have_permission'), {variant: 'error'});
+                    }
                 }
             });
         }

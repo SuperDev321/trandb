@@ -51,10 +51,12 @@ export default function RunQuiz() {
   const { addToast } = useToasts();
   const [botRoom, setBotRoom] = useState(null);
   const [activeRooms, setActiveRooms] = useState([]);
+  const [bootInterval, setBootInterval] = useState(10);
 
   const handleStart = () => {
     Axios.post(`${config.server_url}/api/boot/start`, {
-      room: botRoom
+      room: botRoom,
+      interval: bootInterval
     })
     .then((response) => {
       if(response.status === 204) {
@@ -81,7 +83,6 @@ export default function RunQuiz() {
             if(response.data && Array.isArray(response.data.rooms)) {
                 let {rooms} = response.data;
                 let roomNames = rooms.map((room) => (room.name));
-                console.log(roomNames)
                 setActiveRooms(roomNames)
             }
         }
@@ -125,7 +126,23 @@ export default function RunQuiz() {
                         renderInput={(params) => <TextField {...params} label="Select room for Quiz bot" margin="normal" />}
                     />
                 </Grid>
-                <Grid item xs={12} sm={4}>
+                <Grid item sm={4}>
+                </Grid>
+                <Grid item sm={2}>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                    <TextField
+                      type='number'
+                      style={{width: 300}}
+                      value={bootInterval}
+                      onChange={(e) => setBootInterval(e.target.value)}
+                    />
+                </Grid>
+                <Grid item sm={4}>
+                </Grid>
+                <Grid item sm={2}>
+                </Grid>
+                <Grid item xs={12} sm={6}>
                     <Button
                         variant="contained" 
                         color="primary"
@@ -135,7 +152,7 @@ export default function RunQuiz() {
                     </Button>
                     <Button
                         variant="contained" 
-                        color="secondary"
+                        color="warning"
                         onClick={() => {handleStop()}}
                     >
                         Stop Boot

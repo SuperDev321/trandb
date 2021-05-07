@@ -12,7 +12,7 @@ class BootManager {
         this.io = io;
     }
 
-    start(room) {
+    start(room, interval) {
         try {
             if(this.timer) {
                 clearInterval(this.timer);
@@ -20,22 +20,26 @@ class BootManager {
             }
             this.room = room;
             this.timer = setInterval(async () => {
-                let boots = await Boots.find({});
+                let boots = await Boots.find({active: true});
                 if(this.bootNum >= boots.length) {
                     this.bootNum = 0;
                 }
                 let boot = boots[this.bootNum];
                 console.log('boot message', boot)
                 if(this.io && boot && boot.content) {
+                    let {content, size, bold, color} = boot;
                     this.io.to(room).emit('room message', {
                         type: 'public',
                         room,
-                        msg: boot.content,
+                        msg: content,
+                        size,
+                        bold,
+                        color,
                         messageType: 'boot'
                     });
                 }
                 this.bootNum ++;
-            }, 20000);
+            }, interval * 1000);
             return true;
         } catch (err) {
             return false;

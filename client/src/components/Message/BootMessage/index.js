@@ -19,17 +19,35 @@ const useStyles = makeStyles((theme) => ({
     },
     icon: {
         color: green[200]
+    },
+    text: {
+        color: props=>(
+            props.color?
+            props.color
+            : 'white'
+        ),
+        fontSize: props=>(
+            props.size?
+            props.size
+            : '1em'
+        ),
+        fontWeight: props=>(
+            props.bold?
+            'bold'
+            : 'none'
+        ),
     }
 }))
 
-const BootMessage = ({ text }) => {
-    const classes = useStyles();
+const BootMessage = ({ message }) => {
+    const {msg, size, color, bold} = message;
+    const classes = useStyles({size, color, bold});
     return (
         <div className={classes.root}>
             <AndroidIcon fontSize='large' className={classes.icon} />
             <span>:&nbsp;</span>
             <span className={classes.text}>
-                {text.trim()}
+                {msg.trim()}
             </span>
         </div>
     );

@@ -13,7 +13,7 @@ const settingSchema = new Schema({
     type: Number,
     required: true,
   },
-  privateAllow: {
+  allowPrivate: {
     type: Boolean,
     required: true
   }

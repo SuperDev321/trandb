@@ -9,8 +9,8 @@ class AdminSetting {
         console.log(err);
       } else {
         if(result) {
-          const {theme, language, messageNum} = result;
-          this.settings = {theme, language, messageNum};
+          const {theme, language, messageNum, allowPrivate} = result;
+          this.settings = {theme, language, messageNum, allowPrivate};
         }
       }
     })

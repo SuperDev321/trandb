@@ -1,9 +1,10 @@
-const { Rooms, Chats, Users } = require('../database/models');
+const { Rooms, Chats, Users, Settings } = require('../database/models');
 const { findUserByName } = require('../utils');
 var randomString = require('random-string')
 
-const addPrivate = (io, socket) => async ({ from, to }, callback) => {
+const addPrivate = (io, socket) => async ({ from, to, role }, callback) => {
     try {
+        
         let rooms = Array.from(socket.rooms);
         let privateRoom = rooms.find((item) => {
             let strArr = item.split('_');
@@ -19,7 +20,12 @@ const addPrivate = (io, socket) => async ({ from, to }, callback) => {
             privateRoomName = privateRoom;
             return callback(privateRoom);
         } else {
-            console.log('not find private')
+            if(role === 'guest') {
+                let {allowPrivate} = await Settings.findOne({type: 'admin'});
+                if(!allowPrivate) {
+                    return callback(false, 'private_error_guest')
+                }
+            }
             var newPrivateRoomName = randomString({
                 length: 8,
                 numeric: true,

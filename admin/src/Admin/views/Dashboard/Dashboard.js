@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 // react plugin for creating charts
 // import ChartistGraph from "react-chartist";
 // @material-ui/core
@@ -15,7 +15,9 @@ import Card from "Admin/components/Card/Card.js";
 import CardHeader from "Admin/components/Card/CardHeader.js";
 import CardIcon from "Admin/components/Card/CardIcon.js";
 import CardFooter from "Admin/components/Card/CardFooter.js";
-
+import { NavLink } from "react-router-dom";
+import Axios from 'axios';
+import config from '../../../config'
 // import { bugs, website, server } from "Admin/variables/general.js";
 
 import styles from "Admin/assets/jss/material-dashboard-react/views/dashboardStyle.js";
@@ -24,6 +26,17 @@ const useStyles = makeStyles(styles);
 
 export default function Dashboard() {
   const classes = useStyles();
+  const [num, setNum] = React.useState(0);
+
+  useEffect(() => {
+    const roomRead = async () => {
+      const rooms = await Axios.get(`${config.server_url}/api/rooms`);
+      if(Array.isArray(rooms.data.data)) {
+        setNum(rooms.data.data.length);
+      }
+    }
+    roomRead()
+  }, []);
   return (
     <div>
       <GridContainer>
@@ -35,7 +48,7 @@ export default function Dashboard() {
               </CardIcon>
               <p className={classes.cardCategory}>Available Rooms</p>
               <h3 className={classes.cardTitle}>
-                <small>22</small>
+                <small>{num}</small>
               </h3>
             </CardHeader>
             <CardFooter stats>
@@ -43,9 +56,9 @@ export default function Dashboard() {
                 <Danger>
                   <ReplyIcon />
                 </Danger>
-                <a href="#pablo" onClick={e => e.preventDefault()}>
+                <NavLink to="/admin/room">
                   Rooms
-                </a>
+                </NavLink>
               </div>
             </CardFooter>
           </Card>

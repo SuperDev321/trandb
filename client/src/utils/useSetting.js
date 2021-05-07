@@ -12,6 +12,7 @@ const useSetting = () => {
   const [enablePokeSound, _setEnablePokeSound] = useState(true);
   const [enablePublicSound, _setEnablePublicSound] = useState(true);
   const [enablePrivateSound, _setEnablePrivateSound] = useState(true);
+  const [enableGuestPrivate, setEnableGuestPrivate] = useState(true);
   const [language, _setLanguage] = useState(null);
   const [messageNum, setMessageNum] = useState(30);
   const [enableSysMessage, _setEnableSysMessage] = useState(true);
@@ -65,7 +66,7 @@ const useSetting = () => {
       if(response.status === 200) {
         let data = response.data;
         if(data) {
-          const {theme, messageNum, language} = data;
+          const {theme, messageNum, language, allowPrivate} = data;
           setDefaultTheme(theme);
           if(!currentLanguage)
             setLanguage(language);
@@ -75,6 +76,7 @@ const useSetting = () => {
           if(messageNum) {
             setMessageNum(messageNum);
           }
+          setEnableGuestPrivate(allowPrivate);
         }
       }
     })
@@ -130,7 +132,7 @@ const useSetting = () => {
 
   return { defaultTheme, messageSize, enablePokeSound, enablePrivateSound, enablePublicSound,
     setDefaultTheme, setMessageSize, setEnablePokeSound, setEnablePrivateSound, setEnablePublicSound,
-    language, setLanguage, messageNum, enableSysMessage, setEnableSysMessage};
+    language, setLanguage, messageNum, enableSysMessage, setEnableSysMessage, enableGuestPrivate};
 };
 
 export default useSetting;

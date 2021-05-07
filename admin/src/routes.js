@@ -75,8 +75,8 @@ const dashboardRoutes = [
     super: true,
   },
   {
-    path: "/quizes",
-    name: "Quiz",
+    path: "/boots",
+    name: "Boots",
     icon: QuestionAnswerIcon,
     component: Quiz,
     layout: "/admin",
