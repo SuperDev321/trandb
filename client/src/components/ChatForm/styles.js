@@ -52,7 +52,8 @@ const useStyles = makeStyles((theme) => ({
     },
     fileUploadInput: {
         width: 0,
-        height: 0
+        height: 0,
+        display: 'none'
     },
     fileUploadLabel: {
         cursor: 'pointer',

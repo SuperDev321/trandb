@@ -27,6 +27,7 @@ const useStyles = makeStyles((theme) => ({
         marginLeft: theme.spacing(0.5),
         marginTop: '2px',
         textTransform: 'none',
+        whiteSpace: 'nowrap'
     },
     dropIcon: {
         color: theme.palette.primary.text,

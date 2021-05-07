@@ -17,7 +17,6 @@ import './App.css';
 const useStyles = makeStyles((theme) =>({
     app: {
         fontFamily: 'sans-serif',
-        height: '100vh',
     }
 }));
 
@@ -60,7 +59,7 @@ const App = () => {
             <UserContext.Provider
                 value={{ auth, role, gender, avatar, loading, setAuth, setLoading, username, removeCurrentUser }}
             >
-            <div className={classes.app} dir="rtl">
+            <div className={classes.app} id='app' dir="rtl">
                 <Switch>
                     <PublicRoute exact path="/">
                         <Rooms />
