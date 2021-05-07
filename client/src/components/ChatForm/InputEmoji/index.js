@@ -54,6 +54,7 @@ function InputEmoji ({
     const textInputRef = useRef(null)
     const cleanedTextRef = useRef('')
     const placeholderRef = useRef(null);
+    const [disabled, setDisabled] = useState(true);
 
     const onSend = () => {
         replaceAllTextEmojiToString()
@@ -64,6 +65,7 @@ function InputEmoji ({
         
         if (cleanOnEnter) {
             updateHTML('')
+            emitChange()
         }
     }
  
@@ -128,11 +130,16 @@ function InputEmoji ({
 
     useEffect(() => {
         updateHTML()
+        emitChange()
     }, [updateHTML])
 
     const replaceAllTextEmojiToString = useCallback(() => {
         if (!textInputRef.current) {
-            cleanedTextRef.current = ''
+            cleanedTextRef.current = '';
+            return false;
+        }
+        if(textInputRef.current.innerHTML === '') {
+            return false;
         }
 
         const container = document.createElement('div');
@@ -151,6 +158,7 @@ function InputEmoji ({
         // 
 
         checkPlaceholder()
+        return true;
 
     }, [])
 
@@ -166,15 +174,19 @@ function InputEmoji ({
         //         checkAndEmitResize()
         //     }
         // }, 0)
+        if(textInputRef.current && textInputRef.current.innerHTML !== '') {
+            setDisabled(false);
+        } else {
+            setDisabled(true);
+        }
         checkPlaceholder();
-        
     }, [])
 
     useEffect(() => {
         function handleKeydown (event) {
-            const cleanedText = cleanedTextRef.current
-            if(cleanedText)
+            if(textInputRef.current && textInputRef.current.innerHTML !== '') {
                 placeholderRef.current.style.opacity = 0
+            }
                 
             if (typeof maxLength !== 'undefined' && event.keyCode !== 8 && totalCharacters() >= maxLength) {
                 event.preventDefault()
@@ -192,11 +204,12 @@ function InputEmoji ({
                 }
                 
                 if (cleanOnEnter) {
-                updateHTML('')
+                    updateHTML('')
+                    emitChange()
                 }
                 
                 if (typeof onKeyDown === 'function') {
-                onKeyDown(event)
+                    onKeyDown(event)
                 }
                 
                 return false
@@ -330,7 +343,7 @@ function InputEmoji ({
 
     function setValue (value) {
         updateHTML(value)
-        textInputRef.current.blur()
+        emitChange()
     }
 
     function toggleShowPicker () {
@@ -402,6 +415,7 @@ function InputEmoji ({
         if(textInputRef.current && placeholderRef.current) {
             const text = textInputRef.current.innerHTML;
             if (text !== '' && placeholderRef.current.opacity !== 0) {
+                console.log(text)
                 placeholderRef.current.style.opacity = 0
             } else {
                 placeholderRef.current.style.opacity = 1
@@ -474,7 +488,7 @@ function InputEmoji ({
         <IconButton aria-label="send"
             // className={classes.sendButton}
             variant="contained"
-            disabled={value.trim()? false: true}
+            disabled={disabled}
             onClick={onSend}
             color="primary"
         >

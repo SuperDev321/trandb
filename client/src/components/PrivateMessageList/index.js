@@ -61,6 +61,8 @@ const useListStyles = makeStyles((theme) => ({
         padding: 5,
         wordBreak: 'break-word',
         scrollbarWidth: 'thin',
+        scrollbarColor: `#585B5E #ecdbdb00`,
+        WebkitOverflowScrolling: 'touch', 
         '&::-webkit-scrollbar': {
             width: '5px',
         },
@@ -68,7 +70,7 @@ const useListStyles = makeStyles((theme) => ({
             '-webkit-box-shadow': 'inset 0 0 6px rgba(0,0,0,0.00)'
         },
         '&:hover::-webkit-scrollbar-thumb': {
-            backgroundColor: '#00000017',
+            backgroundColor: 'rgb(0 0 0 / 25%)',
             outline: 'none',
             borderRadius: '5px',
         }
