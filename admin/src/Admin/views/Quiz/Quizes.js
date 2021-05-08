@@ -16,6 +16,7 @@ import IconButton from '@material-ui/core/IconButton';
 import Card from "Admin/components/Card/Card.js";
 import CardHeader from "Admin/components/Card/CardHeader.js";
 import CardIcon from "Admin/components/Card/CardIcon.js";
+import CreateIcon from '@material-ui/icons/Create';
 import CardFooter from "Admin/components/Card/CardFooter.js";
 import AssignmentIcon from '@material-ui/icons/Assignment';
 import Grid from '@material-ui/core/Grid';
@@ -53,7 +54,7 @@ function stableSort(array, comparator) {
 const headCells = [
   { id: 'no', numeric: false, disablePadding: false, label: 'No'},
   { id: 'content', numeric: false, disablePadding: false, label: 'Content'},
-  // { id: 'action', numeric: true, disablePadding: false, label: 'action'}, 
+  { id: 'active', numeric: false, disablePadding: true, label: 'Active'}, 
 ];
 
 function EnhancedTableHead({ classes, order, orderBy, onRequestSort }) {
@@ -132,7 +133,58 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function Quizes( {onClickNew} ) {
+function asyncReducer(state, action) {
+  switch (action.type) {
+    case 'pending': {
+      return {status: 'pending', data: null, error: null}
+    }
+    case 'resolved': {
+      return {status: 'resolved', data: action.data, error: null}
+    }
+    case 'rejected': {
+      return {status: 'rejected', data: null, error: action.error}
+    }
+    default: {
+      throw new Error(`Unhandled action type: ${action.type}`)
+    }
+  }
+}
+
+const useRows = (initialState) => {
+  const [state, dispatch] = React.useReducer(asyncReducer, {
+    data: null,
+    status: 'idle',
+    error: null,
+    ...initialState
+  });
+  const {data, status, error} = state;
+    const run = React.useCallback(promise => {
+        if (!promise) {
+          return
+        }
+        dispatch({type: 'pending'})
+        promise.then(
+          data => {
+            console.log(data)
+            dispatch({type: 'resolved', data})
+          },
+          error => {
+            dispatch({type: 'rejected', error})
+          },
+        )
+        // too bad the eslint plugin can't statically analyze this :-(
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+      }, []);
+
+    return {
+        error,
+        status,
+        data,
+        run,
+    }
+}
+
+export default function Quizes( {onClickNew, onClickEdit} ) {
   // donfsdodifj
   const classes = useStyles();
   const [order, setOrder] = React.useState('asc');
@@ -140,9 +192,10 @@ export default function Quizes( {onClickNew} ) {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [query, setQuery] = React.useState('');
-  const [rows, setRows] = React.useState([]);
+  // const [rows, setRows] = React.useState([]);
   const [filteredRows, setFilteredRows] = React.useState([]);
   const { addToast } = useToasts();
+  const {error, status, data: rows, run} = useRows();
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -163,9 +216,12 @@ export default function Quizes( {onClickNew} ) {
     Axios.delete(`${config.server_url}/api/boots/` + id)
     .then((response) => {
       console.log(response);
+      run(getQuizes());
       if(response.status === 204) {
-        let newRows = rows.filter((row) => (row._id !== id));
-        setRows(newRows);
+        // let newRows = rows.filter((row) => (row._id !== id));
+        // run(async () => {
+        //   return newRows;
+        // });
         addToast('Successfully deleted', { appearance: 'success' })
       }
     })
@@ -174,29 +230,39 @@ export default function Quizes( {onClickNew} ) {
       addToast('Delete failed', { appearance: 'error' })
     })
   }
+  const getQuizes = () => {
+    return Axios.get(`${config.server_url}/api/boots`)
+    .then((response) => {
+      if(response.data) {
+        return response.data.boots;
+      }
+    })
+  }
   React.useEffect(() => {
-    const getQuizes = async () => {
-      const result = await Axios.get(`${config.server_url}/api/boots`);
-      let quizesToShow = result.data.boots.map((item, index) => ({...item, no: index+1}));
-      setRows(quizesToShow);
-    }
-    getQuizes()
+    run(getQuizes());
   }, []);
   React.useEffect(() => {
-    if(query !== '') {
-      let filteredRows = rows.filter((row) => {
-        let strTmp = row.question + ' ' + row.answer;
-        if(strTmp.toLowerCase().indexOf(query.toLowerCase()) < 0) return false;
-        else return true;
-      })
-      setFilteredRows(filteredRows);
-    } else {
-      setFilteredRows([...rows]);
+    console.log(rows, status)
+    if(Array.isArray(rows)) {
+      if(query !== '') {
+        let filteredRows = rows.filter((row) => {
+          let strTmp = row.question + ' ' + row.answer;
+          if(strTmp.toLowerCase().indexOf(query.toLowerCase()) < 0) return false;
+          else return true;
+        })
+        setFilteredRows(filteredRows);
+      } else {
+        setFilteredRows([...rows]);
+      }
     }
+    
   }, [query, rows])
 
+  if(status === 'pending' || status === 'idle'){
+    return null;
+  }
   
-
+  if(status === 'resolved' && Array.isArray(rows))
   return (
   	<Paper className={classes.paper}>
 	    <Card>
@@ -205,7 +271,7 @@ export default function Quizes( {onClickNew} ) {
 	          <AssignmentIcon />
 	        </CardIcon>
 	        <div style={{display:'flex', justifyContent:'space-between'}}>
-	        <p className={classes.cardCategory}>Quizes</p>
+	        <p className={classes.cardCategory}>Boots</p>
 	        <Button 
 	          variant="contained" 
 	          color="primary"
@@ -267,9 +333,25 @@ export default function Quizes( {onClickNew} ) {
 	                        {row.no}
 	                      </TableCell>
                         <TableCell align="left">
-	                        {row.content}
+                          <div  style={{
+                            background: 'violet',
+                            borderRadius: 4,
+                            padding: 4,
+                            width: 'fit-content',
+                            color: row.color?row.color: 'white',
+                            fontSize: row.size? row.size: 16,
+                            fontWeight: row.bold? 'bold': 400
+                          }}>
+                            {row.content}
+                          </div>
+                        </TableCell>
+                        <TableCell align="left">
+	                        {row.active? 'True': 'False'}
                         </TableCell>
                         <TableCell align="right">
+                          <IconButton style={{color:"#4caf50"}} onClick={() => {onClickEdit(row)}}>
+                              <CreateIcon />
+                          </IconButton>
                           <IconButton style={{color:"#f44336"}} onClick={() => {handleClickDelete(row._id)}}>
                             <DeleteIcon />
                           </IconButton>
@@ -285,5 +367,7 @@ export default function Quizes( {onClickNew} ) {
 	    </Card>
   	</Paper>
   );
-
+  else {
+    return null
+  }
 }

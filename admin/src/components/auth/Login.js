@@ -63,10 +63,11 @@ export default function Login() {
       if(response.status === 200)
         setAuth(true);
     } catch (err) {
-      addToast(err.response.data.msg, {
-        appearance: 'error',
-        autoDismiss: true,
-      })
+      if(err && err.response && err.response.data && err.response.data.error)
+        addToast(err.response.data.error, {
+          appearance: 'error',
+          autoDismiss: true,
+        })
       // err.response.data.msg && setError(err.response.data.msg);
     }
   };

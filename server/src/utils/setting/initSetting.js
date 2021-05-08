@@ -6,7 +6,7 @@ const initSetting = async () => {
         let setting = await Settings.findOne({type: 'admin'});
         if(!setting) {
             console.log('create setting')
-            await Settings.create({type: 'admin', theme: 'normal', messageNum: 30, language: 'en', privateAllow: false});
+            await Settings.create({type: 'admin', theme: 'normal', messageNum: 30, language: 'en', allowPrivate: true});
         }
     } catch(err) {
 

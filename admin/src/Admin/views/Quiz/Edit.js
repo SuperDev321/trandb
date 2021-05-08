@@ -1,11 +1,10 @@
-import React from "react";
+import React, { useEffect } from "react";
 // @material-ui/core
 import { makeStyles } from "@material-ui/core/styles";
 import PersonOutlineIcon from '@material-ui/icons/PersonOutline';
 import TextField from '@material-ui/core/TextField';
 import Grid from '@material-ui/core/Grid';
 import FormControl from '@material-ui/core/FormControl';
-import Select from '@material-ui/core/Select';
 import Switch from '@material-ui/core/Switch';
 // core components
 import GridItem from "Admin/components/Grid/GridItem.js";
@@ -16,45 +15,64 @@ import CardIcon from "Admin/components/Card/CardIcon.js";
 import CardFooter from "Admin/components/Card/CardFooter.js";
 import FormattedInputs from "Admin/components/FormattedInputs/FormattedInputs.js";
 import Button from "Admin/components/CustomButtons/Button.js";
-import  ColorPicker from 'rc-color-picker';
+
 import axios from 'axios';
 import config from '../../../config'
+import  ColorPicker from 'rc-color-picker';
 import 'rc-color-picker/assets/index.css';
 import { useToasts } from 'react-toast-notifications';
 
 import styles from "Admin/assets/jss/material-dashboard-react/views/bootCreateStyle.js";
-import { MenuItem } from "@material-ui/core";
 
 const useStyles = makeStyles(styles);
 
-export default function Create( {onClose} ) {
+export default function Edit( {onClose, row} ) {
   const { addToast } = useToasts();
   const [content, setContent] = React.useState('');
-  const [active, setActive] = React.useState(true);
-  const [color, setColor] = React.useState('#fff');
+  const [active, setActive] = React.useState(false);
   const [size, setSize] = React.useState(16);
+  const [color, setColor] = React.useState('#fff');
   const [bold, setBold] = React.useState(false);
   const classes = useStyles({color, bold, size});
   const onSubmit = async () => {
-    let payload = {};
     if(content==='') {
       addToast('Please fill content field', { appearance: 'error' });
       return;
     }
     try {
-        const {data: {data}} = await axios.post(`${config.server_url}/api/boot`, {
-          content,
-          active,
-          color,
-          size,
-          bold
-        });
-        onClose();
+        console.log(content, color, bold, size, active)
+        axios.post(`${config.server_url}/api/boot/edit`, {
+            _id: row._id,
+            content,
+            color,
+            bold,
+            size,
+            active
+        })
+        .then((response) => {
+            if(response && response.status === 204) {
+                addToast('Successfully updated', { appearance: 'success' });
+                onClose();
+            }
+        })
+        
     } catch (err) {
+        console.log(err);
         addToast('Can not create this boot', { appearance: 'error' });
         onClose();
     }
   }
+
+  useEffect(() => {
+    if(row && row.content && row._id) {
+        let {content, color, size, bold, active} = row;
+        setContent(content);
+        setActive(active);
+        setColor(color);
+        setSize(size);
+        setBold(bold);
+    }
+  }, [row])
 
   return (
     <GridContainer>
@@ -74,7 +92,7 @@ export default function Create( {onClose} ) {
                 <p className={classes.cardCategory}>Content</p>
               </Grid>
               <Grid item sm={9}>
-                <TextField style={{width: '100%'}} value={content} className={classes.content} onChange={(e)=>{setContent(e.target.value)}} />
+                <TextField className={classes.content} style={{width: '100%'}} value={content} onChange={(e)=>{setContent(e.target.value)}} />
               </Grid>
             </Grid>
             <Grid container spacing={2} style={{marginTop:'20px'}}>
@@ -95,7 +113,7 @@ export default function Create( {onClose} ) {
               </Grid>
               <Grid item sm={9}>
                 <FormControl style={{width: '100%', padding: 8}}>
-                  <ColorPicker style={{padding: 8}} color={color} enableAlpha={false} onChange={(colors)=>{let {color}=colors; setColor(color)}}/>
+                    <ColorPicker style={{padding: 8}} color={color} enableAlpha={false} onChange={(colors)=>{let {color}=colors; setColor(color)}}/>
                 </FormControl>
               </Grid>
             </Grid>
@@ -116,7 +134,6 @@ export default function Create( {onClose} ) {
                 </FormControl>
               </Grid>
             </Grid>
-
             <Grid container spacing={2} style={{marginTop:'20px'}}>
               <Grid item sm={1}>
               </Grid>
@@ -157,7 +174,7 @@ export default function Create( {onClose} ) {
                 color="rose"
                 onClick={() => {onSubmit()}}
               >
-                Create
+                Update
               </Button>
             </div>
           </CardFooter>

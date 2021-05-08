@@ -1,10 +1,13 @@
 const {Boots} = require('../../database/models')
 
-const add = async (req, res, next) => {
+const edit = async (req, res, next) => {
     try {
-        const {content, active, color, size, bold} = req.body;
-        if(content) {
-            let result = await Boots.create({
+        const {_id, content, active, color, size, bold} = req.body;
+        if(_id && content) {
+            console.log(content, color, size, bold, active)
+            let result = await Boots.updateOne({
+                _id
+            }, {
                 content,
                 active,
                 color,
@@ -13,7 +16,7 @@ const add = async (req, res, next) => {
             })
             if(result) {
                 res
-                .status(201)
+                .status(204)
                 .json({
                     message: 'success'
                 })
@@ -32,4 +35,4 @@ const add = async (req, res, next) => {
     
 }
 
-module.exports = add;
+module.exports = edit;

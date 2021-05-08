@@ -108,7 +108,7 @@ const MessagesList = ({ users, messages, role, userAction, roomName, changeMuteS
         <>
         <div ref={messagesRef} className={classes.root}>
             { currentItems &&
-                currentItems.map(({ _id, from, msg, date, type, color, bold, messageType }, index) => (
+                currentItems.map(({ _id, from, msg, date, type, color, bold, messageType, size }, index) => (
                     // <Message key={_id} text={msg} from={from} date={date} />
                     <span key={_id? _id: index}>
                         { (type==='public' && messageType === 'general')  &&
@@ -127,7 +127,7 @@ const MessagesList = ({ users, messages, role, userAction, roomName, changeMuteS
                         }
                         {
                         (type ==='public' && messageType === 'boot') &&
-                            <BootMessage text={msg} />
+                            <BootMessage message={{msg, color, bold, size}}  />
                         }
                         {
                         (type ==='system' || type === 'poke') &&

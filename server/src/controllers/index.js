@@ -5,7 +5,7 @@ const { getPrivateChat, getPublicChat, fileUploader, deleteChat } = require('./c
 const {addBan, deleteBan, getBans} = require('./bans');
 const {getWords, addWord, deleteWord} = require('./forbiddenWords');
 const {getSetting, updateSetting} = require('./settings');
-const {startBoot, deleteBoot, addBoot, getBoots, stopBoot} = require('./boots');
+const {startBoot, deleteBoot, addBoot, getBoots, stopBoot, editBoot} = require('./boots');
 
 module.exports = {
   clientError,
@@ -49,6 +49,7 @@ module.exports = {
   startBoot,
   deleteBoot,
   addBoot,
+  editBoot,
   getBoots,
   stopBoot
 };

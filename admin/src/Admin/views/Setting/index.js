@@ -37,7 +37,8 @@ export default function Setting() {
         Axios.get(`${config.server_url}/api/setting`)
         .then((response) => {
             if(response.status === 200) {
-                let {theme, language, messageNum} = response.data;
+                let {theme, language, messageNum, allowPrivate} = response.data;
+                console.log(response.data)
                 if(theme) {
                     setTheme(theme);
                 }
@@ -47,12 +48,17 @@ export default function Setting() {
                 if(messageNum) {
                     setMessageNum(messageNum)
                 }
+                if(allowPrivate) {
+                    setAllowPrivate(true);
+                } else {
+                    setAllowPrivate(false);
+                }
             }
         })
     }, [])
 
     const handleUpdate = () => {
-        Axios.post(`${config.server_url}/api/setting`, {theme, language, messageNum})
+        Axios.post(`${config.server_url}/api/setting`, {theme, language, messageNum, allowPrivate})
         .then((response) => {
             if(response.status === 204) {
                 addToast('Successfully updated', {appearance: 'success'});

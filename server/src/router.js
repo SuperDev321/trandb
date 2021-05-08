@@ -39,7 +39,8 @@ const {
   stopBoot,
   addBoot,
   deleteBoot,
-  getBoots
+  getBoots,
+  editBoot
 } = require('./controllers');
 const getUserIp = require('./controllers/users/getUserIp');
 
@@ -94,6 +95,7 @@ router.post('/file_upload', fileUploader);
 
 router.get('/boots', getBoots);
 router.post('/boot', addBoot);
+router.post('/boot/edit', editBoot);
 router.post('/boot/start', startBoot);
 router.post('/boot/stop', stopBoot);
 router.delete('/boots/:id', deleteBoot);
