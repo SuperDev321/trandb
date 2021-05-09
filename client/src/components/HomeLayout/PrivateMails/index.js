@@ -77,7 +77,6 @@ const PrivateMails = ({openPrivate, unReadMsgs}) => {
         setTimeout(() => {
             openPrivate({username: item.from});
         }, 0)
-        
     };
     return (
         <>

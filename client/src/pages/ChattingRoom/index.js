@@ -30,7 +30,8 @@ const ChattingRoom = () => {
     return (
         <HomeLayout messageSize={messageSize} setMessageSize={setMessageSize}>
             <CssBaseline />
-            <ChatRooms ref={chatRef} room={room} addUnReadMsg={addUnReadMsg}
+            <ChatRooms ref={chatRef} room={room}
+            // addUnReadMsg={addUnReadMsg}
             //  readMsg={readMsg}
             />
         </HomeLayout>
