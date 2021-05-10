@@ -15,26 +15,24 @@ import AddRoomModal from '../Modals/AddRoomModal';
 import PasswordModal from '../Modals/PasswordModal'
 import PrivateChatList from '../PrivateChat/PrivateChatList'
 import VideoList from '../VideoList';
-import Peer from 'simple-peer';
 import {StyledTab , StyledTabs} from '../StyledTab';
 import DisconnectModal from '../Modals/DisconncetModal'
 import RoomObject from '../../utils/roomObject';
 import {UserContext, SettingContext} from '../../context';
 import { socket, mediaSocket, useLocalStorage, isPrivateRoom } from '../../utils';
 import {useAudio} from 'react-use';
-import { useTranslation, withTranslation, Trans } from 'react-i18next';
-import SeparateLine from '../SeparateLine';
+import { useTranslation } from 'react-i18next';
 import {MediaClient, mediaEvents, mediaType} from '../../utils';
 
 import {permissionRequest} from './notification';
 
-const ChatRooms = ({room, addUnReadMsg}, ref) => {
+const ChatRooms = ({room}, ref) => {
     const classes = useStyles();
     const { t, i18n } = useTranslation();
     const history= useHistory();
     const [mobileOpen, setMobileOpen] = useState(false);
     const { username, avatar, gender, role } = useContext(UserContext);
-    const {enablePokeSound, enablePrivateSound, enablePublicSound, enableSysMessage} = useContext(SettingContext);
+    const {enablePokeSound, enablePrivateSound, enablePublicSound, enableSysMessage, messageNum} = useContext(SettingContext);
     const [mutes, setMutes] = useLocalStorage('mutes', []);
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
@@ -65,8 +63,6 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
     // receive new infomation for rooms
     const [newInfo, setNewInfo] = useState(null);
     // private chat send message to this user
-    const [privateTo, setPrivateTo] = useState(null);
-    const [privateMessgaes, setPrivateMessages] = useState(null);
     const [openDisconnectModal, setOpenDisconnectModal] = useState(false);
     const [openPasswordModal, setOpenPasswordModal] = useState(false);
     const [roomNameForPassword, setRoomNameForPassword] = useState('');
@@ -257,7 +253,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                 });
                 let sameRoom = roomsRef.current.find((room) => (room.name) === roomName);
                 if(sameRoom) {
-                    sameRoom.messages = [ { type, msg, room: roomName, from: username, color, bold, messageType }, ...sameRoom.messages,];
+                    sameRoom.addMessages([{ type, msg, room: roomName, from: username, color, bold, messageType }]);
                     if(sameRoom.name === currentRoomName) {
                         setCurrentRoomMessages([...sameRoom.messages]);
                     }
@@ -356,7 +352,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                         type: 'poke',
                         msg: t('PokeMessage.you_have_poked', {username: userToSend}),
                     }
-                    sameRoom.messages = [message, ...sameRoom.messages];
+                    sameRoom.addMessages([message]);
                     if(sameRoom.name === currentRoomName) {
                         setCurrentRoomMessages([...sameRoom.messages]);
                     }
@@ -401,9 +397,9 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                                 publicAudioControls.play();
                             }
                             if(currentRoomName !== room.name) {
-                                room.unReadMessages = [newMessage.message, ...room.unReadMessages];
+                                room.addUnreadMessage(newMessage.message);
                             } else {
-                                room.messages = [ newMessage.message, ...room.messages];
+                                room.addMessages([newMessage.message]);
                             }
                         }
                         if(newMessage.message.onlineUsers) {
@@ -419,7 +415,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                     
                 } else if(newMessage.message.type==='private' && newMessage.message.msg && newMessage.message.to) {
                     if(!privateListRef.current.addMessage(newMessage.message, newMessage.message.roomName)) {
-                        addUnReadMsg(newMessage.message);
+                        // addUnReadMsg(newMessage.message);
                     }
                     // if(newMessage.callback) {
                     //     newMessage.callback(true);
@@ -501,17 +497,6 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                 setNewInfo({type: 'poke', payload});
             })
 
-            socket.on('video signal', payload => {
-                // console.log('receive new video');
-                setNewInfo({ type: 'video', payload});
-            });
-
-            socket.on('return video signal', payload => {
-                setNewInfo({type: 'return video', payload});
-            });
-
-            
-
             socket.on('join error', payload => {
                joinErrorHandler(payload);
             })
@@ -574,24 +559,6 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                 console.log('get view request')
                 permissionRequest(username, roomName, callback);
             })
-            // mediaSocket.on('disconnect', (reason) => {
-            //     console.log('media socket disconnect', reason);
-            //     mediaSocket.connect();
-            // })
-
-            // mediaSocket.io.on('reconnect', async () => {
-            //     console.log('media socket reconnect');
-
-            //     if(mediaClientRef.current) {
-            //         let rooms = mediaClientRef.current.rooms;
-            //         mediaClientRef.current.init();
-            //         rooms.forEach(async (room) => {
-            //             await mediaClientRef.current.createRoom(room);
-            //             await mediaClientRef.current.join(room);
-            //         })
-            //     }
-            // })
-
 
             return () => {
                 socket.removeAllListeners();
@@ -675,7 +642,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                                 messages = [wcMsg, ...messages];
                             }
                             
-                            let newRoomObject = new RoomObject(newInfo.payload.room.name, messages, newInfo.payload.onlineUsers, newInfo.payload.blocks);
+                            let newRoomObject = new RoomObject(newInfo.payload.room.name, messages, newInfo.payload.onlineUsers, newInfo.payload.blocks, messageNum);
                             roomsRef.current.push(newRoomObject);
                             setRoomIndex(roomsRef.current.length-1);
                         } else {
@@ -694,7 +661,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                                 sameRoom.users = users;
                             }
                             if(newInfo.payload.messages) {
-                                sameRoom.messages = newInfo.payload.messages;
+                                sameRoom.setMessages(newInfo.payload.messages);
                             }
                         } else {
                             let newRooms = await(roomsRef.current.filter((room) => (room.name !==newInfo.payload.room)));
@@ -722,7 +689,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                                         msg: t('ChatApp.sys_join_room', {username: joinedUser.username})
                                         // msg: joinedUser.username + ' joined the room'
                                     }
-                                    sameRoom.messages = [sysMsg, ...sameRoom.messages];
+                                    sameRoom.addMessages([sysMsg]);
                                 }
                             }
                         }
@@ -749,7 +716,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                                     type: 'system',
                                     msg: t('ChatApp.sys_leave_room', {username: leavedUserInfo.username}) 
                                 }
-                                sameRoom.messages = [message, ...sameRoom.messages];
+                                sameRoom.addMessages([message]);
                             }
                         } else {
                             //you leaved from room by server
@@ -776,7 +743,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                                 type: 'system',
                                 msg
                             }
-                            sameRoom.messages = [message, ...sameRoom.messages];
+                            sameRoom.addMessages([message]);
                             if(sameRoom.name === currentRoomName) {
                                 setCurrentRoomMessages([...sameRoom.messages]);
                                 setCurrentRoomUsers([...sameRoom.users]);
@@ -805,7 +772,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                                 type: 'system',
                                 msg
                             }
-                            roomRef.messages = [message, ...roomRef.messages];
+                            roomRef.addMessages([message]);
                             if(roomRef.name === currentRoomName) {
                                 setCurrentRoomMessages([...roomRef.messages]);
                                 setCurrentRoomUsers([...roomRef.users]);
@@ -834,7 +801,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                                 from: pokeMessage.from,
                                 msg: t('PokeMessage.have_poked_you', {username: pokeMessage.from}) 
                             }
-                            sameRoom.messages = [message, ...sameRoom.messages];
+                            sameRoom.addMessages([message]);
                             let userToReceive = sameRoom.users.find((item) => (item.username === pokeMessage.from));
                             if(userToReceive && !userToReceive.muted) {
                                 pokeAudioControls.seek(0);
@@ -896,8 +863,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
     useEffect(() => {
         if(roomsRef.current.length > 0 && roomsRef.current.length > roomIndex) {
             
-            roomsRef.current[roomIndex].messages = [ ...roomsRef.current[roomIndex].unReadMessages, ...roomsRef.current[roomIndex].messages];
-            roomsRef.current[roomIndex].unReadMessages = [];
+            roomsRef.current[roomIndex].mergeUnreadMessages();
             setCurrentRoomMessages([...roomsRef.current[roomIndex].messages]);
             setCurrentRoomUsers([...roomsRef.current[roomIndex].users]);
             setCurrentRoomName(roomsRef.current[roomIndex].name);
@@ -905,20 +871,6 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
             setRoomsInfo(infos);
         }
     }, [roomIndex, currentRoomName]);
-
-    // useEffect(() => {
-    //     if(currentRoom) {
-    //         let curStreams = [];
-    //         if(currentRoom.myStream) {
-    //             curStreams.push(currentRoom.myStream);
-    //         }
-    //         if(currentRoom.remoteStreams && currentRoom.remoteStreams.length) {
-    //             let curRemoteStreams = currentRoom.remoteStreams.map((item) => (item.stream))
-    //             curStreams = [...curStreams, ...curRemoteStreams];
-    //         }
-    //         setCurrentStreams(curStreams);
-    //     }
-    // }, [currentRoom])
 
     // sound setting
     useEffect(() => {
@@ -1001,7 +953,7 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                                     key={index} label={<span>{item.name}</span>}
                                     id={`scrollable-auto-tabpanel-${index}`}
                                     aria-labelledby={`scrollable-auto-tab-${index}`}
-                                    unRead={item.unReadMessages.length}
+                                    unRead={item.unReadMessages ? item.unReadMessages.length: 0}
                                     onClose={roomsInfo.length < 2 ? null: () => leaveRoomByUser(item.name)}
                                 />
                             ))
@@ -1042,10 +994,6 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
 
                 <main className={classes.main}>
                     <div className={classes.content}>
-                    {/* { currentRoom && roomIndex !== null  && */}
-                    {/* } */}
-                    {/* { currentRoom && roomIndex !== null && */}
-                    {/* <SeparateLine orientation="vertical" style={{height: 'auto'}} /> */}
                         <ChatRoomContent
                             roomName={currentRoomName}
                             username={username}
@@ -1068,13 +1016,8 @@ const ChatRooms = ({room, addUnReadMsg}, ref) => {
                     </div>
                 </main>
             </div>
-            {/* <SeparateLine orientation="vertical" style={{height: 'auto'}} /> */}
             <VideoList  streams={currentRemoteStreams} localStream={currentLocalStream} controlVideo={controlVideo}/>
         </div>
-
-            {/* <PrivateChat open={openPrivate} setOpen={setOpenPrivate}
-                me={{username, avatar, gender}} to={privateTo} room={currentRoom} messages={privateMessgaes}
-            /> */}
         <PrivateChatList ref={privateListRef}
             sendMessage={sendMessage}
             leaveFromPrivate={leaveFromPrivate}

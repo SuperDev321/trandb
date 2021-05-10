@@ -417,7 +417,6 @@ function InputEmoji ({
         if(textInputRef.current && placeholderRef.current) {
             const text = textInputRef.current.innerHTML;
             if (text !== '' && placeholderRef.current.opacity !== 0) {
-                console.log(text)
                 placeholderRef.current.style.opacity = 0
             } else {
                 placeholderRef.current.style.opacity = 1

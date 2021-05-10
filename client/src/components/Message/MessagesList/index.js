@@ -50,8 +50,7 @@ const MessagesList = ({ users, messages, role, userAction, roomName, changeMuteS
     const messagesRef = useRef();
     const classes = useStyles();
     const {currentTheme} = useContext(CustomThemeContext);
-    const {messageNum, messageSize} = useContext(SettingContext);
-    const [currentItems, setCurrentItems] = useState([]);
+    const {messageSize} = useContext(SettingContext);
     const [loading, setLoading] = useState(true);
 
     const [count, setCount] = useState({
@@ -63,18 +62,18 @@ const MessagesList = ({ users, messages, role, userAction, roomName, changeMuteS
             messagesRef.current.scrollTop = messagesRef.current.scrollHeight;
         }
     }
-    const addItems = () => {
-        if(currentItems.length === messages.length) {
-            return;
-        }
-        setLoading(true);
-        setTimeout(() => {
-            let newItems = currentItems.concat(messages.slice(count.prev + itemUnit, count.next + itemUnit));
-            setCurrentItems(newItems)
-            setCount((prevState) => ({ prev: prevState.prev + itemUnit, next: prevState.next + itemUnit }))
-            setLoading(false);
-        }, 1000);
-    }
+    // const addItems = () => {
+    //     if(currentItems.length === messages.length) {
+    //         return;
+    //     }
+    //     setLoading(true);
+    //     setTimeout(() => {
+    //         let newItems = currentItems.concat(messages.slice(count.prev + itemUnit, count.next + itemUnit));
+    //         setCurrentItems(newItems)
+    //         setCount((prevState) => ({ prev: prevState.prev + itemUnit, next: prevState.next + itemUnit }))
+    //         setLoading(false);
+    //     }, 1000);
+    // }
 
     const getUserFromList = (username) => {
         // console.log(users)
@@ -87,19 +86,6 @@ const MessagesList = ({ users, messages, role, userAction, roomName, changeMuteS
     }
     const defaultColor = currentTheme === 'normal'? '#000': '#fff';
 
-    useEffect(() => {
-        if(messages.length) {
-            if(messages.length > messageNum) {
-                setCurrentItems(messages.slice(0, messageNum));
-            } else {
-                setCurrentItems(messages)
-            }
-            setLoading(false);
-        }
-        
-        
-    }, [messages]);
-
     useLayoutEffect(() => {
         setScrollTop();
     })
@@ -107,8 +93,7 @@ const MessagesList = ({ users, messages, role, userAction, roomName, changeMuteS
     return (
         <>
         <div ref={messagesRef} className={classes.root}>
-            { currentItems &&
-                currentItems.map(({ _id, from, msg, date, type, color, bold, messageType, size }, index) => (
+            { messages?.map(({ _id, from, msg, date, type, color, bold, messageType, size }, index) => (
                     // <Message key={_id} text={msg} from={from} date={date} />
                     <span key={_id? _id: index}>
                         { (type==='public' && messageType === 'general')  &&

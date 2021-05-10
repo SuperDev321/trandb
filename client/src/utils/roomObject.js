@@ -1,9 +1,9 @@
 import Peer from 'simple-peer';
 import { socket } from '../utils';
 class RoomObject  {
-    constructor(name, messages, users, blocks) {
+    constructor(name, messages, users, blocks, messageNum = 30) {
         this.name = name;
-        if(messages) {
+        if(Array.isArray(messages)) {
             this.messages = messages;
         } else {
             this.messages = [];
@@ -15,9 +15,10 @@ class RoomObject  {
         } else {
             this.users = [];
         }
-        this.unReadMessages = [];
+        this.unReadMessages = null;
         this.private = {};
         this.mutes = [];
+        this.messageNum = messageNum
         // let mutes = null;
         // let item = window.localStorage.getItem('mutes');
         // if(item) mutes = JSON.parse(item);
@@ -34,10 +35,6 @@ class RoomObject  {
         } else {
             this.blocks = [];
         }
-        
-
-        this.myStream = null;
-        this.remoteStreams = [];
         this.cameraState = false;
     }
 
@@ -77,12 +74,29 @@ class RoomObject  {
     }
     
     setMessages(messages) {
-        this.messages = [...messages];
+        this.messages = messages.slice(0, this.messageNum);
     }
 
     addMessages(messages) {
         // console.log('set message to room object', messages);
-        this.messages = [...this.messages, ...messages];
+        let newMessages = [...messages, ...this.messages];
+        this.messages = newMessages.slice(0, this.messageNum);
+    }
+
+    mergeUnreadMessages() {
+        if(this.unReadMessages && this.unReadMessages.length > 0) {
+            let newMessages = [...this.unReadMessages, ...this.messages];
+            this.messages = newMessages.slice(0, this.messageNum);
+        }
+        this.unReadMessages = null;
+    }
+
+    addUnreadMessage(message) {
+        if(Array.isArray(this.unReadMessages)) {
+            this.unReadMessages = [message, ...this.unReadMessages];
+        } else {
+            this.unReadMessages = [message];
+        }
     }
 
     setMutes(mutes) {
@@ -99,31 +113,14 @@ class RoomObject  {
         }
     }
     deleteMute(mute) {
-        // let user = this.users.find((item) => (item.username === mute));
-        // if(!user.blocked) {
-            this.mutes = this.mutes.filter((item) => (item && (item.username !== mute.username) && (item.ip !== mute.ip)));
-            return true;
-        // } else {
-        //     return false;
-        // }
+        this.mutes = this.mutes.filter((item) => (item && (item.username !== mute.username) && (item.ip !== mute.ip)));
+        return true;
     }
 
     setOnlineUsers(users) {
         this.users = users;
     }
     addOnlineUser(user) {
-        // let mutes = null;
-        // let item = window.localStorage.getItem('mutes');
-        // if(item) mutes = JSON.parse(item);
-        // if(!Array.isArray(mutes)) mutes = null;
-        // let muted = false
-        // if(mutes) {
-        //     let mute = mutes.find((value) => (value.room === this.name && value.user === user.username));
-        //     if(mute) muted = true;
-        // }
-        // if(user.blocked && !this.mutes.includes(user.username)) {
-        //     this.mutes = [...this.mutes, user.username];
-        // }
         let currentUserNames = this.users.map(({username}) => (username));
         if(!currentUserNames.includes(user.username)) {
             this.users = [...this.users, user];
@@ -131,31 +128,6 @@ class RoomObject  {
         } else {
             return false;
         }
-    }
-
-    openCamera = async () => {
-        let stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-        this.streams.push(stream);
-        const peer = new Peer({
-            initiator: true,
-            trickle: false,
-            stream: stream,
-        });
-
-        this.peer=peer;
-    
-        peer.on("signal", data => {
-            // callback(data);
-            socket.emit("broadcast video", { signalData: data, from: this.name })
-        })
-    
-        peer.on("stream", stream => {
-            this.streams.push(stream);
-        });
-
-        peer.on('error', (err)=>{
-        
-        })
     }
 }
 

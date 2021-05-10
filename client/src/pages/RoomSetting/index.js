@@ -158,7 +158,6 @@ export default function RoomSetting() {
         
       }, (error) => {
         enqueueSnackbar('Can not access this setting.', {variant: 'error'});
-        
       })
   }, [enqueueSnackbar, room]);
 
