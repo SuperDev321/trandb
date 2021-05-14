@@ -17,6 +17,7 @@ import {
 import AddIcon from '@material-ui/icons/Add';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import { useTheme } from '@material-ui/core/styles';
+import PasswordModal from '../PasswordModal'
 import { getRooms } from '../../../utils';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -41,6 +42,8 @@ export default function AddRoomModal({addRoom}) {
     const classes = useStyles();
     const [open, setOpen] = useState(false);
     const [rooms, setRooms] = useState(null);
+    const [openPasswordModal, setOpenPasswordModal] = useState(false);
+    const [roomNameForPassword, setRoomNameForPassword] = useState('');
     const theme = useTheme();
     const fullScreen = useMediaQuery(theme.breakpoints.down('xs'));
     const { t } = useTranslation();
@@ -61,6 +64,9 @@ export default function AddRoomModal({addRoom}) {
                 setOpen(false);
                 if(message === 'already_entered') {
                     enqueueSnackbar(t('AddRoomModal.error1'), {variant: 'error'});
+                } else if(message === 'password'){
+                    setRoomNameForPassword(room);
+                    setOpenPasswordModal(true);
                 }
             }
         }); 
@@ -127,6 +133,12 @@ export default function AddRoomModal({addRoom}) {
             </Button>
             </DialogActions> */}
         </Dialog>
+        <PasswordModal
+            open={openPasswordModal}
+            setOpen={setOpenPasswordModal}
+            room={roomNameForPassword}
+            // onClose={() => {if(!roomIndex) setRoomIndex(0)}}
+        />
         </>
     );
 }

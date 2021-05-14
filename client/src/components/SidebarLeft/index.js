@@ -119,7 +119,7 @@ const SideBarLeft = ({ roomName, username, mutes, blocks, globalBlocks, changeMu
         setSideUsers(filteredUsers);
     }, [searchText, users])
 
-    const isMuted = (user) => {
+    const isMuted = useCallback((user) => {
         let mutedNames = Array.isArray(mutes)? mutes.map((item) => ((item&&item.username)? item.username: null)): [];
         let mutedIps =  Array.isArray(mutes)? mutes.map((item) => ((item&&item.ip)? item.ip: null)): [];
         if( mutedNames.includes(user.username) || mutedIps.includes(user.ip)) {
@@ -127,9 +127,9 @@ const SideBarLeft = ({ roomName, username, mutes, blocks, globalBlocks, changeMu
         } else {
             return false;
         }
-    }
+    }, [mutes])
 
-    const isBlocked = (user) => {
+    const isBlocked = useCallback((user) => {
         let blockedNames = blocks.map((item) => (item.username? item.username: null));
         let globalBlockedNames = globalBlocks.map((item) => (item.username? item.username: null));
         blockedNames = [...blockedNames, ...globalBlockedNames];
@@ -143,7 +143,7 @@ const SideBarLeft = ({ roomName, username, mutes, blocks, globalBlocks, changeMu
         } else {
             return false;
         }
-    }
+    }, [blocks, globalBlocks]);
 
     const isBroadcasting = useCallback((user) => {
         if(user.username === username) {
