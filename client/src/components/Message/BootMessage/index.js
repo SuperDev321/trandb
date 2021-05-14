@@ -53,8 +53,4 @@ const BootMessage = ({ message }) => {
     );
 };
 
-BootMessage.propTypes = {
-  text: propTypes.string.isRequired,
-};
-
 export default React.memo(BootMessage);
