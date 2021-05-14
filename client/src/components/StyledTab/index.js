@@ -75,7 +75,7 @@ const StyledTab = withStyles((theme) => ({
                 badgeContent={props.unRead} 
             >
                 <Tab disableRipple  {...newProps} icon={props.onClose && <CloseIcon fontSize="small"
-                onClick={(e)=> {e.preventDefault(); props.onClose()}}/>} />
+                onClick={(e)=> {e.stopPropagation(); props.onClose();}}/>} />
             </StyledBadge>
         )
         

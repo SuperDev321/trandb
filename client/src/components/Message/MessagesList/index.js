@@ -51,8 +51,6 @@ const MessagesList = ({ users, messages, role, userAction, roomName, changeMuteS
     const classes = useStyles();
     const {currentTheme} = useContext(CustomThemeContext);
     const {messageSize} = useContext(SettingContext);
-    const [loading, setLoading] = useState(true);
-
     const [count, setCount] = useState({
         prev: 0,
         next: itemUnit
@@ -63,23 +61,11 @@ const MessagesList = ({ users, messages, role, userAction, roomName, changeMuteS
         }
     }
 
-    useEffect(() => {
-        if(Array.isArray(messages) && messages.length > 0 && loading) {
-            setLoading(false)
-        }
-    }, [messages])
-    // const addItems = () => {
-    //     if(currentItems.length === messages.length) {
-    //         return;
+    // useEffect(() => {
+    //     if(Array.isArray(messages) && messages.length > 0 && loading) {
+    //         setLoading(false)
     //     }
-    //     setLoading(true);
-    //     setTimeout(() => {
-    //         let newItems = currentItems.concat(messages.slice(count.prev + itemUnit, count.next + itemUnit));
-    //         setCurrentItems(newItems)
-    //         setCount((prevState) => ({ prev: prevState.prev + itemUnit, next: prevState.next + itemUnit }))
-    //         setLoading(false);
-    //     }, 1000);
-    // }
+    // }, [messages])
 
     const getUserFromList = (username) => {
         // console.log(users)
@@ -90,7 +76,6 @@ const MessagesList = ({ users, messages, role, userAction, roomName, changeMuteS
             return {username};
         }
     }
-    const defaultColor = currentTheme === 'normal'? '#000': '#fff';
 
     useLayoutEffect(() => {
         setScrollTop();
@@ -102,7 +87,7 @@ const MessagesList = ({ users, messages, role, userAction, roomName, changeMuteS
             { messages?.map(({ _id, from, msg, date, type, color, bold, messageType, size }, index) => (
                     // <Message key={_id} text={msg} from={from} date={date} />
                     <span key={_id? _id: index}>
-                        { (type==='public' && (messageType === 'general' || messageType === 'img'))  &&
+                        { (type==='public' && (messageType === 'general' || messageType === 'image'))  &&
                             <ClientMessage userAction={userAction}
                                 user={getUserFromList(from)}
                                 roomName={roomName}
@@ -127,9 +112,9 @@ const MessagesList = ({ users, messages, role, userAction, roomName, changeMuteS
                     </span>
                 ))
             }
-            { loading &&
+            {/* { loading &&
                 <span className={classes.loading}>Loading ...</span>
-            }
+            } */}
         </div>
         {/* <div ref={messagesRef} className={classes.root} id="scrollableDiv"></div>
         <InfiniteScroll

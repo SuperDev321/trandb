@@ -17,6 +17,7 @@ const ChatForm = ({roomName, to, sendMessage, onFocus, onBlur, type, blocked}) =
     const {t} = useTranslation();
     const [msg, setMsg] = useState('');
     const formRef = useRef(null);
+    const fileInputRef = useRef(null);
     const [userColor, setUserColor] = useState('default');
     const [bold, setBold] = useState(false);
     // const emoji = new EmojiConvertor();
@@ -53,10 +54,13 @@ const ChatForm = ({roomName, to, sendMessage, onFocus, onBlur, type, blocked}) =
                 let fileUrl = response.data.photoUrl;
                 sendMessage(roomName, to, userColor, fileUrl, null, type, 'image');
             }
+            if(fileInputRef.current) {
+                fileInputRef.current.value = null;
+            }
         })
     }, [roomName, to, type, userColor]);
     const handleChangeFile = (files, type) => {
-        if(files[0]) {
+        if(files && files[0]) {
             let file = files[0];
             sendFileMessage(file);
         }
@@ -83,7 +87,7 @@ const ChatForm = ({roomName, to, sendMessage, onFocus, onBlur, type, blocked}) =
                 <div  className={classes.fileUpload}>
                 
                 <label className={classes.fileUploadLabel}><CloudUploadIcon fontSize="small"/>
-                    <input type="file" className={classes.fileUploadInput}
+                    <input type="file" className={classes.fileUploadInput} ref={fileInputRef}
                         onChange={(e) => handleChangeFile(e.target.files)}
                     />
                 </label>
