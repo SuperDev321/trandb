@@ -62,6 +62,12 @@ const MessagesList = ({ users, messages, role, userAction, roomName, changeMuteS
             messagesRef.current.scrollTop = messagesRef.current.scrollHeight;
         }
     }
+
+    useEffect(() => {
+        if(Array.isArray(messages) && messages.length > 0 && loading) {
+            setLoading(false)
+        }
+    }, [messages])
     // const addItems = () => {
     //     if(currentItems.length === messages.length) {
     //         return;
@@ -96,7 +102,7 @@ const MessagesList = ({ users, messages, role, userAction, roomName, changeMuteS
             { messages?.map(({ _id, from, msg, date, type, color, bold, messageType, size }, index) => (
                     // <Message key={_id} text={msg} from={from} date={date} />
                     <span key={_id? _id: index}>
-                        { (type==='public' && messageType === 'general')  &&
+                        { (type==='public' && (messageType === 'general' || messageType === 'img'))  &&
                             <ClientMessage userAction={userAction}
                                 user={getUserFromList(from)}
                                 roomName={roomName}

@@ -129,6 +129,10 @@ class RoomObject  {
             return false;
         }
     }
+    removeOnlineUser(userId) {
+        let usersToSet = this.users.filter((user) => (user._id !== userId));
+        this.users = usersToSet;
+    }
 }
 
 export default RoomObject;
