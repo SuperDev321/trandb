@@ -37,7 +37,6 @@ function roomReducer(state, action) {
 function roomsReducer(state, action) {
     switch (action.type) {
         case 'add': {
-            console.log('add room info')
             return {status: 'resolved', data: [...state.data, action.data], roomIndex: state.data.length, error: null}
         }
         case 'remove': {
@@ -107,7 +106,6 @@ const useRooms = ({initRoomName, ...initalState}) => {
     const {status: roomsStatus, data: roomsData, roomIndex, error: roomsError} = roomsState;
 
     const changeRoom = (newRoomIndex) => {
-       
         let room = roomsRef.current[newRoomIndex];
         room.mergeUnreadMessages();
         data.name = room.name;
@@ -120,7 +118,6 @@ const useRooms = ({initRoomName, ...initalState}) => {
         dispatch({type: 'init', data});
         roomNameRef.current = room.name;
         let newRoomsData = roomsRef.current.map(({name, unReadMessages}) => ({name, unReadMessages}));
-        console.log(newRoomIndex, newRoomsData, roomsState)
         roomsDispatch({type: 'set', data: newRoomsData, roomIndex: newRoomIndex});
     }
 
@@ -324,7 +321,6 @@ const useRooms = ({initRoomName, ...initalState}) => {
     }
 
     const removeRoom = React.useCallback(async (room, callback) => {
-        console.log('remove room', room, data, roomsData)
         if(status === 'resolved' && roomsStatus === 'resolved') {
             let {name: currentRoomName} = data;
             let roomIndexToRemove = roomsRef.current.findIndex((item) => (item.name === room));
@@ -355,11 +351,9 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 }
                 let newRooms = await(roomsRef.current.filter((oneRoom) => (oneRoom.name !==room)));
                 roomsRef.current = newRooms;
-                // console.log('remove a room');
                 if(newRoomIndex === null) {
                     newRoomIndex = roomsRef.current.findIndex((item) => (item.name === currentRoomName));
                 }
-                console.log(newRoomIndex, currentRoomName, room, roomsRef.current)
                 let newRoomsData = roomsRef.current.map(({name, unReadMessages}) => ({name, unReadMessages}));
                 roomsDispatch({type: 'set', data: newRoomsData, roomIndex: newRoomIndex});
                 if(callback) callback(true);
@@ -457,7 +451,6 @@ const useRooms = ({initRoomName, ...initalState}) => {
 
     const receivePoke = (pokeMessage) => {
         let {room} = pokeMessage;
-        console.log('poke', pokeMessage)
         if(roomsRef.current && room) {
             let sameRoom = roomsRef.current.find((item) => (item.name === room));
             if(sameRoom) {
@@ -527,7 +520,6 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 fn('success');
                 let usernames = await onlineUsers.map((item) => (item.username));
                 if(usernames.includes(username)) {
-                    // console.log('username: ', username);
                     initRoom({room, onlineUsers, messages, blocks, globalBlocks});
                 }
             });
@@ -547,7 +539,6 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 kickUser({kickedUserName, type: 'global ban'}); 
             });
             socket.on('update block', ({room, blocks}) => {
-                console.log('update blocks', room, blocks)
                 dispatch({type: 'update', data: { name: room, blocks}}); 
             })
             socket.on('update global block', ({blocks}) => {
@@ -646,11 +637,9 @@ const useRooms = ({initRoomName, ...initalState}) => {
     useEffect(() => {
         if(roomEvent) {
             let {type, data} = roomEvent;
-            console.log(roomEvent, type)
             switch(type) {
                 case 'remove room':
                     let {room, reason} = data;
-                    console.log(data)
                     removeRoom(room, (result, message) => {
                         if(result) {
                             let alertText = (reason === 'kick') 
