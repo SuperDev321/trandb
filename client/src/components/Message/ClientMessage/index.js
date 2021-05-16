@@ -1,8 +1,8 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState, useRef } from 'react';
 import {UserContext} from '../../../context';
 import PropTypes, { element } from 'prop-types';
 import {EmojiConvertor} from 'emoji-js';
-import parseHTML from 'parsehtml';
+import ImageView from './ImageView';
 import moment from 'moment';
 import randomstring from "randomstring";
 import RoomUserName from '../../RoomUserName';
@@ -18,10 +18,13 @@ emoji.replace_mode = 'img';// 'unified';
 emoji.use_sheet = true;
 
 const MyMessage = ({user, roomName, message, messageSize, role, font_size, userAction, changeMuteState, sendPokeMessage, 
-    kickUser, banUser, addOrOpenPrivate}) => {
+    kickUser, banUser, addOrOpenPrivate, scrollEvent, ...props}) => {
     const classes = useStyles({color: message.color, bold: message.bold, messageSize});
     const { username } = useContext(UserContext);
     const [checked, setChecked] = useState(false);
+
+    
+
     const urlify = (text) => {
     
         let urlRegex = /(https?:\/\/[^\s]+)/g;
@@ -42,7 +45,6 @@ const MyMessage = ({user, roomName, message, messageSize, role, font_size, userA
     }
     const makeTag = (emojiText) => {
         let arr = emojiText.split(/<img .*?>/g);
-        let urlRegex = /(https?:\/\/[^\s]+)/g;
         let noRepeatArr = [...new Set(arr)];
         let urlText = emojiText;
         if(noRepeatArr && noRepeatArr.length) {
@@ -75,51 +77,8 @@ const MyMessage = ({user, roomName, message, messageSize, role, font_size, userA
         }
     }
 
-    const convertHTML = (text) => {
-        console.log('convertHTML',text)
-        text = text.split('\" />').join('\">');
-        let result = [];
-        var html = parseHTML(text);
-        // console.log(text)
-
-        if (html.children.length > 0) {
-            for (let k = 0; k < html.children.length; k++) {
-                const element = html.children[k];
-                let key = randomstring.generate(8);
-                if (element.tagName == "IMG") {
-                    key = randomstring.generate(8)
-                    result.push(<img key={key} src={element.attributes[0].nodeValue}
-                                className={element.attributes[1].nodeValue}
-                                data-codepoints={element.attributes[2].nodeValue}/>)
-                } else if (element.tagName === "A") {
-                    let url = element.href
-                    let host = element.host
-                    result.push(<span key={key} className={classes.url_underline}
-                                onClick={() => userAction('show_link', {url, host})}>{url}</span>)
-                } else {
-                    element.setAttribute('key', key);
-                    result.push(<span key={key}>{element.innerHTML}</span>)
-                }
-            }
-        } else {
-            let key = randomstring.generate(8);
-            if (html.tagName == "IMG") {
-            result.push(<img key={key} src={html.attributes[0].nodeValue}
-                            className={html.attributes[1].nodeValue}
-                            data-codepoints={html.attributes[2].nodeValue}/>)
-            } else if (html.tagName === "A") {
-            let url = html.href
-            result.push(<span key={key} className={classes.url_underline}
-                                onClick={() =>{userAction('show_link', {url})} }>{url}</span>)
-            } else {
-            result.push(<span key={key}>{html.innerHTML}</span>)
-            }
-        }
-        return result
-    }
-
     return (
-        <div className={classes.message}>
+        <div className={classes.message} {...props}>
             <div className={classes.messageContent}>
             <span className={classes.sender}>
                 <RoomUserName
@@ -138,13 +97,14 @@ const MyMessage = ({user, roomName, message, messageSize, role, font_size, userA
                 <span>:&nbsp;</span></span>
                 <>
                 { (message.messageType === 'image') ?
-                <span className={classes.text + ' ' + classes.size10}>
+                    <ImageView url={message.msg} className={classes.text + ' ' + classes.size10} scrollEvent={scrollEvent} />
+                    /* <span className={classes.text + ' ' + classes.size10}>
                 {!checked ? <a href="#!" style={{color: '#046eb9'}}>
                 <strong
                     onClick={() => {setChecked(true)}}
                     style={{cursor: "pointer"}}>click to view</strong></a> :
                 <img src={'/'+message.msg} className={classes.photo}/>}
-                </span>
+                </span> */
                 :
                 <span
                     className={classes.text}
@@ -175,4 +135,4 @@ const MyMessage = ({user, roomName, message, messageSize, role, font_size, userA
 //   font_size: PropTypes.number.isRequired,
 // };
 
-export default MyMessage;
+export default React.memo(MyMessage);

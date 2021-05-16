@@ -1,5 +1,6 @@
 import React, { useState, useReducer, useEffect, useContext, useRef, useCallback } from 'react';
 import { socket, mediaSocket, useLocalStorage, isPrivateRoom } from '../../utils';
+import {MediaClient, mediaEvents, mediaType} from '../../utils';
 import RoomObject from '../../utils/roomObject';
 import {UserContext, SettingContext} from '../../context';
 import { useTranslation } from 'react-i18next';
@@ -65,6 +66,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
 
     const history= useHistory();
     const roomsRef = useRef([]);
+    const mediaClientRef = useRef(null);
     const [roomsState, roomsDispatch] = useReducer(roomsReducer, {
         status: 'idle',
         data: [],
@@ -106,6 +108,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
     const {status: roomsStatus, data: roomsData, roomIndex, error: roomsError} = roomsState;
 
     const changeRoom = (newRoomIndex) => {
+        console.log('change room');
         let room = roomsRef.current[newRoomIndex];
         room.mergeUnreadMessages();
         data.name = room.name;
@@ -115,13 +118,16 @@ const useRooms = ({initRoomName, ...initalState}) => {
         data.mutes = room.mutes
         data.unReadMessages = room.unReadMessages;
         data.users = room.users;
+        data.localStream = mediaClientRef.current.getLocalStream(room.name);
+        data.remoteStreams = mediaClientRef.current.getRemoteStreams(room.name);
+        data.liveUsers = mediaClientRef.current.getLiveUsers(room.name);
         dispatch({type: 'init', data});
         roomNameRef.current = room.name;
         let newRoomsData = roomsRef.current.map(({name, unReadMessages}) => ({name, unReadMessages}));
         roomsDispatch({type: 'set', data: newRoomsData, roomIndex: newRoomIndex});
     }
 
-    const initRoom = ({room, globalBlocks, onlineUsers, messages, blocks}) => {
+    const initRoom = async ({room, globalBlocks, onlineUsers, messages, blocks}) => {
         let data = {};
         if(roomsRef.current && room) {
             if(Array.isArray(globalBlocks)) {
@@ -146,6 +152,9 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 data.blocks = blocks;
                 data.mutes = newRoomObject.mutes
                 data.unReadMessages = newRoomObject.unReadMessages;
+                data.localStream = null;
+                data.remoteStreams = null;
+                data.liveUsers = null;
                 dispatch({type: 'init', data});
                 roomNameRef.current = room.name;
                 roomsDispatch({type: 'add', data: {
@@ -166,11 +175,11 @@ const useRooms = ({initRoomName, ...initalState}) => {
                     sameRoom.setMessages(messages);
                 }
             }
-            // if(mediaClientRef.current) {
-            //     await mediaClientRef.current?.init();
-            //     await mediaClientRef.current?.createRoom(room.name);
-            //     await mediaClientRef.current?.join(room.name);
-            // }
+            if(mediaClientRef.current) {
+                await mediaClientRef.current?.init();
+                await mediaClientRef.current?.createRoom(room.name);
+                await mediaClientRef.current?.join(room.name);
+            }
         }
     }
 
@@ -347,6 +356,9 @@ const useRooms = ({initRoomName, ...initalState}) => {
                     data.mutes = newRoom.mutes
                     data.unReadMessages = newRoom.unReadMessages;
                     data.users = newRoom.users;
+                    data.localStream = mediaClientRef.current.getLocalStream(newRoom.name);
+                    data.remoteStreams = mediaClientRef.current.getRemoteStreams(newRoom.name);
+                    data.liveUsers = mediaClientRef.current.getLiveUsers(newRoom.name);
                     dispatch({type: 'init', data});
                 }
                 let newRooms = await(roomsRef.current.filter((oneRoom) => (oneRoom.name !==room)));
@@ -361,9 +373,9 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 if(callback) callback(false);
             }
         }
-        // if(mediaClientRef.current) {
-        //     mediaClientRef.current.exitRoom(room);
-        // }
+        if(mediaClientRef.current) {
+            mediaClientRef.current.exitRoom(room);
+        }
     }, [state, roomsState, history])
 
     const changeMuteState = (roomName, userToMute, isMuted) => {
@@ -479,6 +491,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
     }
 
     const addMessage = ({message, room}) => {
+        console.log('add message', message)
         let sameRoom = roomsRef.current.find((item) => (item.name) === room);
         if(sameRoom) {
             sameRoom.addMessages([message]);
@@ -494,7 +507,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
     useEffect(() => {
         if(socket && mediaSocket && initRoomName && username) {
             let result = socket.open();
-            // mediaSocket.open();
+            mediaSocket.open();
 
             isPrivateRoom(initRoomName, ({isPrivate}) => {
                 if(isPrivate) {
@@ -542,9 +555,11 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 dispatch({type: 'update', data: { name: room, blocks}}); 
             })
             socket.on('update global block', ({blocks}) => {
+
                 setGlobalBlocks(blocks);
             })
             socket.on('room message', (message, callback) => {
+                console.log('new message', message)
                 if(callback) {
                     callback(true);
                 }
@@ -577,7 +592,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 console.log('connect_error', err);
             })
 
-            socket.io.on('reconnect', () => {
+            socket.io.on('reconnect', async () => {
                 let roomNames = roomsRef.current.map((room) => (room.name));
                 let privateRooms = privateListRef.current ? privateListRef.current.getPrivateRooms(): [];
                 roomNames.map(async (roomName) => {
@@ -601,6 +616,8 @@ const useRooms = ({initRoomName, ...initalState}) => {
                     })
                 })
                 setOpenDisconnectModal(false)
+                await mediaSocket.close();
+                await mediaSocket.open();
             })
 
             socket.io.on('reconnect_attempt', () => {
@@ -627,6 +644,79 @@ const useRooms = ({initRoomName, ...initalState}) => {
             };
         }
     }, [socket, mediaSocket, initRoomName, username]);
+
+    useEffect(() => {
+        let mediaObj = new MediaClient(username);
+        mediaObj.on(mediaEvents.onChangeConsume, (data) => {
+            let {room_id} = data;
+            let liveUsers = mediaClientRef.current.getLiveUsers(room_id);
+            dispatch({
+                type: 'update',
+                data: {
+                    name: room_id,
+                    liveUsers
+                }
+            })
+            // setMediaEvent({room_id, event: 'consume'});
+        })
+        mediaObj.on(mediaEvents.onChangeRemoteStreams, (data) => {
+            let {room_id} = data;
+            let remoteStreams = mediaClientRef.current.getRemoteStreams(room_id);
+            dispatch({
+                type: 'update',
+                data: {
+                    name: room_id,
+                    remoteStreams
+                }
+            })
+            // setMediaEvent({room_id, event: 'remote streams'});
+        })
+
+        mediaObj.on(mediaEvents.startStream, (data) => {
+            let {room_id} = data;
+            let stream = mediaObj.getLocalStream(room_id);
+            dispatch({
+                type: 'update',
+                data: {
+                    name: room_id,
+                    localStream: stream
+                }
+            })
+        })
+
+        mediaObj.on(mediaEvents.stopStream, (data) => {
+            let {room_id} = data;
+            dispatch({
+                type: 'update',
+                data: {
+                    name: room_id,
+                    localStream: null
+                }
+            })
+        })
+
+        mediaObj.on(mediaEvents.changeViewers, (data) => {
+            let {room_id} = data;
+            let viewers = mediaClientRef.current.getViewers(room_id);
+            dispatch({
+                type: 'update',
+                data: {
+                    name: room_id,
+                    viewers
+                }
+            })
+        })
+
+        mediaClientRef.current = mediaObj;
+
+        return () => {
+            if(mediaClientRef.current) {
+                mediaClientRef.current.exit(true);
+                mediaClientRef.current = null;
+            }
+            
+        }
+    }, [username])
 
     useEffect(() => {
         if(status === 'rejected') {
@@ -702,7 +792,8 @@ const useRooms = ({initRoomName, ...initalState}) => {
         privateAudio,
         publicAudio,
         openDisconnectModal,
-        setOpenDisconnectModal
+        setOpenDisconnectModal,
+        mediaClientRef
     }
 
 }

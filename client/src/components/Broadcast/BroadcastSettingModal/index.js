@@ -59,7 +59,6 @@ function BroadcastSettingModal({roomName, startBroadcast, users, ...modalProps})
     }
 
     useEffect(() => {
-        console.log(status, error, data);
         if((status === 'resolved') && data) {
             if(data) {
                 console.log(data);
@@ -120,8 +119,9 @@ function BroadcastSettingModal({roomName, startBroadcast, users, ...modalProps})
 
 const BroadcastSetting = ({users, startBroadcast, stopBroadcast, cameraState, roomName}) => {
     const classes = useStyles();
-    
+    const { t } = useTranslation();
     const [open, setOpen] = useState(false);
+    
     const handleClickOpen = () => {
         // console.log('users', users)
         if(!cameraState) {
@@ -133,14 +133,7 @@ const BroadcastSetting = ({users, startBroadcast, stopBroadcast, cameraState, ro
     const handleClose = () => {
         setOpen(false);
     };
-    const { t } = useTranslation();
-    // const handleOK = () => {
-    //     if(usersState) {
-    //         let usersChecked = usersState.filter((state) => (state.checked));
-    //         // console.log(usersChecked);
-    //     }
-    //     setOpen(false);
-    // }
+
     return (
         <div>
             <Button fullWidth

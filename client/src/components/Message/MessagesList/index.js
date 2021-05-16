@@ -77,9 +77,14 @@ const MessagesList = ({ users, messages, role, userAction, roomName, changeMuteS
         }
     }
 
+    const scrollEvent = (index) => {
+        setScrollTop();
+    }
+
     useLayoutEffect(() => {
         setScrollTop();
-    })
+        console.log(messages)
+    }, [messages])
 
     return (
         <>
@@ -88,7 +93,9 @@ const MessagesList = ({ users, messages, role, userAction, roomName, changeMuteS
                     // <Message key={_id} text={msg} from={from} date={date} />
                     <span key={_id? _id: index}>
                         { (type==='public' && (messageType === 'general' || messageType === 'image'))  &&
-                            <ClientMessage userAction={userAction}
+                            <ClientMessage
+                                id={`message-${_id}`}
+                                userAction={userAction}
                                 user={getUserFromList(from)}
                                 roomName={roomName}
                                 role={role}
@@ -99,6 +106,7 @@ const MessagesList = ({ users, messages, role, userAction, roomName, changeMuteS
                                 kickUser={kickUser}
                                 banUser={banUser}
                                 addOrOpenPrivate={addOrOpenPrivate}
+                                scrollEvent={() => {scrollEvent(index)}}
                             />
                         }
                         {
