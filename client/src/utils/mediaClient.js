@@ -45,7 +45,6 @@ class MediaClient {
         this.remoteStreams = new Map();
         this.localStreams = new Map();
 
-        this.producer = null;
         /**
          * map that contains a mediatype as key and producer_id as value
          */
@@ -75,7 +74,8 @@ class MediaClient {
 
     async createRoom(room_id) {
         await mediaSocket.request('createMediaRoom', {
-            room_id
+            room_id,
+            token: 'media_token'
         }).catch(err => {
             console.log(err)
         })
@@ -85,7 +85,8 @@ class MediaClient {
         try {
             let result = await mediaSocket.request('joinMedia', {
                 name: this.name,
-                room_id
+                room_id,
+                token: 'media_token'
             });
 
             const data = await mediaSocket.request('getRouterRtpCapabilities', room_id);
@@ -97,6 +98,37 @@ class MediaClient {
         } catch (e) {
             console.log(e);
         }
+    }
+
+    clearRoom(room_id) {
+        this.devices.delete(room_id);
+        let consumerTransport = this.consumerTransports.get(room_id);
+        if(consumerTransport) {
+            consumerTransport.close();
+        }
+        let producerTransport = this.producerTransports.get(room_id);
+        if(producerTransport) {
+            producerTransport.close();
+        }
+        let producerInfo = this.producers.get(room_id);
+        if(producerInfo && producerInfo.producer) {
+            producerInfo.producer.close();
+        }
+        let consumerArr = Array.from(this.consumers.values())
+        consumerArr.forEach((item) => {
+            if(item && (item.room_id === room_id)) {
+                if(item.consumer) {
+                    item.consumer.close();
+                }
+                this.consumers.delete(item.consumer.id);
+            }
+        })
+        this.localStreams.delete(room_id);
+        this.remoteStreams.delete(room_id);
+        this.viewers.delete(room_id);
+        this.event(_EVENTS.stopStream, {room_id});
+        this.event(_EVENTS.changeViewers, {room_id});
+        this.event(_EVENTS.onChangeRemoteStreams, {room_id});
     }
 
     exitRoom(room_id) {
@@ -123,7 +155,12 @@ class MediaClient {
                 this.consumers.delete(item.consumer.id);
             }
         })
-
+        this.localStreams.delete(room_id);
+        this.remoteStreams.delete(room_id);
+        this.viewers.delete(room_id);
+        this.event(_EVENTS.stopStream, {room_id});
+        this.event(_EVENTS.changeViewers, {room_id});
+        this.event(_EVENTS.onChangeRemoteStreams, {room_id});
     }
 
     async loadDevice(routerRtpCapabilities) {
@@ -207,10 +244,10 @@ class MediaClient {
                         break;
 
                     case 'connected':
-                        //localVideo.srcObject = stream
                         break;
 
                     case 'failed':
+                        console.log('transport connection failed')
                         producerTransport.close();
                         break;
 
@@ -251,8 +288,6 @@ class MediaClient {
                         break;
 
                     case 'connected':
-                        //remoteVideo.srcObject = await stream;
-                        //await mediaSocket.request('resume');
                         break;
 
                     case 'failed':
@@ -311,6 +346,9 @@ class MediaClient {
         })
 
         mediaSocket.on('disconnect' ,function (reason) {
+            this.rooms.forEach((room) => {
+                this.clearRoom(room);
+            })
             if (reason === "io server disconnect") {
                 // the disconnection was initiated by the server, you need to reconnect manually
                 mediaSocket.connect();
@@ -771,9 +809,7 @@ class MediaClient {
         } else {
             let audioProducerId = label['audio'];
             let videoProducerId = label['video'];
-            mediaSocket.emit('roomProducersClosed', {
-                room_id
-            });
+            
             let audioProducerInfo = this.producers.get(audioProducerId);
             if(audioProducerInfo) {
                 audioProducerInfo.producer.close();
@@ -787,9 +823,13 @@ class MediaClient {
             this.producerLabels.delete(room_id);
             this.viewers.delete(room_id);
             this.localStreams.delete(room_id);
+            mediaSocket.emit('roomProducersClosed', {
+                room_id
+            });
             this.event(_EVENTS.onChangeProduce, {room_id, type: 'close'});
             this.event(_EVENTS.changeViewers, {room_id});
             this.event(_EVENTS.stopStream, {room_id});
+            
         }
     }
 
@@ -1029,8 +1069,8 @@ class MediaClient {
         } else {
             return null;
         }
-        
     }
+
 
 
     //////// GETTERS ////////

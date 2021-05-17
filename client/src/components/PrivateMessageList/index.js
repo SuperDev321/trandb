@@ -100,7 +100,6 @@ const PrivateMessageList = ({messages, me, blocked, withBlocked}) => {
     }, [messagesToShow]);
     const setScrollTop = () => {
         if (listRef.current) {
-            console.log('private scroll')
             listRef.current.scrollTop = listRef.current.scrollHeight;
         }
     }
