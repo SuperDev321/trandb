@@ -21,7 +21,7 @@ import { useTranslation } from 'react-i18next';
 import {MediaClient, mediaEvents, mediaType} from '../../utils';
 import useRooms from './useRooms';
 
-import {permissionRequest} from './notification';
+
 import Loading from '../Loading';
 
 function makeid(length) {
