@@ -24,6 +24,17 @@ import useRooms from './useRooms';
 import {permissionRequest} from './notification';
 import Loading from '../Loading';
 
+function makeid(length) {
+    var result           = [];
+    var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var charactersLength = characters.length;
+    for ( var i = 0; i < length; i++ ) {
+        result.push(characters.charAt(Math.floor(Math.random() * 
+        charactersLength)));
+   }
+   return result.join('');
+}
+
 const ChatRooms = ({room}, ref) => {
     const classes = useStyles();
     const { t, i18n } = useTranslation();
@@ -50,75 +61,19 @@ const ChatRooms = ({room}, ref) => {
         privateAudio,
         publicAudio,
         openDisconnectModal,
-        setOpenDisconnectModal
+        setOpenDisconnectModal,
+        mediaClientRef
     } = useRooms({initRoomName: room});
-    // roomObject array
-    const mediaClientRef = useRef(null);
-
-
-    const [currentRoomName, setCurrentRoomName] = useState(null);
-    // video stream objects
-    const [mediaEvent, setMediaEvent] = useState(null);
-    const [currentRemoteStreams, setCurrentRemoteStreams] = useState([]);
-    const [localStreamTmp, setLocalStreamTmp] = useState(null);
-    const [currentLocalStream, setCurrentLocalStream] = useState(null);
-    const [currentBroadcastingUsers, setCurrentBroadcastingUsers] = useState([]);
-    const [currentViewers, setCurrentViewers] = useState([]);
-
-    // private chat send message to this user
-    
-    
-    // const privateListRef = useRef();
-
-    // const audio = new Audio('/media/poke.mp3');
-    // const audio = new Audio('/media/new_message.mp3');
-    useEffect(() => {
-        let mediaObj = new MediaClient(username);
-        mediaObj.on(mediaEvents.onChangeConsume, (data) => {
-            let {room_id} = data;
-            setMediaEvent({room_id, event: 'consume'});
-        })
-        mediaObj.on(mediaEvents.onChangeRemoteStreams, (data) => {
-            let {room_id} = data;
-            setMediaEvent({room_id, event: 'remote streams'});
-        })
-
-        mediaObj.on(mediaEvents.startStream, (data) => {
-            let {room_id} = data;
-            let stream = mediaObj.getLocalStream(room_id);
-            setLocalStreamTmp({stream, room_id});
-        })
-
-        mediaObj.on(mediaEvents.stopStream, (data) => {
-            let {room_id} = data;
-            setLocalStreamTmp({stream: null, room_id});
-        })
-
-        mediaObj.on(mediaEvents.changeViewers, (data) => {
-            let {room_id} = data;
-            setMediaEvent({room_id, event: 'view'});
-        })
-
-        mediaClientRef.current = mediaObj;
-
-        return () => {
-            if(mediaClientRef.current) {
-                mediaClientRef.current.exit(true);
-                mediaClientRef.current = null;
-            }
-            
-        }
-    }, [username])
 
     const controlVideo = (data) => {
-        let {type, name} = data;
+        let {type, name, roomName} = data;
         if(mediaClientRef.current) {
             switch(type) {
                 case 'close':
                     if(name === username) {
-                        mediaClientRef.current.closeProducer(null, currentRoomName);
+                        mediaClientRef.current.closeProducer(null, roomName);
                     } else {
-                        mediaClientRef.current.removeRemoteStream(name, null, currentRoomName);
+                        mediaClientRef.current.removeRemoteStream(name, null, roomName);
                     }
                     break;
                 default:
@@ -166,9 +121,9 @@ const ChatRooms = ({room}, ref) => {
     // remove a room
     const sendMessage = (roomName, to, color, msg, bold, type, messageType) => {
         if (msg) {
-            
             if(type === 'private') {
                 privateListRef.current.addMessage({
+                    _id: makeid(5),
                     type, roomName, msg, from: username, to, color, bold, messageType
                 }, roomName);
                 socket.emit('private message',
@@ -193,7 +148,7 @@ const ChatRooms = ({room}, ref) => {
                 socket.emit('public message', { type, msg, room: roomName, from: username, color, bold, messageType }, async (data) => {
                     
                 });
-                addMessage({message: { type, msg, room: roomName, from: username, color, bold, messageType }, room: roomName})
+                addMessage({message: { _id: makeid(5), type, msg, room: roomName, from: username, color, bold, messageType }, room: roomName})
             }
         }
     };
@@ -228,52 +183,53 @@ const ChatRooms = ({room}, ref) => {
         }
     }
 
-    useEffect(() => {
-        if(currentRoomName && mediaClientRef.current) {
-           let localStream = mediaClientRef.current.getLocalStream(currentRoomName);
-           let remoteStreams = mediaClientRef.current.getRemoteStreams(currentRoomName);
-           let viewers = mediaClientRef.current.getViewers(currentRoomName);
-           setCurrentLocalStream(localStream);
-           setCurrentRemoteStreams([...remoteStreams]);
-           setCurrentViewers([...viewers]);
-        }
-        
-    }, [currentRoomName]);
+    
 
-    useEffect(() => {
-        if(localStreamTmp) {
-           let {room_id, stream} = localStreamTmp;
-            if(room_id === currentRoomName) {
-                setCurrentLocalStream(stream);
-            } 
-        }
-    }, [localStreamTmp]);
+    // useEffect(() => {
+    //     if(currentRoomName && mediaClientRef.current) {
+    //        let localStream = mediaClientRef.current.getLocalStream(currentRoomName);
+    //        let remoteStreams = mediaClientRef.current.getRemoteStreams(currentRoomName);
+    //        let viewers = mediaClientRef.current.getViewers(currentRoomName);
+    //        setCurrentLocalStream(localStream);
+    //        setCurrentRemoteStreams([...remoteStreams]);
+    //        setCurrentViewers([...viewers]);
+    //     }
+    // }, [currentRoomName]);
 
-    useEffect(() => {
-        if(mediaEvent && mediaClientRef.current) {
-            let {room_id, event} = mediaEvent;
-            switch(event) {
-                case 'remote streams':
-                    if(room_id === currentRoomName) {
-                        let remoteStreams = mediaClientRef.current.getRemoteStreams(currentRoomName);
-                        setCurrentRemoteStreams([...remoteStreams]);
-                    }
-                    break;
-                case 'consume':
-                    if(room_id === currentRoomName) {
-                        let liveUsers = mediaClientRef.current.getLiveUsers(room_id);
-                        setCurrentBroadcastingUsers(liveUsers);
-                    }
-                    break;
-                case 'view':
-                    let viewers = mediaClientRef.current.getViewers(room_id);
-                    setCurrentViewers([...viewers]);
-                    break;
-                default:
-                    break;
-            }
-        }
-    }, [mediaEvent]);
+    // useEffect(() => {
+    //     if(localStreamTmp) {
+    //        let {room_id, stream} = localStreamTmp;
+    //         if(room_id === currentRoomName) {
+    //             setCurrentLocalStream(stream);
+    //         } 
+    //     }
+    // }, [localStreamTmp]);
+
+    // useEffect(() => {
+    //     if(mediaEvent && mediaClientRef.current) {
+    //         let {room_id, event} = mediaEvent;
+    //         switch(event) {
+    //             case 'remote streams':
+    //                 if(room_id === currentRoomName) {
+    //                     let remoteStreams = mediaClientRef.current.getRemoteStreams(currentRoomName);
+    //                     setCurrentRemoteStreams([...remoteStreams]);
+    //                 }
+    //                 break;
+    //             case 'consume':
+    //                 if(room_id === currentRoomName) {
+    //                     let liveUsers = mediaClientRef.current.getLiveUsers(room_id);
+    //                     setCurrentBroadcastingUsers(liveUsers);
+    //                 }
+    //                 break;
+    //             case 'view':
+    //                 let viewers = mediaClientRef.current.getViewers(room_id);
+    //                 setCurrentViewers([...viewers]);
+    //                 break;
+    //             default:
+    //                 break;
+    //         }
+    //     }
+    // }, [mediaEvent]);
 
     // send poke message
     const sendPokeMessage = (roomName, userToSend) => {
@@ -303,7 +259,6 @@ const ChatRooms = ({room}, ref) => {
     const stopBroadcast = (roomName) => {
         if(mediaClientRef.current) {
             mediaClientRef.current.closeProducer(null, roomName);
-            setCurrentLocalStream(null);
         }
      }
 /*************************************************************** */
@@ -325,8 +280,8 @@ const ChatRooms = ({room}, ref) => {
                 { (status === 'resolved' && currentRoomData) ?
                     <SideBarLeft
                         users={currentRoomData.users}
-                        broadcastingUsers={currentBroadcastingUsers}
-                        viewers={currentViewers}
+                        broadcastingUsers={currentRoomData.liveUsers}
+                        viewers={currentRoomData.viewers}
                         changeMuteState={changeMuteState}
                         sendPokeMessage={sendPokeMessage}
                         kickUser={kickUser}
@@ -339,7 +294,7 @@ const ChatRooms = ({room}, ref) => {
                         // setOpenPrivate={setOpenPrivate}
                         // setPrivateTo={setPrivateTo}
                         addOrOpenPrivate={addOrOpenPrivate}
-                        cameraState={currentLocalStream? (currentLocalStream.locked? 'locked': true): false}
+                        cameraState={currentRoomData.localStream? (currentRoomData.localStream.locked? 'locked': true): false}
                         startBroadcast={startBroadcast}
                         stopBroadcast={stopBroadcast}
                         stopBroadcastTo={stopBroadcastTo}
@@ -397,8 +352,8 @@ const ChatRooms = ({room}, ref) => {
                         { (status === 'resolved' && currentRoomData) ?
                             <SideBarLeft
                                 users={currentRoomData.users}
-                                broadcastingUsers={currentBroadcastingUsers}
-                                viewers={currentViewers}
+                                broadcastingUsers={currentRoomData.liveUsers}
+                                viewers={currentRoomData.viewers}
                                 changeMuteState={changeMuteState}
                                 sendPokeMessage={sendPokeMessage}
                                 kickUser={kickUser}
@@ -411,7 +366,7 @@ const ChatRooms = ({room}, ref) => {
                                 // setOpenPrivate={setOpenPrivate}
                                 // setPrivateTo={setPrivateTo}
                                 addOrOpenPrivate={addOrOpenPrivate}
-                                cameraState={currentLocalStream? (currentLocalStream.locked? 'locked': true): false}
+                                cameraState={currentRoomData.localStream? (currentRoomData.localStream.locked? 'locked': true): false}
                                 startBroadcast={startBroadcast}
                                 stopBroadcast={stopBroadcast}
                                 stopBroadcastTo={stopBroadcastTo}
@@ -451,7 +406,14 @@ const ChatRooms = ({room}, ref) => {
                     </div>
                 </main>
             </div>
-            <VideoList  streams={currentRemoteStreams} localStream={currentLocalStream} controlVideo={controlVideo}/>
+            <>
+            {
+                (status === 'resolved' && currentRoomData) ?
+                <VideoList roomName={currentRoomData.name}
+                    streams={currentRoomData.remoteStreams} localStream={currentRoomData.localStream} controlVideo={controlVideo}/>
+                : null
+            }
+            </>
         </div>
         <PrivateChatList ref={privateListRef}
             sendMessage={sendMessage}

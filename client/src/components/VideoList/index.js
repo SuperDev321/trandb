@@ -348,7 +348,7 @@ function asyncReducer(state, action) {
     }
 }
 
-const VideoList = ({streams: remoteStreams, localStream, controlVideo}) => {
+const VideoList = ({streams: remoteStreams, localStream, controlVideo, roomName}) => {
     const classes = useStyles();
 
     // const locked = localStream?.locked;
@@ -363,18 +363,17 @@ const VideoList = ({streams: remoteStreams, localStream, controlVideo}) => {
     })
 
     useEffect(() => {
-        let streams = null;
+        let streams = [];
+        console.log(localStream, remoteStreams)
         
         if(localStream) {
             dispatch({type: 'pending'})
-            streams = [{...localStream, name: username, muted: true},...remoteStreams]
-        } else {
-            if(remoteStreams) {
-                dispatch({type: 'pending'})
-                streams = [...remoteStreams];
-            } else {
-                return;
-            }
+            streams = [{...localStream, name: username, muted: true}];
+        }
+
+        if(Array.isArray(remoteStreams)) {
+            dispatch({type: 'pending'})
+            streams = [...streams, ...remoteStreams];
         }
         if(zoom) {
             let zoomStream = streams.find(({name}) => (name === zoom));
@@ -383,7 +382,7 @@ const VideoList = ({streams: remoteStreams, localStream, controlVideo}) => {
                 streams = [{...zoomStream, zoom: true}, ...unZoomStreams];
             }
         }
-        if(streams) {
+        if(streams.length) {
             dispatch({type: 'resolved', data: streams})
         }
     }, [localStream, remoteStreams, zoom])
@@ -405,7 +404,7 @@ const VideoList = ({streams: remoteStreams, localStream, controlVideo}) => {
                 break;
             case 'close':
                 if(name) {
-                    controlVideo(payload);
+                    controlVideo({...payload, roomName});
                 }
                 break;
             default:
