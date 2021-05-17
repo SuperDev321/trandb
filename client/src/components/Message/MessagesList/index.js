@@ -83,7 +83,6 @@ const MessagesList = ({ users, messages, role, userAction, roomName, changeMuteS
 
     useLayoutEffect(() => {
         setScrollTop();
-        console.log(messages)
     }, [messages])
 
     return (
