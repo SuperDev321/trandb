@@ -95,8 +95,6 @@ const CreateRoom = () => {
         .required(t('CreateRoom.error3'))
     });
 
-    const [coverFile, setCoverFile] = useState(null);
-   
     const formik = useFormik({
         initialValues: {
             name: '',
@@ -242,8 +240,8 @@ const CreateRoom = () => {
                     </Grid>
                     <Grid item xs={12}>
                     <FileUploader title={t('CreateRoom.cover')} value={formik.values.cover}
-                    handleFile={(file) => {console.log('cover set', {file});formik.setFieldValue('cover', file, false)}}/>
-                    <FileUploader title={t('CreateRoom.upload_icon')} handleFile={(file)=>{console.log('uploaded');formik.setFieldValue('icon', file, false)}}/>
+                    handleFile={(file) => {formik.setFieldValue('cover', file, false)}}/>
+                    <FileUploader title={t('CreateRoom.upload_icon')} handleFile={(file)=>{formik.setFieldValue('icon', file, false)}}/>
                     {/* <TextField
                         required
                         fullWidth

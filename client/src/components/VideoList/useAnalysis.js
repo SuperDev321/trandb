@@ -1,7 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 
 
-const useAnalysis = (stream) => {
+const useAnalysis = ({stream}) => {
     const audioContext = useRef(null);
     const analyser = useRef(null);
     const dataArray = useRef(null);
@@ -9,7 +9,7 @@ const useAnalysis = (stream) => {
     const rafId = useRef(null);
     const [data, setData] = useState(0);
 
-    const tick = () => {
+    const tick = useCallback(() => {
         if(analyser.current) {
             analyser.current.getByteFrequencyData(dataArray.current);
             let sum = 0;
@@ -22,7 +22,7 @@ const useAnalysis = (stream) => {
         setTimeout(() => {
             rafId.current = requestAnimationFrame(tick);
         }, 50);
-    }
+    }, [])
 
     useEffect(() => {
         let audioTracks = stream?.getAudioTracks();
@@ -46,7 +46,7 @@ const useAnalysis = (stream) => {
                 source.current.disconnect();
             source.current = null;
         }
-    }, [stream])
+    }, [stream, tick])
 
     return {
         data

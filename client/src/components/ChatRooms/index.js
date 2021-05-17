@@ -1,4 +1,4 @@
-import React, { useState, useReducer, useEffect, useContext, useRef, forwardRef, useImperativeHandle } from 'react';
+import React, { useState, useContext, forwardRef, useImperativeHandle } from 'react';
 import {
     AppBar,
     Card,
@@ -14,11 +14,10 @@ import AddRoomModal from '../Modals/AddRoomModal';
 import PrivateChatList from '../PrivateChat/PrivateChatList'
 import VideoList from '../VideoList';
 import {StyledTab , StyledTabs} from '../StyledTab';
-import DisconnectModal from '../Modals/DisconncetModal'
-import {UserContext, SettingContext} from '../../context';
-import { socket, mediaSocket, useLocalStorage, isPrivateRoom } from '../../utils';
+import DisconnectModal from '../Modals/DisconnectModal'
+import {UserContext} from '../../context';
+import { socket } from '../../utils';
 import { useTranslation } from 'react-i18next';
-import {MediaClient, mediaEvents, mediaType} from '../../utils';
 import useRooms from './useRooms';
 
 
@@ -37,7 +36,7 @@ function makeid(length) {
 
 const ChatRooms = ({room}, ref) => {
     const classes = useStyles();
-    const { t, i18n } = useTranslation();
+    const { t } = useTranslation();
     const [mobileOpen, setMobileOpen] = useState(false);
     const { username, avatar, gender, role } = useContext(UserContext);
     
@@ -130,7 +129,7 @@ const ChatRooms = ({room}, ref) => {
                     { type, roomName, msg, from: username, to, color, bold, messageType },
                     async (data, err) => {
                         if(data) {
-                            let message = data;
+                            // let message = data;
                             // privateListRef.current.addMessage(message, roomName);
                         } else {
                             if(err === 'logout') {
@@ -329,7 +328,7 @@ const ChatRooms = ({room}, ref) => {
                                 {
                                     roomsData.map((item, index) => (
                                         <StyledTab
-                                            key={index} label={<span>{item.name}</span>}
+                                            key={item.name} label={<span>{item.name}</span>}
                                             id={`scrollable-auto-tabpanel-${index}`}
                                             aria-labelledby={`scrollable-auto-tab-${index}`}
                                             onClick={() => handleChangeRoom(index)}

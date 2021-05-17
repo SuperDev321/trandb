@@ -1,10 +1,8 @@
-import React, { useContext, useEffect, useState, useRef } from 'react';
+import React, { useContext, useState } from 'react';
 import {UserContext} from '../../../context';
-import PropTypes, { element } from 'prop-types';
 import {EmojiConvertor} from 'emoji-js';
 import ImageView from './ImageView';
 import moment from 'moment';
-import randomstring from "randomstring";
 import RoomUserName from '../../RoomUserName';
 import useStyles from './styles';
 let emoji = new EmojiConvertor();
@@ -21,9 +19,6 @@ const MyMessage = ({user, roomName, message, messageSize, role, font_size, userA
     kickUser, banUser, addOrOpenPrivate, scrollEvent, ...props}) => {
     const classes = useStyles({color: message.color, bold: message.bold, messageSize});
     const { username } = useContext(UserContext);
-    const [checked, setChecked] = useState(false);
-
-    
 
     const urlify = (text) => {
     
@@ -98,13 +93,6 @@ const MyMessage = ({user, roomName, message, messageSize, role, font_size, userA
                 <>
                 { (message.messageType === 'image') ?
                     <ImageView url={message.msg} className={classes.text + ' ' + classes.size10} scrollEvent={scrollEvent} />
-                    /* <span className={classes.text + ' ' + classes.size10}>
-                {!checked ? <a href="#!" style={{color: '#046eb9'}}>
-                <strong
-                    onClick={() => {setChecked(true)}}
-                    style={{cursor: "pointer"}}>click to view</strong></a> :
-                <img src={'/'+message.msg} className={classes.photo}/>}
-                </span> */
                 :
                 <span
                     className={classes.text}
@@ -122,17 +110,5 @@ const MyMessage = ({user, roomName, message, messageSize, role, font_size, userA
         </div>
     );
 }
-
-// MyMessage.propTypes = {
-//   message: PropTypes.shape({
-//     sender: PropTypes.shape.isRequired,
-//     msg: PropTypes.string.isRequired,
-//     // message_type: PropTypes.string.isRequired,
-//     // color: PropTypes.string.isRequired,
-//     date: PropTypes.string.isRequired,
-//   }).isRequired,
-// //   onActionOnMessage: PropTypes.func.isRequired,
-//   font_size: PropTypes.number.isRequired,
-// };
 
 export default React.memo(MyMessage);

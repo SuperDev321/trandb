@@ -18,8 +18,7 @@ const DevicesSelector = ({audio, video, setAudio, setVideo}) => {
                 setAudio(audioDevices[0].deviceId);
             }
         }
-        console.log(devices)
-    }, [audio, video, devices])
+    }, [audio, video, devices, setAudio])
 
     if (deviceStatus === 'idle') {
         return null;

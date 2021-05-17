@@ -6,7 +6,6 @@ const useStyles = makeStyles((theme) => ({
         height: 40,
         textTransform: 'none',
         color: pink[500],
-        textTransform: 'none',
     },
     dialog: {
         direction: 'ltr',

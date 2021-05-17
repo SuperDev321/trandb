@@ -1,7 +1,5 @@
-import React, { useState, useEffect, useCallback, useImperativeHandle, forwardRef, useRef, createRef } from 'react';
+import React, { useState, useCallback, useImperativeHandle, forwardRef, useRef, createRef } from 'react';
 import PrivateChatContent from '../PrivateChatContent';
-import { makeStyles } from '@material-ui/core/styles';
-// import getUser from '../../utils/getUser';
 
 const PrivateChatList = ({sendMessage, readMsg ,me, globalBlocks}, ref) => {
     const [chatList, setChatList] = useState([]);
@@ -26,7 +24,7 @@ const PrivateChatList = ({sendMessage, readMsg ,me, globalBlocks}, ref) => {
                 setActiveChat(roomName);
             }
         }
-    }, )
+    }, [])
 
     const openChat = (toUsername) => {
         let chatInfo = chatList.find((item) => (item.to === toUsername));
@@ -46,7 +44,7 @@ const PrivateChatList = ({sendMessage, readMsg ,me, globalBlocks}, ref) => {
         elRefs.current = newRefs;
         setChatList(newChats);
         // leaveFromPrivate(roomName);
-    })
+    }, [chatList, setChatList])
     useImperativeHandle(ref, () => ({
         getPrivateRooms: () => {
             let rooms = chatList.map((item) => (item.roomName));

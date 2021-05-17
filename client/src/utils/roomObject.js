@@ -1,5 +1,3 @@
-import Peer from 'simple-peer';
-import { socket } from '../utils';
 class RoomObject  {
     constructor(name, messages, users, blocks, messageNum = 30) {
         this.name = name;

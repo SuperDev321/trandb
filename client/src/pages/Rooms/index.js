@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { useHistory } from 'react-router-dom';
 import { FormControlLabel, Checkbox, Container, Button } from '@material-ui/core';
-import { RoomsList, PublicLayout, Loading } from '../../components';
+import { RoomsList, PublicLayout } from '../../components';
 import { makeStyles } from '@material-ui/styles';
 import {UserContext} from '../../context';
 import {useTranslation} from 'react-i18next';
@@ -25,6 +25,8 @@ const Rooms = () => {
     const [showEmpty, setShowEmpty] = useState(false);
     const history = useHistory();
     const {t} = useTranslation();
+    const { auth, role, setLoading } = useContext(UserContext);
+
     useEffect(() => {
         getRooms((data) => {
             setLoading(false);
@@ -41,9 +43,8 @@ const Rooms = () => {
             setError(err);
         }
         );
-    }, []);
+    }, [setRooms, setLoading, setError]);
 
-    const { auth, role, setLoading } = useContext(UserContext);
     return (
         <div className="rooms__wrapper">
         <PublicLayout />

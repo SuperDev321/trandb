@@ -39,7 +39,6 @@ const useStyles = makeStyles((theme) => ({
         margin: 0,
         whiteSpace: 'nowrap',
         fontWeight: 'bold',
-        display: 'flex',
         flexDirection: 'row',
         fontSize: '1em',
     },

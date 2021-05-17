@@ -1,6 +1,6 @@
 import React, { useState, useReducer, useEffect, useContext, useRef, useCallback } from 'react';
 import { socket, mediaSocket, useLocalStorage, isPrivateRoom } from '../../utils';
-import {MediaClient, mediaEvents, mediaType} from '../../utils';
+import {MediaClient, mediaEvents} from '../../utils';
 import RoomObject from '../../utils/roomObject';
 import {UserContext, SettingContext} from '../../context';
 import { useTranslation } from 'react-i18next';
@@ -74,7 +74,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
         roomIndex: null,
         error: null,
     });
-    const { username, avatar, gender, role } = useContext(UserContext);
+    const { username } = useContext(UserContext);
     const {enablePokeSound, enablePrivateSound, enablePublicSound, enableSysMessage, messageNum} = useContext(SettingContext);
     // current room state
     const [state, dispatch] = useReducer(roomReducer, {
@@ -86,8 +86,8 @@ const useRooms = ({initRoomName, ...initalState}) => {
     const [mutes, setMutes] = useLocalStorage('mutes', []);
     const privateListRef = useRef();
     const [roomEvent, setRoomEvent] = useState(null);
-    const { t, i18n } = useTranslation();
-    const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+    const { t } = useTranslation();
+    const { enqueueSnackbar } = useSnackbar();
     const [openDisconnectModal, setOpenDisconnectModal] = useState(false);
 
     const roomNameRef = React.useRef(initRoomName);
@@ -109,7 +109,6 @@ const useRooms = ({initRoomName, ...initalState}) => {
     const {status: roomsStatus, data: roomsData, roomIndex, error: roomsError} = roomsState;
 
     const changeRoom = (newRoomIndex) => {
-        console.log('change room');
         let room = roomsRef.current[newRoomIndex];
         room.mergeUnreadMessages();
         data.name = room.name;
@@ -128,7 +127,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
         roomsDispatch({type: 'set', data: newRoomsData, roomIndex: newRoomIndex});
     }
 
-    const initRoom = async ({room, globalBlocks, onlineUsers, messages, blocks}) => {
+    const initRoom = useCallback(async ({room, globalBlocks, onlineUsers, messages, blocks}) => {
         let data = {};
         if(roomsRef.current && room) {
             if(Array.isArray(globalBlocks)) {
@@ -182,9 +181,9 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 await mediaClientRef.current?.join(room.name);
             }
         }
-    }
+    }, [dispatch, roomsDispatch, messageNum]);
 
-    const addRoom = async (room, callback) => {
+    const addRoom = useCallback(async (room, callback) => {
         let roomNames = await roomsRef.current.map((oneRoom) => (oneRoom.name));
         if(room && roomNames && !roomNames.includes(room)) {
             isPrivateRoom(room, ({isPrivate}) => {
@@ -206,9 +205,9 @@ const useRooms = ({initRoomName, ...initalState}) => {
         } else {
             callback(false, 'already_entered');
         }
-    }
+    }, [])
 
-    const addUser = ({room, joinedUser, onlineUsers}) => {
+    const addUser = useCallback(({room, joinedUser, onlineUsers}) => {
         if(roomsRef.current) {
             let sameRoom = roomsRef.current.find((item) => (item.name === room));
             if(sameRoom) {
@@ -235,9 +234,9 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 }
             }
         }
-    }
+    }, [enableSysMessage, username]);
 
-    const removeUser = ({room, leavedUser}) => {
+    const removeUser = useCallback(({room, leavedUser}) => {
         if(roomsRef.current) {
             let sameRoom = roomsRef.current.find((item) => (item.name === room));
             if(sameRoom) {
@@ -262,9 +261,9 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 }
             }
         }
-    }
+    }, [enableSysMessage]);
 
-    const kickUser = ({room, kickedUserName, type}) => {
+    const kickUser = useCallback(({room, kickedUserName, type}) => {
         if(roomsRef.current && room) {
             let sameRoom = roomsRef.current.find((item) => (item.name === room));
             if(sameRoom) {
@@ -298,7 +297,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
             }
         } else if(roomsRef.current.length && type === 'global ban') {
             if(username !== kickedUserName) {
-                roomsRef.current.map((roomRef) => {
+                roomsRef.current.forEach((roomRef) => {
                  // kick other
                     let kickedUser = roomRef.users.find(({username}) => (username === kickedUserName));
                     if(kickedUser) {
@@ -314,7 +313,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
                             data: {
                                 name: roomRef.name,
                                 messages: roomRef.messages,
-                                users: roomRef.messages
+                                users: roomRef.users
                             }
                         })
                     }
@@ -328,7 +327,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 enqueueSnackbar(alertText, {variant: 'error'});
             }
         }
-    }
+    }, [username])
 
     const removeRoom = React.useCallback(async (room, callback) => {
         if(status === 'resolved' && roomsStatus === 'resolved') {
@@ -377,9 +376,9 @@ const useRooms = ({initRoomName, ...initalState}) => {
         if(mediaClientRef.current) {
             mediaClientRef.current.exitRoom(room);
         }
-    }, [state, roomsState, history])
+    }, [status, roomsStatus, roomIndex, data])
 
-    const changeMuteState = (roomName, userToMute, isMuted) => {
+    const changeMuteState = useCallback((roomName, userToMute, isMuted) => {
         let room = roomsRef.current.find((item) => (item.name === roomName));
         if(room) {
             if(isMuted) {
@@ -416,7 +415,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 })
             }
         }
-    }
+    }, [data, mutes])
 
     const receiveMessage = useCallback(({message}) => {
         if(message) {
@@ -460,9 +459,9 @@ const useRooms = ({initRoomName, ...initalState}) => {
             let infos = roomsRef.current.map(({name, unReadMessages}) => ({name, unReadMessages}));
             roomsDispatch({type: 'set', data: infos});
         }
-    }, [data, roomIndex]);
+    }, []);
 
-    const receivePoke = (pokeMessage) => {
+    const receivePoke = useCallback((pokeMessage) => {
         let {room} = pokeMessage;
         if(roomsRef.current && room) {
             let sameRoom = roomsRef.current.find((item) => (item.name === room));
@@ -489,10 +488,9 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 }
             }
         }
-    }
+    }, [username]);
 
-    const addMessage = ({message, room}) => {
-        console.log('add message', message)
+    const addMessage = useCallback(({message, room}) => {
         let sameRoom = roomsRef.current.find((item) => (item.name) === room);
         if(sameRoom) {
             sameRoom.addMessages([message]);
@@ -504,29 +502,12 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 }
             })
         }
-    }
-    useEffect(() => {
-        if(socket && mediaSocket && initRoomName && username) {
-            let result = socket.open();
-            mediaSocket.open();
+    }, [])
 
-            isPrivateRoom(initRoomName, ({isPrivate}) => {
-                if(isPrivate) {
-                //    setRoomNameForPassword(room);
-                //    setOpenPasswordModal(true);
-                } else {
-                    socket.emit('join room', { room: initRoomName }, (result, message) => {
-                        if(!result) {
-                            if(message)
-                                enqueueSnackbar(t('ChatApp.'+message, {roomName: initRoomName}), {variant: 'error'});
-                            dispatch({type: 'rejected', error: 'joine error'});
-                        }
-                    });
-                }
-            }, (err) => {
-                console.log(err);
-            })
-            
+    useEffect(() => {
+        if(initRoomName && username) {
+            socket.open();
+            mediaSocket.open();
             socket.on('connect_error', (err) => {
                 console.log(err)
             })
@@ -537,21 +518,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
                     initRoom({room, onlineUsers, messages, blocks, globalBlocks});
                 }
             });
-            socket.on('joined room',async ({room, onlineUsers, joinedUser}) => {
-                addUser({room, onlineUsers, joinedUser});
-            });
-            socket.on('leave room', async ({room, onlineUsers, leavedUser}) => {
-                removeUser({room, leavedUser});
-            });
-            socket.on('kicked user', async ({room, kickedUserName}) => {
-                kickUser({room, kickedUserName, type: 'kick'});
-            });
-            socket.on('banned user', async ({room, kickedUserName}) => {
-                kickUser({room, kickedUserName, type: 'ban'}); 
-            });
-            socket.on('global banned user', async ({kickedUserName}) => {
-                kickUser({kickedUserName, type: 'global ban'}); 
-            });
+            
             socket.on('update block', ({room, blocks}) => {
                 dispatch({type: 'update', data: { name: room, blocks}}); 
             })
@@ -560,7 +527,6 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 setGlobalBlocks(blocks);
             })
             socket.on('room message', (message, callback) => {
-                console.log('new message', message)
                 if(callback) {
                     callback(true);
                 }
@@ -576,21 +542,12 @@ const useRooms = ({initRoomName, ...initalState}) => {
             //    joinErrorHandler(payload);
             // })
 
-            socket.on('hey', (payload, callback) => {
-                callback(true);
-            })
-
             socket.on('disconnect', (reason) => {
                 setOpenDisconnectModal(true);
                 if (reason === 'io server disconnect') {
                     // the disconnection was initiated by the server, you need to reconnect manually
                     socket.connect();
                 }
-            })
-
-            
-            socket.on('connect_error', (err) => {
-                console.log('connect_error', err);
             })
 
             socket.io.on('reconnect', async () => {
@@ -606,7 +563,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
                         
                     })
                 });
-                privateRooms.map((roomName) => {
+                privateRooms.forEach((roomName) => {
                     socket.emit('rejoin room',{room: roomName, type: 'private'}, (result) => {
                         if(result) {
                             console.log('rejoin success') 
@@ -622,8 +579,6 @@ const useRooms = ({initRoomName, ...initalState}) => {
             socket.io.on('reconnect_attempt', () => {
                 console.log('reconnect_attempt');
             })
-            socket.on('connect', () => {
-            })
 
             socket.on('repeat connection', () => {
                 enqueueSnackbar(t('ChatApp.already_in_chat'), {variant: 'error'});
@@ -631,18 +586,74 @@ const useRooms = ({initRoomName, ...initalState}) => {
             })
 
             mediaSocket.on('view request', ({username, roomName}, callback) => {
-                console.log('get view request')
                 permissionRequest(username, roomName, callback);
             })
 
-            return () => {
-                socket.removeAllListeners();
-                socket.close();
-                mediaSocket.removeAllListeners();
-                mediaSocket.close();
-            };
+            isPrivateRoom(initRoomName, ({isPrivate}) => {
+                if(isPrivate) {
+                //    setRoomNameForPassword(room);
+                //    setOpenPasswordModal(true);
+                } else {
+                    
+                    socket.emit('join room', { room: initRoomName }, (result, message) => {
+                        if(!result) {
+                            if(message)
+                                enqueueSnackbar(t('ChatApp.'+message, {roomName: initRoomName}), {variant: 'error'});
+                            dispatch({type: 'rejected', error: 'joine error'});
+                        }
+                    });
+                }
+            }, (err) => {
+                console.log(err);
+            })
         }
-    }, [socket, mediaSocket, initRoomName, username]);
+
+        return () => {
+            socket.removeAllListeners();
+            socket.io.removeAllListeners();
+            mediaSocket.removeAllListeners();
+            mediaSocket.io.removeAllListeners();
+            socket.close();
+            mediaSocket.close();
+            // socket.off('connect_error');
+            // socket.off('init room');
+            // socket.off('update block');
+            // socket.off('update global block');
+            // socket.off('room message');
+            // socket.off('private message');
+            // socket.off('poke message');
+            // socket.off('disconnect');
+            // socket.off('repeat connection');
+            // socket.io.off('reconnect');
+            // socket.io.off('reconnect_attempt')
+            // mediaSocket.off('view request');
+        };
+    }, [initRoomName, username]);
+
+    useEffect(() => {
+        socket.on('joined room',async ({room, onlineUsers, joinedUser}) => {
+            addUser({room, onlineUsers, joinedUser});
+        });
+        socket.on('leave room', async ({room, onlineUsers, leavedUser}) => {
+            removeUser({room, leavedUser});
+        });
+        socket.on('kicked user', async ({room, kickedUserName}) => {
+            kickUser({room, kickedUserName, type: 'kick'});
+        });
+        socket.on('banned user', async ({room, kickedUserName}) => {
+            kickUser({room, kickedUserName, type: 'ban'}); 
+        });
+        socket.on('global banned user', async ({kickedUserName}) => {
+            kickUser({kickedUserName, type: 'global ban'}); 
+        });
+
+        return () => {
+            socket.off('joined room');
+            socket.off('leave room');
+            socket.off('banned user');
+            socket.off('global banned user');
+        }
+    }, [enableSysMessage, username])
 
     useEffect(() => {
         let mediaObj = new MediaClient(username);
@@ -706,12 +717,19 @@ const useRooms = ({initRoomName, ...initalState}) => {
             })
         })
 
+        let old = mediaClientRef.current;
+
+        if(mediaClientRef.current) {
+            mediaClientRef.current = null;
+        }
+
         mediaClientRef.current = mediaObj;
 
         return () => {
-            if(mediaClientRef.current) {
-                mediaClientRef.current.exit(true);
-                mediaClientRef.current = null;
+            if(mediaObj) {
+                mediaObj.offAll();
+                mediaObj.exit(true);
+                mediaObj = null;
             }
             
         }
@@ -721,7 +739,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
         if(status === 'rejected') {
             history.push('/')
         }
-    }, [status])
+    }, [status, history])
 
     useEffect(() => {
         if(roomEvent) {
@@ -754,7 +772,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
         } else {
             pokeAudioControls.mute();
         }
-    }, [enablePokeSound])
+    }, [enablePokeSound, pokeAudioControls])
     useEffect(() => {
 
         if(enablePublicSound) {
@@ -762,7 +780,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
         } else {
             publicAudioControls.mute();
         }
-    }, [enablePublicSound]);
+    }, [enablePublicSound, publicAudioControls]);
     useEffect(() => {
 
         if(enablePrivateSound) {
@@ -770,7 +788,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
         } else {
             privateAudioControls.mute();
         }
-    }, [enablePrivateSound])
+    }, [enablePrivateSound, privateAudioControls])
 
     return {
         status,

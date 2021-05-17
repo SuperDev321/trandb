@@ -6,16 +6,12 @@ import {
     CardMedia,
     Button,
     Divider,
-    Badge,
 } from '@material-ui/core';
 import {
     QuestionAnswer,
     AccountCircleOutlined,
     Videocam,
-    Block,
-    Check,
     Notifications,
-    StarRounded,
     VisibilityOff
 } from '@material-ui/icons';
 import {useTranslation} from 'react-i18next';

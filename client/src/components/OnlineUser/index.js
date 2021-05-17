@@ -2,20 +2,13 @@ import React from 'react';
 import { makeStyles, withStyles } from '@material-ui/core/styles';
 import {
     Avatar,
-    Popover,
-    Card,
-    CardMedia,
-    Button,
-    Divider,
     Badge,
 } from '@material-ui/core';
 import { deepOrange, pink, blue, green, grey, yellow } from '@material-ui/core/colors';
-import {QuestionAnswer,
-    AccountCircleOutlined,
+import {
     Videocam,
     Block,
     Check,
-    Notifications,
     StarRounded,
     Visibility,
     VisibilityOff,
@@ -135,59 +128,59 @@ const OnlineUser = ({roomName, username, user, role, isMuted, isBlocked, isBroad
     }) => {
     const classes = useStyles({role: user.role});
     const [anchorEl, setAnchorEl] = React.useState(null);
-    const [openBan, setOpenBan] = React.useState(false);
+    // const [openBan, setOpenBan] = React.useState(false);
 
-    const handleClick = (event) => {
-        setAnchorEl(event.currentTarget);
-    };
+    // const handleClick = (event) => {
+    //     setAnchorEl(event.currentTarget);
+    // };
 
-    const handleClickPrivateChat = (event) => {
-        setAnchorEl(null);
-        event.preventDefault();
-        setTimeout(() => {
-            addOrOpenPrivate(user);
-        }, 0);
-    }
-    const handleMute = () => {
-        setAnchorEl(null);
-        setTimeout(() => {
-            changeMuteState(roomName, user);
-        }, 0)
-    }
-    const handleKick = (username) => {
-        setAnchorEl(null);
-        setTimeout(() => {
-            kickUser(roomName, username);
-        }, 0)
-    }
-    const handleBan = (username) => {
-        setAnchorEl(null);
-        if(role === 'admin') {
-            setOpenBan(true);
-        } else {
-            setTimeout(() => {
-                if(role)
-                banUser(roomName, username);
-            }, 0);
-        }
-    }
+    // const handleClickPrivateChat = (event) => {
+    //     setAnchorEl(null);
+    //     event.preventDefault();
+    //     setTimeout(() => {
+    //         addOrOpenPrivate(user);
+    //     }, 0);
+    // }
+    // const handleMute = () => {
+    //     setAnchorEl(null);
+    //     setTimeout(() => {
+    //         changeMuteState(roomName, user);
+    //     }, 0)
+    // }
+    // const handleKick = (username) => {
+    //     setAnchorEl(null);
+    //     setTimeout(() => {
+    //         kickUser(roomName, username);
+    //     }, 0)
+    // }
+    // const handleBan = (username) => {
+    //     setAnchorEl(null);
+    //     if(role === 'admin') {
+    //         setOpenBan(true);
+    //     } else {
+    //         setTimeout(() => {
+    //             if(role)
+    //             banUser(roomName, username);
+    //         }, 0);
+    //     }
+    // }
     const handleClose = () => {
         setAnchorEl(null);
     };
 
-    const handleClickProfile = () => {
-        if(user && user.username)
-            window.open('/profile/'+user.username);
-        setAnchorEl(null);
-    }
+    // const handleClickProfile = () => {
+    //     if(user && user.username)
+    //         window.open('/profile/'+user.username);
+    //     setAnchorEl(null);
+    // }
 
-    const sendPoke = () => {
-        setAnchorEl(null);
-        setTimeout(() => {
-            sendPokeMessage(roomName, user.username);
-        }, 0)
+    // const sendPoke = () => {
+    //     setAnchorEl(null);
+    //     setTimeout(() => {
+    //         sendPokeMessage(roomName, user.username);
+    //     }, 0)
         
-    }
+    // }
 
     const open = Boolean(anchorEl);
     return (

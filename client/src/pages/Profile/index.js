@@ -3,12 +3,8 @@ import React, {useState, useEffect} from "react";
 // import Axios from "axios";
 import {
   Paper,
-  TextField,
   Button,
   Grid,
-  InputLabel,
-  FormControl,
-  Select,
   Container
 } from '@material-ui/core';
 import PersonIcon from '@material-ui/icons/Person';
@@ -23,14 +19,8 @@ import { useHistory, useParams } from "react-router-dom";
 export default function Profile() {
   const {username} = useParams();
   const classes = useStyles();
-  const history = useHistory();
 
   const [gender, setGender] = useState('');
-  const [description, setDescription] = useState('this is my test room');
-  const [message, setMessage] = useState('best practice');
-  const [userNum, setUserNum] = useState('- Unlimited -');
-  const [password, setPassword] = useState('');
-  const [moderator, setModerator] = useState('');
   const [rooms, setRooms] = useState([]);
 
   const handleSetting = (roomName) => {
@@ -38,7 +28,6 @@ export default function Profile() {
   }
 
   useEffect(() => {
-    console.log(username)
     getUserDetail(username, (data) => {
       console.log(data)
       if(data.rooms) {
@@ -50,7 +39,7 @@ export default function Profile() {
     }, () => {
 
     });
-  }, [])
+  }, [username])
 
   return (
     <Container>

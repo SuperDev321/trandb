@@ -1,16 +1,10 @@
-import React, { useState, useEffect, useRef, useContext, useCallback, useReducer } from 'react';
+import React, { useState, useEffect, useRef, useContext} from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import {
     IconButton
 } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
-import PauseIcon from '@material-ui/icons/Pause';
-import PlayCircleFilledIcon from '@material-ui/icons/PlayCircleFilled';
-import LockIcon from '@material-ui/icons/Lock';
-
-import SeparateLine from '../SeparateLine';
 import { UserContext } from '../../context';
-
 import useAnalysis from './useAnalysis';
 import SoundMeter from './SoundMeter';
 import VolumnControl from './VolumnControl';
@@ -196,7 +190,7 @@ const UserVideo = ({stream, locked, name, controlVideo, muted, total, streamNum,
     // const userAudio = useRef();
     const classes = useVideoStyles({total, num: streamNum, zoom});
     const [playing, setPlaying] = useState(false);
-    const {data} = useAnalysis(stream);
+    const {data} = useAnalysis({stream});
     const [volume, setVolume] = useState(0);
 
     const echo = data*volume/100;
@@ -364,28 +358,32 @@ const VideoList = ({streams: remoteStreams, localStream, controlVideo, roomName}
 
     useEffect(() => {
         let streams = [];
-        console.log(localStream, remoteStreams)
-        
-        if(localStream) {
-            dispatch({type: 'pending'})
-            streams = [{...localStream, name: username, muted: true}];
-        }
+        if(localStream || remoteStreams) {
+            if(localStream) {
+                dispatch({type: 'pending'})
+                streams = [{...localStream, name: username, muted: true}];
+            } else {
 
-        if(Array.isArray(remoteStreams)) {
-            dispatch({type: 'pending'})
-            streams = [...streams, ...remoteStreams];
-        }
-        if(zoom) {
-            let zoomStream = streams.find(({name}) => (name === zoom));
-            if(zoomStream) {
-                let unZoomStreams = streams.filter(({name}) => (name !== zoom));
-                streams = [{...zoomStream, zoom: true}, ...unZoomStreams];
+            }
+
+            if(Array.isArray(remoteStreams)) {
+                dispatch({type: 'pending'})
+                streams = [...streams, ...remoteStreams];
+            }
+            if(zoom) {
+                let zoomStream = streams.find(({name}) => (name === zoom));
+                if(zoomStream) {
+                    let unZoomStreams = streams.filter(({name}) => (name !== zoom));
+                    streams = [{...zoomStream, zoom: true}, ...unZoomStreams];
+                }
             }
         }
         if(streams.length) {
-            dispatch({type: 'resolved', data: streams})
+            dispatch({type: 'resolved', data: streams});
+        } else {
+            dispatch({type: 'resolved', data: null});
         }
-    }, [localStream, remoteStreams, zoom])
+    }, [username, localStream, remoteStreams, zoom])
 
     const handleVideo = (payload) => {
         let {type, name} = payload;
@@ -427,7 +425,7 @@ const VideoList = ({streams: remoteStreams, localStream, controlVideo, roomName}
         :
             streams?.map(({stream, name, locked, zoom, muted}, index) => (
                 <UserVideo
-                    stream={stream} key={index} locked={locked} name={name}
+                    stream={stream} key={stream.id} locked={locked} name={name}
                     controlVideo={handleVideo}
                     total={streams.length}
                     zoom={zoom}

@@ -3,20 +3,11 @@ import { useHistory } from 'react-router-dom';
 import {
     AppBar,
     Toolbar,
-    IconButton,
-    Badge,
 } from "@material-ui/core";
-import {
-    Mail,
-    Settings,
-    AccountCircle
-} from '@material-ui/icons'
 import AppMenu from '../AppMenu';
 import { makeStyles } from '@material-ui/core/styles';
-import PrivateMails from './PrivateMails';
 import SettingModal from '../Modals/SettingModal';
 
-import { message } from 'antd';
 const useStyles = makeStyles((theme) => ({
     root: {
     },
@@ -77,7 +68,7 @@ const HomeLayout = ({children, unReadMsgs, openPrivate, messageSize, setMessageS
         };
         
         resetMessageSize(messageSize);
-    }, [messageSize])
+    }, [messageSize, setMessageSize])
     return (
     <div style={{fontSize: messageSize, height: '100%'}}>
         <AppBar position="static" className={classes.appBar}>
@@ -89,7 +80,7 @@ const HomeLayout = ({children, unReadMsgs, openPrivate, messageSize, setMessageS
                     onClick={()=>history.push('/')}
                 />
                 <div className={classes.grow} >{ frameShow &&
-                    <iframe src="https://widget.walla.co.il/fxp4" height="40px" width="100%" frameBorder={0} scrolling="no" />
+                    <iframe title="header-title" src="https://widget.walla.co.il/fxp4" height="40px" width="100%" frameBorder={0} scrolling="no" />
                 }
                 </div>
                 <div className={classes.sectionDesktop}>

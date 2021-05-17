@@ -1,26 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import {mediaType} from '../../../utils'
 import {
     Button,
     Dialog,
     DialogActions,
     DialogContent,
-    DialogContentText,
     DialogTitle,
     FormControl,
     FormControlLabel,
-    FormGroup,
-    FormLabel,
     Checkbox,
-    InputLabel,
-    Select,
-    MenuItem
 } from '@material-ui/core';
-import TextField from '@material-ui/core/TextField';
 import VideocamIcon from '@material-ui/icons/Videocam';
 import { useTranslation } from 'react-i18next';
-import useDevices from './useDevices';
 import VideoDeviceView from './VideoDeviceView';
 import useDefaultMedia from './useDefaultMedia';
 import DevicesSelector from './DevicesSelector';
@@ -50,8 +41,6 @@ function BroadcastSettingModal({roomName, startBroadcast, users, ...modalProps})
     const [lock, setLock] = useState(false);
     const [currentAudioDevice, setCurrentAudioDevice] = useState('');
     const [currentVideoDevice, setCurrentVideoDevice] = useState('');
-    const [usersState, setUsersState] = useState(null);
-    const { t } = useTranslation();
     
     const handleClickOK = () => {
         startBroadcast(roomName, lock, currentVideoDevice, currentAudioDevice);
@@ -61,7 +50,6 @@ function BroadcastSettingModal({roomName, startBroadcast, users, ...modalProps})
     useEffect(() => {
         if((status === 'resolved') && data) {
             if(data) {
-                console.log(data);
                 const audioTrack = data?.getAudioTracks()[0];
                 const videoTrack = data?.getVideoTracks()[0];
                 if(audioTrack) {

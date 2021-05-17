@@ -137,7 +137,6 @@ export default function AddRoomModal({addRoom}) {
             open={openPasswordModal}
             setOpen={setOpenPasswordModal}
             room={roomNameForPassword}
-            // onClose={() => {if(!roomIndex) setRoomIndex(0)}}
         />
         </>
     );

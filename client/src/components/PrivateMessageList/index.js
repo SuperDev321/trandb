@@ -88,12 +88,12 @@ const PrivateMessageList = ({messages, me, blocked, withBlocked}) => {
         if(blocked && !withBlocked) {
             filteredMessages = filteredMessages.filter((item) => (item.from !== me.username));
         } else if(!blocked && withBlocked) {
-            filteredMessages = filteredMessages.filter((item) => (item.username == me.username));
+            filteredMessages = filteredMessages.filter((item) => (item.username === me.username));
         } else if(blocked && withBlocked) {
             filteredMessages = [];
         }
         setMessagesToShow(filteredMessages);
-    }, [messages, blocked, withBlocked])
+    }, [messages, blocked, withBlocked, me])
 
     useEffect(() => {
         setScrollTop();

@@ -8,7 +8,7 @@ import {makeStyles} from '@material-ui/core';
 import {
     Close
 } from '@material-ui/icons';
-import { useTranslation, withTranslation, Trans } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 let notification = null;
 Notification.newInstance({
   style: {top: 20, left: 'calc(50% - 160px)', zIndex: 100, position: "fixed"}
@@ -73,7 +73,7 @@ const PermissionNoticeEl = ({username, roomName, noticeKey, callback, closeNotic
 
 const PermissionSendedEl = ({username, roomName, noticeKey, callback, closeNotice}) => {
     const classes = useStyles();
-    const { t, i18n } = useTranslation();
+    const { t } = useTranslation();
     const message = t('ChatApp.system_user_request_video_permission', {username, roomName});
     const handleClickAccept = () => {
         callback(true);

@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer, useCallback } from 'react';
+import React, { useEffect } from 'react';
 import Loading from '../../Loading'
 const getStream = (audioDevice, videoDevice) => {
     window.stream && window.stream.getTracks().forEach(function (a) {
@@ -122,16 +122,16 @@ const VideoDeviceView = ({audioDevice, videoDevice}) => {
     // }, [audioDevice, videoDevice])
 
     useEffect(() => {
-      if(stream && status === 'resolved' && userVideo.current) {
-        userVideo.current.srcObject = stream;
+      let userVideoEl = userVideo.current;
+      if(stream && status === 'resolved' && userVideoEl) {
+        userVideoEl.srcObject = stream;
       }
       return () => {
-        if(userVideo.current && userVideo.current.srcObject) {
-          console.log('stop tracks')
-          userVideo.current.srcObject.getTracks().forEach(function (track) {
+        if(userVideoEl && userVideoEl.srcObject) {
+          userVideoEl.srcObject.getTracks().forEach(function (track) {
             track.stop();
           });
-          userVideo.current.srcObject = null;
+          userVideoEl.srcObject = null;
         }
       }
     }, [stream, status])

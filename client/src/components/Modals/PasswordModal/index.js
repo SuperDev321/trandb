@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import {
-    Button,
     Dialog,
     DialogActions,
     DialogContent,
@@ -28,11 +26,10 @@ const StyledDialog = withStyles((theme) => ({
     />
 ))
 
-const PasswordModal = ({room, open, setOpen, onClose}) => {
+const PasswordModal = ({room, open, setOpen}) => {
     const [password, setPassword] = useState('');
-    const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+    const { enqueueSnackbar } = useSnackbar();
     const handleClose = () => {
-        onClose();
         setOpen(false);
     };
     const { t } = useTranslation();
@@ -42,7 +39,6 @@ const PasswordModal = ({room, open, setOpen, onClose}) => {
                 setOpen(false);
             } else {
                 enqueueSnackbar(t('PasswordModal.wrong'), {variant: 'error'});
-                onClose();
             }
         })
         setPassword('');
