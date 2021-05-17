@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { useHistory } from 'react-router-dom';
 import {useAudio} from 'react-use';
+import {permissionRequest} from './notification';
 
 function roomReducer(state, action) {
     switch (action.type) {
@@ -616,8 +617,6 @@ const useRooms = ({initRoomName, ...initalState}) => {
                     })
                 })
                 setOpenDisconnectModal(false)
-                await mediaSocket.close();
-                await mediaSocket.open();
             })
 
             socket.io.on('reconnect_attempt', () => {
@@ -633,7 +632,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
 
             mediaSocket.on('view request', ({username, roomName}, callback) => {
                 console.log('get view request')
-                // permissionRequest(username, roomName, callback);
+                permissionRequest(username, roomName, callback);
             })
 
             return () => {
