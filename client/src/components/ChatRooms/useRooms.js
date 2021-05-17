@@ -176,7 +176,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 }
             }
             if(mediaClientRef.current) {
-                await mediaClientRef.current?.init();
+                // await mediaClientRef.current?.init();
                 await mediaClientRef.current?.createRoom(room.name);
                 await mediaClientRef.current?.join(room.name);
             }
@@ -657,6 +657,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
 
     useEffect(() => {
         let mediaObj = new MediaClient(username);
+        mediaObj.init();
         mediaObj.on(mediaEvents.onChangeConsume, (data) => {
             let {room_id} = data;
             let liveUsers = mediaClientRef.current.getLiveUsers(room_id);

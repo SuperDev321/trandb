@@ -11,6 +11,10 @@ const socket = io(`${config.server_url}`,{
 
 const mediaSocket = io(`${config.media_server_url}`,{
     autoConnect: false,
+    withCredentials: true,
+    extraHeaders: {
+        "my-custom-header": "abcd"
+    },
     transport: ['polling', 'websocket'],
     timeout: 60000,
     pingTimeout: 60000,

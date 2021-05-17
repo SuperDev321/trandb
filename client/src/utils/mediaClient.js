@@ -32,6 +32,7 @@ class MediaClient {
         this.producerTransports = new Map();
         this.consumerTransports = new Map();
         this.devices = new Map();
+        this.id = Math.random()
 
         this.consumers = new Map()
         this.producers = new Map()
@@ -303,6 +304,7 @@ class MediaClient {
     }
 
     initSockets() {
+        console.log('init sockets')
         mediaSocket.on('consumerClosed', function ({
             consumer_id,
             room_id
