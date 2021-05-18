@@ -41,22 +41,16 @@ const joinRoom = (io, socket) => async ({ room, password }, callback) => {
 
         const globalBlocks = await getGlobalBlocksWithIp();
         const blocks = await getRoomBlocks(room);
-        let blocked = await checkBlock(room, user.username, user.ip);
+        // let blocked = await checkBlock(room, user.username, user.ip);
         socket.emit('init room',
             {messages, onlineUsers, room: {name: room, welcomeMessage: roomInfo.welcomeMessage}, blocks, globalBlocks},
             (data)=> {
                 if(data === 'success') {
-                    
-                    io.to(room).emit('joined room', {room, onlineUsers: usersInfo,
-                        joinedUser: {
-                            _id: user._id,
-                            username: user.username,
-                            role: user.role,
-                            gender: user.gender,
-                            ip: ipInt(user.ip).toIP(),
-                            blocked,
-                            avatar: user.avatar
-                        }
+                    let joinedUser = onlineUsers.find(({item}) => (item._id === _id));
+                    io.to(room).emit('joined room', {
+                        room,
+                        // onlineUsers: usersInfo,
+                        joinedUser
                     });
                 }
             }
@@ -117,17 +111,22 @@ const rejoinRoom = (io, socket) => async ({ room, type }, callback) => {
             let blocks = await getRoomBlocks(room);
             let blocked = await checkBlock(room, user.username, user.ip);
             socket.emit('init room', {messages, onlineUsers, room: {name: room}, globalBlocks, blocks}, (data)=> {
-                if(data === 'success' && result && result.nModified) {
-                    io.to(room).emit('joined room', {room, onlineUsers: usersInfo,
-                        joinedUser: {
-                            _id: user._id,
-                            username: user.username,
-                            role: user.role,
-                            gender: user.gender,
-                            ip: ipInt(user.ip).toIP(),
-                            blocked,
-                            avatar: user.avatar
-                        }});
+                if(data === 'success') {
+                    let joinedUser = onlineUsers.find(({item}) => (item._id === _id));
+                    io.to(room).emit('joined room', {
+                        room,
+                        joinedUser
+                        // onlineUsers: usersInfo,
+                        // joinedUser: {
+                        //     _id: user._id,
+                        //     username: user.username,
+                        //     role: user.role,
+                        //     gender: user.gender,
+                        //     ip: ipInt(user.ip).toIP(),
+                        //     blocked,
+                        //     avatar: user.avatar
+                        // }});
+                    });
                 }
             });
             return callback(true);
