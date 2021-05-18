@@ -18,7 +18,7 @@ const joinRoom = (io, socket) => async ({ room, password }, callback) => {
         }
         let result = await Rooms.updateOne({ name: room }, { $addToSet: { users: _id} });
         
-
+        console.log('join result', result)
         socket.join(room);
         callback(true)
         
@@ -46,10 +46,10 @@ const joinRoom = (io, socket) => async ({ room, password }, callback) => {
             {messages, onlineUsers, room: {name: room, welcomeMessage: roomInfo.welcomeMessage}, blocks, globalBlocks},
             (data)=> {
                 if(data === 'success' && result && result.nModified) {
-                    let joinedUser = onlineUsers.find((item) => (item._id === _id));
+                    let joinedUser = usersInfo.find((item) => (item._id.equals(_id)));
                     io.to(room).emit('joined room', {
                         room,
-                        // onlineUsers: usersInfo,
+                        onlineUsers: usersInfo,
                         joinedUser
                     });
                 }
@@ -113,12 +113,11 @@ const rejoinRoom = (io, socket) => async ({ room, type }, callback) => {
             
             socket.emit('init room', {messages, onlineUsers, room: {name: room}, globalBlocks, blocks}, (data)=> {
                 if(data === 'success' && result && result.nModified) {
-                    // && result && result.nModified
-                    let joinedUser = onlineUsers.find((item) => (item._id === _id));
+                    let joinedUser = usersInfo.find((item) => (item._id.equals(_id)));
                     io.to(room).emit('joined room', {
                         room,
-                        joinedUser
-                        // onlineUsers: usersInfo,
+                        joinedUser,
+                        onlineUsers: usersInfo,
                         // joinedUser: {
                         //     _id: user._id,
                         //     username: user.username,
