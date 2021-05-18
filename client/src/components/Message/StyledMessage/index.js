@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import {EmojiConvertor} from 'emoji-js';
 import parseHTML from 'parsehtml';
 import moment from 'moment';
 import randomstring from "randomstring";
-import {grey, blue} from '@material-ui/core/colors'
+import {grey} from '@material-ui/core/colors'
 const useStyles = makeStyles((theme) => ({
     root: {
         display: 'flex',
@@ -110,7 +110,6 @@ const StyledMessage = ({message, mine}) => {
       }
       const makeTag = (emojiText) => {
         let arr = emojiText.split(/<img .*?>/g);
-        let urlRegex = /(https?:\/\/[^\s]+)/g;
         let noRepeatArr = [...new Set(arr)];
         let urlText = emojiText;
         if(noRepeatArr && noRepeatArr.length) {
@@ -145,14 +144,15 @@ const StyledMessage = ({message, mine}) => {
             for (let k = 0; k < html.children.length; k++) {
             const element = html.children[k];
             let key = randomstring.generate(8);
-            if (element.tagName == "IMG") {
+            if (element.tagName === "IMG") {
                 key = randomstring.generate(8)
                 result.push(<img key={key} src={element.attributes[0].nodeValue}
                                 className={element.attributes[1].nodeValue}
-                                data-codepoints={element.attributes[2].nodeValue}/>)
+                                data-codepoints={element.attributes[2].nodeValue}
+                                alt="emoji"
+                                />)
             } else if (element.tagName === "A") {
                 let url = element.href
-                let host = element.host
                 result.push(<span key={key} className={classes.url_underline}
                                 onClick={() => {window.open(url, '_blank');}}>{url}</span>)
             } else{
@@ -162,10 +162,10 @@ const StyledMessage = ({message, mine}) => {
             }
         } else {
             let key = randomstring.generate(8);
-            if (html.tagName == "IMG") {
+            if (html.tagName === "IMG") {
                 result.push(<img key={key} src={html.attributes[0].nodeValue}
                                 className={html.attributes[1].nodeValue}
-                                data-codepoints={html.attributes[2].nodeValue}/>)
+                                data-codepoints={html.attributes[2].nodeValue} alt="emoji"/>)
             } else if (html.tagName === "A") {
                 let url = html.href
                 result.push(<span key={key} className={classes.url_underline}
@@ -191,7 +191,7 @@ const StyledMessage = ({message, mine}) => {
               <strong
                 onClick={() => {setChecked(true)}}
                 style={{cursor: "pointer"}}>click to view</strong></a> :
-              <img src={'/'+message.msg} className={classes.photo}/>}
+              <img src={'/'+message.msg} className={classes.photo} alt="message_photo" />}
             </span>
             :
                 <div  className={classes.message}

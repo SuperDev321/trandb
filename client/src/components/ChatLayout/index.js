@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import AppBar from '@material-ui/core/AppBar';
 import Button from '@material-ui/core/Button';
 import Card from '@material-ui/core/Card';
@@ -9,7 +9,6 @@ import AddIcon from '@material-ui/icons/Add';
 import { makeStyles } from '@material-ui/core/styles';
 
 import SideBarLeft from '../SidebarLeft'
-import roomContext from '../../contexts/roomContext';
 
 const drawerWidth = 240;
 
@@ -95,10 +94,6 @@ function ChatLayout({users, room, children}) {
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
-
-  const { rooms, setRooms } = useContext(roomContext);
-
-//   const container = window !== undefined ? () => window().document.body : undefined;
 
   return (
     <div className={classes.root} color="primary">

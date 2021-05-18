@@ -1,10 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
-import PropTypes from 'prop-types';
 import { withStyles, makeStyles } from '@material-ui/core/styles';
 import {
-    Button,
     Dialog,
-    DialogActions,
     DialogContent,
     // MuiDialogTitle,
     IconButton,
@@ -17,10 +14,7 @@ import MuiDialogTitle from '@material-ui/core/DialogTitle';
 import {
     Settings,
 } from '@material-ui/icons'
-import { useSnackbar } from 'notistack';
 import {useTranslation} from 'react-i18next';
-import CustomTextField from '../../CustomTextField';
-import OutlinedButton from '../../OutlinedButton';
 import ThemeSetting from './ThemeSetting';
 import MessageSetting from './MessageSetting';
 import {SettingContext} from '../../../context';
@@ -90,7 +84,6 @@ const SettingModal = () => {
     const [open, setOpen] = useState(false);
     const [page, setPage] = useState(null);
     const classes = useStyles();
-    const { enqueueSnackbar, closeSnackbar } = useSnackbar();
     const {t} = useTranslation();
     const handleClose = () => {
         setOpen(false);

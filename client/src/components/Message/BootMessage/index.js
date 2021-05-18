@@ -1,11 +1,9 @@
 import React from 'react';
-import propTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
 import AndroidIcon from '@material-ui/icons/Android';
 import { green } from '@material-ui/core/colors';
 const useStyles = makeStyles((theme) => ({
     root: {
-        padding: 5,
         margin: 3,
         marginLeft: 35,
         borderRadius: 5,

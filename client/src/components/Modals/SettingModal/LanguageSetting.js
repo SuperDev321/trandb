@@ -1,16 +1,14 @@
-import React, {useState, useContext, useEffect} from 'react';
+import React from 'react';
 import { withStyles, makeStyles } from '@material-ui/core/styles';
 import {
     FormGroup,
-    FormControl,
     InputLabel,
     InputBase,
     Select,
     MenuItem
 } from '@material-ui/core';
-
-import {CustomThemeContext} from '../../../themes/cutomThemeProvider';
 import { useTranslation } from 'react-i18next';
+
 const BootstrapInput = withStyles((theme) => ({
   root: {
     'label + &': {

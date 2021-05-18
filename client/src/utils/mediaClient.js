@@ -75,7 +75,7 @@ class MediaClient {
     async createRoom(room_id) {
         await mediaSocket.request('createMediaRoom', {
             room_id,
-            token: 'media_token'
+            token: 'media_token',
         }).catch(err => {
             console.log(err)
         })
@@ -83,7 +83,7 @@ class MediaClient {
 
     async join(room_id) {
         try {
-            let result = await mediaSocket.request('joinMedia', {
+            await mediaSocket.request('joinMedia', {
                 name: this.name,
                 room_id,
                 token: 'media_token'
@@ -281,7 +281,7 @@ class MediaClient {
                     })
                     .then(callback)
                     .catch(errback);
-            }.bind(this));
+            });
             consumerTransport.on('connectionstatechange', async (state) => {
                 switch (state) {
                     case 'connecting':
@@ -330,13 +330,13 @@ class MediaClient {
         }.bind(this))
 
         mediaSocket.on('start view', (data) => {
-            let {name, producer_id, room_id} = data;
+            let {name, room_id} = data;
             this.addViewer(room_id, name);
         })
 
         mediaSocket.on('stop view', (data) => {
             
-            let {name, producer_id, room_id} = data;
+            let {name, room_id} = data;
             this.deleteViewer(room_id, name);
         })
 
@@ -356,13 +356,12 @@ class MediaClient {
         }.bind(this))
 
         mediaSocket.on('connect_error' ,function () {
-            setTimeout(() => {
-                mediaSocket.connect();
-            }, 1000);
-        }.bind(this))
+            console.log('media socket error')
+        })
 
         mediaSocket.io.on('reconnect', async () => {
             this.rooms.forEach(async (room) => {
+                console.log('reconnect', room, this.id)
                 await this.createRoom(room);
                 await this.join(room);
             })
@@ -544,7 +543,7 @@ class MediaClient {
             let {
                 consumer,
                 kind,
-                name
+                // name
             } = data;
             consumer.on('trackended', ()  => {
                 this.removeConsumer(consumer.id)
@@ -886,7 +885,7 @@ class MediaClient {
     closeConsumer(consumer_id, room_id) {
         let consumerInfo = this.consumers.get(consumer_id);
         if(consumerInfo) {
-            let {kind, room_id, name, socket_id, consumer} = consumerInfo;
+            let {kind, room_id, name, consumer} = consumerInfo;
             consumer.close();
             this.removeRemoteStream(name, kind, room_id)
             this.consumers.delete(consumer_id);
@@ -902,7 +901,7 @@ class MediaClient {
         // elem.parentNode.removeChild(elem)
         let consumerInfo = this.consumers.get(consumer_id);
         if(consumerInfo) {
-            let {kind, room_id, name, socket_id} = consumerInfo;
+            let {kind, room_id, name} = consumerInfo;
             this.removeRemoteStream(name, kind, room_id)
             
             this.consumers.delete(consumer_id);
@@ -938,7 +937,7 @@ class MediaClient {
     }
 
     stopView(room_id, targetId, name) {
-        let roomStreams = this.remoteStreams.get(room_id);
+        // let roomStreams = this.remoteStreams.get(room_id);
         mediaSocket.request('stop broadcast', {
             room_id,
             name: this.name,
@@ -968,16 +967,16 @@ class MediaClient {
                     }
                 })
             }
-                
+            mediaSocket.removeAllListeners();
             // mediaSocket.off('disconnect')
-            mediaSocket.off('newProducers')
-            mediaSocket.off('consumerClosed')
+            // mediaSocket.off('newProducers')
+            // mediaSocket.off('consumerClosed')
         }.bind(this)
 
         if (!offline) {
             mediaSocket.request('exit').then(e => console.log(e)).catch(e => console.warn(e)).finally(function () {
                 clean()
-            }.bind(this))
+            })
         } else {
             clean()
         }
@@ -997,6 +996,14 @@ class MediaClient {
 
     on(evt, callback) {
         this.eventListeners.get(evt).push(callback)
+    }
+
+    off(evt) {
+        this.eventListeners.delete(evt);
+    }
+
+    offAll() {
+        this.eventListeners.clear();
     }
 
     startStream(room_id, stream, locked) {

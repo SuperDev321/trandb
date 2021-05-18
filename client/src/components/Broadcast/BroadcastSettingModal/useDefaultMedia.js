@@ -1,4 +1,4 @@
-import React, { useReducer } from 'react';
+import React from 'react';
 
 const getUserMedia = async () => {
     // navigator.getUserMedia = navigator.getUserMedia ||
@@ -69,7 +69,7 @@ const useDefaultMedia = (initialState) => {
 
       React.useEffect(() => {
         run(getUserMedia())
-      }, [getUserMedia, run])
+      }, [run])
     
     return {
         error,

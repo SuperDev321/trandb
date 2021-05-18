@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useContext, useCallback } from 'react';
+import React, { useState, useRef, useContext, useCallback } from 'react';
 import CloudUploadIcon from '@material-ui/icons/CloudUpload';
 import useStyles from './styles';
 import InputEmoji from './InputEmoji';
@@ -58,7 +58,7 @@ const ChatForm = ({roomName, to, sendMessage, onFocus, onBlur, type, blocked}) =
                 fileInputRef.current.value = null;
             }
         })
-    }, [roomName, to, type, userColor]);
+    }, [roomName, to, type, userColor, blocked, sendMessage]);
     const handleChangeFile = (files, type) => {
         if(files && files[0]) {
             let file = files[0];
@@ -68,17 +68,15 @@ const ChatForm = ({roomName, to, sendMessage, onFocus, onBlur, type, blocked}) =
     const defaultColor = currentTheme === 'normal'? '#000': '#fff';
     const colorPickBackground = currentTheme === 'normal'? '#fff': '#263238';
 
-    const handleOnEnter = (msg) => {
+    const handleOnEnter = useCallback((msg) => {
         let realMsg = msg.trim();
         if(realMsg) {
             if(!blocked) {
-                setTimeout(() => {
-                    sendMessage(roomName, to, userColor, realMsg, bold, type, 'general');
-                }, 0);
+                sendMessage(roomName, to, userColor, realMsg, bold, type, 'general');
             }
             setMsg('');
         }
-    }
+    }, [sendMessage, roomName, to, bold, userColor, type, blocked]);
     
     return (
         <div className={classes.inputArea}>

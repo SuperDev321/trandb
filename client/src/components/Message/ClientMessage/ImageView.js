@@ -4,15 +4,12 @@ const ImageView = ({url, scrollEvent, ...props}) => {
 
     const myRef = React.useRef(null)
     const [checked, setChecked] = React.useState(false);
-    const executeScroll = () => {
-        console.log('executeScroll')
-        myRef.current.scrollIntoView();
-    }
+
     React.useEffect(() => {
         if(checked) {
             scrollEvent();
         }
-    }, [checked])
+    }, [checked, scrollEvent])
 
     return (
         <span ref={myRef} {...props}>
@@ -20,7 +17,7 @@ const ImageView = ({url, scrollEvent, ...props}) => {
         <strong
             onClick={() => {setChecked(true)}}
             style={{cursor: "pointer"}}>click to view</strong></a> :
-        <img src={'/'+url} style={{ width: 'auto', height: 'auto', maxWidth: 250}} />}
+        <img src={'/'+url} style={{ width: 'auto', height: 'auto', maxWidth: 250}} alt="" />}
         </span>
     )
 }

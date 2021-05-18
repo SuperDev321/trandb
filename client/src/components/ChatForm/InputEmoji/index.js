@@ -48,8 +48,7 @@ function InputEmoji ({
 }, ref) {
     const classes = useStyles();
     const [showPicker, setShowPicker] = useState(false)
-    const [allEmojiStyle] = useState({})
-    const [currentSize, setCurrentSize] = useState(null)
+    // const [currentSize, setCurrentSize] = useState(null)
 
     const textInputRef = useRef(null)
     const cleanedTextRef = useRef('')
@@ -113,26 +112,34 @@ function InputEmoji ({
     const updateHTML = useCallback((nextValue) => {
         nextValue = nextValue || value
         textInputRef.current.innerHTML = replaceAllTextEmojis(nextValue || '');
-    }, [replaceAllTextEmojis])
+    }, [replaceAllTextEmojis, value])
 
-    const checkAndEmitResize = useCallback(() => {
-        const nextSize = {
-        width: textInputRef.current.offsetWidth,
-        height: textInputRef.current.offsetHeight
+    // const checkAndEmitResize = useCallback(() => {
+    //     const nextSize = {
+    //     width: textInputRef.current.offsetWidth,
+    //     height: textInputRef.current.offsetHeight
+    //     }
+
+    //     if (!currentSize ||
+    //     currentSize.width !== nextSize.width ||
+    //     currentSize.height !== nextSize.height) {
+    //     onResize(nextSize)
+    //     setCurrentSize(nextSize)
+    //     }
+    // }, [currentSize, onResize])
+
+    const checkPlaceholder = useCallback(() => {
+        if(textInputRef.current && placeholderRef.current) {
+            const text = textInputRef.current.innerHTML;
+            if (text !== '' && placeholderRef.current.opacity !== 0) {
+                placeholderRef.current.style.opacity = 0
+            } else {
+                placeholderRef.current.style.opacity = 1
+            }
+        } else {
+
         }
-
-        if (!currentSize ||
-        currentSize.width !== nextSize.width ||
-        currentSize.height !== nextSize.height) {
-        onResize(nextSize)
-        setCurrentSize(nextSize)
-        }
-    }, [currentSize, onResize])
-
-    useEffect(() => {
-        updateHTML()
-        emitChange()
-    }, [updateHTML])
+    }, []);
 
     const replaceAllTextEmojiToString = useCallback(() => {
         if (!textInputRef.current) {
@@ -164,17 +171,6 @@ function InputEmoji ({
     }, [])
 
     const emitChange = useCallback(() => {
-        // setTimeout(() => {
-        //     replaceAllTextEmojiToString()
-        //     if (typeof onChange === 'function') {
-        //         onChange(cleanedTextRef.current);
-        //         // console.log(cleanedTextRef.current)
-        //     }
-
-        //     if (typeof onResize === 'function') {
-        //         checkAndEmitResize()
-        //     }
-        // }, 0)
         if(textInputRef.current && textInputRef.current.innerHTML !== '') {
             setDisabled(false);
         } else {
@@ -237,7 +233,7 @@ function InputEmoji ({
             inputEl.removeEventListener('keydown', handleKeydown)
             inputEl.removeEventListener('keyup', handleKeyup)
         }
-    }, [cleanOnEnter, onEnter, updateHTML, replaceAllTextEmojiToString, maxLength, onKeyDown])
+    }, [cleanOnEnter, onEnter, updateHTML, replaceAllTextEmojiToString, maxLength, onKeyDown, emitChange])
     // }, [onChange, cleanOnEnter, onEnter, updateHTML, replaceAllTextEmojiToString, replaceAllTextEmojiToStringDebounced, emitChange, maxLength, onKeyDown])
 
     useEffect(() => {
@@ -273,14 +269,14 @@ function InputEmoji ({
         return textCount + emojisCount
     }
 
-    useEffect(() => {
-        if (textInputRef.current) {
-        setCurrentSize({
-            width: textInputRef.current.offsetWidth,
-            height: textInputRef.current.offsetHeight
-        })
-        }
-    }, [])
+    // useEffect(() => {
+    //     if (textInputRef.current) {
+    //     setCurrentSize({
+    //         width: textInputRef.current.offsetWidth,
+    //         height: textInputRef.current.offsetHeight
+    //     })
+    //     }
+    // }, [])
 
     useEffect(() => {
         function handleCopy (e) {
@@ -340,7 +336,13 @@ function InputEmoji ({
           inputEl.removeEventListener('copy', handleCopy)
           inputEl.removeEventListener('paste', handlePaste)
         }
-      }, [replaceAllTextEmojis])
+    }, [replaceAllTextEmojis])
+
+    
+    useEffect(() => {
+        updateHTML()
+        emitChange()
+    }, [updateHTML, emitChange])
 
 
     function setValue (value) {
@@ -411,19 +413,6 @@ function InputEmoji ({
         return text.match(
         /(?:[\u2700-\u27bf]|(?:\ud83c[\udde6-\uddff]){2}|[\ud800-\udbff][\udc00-\udfff])[\ufe0e\ufe0f]?(?:[\u0300-\u036f\ufe20-\ufe23\u20d0-\u20f0]|\ud83c[\udffb-\udfff])?(?:\u200d(?:[^\ud800-\udfff]|(?:\ud83c[\udde6-\uddff]){2}|[\ud800-\udbff][\udc00-\udfff])[\ufe0e\ufe0f]?(?:[\u0300-\u036f\ufe20-\ufe23\u20d0-\u20f0]|\ud83c[\udffb-\udfff])?)*/g
         )
-    }
-
-    function checkPlaceholder () {
-        if(textInputRef.current && placeholderRef.current) {
-            const text = textInputRef.current.innerHTML;
-            if (text !== '' && placeholderRef.current.opacity !== 0) {
-                placeholderRef.current.style.opacity = 0
-            } else {
-                placeholderRef.current.style.opacity = 1
-            }
-        } else {
-
-        }
     }
 
     function handleClick () {

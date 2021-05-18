@@ -1,17 +1,14 @@
 import React from 'react';
-import { Switch, Redirect } from 'react-router-dom';
-import { Spin } from 'antd';
+import { Switch } from 'react-router-dom';
 import {makeStyles} from '@material-ui/core/styles';
 import {UserContext, SettingContext} from './context';
 import CustomThemeProvider from './themes/cutomThemeProvider'
 import { useAuth, useSetting } from './utils';
-import { Signup, Login, Rooms, ChattingRoom, Admin, RoomSetting, Profile, Loading } from './pages';
+import { Signup, Login, Rooms, ChattingRoom, RoomSetting, Profile, Loading } from './pages';
 import { PublicRoute, PrivateRoute } from './components';
 import CreateRoom from './pages/CreateRoom';
-import BlockUsers from './pages/Admin/BlockUsers';
 import { SnackbarProvider } from 'notistack';
 import CloseIcon from '@material-ui/icons/Close';
-import {useAudio} from 'react-use';
 import './App.css';
 
 const useStyles = makeStyles((theme) =>({

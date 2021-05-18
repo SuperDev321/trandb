@@ -148,7 +148,7 @@ const PrivateChat = ({ me, to, ip, sendMessage, active, setActive, initMessages,
     const [blocked, setBlocked] = useState(false);
     const [withBlocked, setWithBlocked] = useState(false);
     const classes = useStyles({max});
-    const {messageNum, messageSize} = useContext(SettingContext);
+    const {messageNum} = useContext(SettingContext);
 
 
     const handleMinimize = () => {
@@ -226,7 +226,7 @@ const PrivateChat = ({ me, to, ip, sendMessage, active, setActive, initMessages,
         } else {
             setBlocked(false);
         }
-    }, [globalBlocks])
+    }, [globalBlocks, ip, me, to])
 
     // useEffect(() => {
     //     getPrivateMessages({from: me.username, to},

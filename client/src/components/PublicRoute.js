@@ -1,11 +1,9 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import propTypes from 'prop-types';
-import { Route, Redirect } from 'react-router-dom';
-
-import {UserContext} from '../context';
+import { Route } from 'react-router-dom';
 
 const PublicRoute = ({ children, path }) => {
-  const { auth } = useContext(UserContext);
+  // const { auth } = useContext(UserContext);
   return (
     <Route path={path}>{children}</Route>
   );

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useLayoutEffect, useRef, useCallback, useContext } from 'react';
+import React, { useState, useLayoutEffect, useRef, useContext } from 'react';
 import propTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
 import ClientMessage from '../ClientMessage';
@@ -6,7 +6,6 @@ import SystemMessage from '../SystemMessage';
 import BootMessage from '../BootMessage';
 import {CustomThemeContext} from '../../../themes/cutomThemeProvider';
 import { SettingContext } from '../../../context';
-import { message } from 'antd';
 
 const useStyles =  makeStyles((theme) => ({
     root: {
@@ -49,12 +48,8 @@ const MessagesList = ({ users, messages, role, userAction, roomName, changeMuteS
     addOrOpenPrivate }) => {
     const messagesRef = useRef();
     const classes = useStyles();
-    const {currentTheme} = useContext(CustomThemeContext);
     const {messageSize} = useContext(SettingContext);
-    const [count, setCount] = useState({
-        prev: 0,
-        next: itemUnit
-    });
+
     const setScrollTop = () => {
         if (messagesRef.current) {
             messagesRef.current.scrollTop = messagesRef.current.scrollHeight;

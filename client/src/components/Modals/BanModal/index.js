@@ -1,16 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import {
-    Button,
     Dialog,
     DialogActions,
     DialogContent,
     DialogTitle,
     MenuItem,
     Grid,
-    Switch,
-    Input
 } from '@material-ui/core';
-import DialogContentText from '@material-ui/core/DialogContentText';
 import CustomTextField from '../../CustomTextField';
 import OutlinedButton from '../../OutlinedButton';
 import useStyles from './styles';
@@ -23,7 +19,7 @@ import config from '../../../config';
 export default function BanModal({open, setOpen, initVal, roomName}) {
     const classes = useStyles();
     // const name = initVal.name?initVal.name: '';
-    const [name, setName] = useState(initVal.name || '');
+    const name = initVal.name || '';
     const [type, setType] = useState('all');
     const [ip, setIp] = useState(initVal.ip?initVal.ip: '');
     // const [toIp, setToIp] = useState(initVal.ip?initVal.ip: '');
@@ -38,7 +34,7 @@ export default function BanModal({open, setOpen, initVal, roomName}) {
                 }
             })
         }
-    }, [open])
+    }, [open, initVal])
     const handleClose = () => {
         setOpen(false);
     };

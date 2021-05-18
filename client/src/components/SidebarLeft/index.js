@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { fade, makeStyles } from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/core/styles';
 import {
-    Divider,
     InputBase,
 } from '@material-ui/core';
 import SearchIcon from '@material-ui/icons/Search'
@@ -49,7 +48,20 @@ const useStyles = makeStyles((theme) => ({
         padding: '0',
         flexGrow: 1,
         overflow: 'auto',
-        
+        scrollbarWidth: 'thin',
+        scrollbarColor: `#585B5E #ecdbdb00`,
+        WebkitOverflowScrolling: 'touch',
+        '&::-webkit-scrollbar': {
+            width: '5px',
+        },
+        '&::-webkit-scrollbar-track': {
+            '-webkit-box-shadow': 'inset 0 0 6px rgba(0,0,0,0.00)'
+        },
+        '&:hover::-webkit-scrollbar-thumb': {
+            backgroundColor: 'rgb(0 0 0 / 25%)',
+            outline: 'none',
+            borderRadius: '5px',
+        }
     },
     listItem: {
         paddingTop: theme.spacing(0.5),
@@ -66,7 +78,6 @@ const useStyles = makeStyles((theme) => ({
         width: '100%',
         boxShadow: '0 0 0px 1px #0000002b',
         color: theme.palette.menu.color,
-        backgroundColor: theme.palette.inputField
     },
     searchIcon: {
         padding: theme.spacing(0, 2),
@@ -165,7 +176,7 @@ const SideBarLeft = ({ roomName, username, mutes, blocks, globalBlocks, changeMu
             return false;
         }
         
-    }, [broadcastingUsers, cameraState]);
+    }, [username, broadcastingUsers, cameraState]);
 
     const isViewer = useCallback((user) => {
         if(user.username === username) {
@@ -177,7 +188,7 @@ const SideBarLeft = ({ roomName, username, mutes, blocks, globalBlocks, changeMu
             return false;
         }
         
-    }, [viewers, cameraState]);
+    }, [username, viewers, cameraState]);
 
     return (
         <div className={classes.root}>
@@ -198,7 +209,7 @@ const SideBarLeft = ({ roomName, username, mutes, blocks, globalBlocks, changeMu
                                 roomName={roomName}
                                 username={username}
                                 role={role}
-                                user={user} key={index}
+                                user={user} key={user? user._id: null}
                                 isMuted={isMuted(user)}
                                 isBlocked = {isBlocked(user)}
                                 isBroadcasting={isBroadcasting(user)}

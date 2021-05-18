@@ -142,7 +142,7 @@ export default function RoomSetting() {
   useEffect(() => {
     if(room)
       getRoomDetail(room, (data) => {
-        const {_id, name, category, description, welcomeMessage, maxUsers, owner, bans, moderators, cover, icon} = data;
+        const {_id, name, category, description, welcomeMessage, maxUsers, owner, bans, moderators} = data;
         setRoomId(_id);
         setRoomName(name);
         setCategory(category);

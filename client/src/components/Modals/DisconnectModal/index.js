@@ -1,40 +1,33 @@
-import React, { useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
+import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import {
-    Button,
     Dialog,
     DialogActions,
     DialogContent,
     DialogContentText,
     DialogTitle,
-    ListItem,
-    ListItemText,
-    ListItemAvatar,
-    Avatar,
-    List
 } from '@material-ui/core';
 
-const useStyles = makeStyles((theme) => ({
-    root: {
-      width: '100%',
-      minWidth: 400,
-      padding: '0 10px',
-      backgroundColor: theme.palette.background.paper,
-    },
-    button: {
-        margin: '0 10px',
-        // borderRadius: '0',
-        height: '30px'
-    },
-}));
+// const useStyles = makeStyles((theme) => ({
+//     root: {
+//       width: '100%',
+//       minWidth: 400,
+//       padding: '0 10px',
+//       backgroundColor: theme.palette.background.paper,
+//     },
+//     button: {
+//         margin: '0 10px',
+//         // borderRadius: '0',
+//         height: '30px'
+//     },
+// }));
 
 export default function DisconnectModal({open, setOpen}) {
-    const classes = useStyles();
+    // const classes = useStyles();
 
-    const handleClose = () => {
-        setOpen(false);
-    };
+    // const handleClose = () => {
+    //     setOpen(false);
+    // };
 
     return (
         <Dialog

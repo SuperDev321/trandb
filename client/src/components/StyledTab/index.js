@@ -1,16 +1,9 @@
 import React from 'react';
-import { makeStyles, withStyles } from '@material-ui/core/styles';
+import { withStyles } from '@material-ui/core/styles';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Badge from '@material-ui/core/Badge';
 import CloseIcon from '@material-ui/icons/Close';
-import theme from '../../themes/normal';
-
-const useTabStyles = makeStyles((theme) => {
-    root: {
-        
-    }
-});
 
 const StyledBadge = withStyles((theme) => ({
     root: {
@@ -32,7 +25,7 @@ const StyledBadge = withStyles((theme) => ({
 const StyledTab = withStyles((theme) => ({
     root: {
         textTransform: 'none',
-        color: theme.palette.primary.main,
+        // color: theme.palette.primary.main,
         fontWeight: theme.typography.fontWeightRegular,
         fontSize: theme.typography.pxToRem(15),
         height: '30px',
@@ -72,7 +65,7 @@ const StyledTab = withStyles((theme) => ({
         // console.log(props.unRead)
         return(
             <StyledBadge color="secondary"
-                badgeContent={props.unRead} 
+                badgeContent={props.unRead}
             >
                 <Tab disableRipple  {...newProps} icon={props.onClose && <CloseIcon fontSize="small"
                 onClick={(e)=> {e.stopPropagation(); props.onClose();}}/>} />

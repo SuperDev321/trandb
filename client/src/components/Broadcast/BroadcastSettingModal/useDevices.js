@@ -78,7 +78,7 @@ const useDevices = (initialState) => {
 
       React.useEffect(() => {
         run(getDevices())
-      }, [getDevices, run])
+      }, [run])
     
     return {
         error,
