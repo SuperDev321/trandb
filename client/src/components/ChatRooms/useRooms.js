@@ -360,14 +360,17 @@ const useRooms = ({initRoomName, ...initalState}) => {
                     data.remoteStreams = mediaClientRef.current.getRemoteStreams(newRoom.name);
                     data.liveUsers = mediaClientRef.current.getLiveUsers(newRoom.name);
                     dispatch({type: 'init', data});
+                    roomNameRef.current = newRoom.name;
                 }
                 let newRooms = await(roomsRef.current.filter((oneRoom) => (oneRoom.name !==room)));
                 roomsRef.current = newRooms;
+                
                 if(newRoomIndex === null) {
                     newRoomIndex = roomsRef.current.findIndex((item) => (item.name === currentRoomName));
                 }
                 let newRoomsData = roomsRef.current.map(({name, unReadMessages}) => ({name, unReadMessages}));
                 roomsDispatch({type: 'set', data: newRoomsData, roomIndex: newRoomIndex});
+                
                 if(callback) callback(true);
             } else {
                 if(callback) callback(false);

@@ -24,7 +24,7 @@ const PrivateChatList = ({sendMessage, readMsg ,me, globalBlocks}, ref) => {
                 setActiveChat(roomName);
             }
         }
-    }, [])
+    }, [chatList])
 
     const openChat = (toUsername) => {
         let chatInfo = chatList.find((item) => (item.to === toUsername));
@@ -81,7 +81,7 @@ const PrivateChatList = ({sendMessage, readMsg ,me, globalBlocks}, ref) => {
     return (
         <>
             {chatList.map((item, index) =>
-                <PrivateChatContent key={item.to}
+                <PrivateChatContent key={item.roomName}
                     ref={elRefs.current[index].ref}
                     me={me} to={item.to}
                     ip={item.ip}

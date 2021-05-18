@@ -38,7 +38,7 @@ const VolumnControl = ({value, handleChange}) => {
                 }
                 </Grid>
                 <Grid item xs  className={classes.grid}>
-                    <Slider className={classes.slider} value={value} onChange={handleChange} aria-labelledby="continuous-slider" />
+                    <Slider className={classes.slider} value={value} onChange={(e, newValue) => handleChange(newValue)} aria-labelledby="continuous-slider" />
                 </Grid>
         </Grid>
       </div>
