@@ -45,8 +45,8 @@ const joinRoom = (io, socket) => async ({ room, password }, callback) => {
         socket.emit('init room',
             {messages, onlineUsers, room: {name: room, welcomeMessage: roomInfo.welcomeMessage}, blocks, globalBlocks},
             (data)=> {
-                if(data === 'success') {
-                    let joinedUser = onlineUsers.find(({item}) => (item._id === _id));
+                if(data === 'success' && result && result.nModified) {
+                    let joinedUser = onlineUsers.find((item) => (item._id === _id));
                     io.to(room).emit('joined room', {
                         room,
                         // onlineUsers: usersInfo,
@@ -109,10 +109,12 @@ const rejoinRoom = (io, socket) => async ({ room, type }, callback) => {
             
             let globalBlocks = await getGlobalBlocksWithIp();
             let blocks = await getRoomBlocks(room);
-            let blocked = await checkBlock(room, user.username, user.ip);
+            // let blocked = await checkBlock(room, user.username, user.ip);
+            
             socket.emit('init room', {messages, onlineUsers, room: {name: room}, globalBlocks, blocks}, (data)=> {
-                if(data === 'success') {
-                    let joinedUser = onlineUsers.find(({item}) => (item._id === _id));
+                if(data === 'success' && result && result.nModified) {
+                    // && result && result.nModified
+                    let joinedUser = onlineUsers.find((item) => (item._id === _id));
                     io.to(room).emit('joined room', {
                         room,
                         joinedUser
