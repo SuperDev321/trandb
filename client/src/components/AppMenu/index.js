@@ -105,7 +105,7 @@ export default function AppMenu() {
                 </span>
                 <ArrowDropDownIcon className={classes.dropIcon} />
             </Button>
-            <Popper open={open} anchorEl={anchorRef.current} role={undefined} transition>
+            <Popper open={open} style={{zIndex: 100}} anchorEl={anchorRef.current} role={undefined} transition>
             {
                 ({ TransitionProps, placement }) => (
                 <Grow

@@ -192,6 +192,7 @@ const UserVideo = ({stream, locked, name, controlVideo, muted, total, streamNum,
     const [playing, setPlaying] = useState(false);
     const {data} = useAnalysis({stream});
     const [volume, setVolume] = useState(0);
+    const audioTrackRef = useRef(null);
 
     const echo = data*volume/100;
  
@@ -231,7 +232,7 @@ const UserVideo = ({stream, locked, name, controlVideo, muted, total, streamNum,
         controlVideo(data);
     }
 
-    const handleChangeVolume = (event, newValue) => {
+    const changeVolume = (newValue) => {
         setVolume(newValue);
         if(userVideo.current) {
             userVideo.current.volume = newValue/100;
@@ -243,6 +244,13 @@ const UserVideo = ({stream, locked, name, controlVideo, muted, total, streamNum,
             
             if(stream) {
                 userVideo.current.srcObject = stream;
+                let audioTrack = stream.getAudioTracks()[0];
+                if(audioTrack.volume) {
+                    changeVolume(audioTrack.volume);
+                } else {
+                    audioTrack.volume = 50;
+                    changeVolume(50);
+                }
                 // userVideo.current.load();
                 // userVideo.current.play();
             }
@@ -275,6 +283,15 @@ const UserVideo = ({stream, locked, name, controlVideo, muted, total, streamNum,
             }
         }
     }, [stream])
+
+    useEffect(() => {
+        return () => {
+            if(stream) {
+                let audioTrack = stream.getAudioTracks()[0];
+                audioTrack.volume = volume;
+            }
+        }
+    }, [volume])
     
     return (
         <div className={classes.root}>
@@ -307,7 +324,7 @@ const UserVideo = ({stream, locked, name, controlVideo, muted, total, streamNum,
                             <ZoomInIcon />
                         </IconButton>
                     }
-                        <VolumnControl value={volume} handleChange={handleChangeVolume} />
+                        <VolumnControl value={volume} handleChange={(value) => changeVolume(value)} />
                     </div>
                 </div>
                 <div className={classes.content}>
@@ -324,6 +341,8 @@ const UserVideo = ({stream, locked, name, controlVideo, muted, total, streamNum,
         </div>
     )
 }
+
+const UserVideoMemo = React.memo(UserVideo);
 
 function asyncReducer(state, action) {
     switch (action.type) {
@@ -424,7 +443,7 @@ const VideoList = ({streams: remoteStreams, localStream, controlVideo, roomName}
             <Loading/>
         :
             streams?.map(({stream, name, locked, zoom, muted}, index) => (
-                <UserVideo
+                <UserVideoMemo
                     stream={stream} key={stream.id} locked={locked} name={name}
                     controlVideo={handleVideo}
                     total={streams.length}
@@ -438,4 +457,4 @@ const VideoList = ({streams: remoteStreams, localStream, controlVideo, roomName}
     )
 }
 
-export default VideoList;
+export default React.memo(VideoList);
