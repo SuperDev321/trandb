@@ -37,8 +37,13 @@ export default function Create( {onClose} ) {
     }
     payload.word = word;
     try {
-        const {data: {data}} = await axios.post(`${config.server_url}/api/forbiddenWords`, payload);
-        onClose();
+      let token = window.localStorage.getItem('token');
+      const {data: {data}} = await axios.post(`${config.server_url}/api/forbiddenWords`, payload, {
+        headers: {
+          authorization: token
+        }
+      });
+      onClose();
     } catch (err) {
         addToast('Can not create this word', { appearance: 'error' });
         onClose();

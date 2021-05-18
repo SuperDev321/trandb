@@ -79,8 +79,13 @@ export default function RoomSelector() {
   const [activeUsers, setActiveUsers] = useState([]);
 
   useEffect(() => {
+    let token = window.localStorage.getItem('token');
     if(roomType === 'public') {
-        Axios.get(`${config.server_url}/api/room/names`)
+        Axios.get(`${config.server_url}/api/room/names`, {
+            headers: {
+                authorization: token
+            }
+        })
         .then((response) => {
             if(response.status === 200) {
                 console.log(response.data)
@@ -93,7 +98,11 @@ export default function RoomSelector() {
             }
         })
     } else if(roomType === 'private') {
-        Axios.get(`${config.server_url}/api/users`)
+        Axios.get(`${config.server_url}/api/users`, {
+            headers: {
+                authorization: token
+            }
+        })
         .then((response) => {
             if(response.status === 200) {
                 console.log(response.data)

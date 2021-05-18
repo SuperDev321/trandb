@@ -40,22 +40,25 @@ export default function Edit( {onClose, row} ) {
       return;
     }
     try {
-        console.log(content, color, bold, size, active)
-        axios.post(`${config.server_url}/api/boot/edit`, {
-            _id: row._id,
-            content,
-            color,
-            bold,
-            size,
-            active
-        })
-        .then((response) => {
-            if(response && response.status === 204) {
-                addToast('Successfully updated', { appearance: 'success' });
-                onClose();
-            }
-        })
-        
+      let token = window.localStorage.getItem('token');
+      axios.post(`${config.server_url}/api/boot/edit`, {
+          _id: row._id,
+          content,
+          color,
+          bold,
+          size,
+          active
+      }, {
+        headers: {
+          authorization: token
+        }
+      })
+      .then((response) => {
+          if(response && response.status === 204) {
+              addToast('Successfully updated', { appearance: 'success' });
+              onClose();
+          }
+      })
     } catch (err) {
         console.log(err);
         addToast('Can not create this boot', { appearance: 'error' });

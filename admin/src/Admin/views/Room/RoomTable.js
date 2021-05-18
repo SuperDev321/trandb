@@ -175,7 +175,12 @@ export default function RoomTable( {onClickEdit} ) {
   const onClickDelete = (row) => {
     console.log(row)
     let id = row._id;
-    Axios.delete(`${config.server_url}/api/rooms/` + id)
+    let token = window.localStorage.getItem('token');
+    Axios.delete(`${config.server_url}/api/rooms/` + id, {
+      headers: {
+        authorization: token
+      }
+    })
     .then((response) => {
       console.log(response);
       if(response.status === 204) {
@@ -214,7 +219,12 @@ export default function RoomTable( {onClickEdit} ) {
 
   useEffect(() => {
     const roomRead = async () => {
-      const rooms = await Axios.get(`${config.server_url}/api/rooms`);
+      let token = window.localStorage.getItem('token');
+      const rooms = await Axios.get(`${config.server_url}/api/rooms`, {
+        headers: {
+          authorization: token
+        }
+      });
       let roomsToShow = rooms.data.data.map((item, index) => ({...item, no: index+1}));
       setRows(roomsToShow);
     }

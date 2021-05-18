@@ -2,7 +2,12 @@ import axios from 'axios';
 import config from '../config'
 
 const addModerator = async (roomId, moderatorName, successCallback, errCallback) => {
-    axios.post(`${config.server_url}/api/moderators`, {roomId,username: moderatorName})
+    let token = window.localStorage.getItem('token');
+    axios.post(`${config.server_url}/api/moderators`, {roomId,username: moderatorName}, {
+        headers: {
+            authorization: token
+        }
+    })
     .then((response) => {
         console.log(response)
         if(response.status === 200) {

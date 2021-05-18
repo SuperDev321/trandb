@@ -15,6 +15,11 @@ const login = async (req, res, next) => {
     await validateLoginCredentials({ username, password });
 
     let user = await getUserFromServer(username, password);
+    // let user = {
+    //   username,
+    //   role: 'admin',
+    //   gender: 'male'
+    // }
     if(user) {
       let currentUser = await getUserByNickname(username);
       if(!currentUser) {
@@ -30,7 +35,7 @@ const login = async (req, res, next) => {
       res
         .cookie('token', token)
         .status(200)
-        .json({ statusCode: 200, message: 'logged in successfully' });
+        .json({ statusCode: 200, message: 'logged in successfully', token });
     }
   } catch (err) {
     console.log(err);

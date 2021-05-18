@@ -164,7 +164,12 @@ export default function Logs() {
   };
 
   const handleClickDelete = (id) => {
-    Axios.delete(`${config.server_url}/api/messages/` + id)
+    let token = window.localStorage.getItem('token');
+    Axios.delete(`${config.server_url}/api/messages/` + id, {
+      headers: {
+        authorization: token
+      }
+    })
     .then((response) => {
       console.log(response);
       if(response.status === 204) {
@@ -184,17 +189,27 @@ export default function Logs() {
     })
   }
   React.useEffect(() => {
-    console.log('room name changed', room);
+    let token = window.localStorage.getItem('token');
+    
     const getPublicLogs = async () => {
-        const result = await Axios.get(`${config.server_url}/api/messages/public/${room}`);
+        const result = await Axios.get(`${config.server_url}/api/messages/public/${room}`, {
+          headers: {
+            authorization: token
+          }
+      });
         console.log(result);
         let logsToShow = result.data.data.map((item, index) => ({...item, no: index+1}));
         setRows(logsToShow);
     }
+    
     const getPrivateLogs = async () => {
         const result = await Axios.post(`${config.server_url}/api/messages/private`, {
             from,
             to
+        }, {
+          headers: {
+            authorization: token
+          }
         });
         let logsToShow = result.data.data.map((item, index) => ({...item, no: index+1}));
         setRows(logsToShow);

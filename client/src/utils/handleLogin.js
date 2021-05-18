@@ -1,8 +1,14 @@
 import axios from 'axios';
 import config from '../config'
+import {createNewSocket} from './socketHandler';
 const handleLogin = async (credentials, successCallback, errCallback) => {
   try {
-    await axios.post(`${config.server_url}/api/login`, credentials);
+    let result = await axios.post(`${config.server_url}/api/login`, credentials);
+    if(result && result.status === 200) {
+      let token = result.data.token;
+      window.localStorage.setItem('token', token);
+      createNewSocket(token);
+    }
     successCallback();
   } catch (err) {
     let errMessage;

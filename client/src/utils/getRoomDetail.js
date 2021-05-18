@@ -1,13 +1,15 @@
 import axios from 'axios';
 import config from '../config'
 const getRoomDetail = async (roomName, successCallback, errCallback) => {
-    console.log('get room detail')
     try {
+        const token = window.localStorage.getItem('token');
         const {
             data: { data, statusCode, error },
 
-        } = await axios({url: `${config.server_url}/api/rooms/` + roomName,
-            method: 'GET'
+        } = await axios.get(`${config.server_url}/api/rooms/` + roomName, {
+            headers: {
+                authorization: token
+            }
         });
         // setLoading(false);
         // setRooms(data);

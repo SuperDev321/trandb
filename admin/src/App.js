@@ -25,7 +25,11 @@ export default function App() {
 
   useEffect(() => {
     const checkLoggedIn = async () => {
-      const { data } = await axios.get(`${config.server_url}/api/checkToken`);
+      const token = window.localStorage.getItem('token');
+      const { data } = await axios.post(`${config.server_url}/api/checkToken`, {
+        token
+      });
+      console.log(data)
         if (data === 'un-auth') {
           setLoading(false);
           setSuperAdmin(false);

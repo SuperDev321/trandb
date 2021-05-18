@@ -160,7 +160,12 @@ export default function Words( {onClickNew} ) {
   };
 
   const handleClickDelete = (id) => {
-    Axios.delete(`${config.server_url}/api/forbiddenWords/` + id)
+    let token = window.localStorage.getItem('token');
+    Axios.delete(`${config.server_url}/api/forbiddenWords/` + id, {
+      headers: {
+        authorization: token
+      }
+    })
     .then((response) => {
       console.log(response);
       if(response.status === 204) {
@@ -175,7 +180,12 @@ export default function Words( {onClickNew} ) {
   }
   React.useEffect(() => {
     const getWords = async () => {
-      const result = await Axios.get(`${config.server_url}/api/forbiddenWords`);
+      let token = window.localStorage.getItem('token');
+      const result = await Axios.get(`${config.server_url}/api/forbiddenWords`, {
+        headers: {
+          authorization: token
+        }
+      });
       console.log(result)
       let wordsToShow = result.data.words.map((item, index) => ({...item, no: index+1}));
       setRows(wordsToShow);

@@ -54,9 +54,14 @@ export default function RunQuiz() {
   const [bootInterval, setBootInterval] = useState(10);
 
   const handleStart = () => {
+    let token = window.localStorage.getItem('token');
     Axios.post(`${config.server_url}/api/boot/start`, {
       room: botRoom,
       interval: bootInterval
+    }, {
+      headers: {
+        authorization: token
+      }
     })
     .then((response) => {
       if(response.status === 204) {
@@ -66,8 +71,14 @@ export default function RunQuiz() {
   }
 
   const handleStop = () => {
+    let token = window.localStorage.getItem('token');
+    
     Axios.post(`${config.server_url}/api/boot/stop`, {
       room: botRoom
+    }, {
+      headers: {
+        authorization: token
+      }
     })
     .then((response) => {
       if(response.status === 204) {
@@ -77,7 +88,12 @@ export default function RunQuiz() {
   }
 
   useEffect(() => {
-    Axios.get(`${config.server_url}/api/room/names`)
+    let token = window.localStorage.getItem('token');
+    Axios.get(`${config.server_url}/api/room/names`, {
+      headers: {
+        authorization: token
+      }
+    })
     .then((response) => {
         if(response.status === 200) {
             if(response.data && Array.isArray(response.data.rooms)) {

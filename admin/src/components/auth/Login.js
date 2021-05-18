@@ -60,8 +60,11 @@ export default function Login() {
         `${config.server_url}/api/login`,
         loginUser
       );
-      if(response.status === 200)
+      if(response.status === 200) {
+        let {token} = response.data;
+        window.localStorage.setItem('token', token);
         setAuth(true);
+      }
     } catch (err) {
       if(err && err.response && err.response.data && err.response.data.error)
         addToast(err.response.data.error, {

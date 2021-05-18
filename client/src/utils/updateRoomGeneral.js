@@ -3,8 +3,12 @@ import config from '../config'
 const handleCreateRoom = async (data, successCallback, errCallback) => {
   try {
 
-    console.log('axios data', data)
-    await axios.put(`${config.server_url}/api/room/general`, data);
+    let token = window.localStorage.getItem('token');
+    await axios.put(`${config.server_url}/api/room/general`, data, {
+      headers: {
+        authorization: token
+      }
+    });
     successCallback();
   } catch (err) {
     let errMessage;
