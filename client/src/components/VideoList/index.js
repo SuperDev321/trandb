@@ -241,16 +241,16 @@ const UserVideo = ({stream, locked, name, controlVideo, muted, total, streamNum,
 
     useEffect(() => {
         if(stream && userVideo.current) {
-            
+            let audioTrack = stream.getAudioTracks()[0];
+            let initVolume = audioTrack.volume;
+            audioTrackRef.current = audioTrack;
             if(stream) {
                 userVideo.current.srcObject = stream;
-                let audioTrack = stream.getAudioTracks()[0];
-                if(audioTrack.volume) {
-                    changeVolume(audioTrack.volume);
-                } else {
-                    audioTrack.volume = 50;
-                    changeVolume(50);
+                if(initVolume === undefined || initVolume === null) {
+                    initVolume = 50;
                 }
+                changeVolume(initVolume);
+                
                 // userVideo.current.load();
                 // userVideo.current.play();
             }
@@ -271,7 +271,7 @@ const UserVideo = ({stream, locked, name, controlVideo, muted, total, streamNum,
                 if (playPromise !== undefined) {
                     playPromise
                     .then(_ => {
-                        setVolume(userVideo.current.volume*100);
+                        changeVolume(initVolume);
                         // Automatic playback started!
                         // Show playing UI.
                     })
@@ -286,9 +286,8 @@ const UserVideo = ({stream, locked, name, controlVideo, muted, total, streamNum,
 
     useEffect(() => {
         return () => {
-            if(stream) {
-                let audioTrack = stream.getAudioTracks()[0];
-                audioTrack.volume = volume;
+            if(audioTrackRef.current) {
+                audioTrackRef.current.volume = volume;
             }
         }
     }, [volume])
