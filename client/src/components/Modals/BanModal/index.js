@@ -27,7 +27,12 @@ export default function BanModal({open, setOpen, initVal, roomName}) {
     // const [ipSel, setIpSel] = useState(true);
     useEffect(() => {
         if(initVal.name && open) {
-            Axios.get(`${config.server_url}/api/users/`+initVal.name+'/ip')
+            let token = window.localStorage.getItem('token');
+            Axios.get(`${config.server_url}/api/users/`+initVal.name+'/ip', {
+                headers: {
+                    authorization: token
+                }
+            })
             .then((response) => {
                 if(response.status === 200) {
                     setIp(response.data);
