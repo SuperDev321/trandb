@@ -17,7 +17,13 @@ const Logout = () => {
 
     const logout = async () => {
         try {
-            await axios.get('/api/logout');
+            let token = window.localStorage.getItem('token');
+            console.log(token)
+            await axios.get('/api/logout' , {
+                headers: {
+                    "Authorization" : token
+                }
+            });
             removeCurrentUser();
         } catch (err) {
             message.error('Something went wrong, please try again later');

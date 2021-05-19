@@ -49,7 +49,7 @@ const isAdmin = require('./middleware/isAdmin');
 
 const router = express.Router();
 
-router.get('/checkToken', checkToken);
+router.post('/checkToken', checkToken);
 router.get('/logout', withAuth, logout);
 
 router.get('/setting', getSetting);

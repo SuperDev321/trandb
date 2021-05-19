@@ -7,8 +7,12 @@ const updateRoomMedia = async (data, successCallback, errCallback) => {
     formData.append('_id', data._id);
     formData.append('cover', data.cover);
     formData.append('icon', data.icon);
+    let token = window.localStorage.getItem('token');
     await axios.put(`${config.server_url}/api/room/media`, formData, {
-        headers: {'Content-type': 'multipart/form-data'}
+        headers: {
+          'Content-type': 'multipart/form-data',
+          authorization: token
+        }
     });
     successCallback();
   } catch (err) {

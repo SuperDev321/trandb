@@ -11,14 +11,15 @@ export default function AuthOptions() {
   const register = () => history.push("/register");
   const login = () => history.push("/login");
   const logout = async () => {
-    let res = await axios.get(config.server_url+'/api/logout');
-    if(res.status === 200) {
+    // let res = await axios.get(config.server_url+'/api/logout');
+    // if(res.status === 200) {
+      window.localStorage.removeItem('token');
       setUserData({
         avatar: undefined,
         username: undefined,
       });
       setAuth(false);
-    }
+    // }
   };
 
   return (

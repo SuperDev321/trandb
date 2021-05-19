@@ -34,7 +34,12 @@ export default function Setting() {
     const { addToast } = useToasts();
 
     useEffect(() => {
-        Axios.get(`${config.server_url}/api/setting`)
+        let token = window.localStorage.getItem('token');
+        Axios.get(`${config.server_url}/api/setting`, {
+            headers: {
+                authorization: token
+            }
+        })
         .then((response) => {
             if(response.status === 200) {
                 let {theme, language, messageNum, allowPrivate} = response.data;
@@ -58,7 +63,12 @@ export default function Setting() {
     }, [])
 
     const handleUpdate = () => {
-        Axios.post(`${config.server_url}/api/setting`, {theme, language, messageNum, allowPrivate})
+        let token = window.localStorage.getItem('token');
+        Axios.post(`${config.server_url}/api/setting`, {theme, language, messageNum, allowPrivate}, {
+            headers: {
+                authorization: token
+            }
+        })
         .then((response) => {
             if(response.status === 204) {
                 addToast('Successfully updated', {appearance: 'success'});

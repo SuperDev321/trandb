@@ -3,7 +3,9 @@ const { Users } = require('../../database/models');
 
 const checkToken = async (req, res, next) => {
   try {
-    const { token } = req.cookies;
+    // const { token } = req.cookies;
+    const {token} = req.body;
+    
     const { _id } = await verifyToken(token);
     const { username, role, gender, avatar } = await Users.findOne({ _id });
     

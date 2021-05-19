@@ -12,9 +12,12 @@ const handleCreateRoom = async (data, successCallback, errCallback) => {
     formData.append('welcomeMessage', data.welcomeMessage);
     formData.append('cover', data.cover);
     formData.append('icon', data.icon);
-    console.log('axios data', data)
+    let token = window.localStorage.getItem('token');
     await axios.post(`${config.server_url}/api/room`, formData, {
-      headers: {'Content-type': 'multipart/form-data'}
+      headers: {
+        'Content-type': 'multipart/form-data',
+        authorization: token
+      }
     });
     successCallback();
   } catch (err) {

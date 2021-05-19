@@ -213,7 +213,12 @@ export default function Quizes( {onClickNew, onClickEdit} ) {
   };
 
   const handleClickDelete = (id) => {
-    Axios.delete(`${config.server_url}/api/boots/` + id)
+    let token = window.localStorage.getItem('token');
+    Axios.delete(`${config.server_url}/api/boots/` + id, {
+      headers: {
+        authorization: token
+      }
+    })
     .then((response) => {
       console.log(response);
       run(getQuizes());
@@ -231,7 +236,12 @@ export default function Quizes( {onClickNew, onClickEdit} ) {
     })
   }
   const getQuizes = () => {
-    return Axios.get(`${config.server_url}/api/boots`)
+    let token = window.localStorage.getItem('token');
+    return Axios.get(`${config.server_url}/api/boots`, {
+      headers: {
+        authorization: token
+      }
+    })
     .then((response) => {
       if(response.data) {
         return response.data.boots;

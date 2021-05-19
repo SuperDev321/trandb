@@ -48,6 +48,7 @@
     "connection_lost_description": "The connection to the chat was interrupted. Attempting to reconnect...",
     "connection_attempt": "Connection attempt: ",
     "already_in_chat": "The same user is already chatting.",
+    "private_logout_error": "This user logged out, message delivery failed. Please close this chat.",
     "default": "default"
     
   },

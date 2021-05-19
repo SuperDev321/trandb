@@ -304,7 +304,6 @@ class MediaClient {
     }
 
     initSockets() {
-        console.log('init sockets')
         mediaSocket.on('consumerClosed', function ({
             consumer_id,
             room_id

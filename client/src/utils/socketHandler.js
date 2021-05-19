@@ -1,13 +1,38 @@
 import io from 'socket.io-client';
 import config from '../config'
-const socket = io(`${config.server_url}`,{
+
+let token = window.localStorage.getItem('token');
+
+let socket = io(`${config.server_url}`,{
     autoConnect: false,
     transport: ['polling', 'websocket'],
     timeout: 60000,
     pingTimeout: 60000,
     secure: true,
-    reconnectionDelay: 1000
+    reconnectionDelay: 1000,
+    extraHeaders: {
+        token
+    }
 });
+
+const createNewSocket = (token) => {
+    if(socket) {
+        socket.removeAllListeners();
+        socket.close();
+    }
+    socket = io(`${config.server_url}`,{
+        autoConnect: false,
+        transport: ['polling', 'websocket'],
+        timeout: 60000,
+        pingTimeout: 60000,
+        secure: true,
+        reconnectionDelay: 1000,
+        extraHeaders: {
+            token
+        },
+    });
+    return;
+}
 
 const mediaSocket = io(`${config.media_server_url}`,{
     autoConnect: false,
@@ -47,4 +72,4 @@ mediaSocket.request = function request(type, data = {}) {
     })
 }
 
-export { socket, mediaSocket };
+export { socket, mediaSocket, createNewSocket };

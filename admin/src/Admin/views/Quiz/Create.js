@@ -42,14 +42,19 @@ export default function Create( {onClose} ) {
       return;
     }
     try {
-        const {data: {data}} = await axios.post(`${config.server_url}/api/boot`, {
-          content,
-          active,
-          color,
-          size,
-          bold
-        });
-        onClose();
+      let token = window.localStorage.getItem('token');
+      const {data: {data}} = await axios.post(`${config.server_url}/api/boot`, {
+        content,
+        active,
+        color,
+        size,
+        bold
+      }, {
+        headers: {
+          authorization: token
+        }
+      });
+      onClose();
     } catch (err) {
         addToast('Can not create this boot', { appearance: 'error' });
         onClose();

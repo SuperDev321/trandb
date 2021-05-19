@@ -11,6 +11,7 @@ import {
     Minimize
 } from '@material-ui/icons';
 import {red} from '@material-ui/core/colors'
+import { useTranslation } from 'react-i18next';
 import ChatForm from '../../ChatForm';
 import { Rnd } from "react-rnd";
 import PrivateMessageList from '../../PrivateMessageList';
@@ -149,6 +150,7 @@ const PrivateChat = ({ me, to, ip, sendMessage, active, setActive, initMessages,
     const [withBlocked, setWithBlocked] = useState(false);
     const classes = useStyles({max});
     const {messageNum} = useContext(SettingContext);
+    const { t } = useTranslation();
 
 
     const handleMinimize = () => {
@@ -338,7 +340,7 @@ const PrivateChat = ({ me, to, ip, sendMessage, active, setActive, initMessages,
                     <div className={classes.content}>
                         <PrivateMessageList messages={messages} withBlocked={withBlocked} blocked={blocked} me={me}/>
                         { error &&
-                            <div className={classes.errorContent}>This user logged out, message delivery failed.Please close this chat.</div>
+                            <div className={classes.errorContent}>{t('ChatApp.private_logout_error')}</div>
                         }
                     </div>
                     <ChatForm to={to} blocked={blocked} sendMessage={sendMessage} onFocus={onFocus} onBlur={onBlur} roomName={roomName}

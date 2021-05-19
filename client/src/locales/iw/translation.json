@@ -48,6 +48,7 @@
     "connection_lost_description": "מנסה להחזיר  את החיבור לשרת.. ...",
     "connection_attempt": "נסיון התחברות מספר: ",
     "already_in_chat": "אותו משתמש כבר משוחח.",
+    "private_logout_error": "משתמש זה התנתק ולא הצליח להעביר את ההודעה. אנא סגור את הצ'אט הזה.",
     "default": "default"
   },
   "AddRoomModal": {

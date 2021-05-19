@@ -47,7 +47,12 @@ export default function Edit( {onClickBack, room} ) {
 
   const handleClickDeleteModerator = (moderatorId) => {
     if(id) {
-      Axios.post(`${config.server_url}/api/moderators/delete`, {roomId: id, moderatorId})
+      let token = window.localStorage.getItem('token');
+      Axios.post(`${config.server_url}/api/moderators/delete`, {roomId: id, moderatorId}, {
+        headers: {
+          authorization: token
+        }
+      })
       .then((response) => {
         if(response.status === 204) {
           let newModerators = moderators.filter(({_id})=> (_id !== moderatorId));
@@ -58,7 +63,12 @@ export default function Edit( {onClickBack, room} ) {
   }
   const handleDeleteBan = (banId) => {
     if(id) {
-      Axios.delete(`${config.server_url}/api/bans/`+banId)
+      let token = window.localStorage.getItem('token');
+      Axios.delete(`${config.server_url}/api/bans/`+banId, {
+        headers: {
+          authorization: token
+        }
+      })
       .then((response) => {
         if(response.status === 204) {
           let newBans = bans.filter(({_id}) => (_id !== banId));
@@ -69,7 +79,12 @@ export default function Edit( {onClickBack, room} ) {
   }
   const handleUpdateRoom = () => {
     if(id) {
-      Axios.put(`${config.server_url}/api/room/general`, {_id: id, category, description, welcomeMessage, maxUsers})
+      let token = window.localStorage.getItem('token');
+      Axios.put(`${config.server_url}/api/room/general`, {_id: id, category, description, welcomeMessage, maxUsers}, {
+        headers: {
+          authorization: token
+        }
+      })
       .then((response) => {
         if(response.status === 202) {
           addToast('Successfully updated', { appearance: 'success' });
@@ -86,7 +101,12 @@ export default function Edit( {onClickBack, room} ) {
   useEffect(() => {
     if(room) {
       const {name} = room;
-      Axios.get(`${config.server_url}/api/rooms/`+name)
+      let token = window.localStorage.getItem('token');
+      Axios.get(`${config.server_url}/api/rooms/`+name, {
+        headers: {
+          authorization: token
+        }
+      })
       .then((response) => {
         if(response.status === 200) {
           const {data : { data}} = response;

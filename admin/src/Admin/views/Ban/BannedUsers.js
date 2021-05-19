@@ -165,7 +165,13 @@ export default function BanComponent( {onClickNew} ) {
   };
 
   const handleClickDelete = (id) => {
-    Axios.delete(`${config.server_url}/api/bans/` + id)
+    let token = window.localStorage.getItem('token');
+    
+    Axios.delete(`${config.server_url}/api/bans/` + id, {
+      headers: {
+        authorization: token
+      }
+    })
     .then((response) => {
       console.log(response);
       if(response.status === 204) {
@@ -200,7 +206,13 @@ export default function BanComponent( {onClickNew} ) {
 
   React.useEffect(() => {
     const banRead = async () => {
-      const bans = await Axios.get(`${config.server_url}/api/bans`);
+      let token = window.localStorage.getItem('token');
+    
+      const bans = await Axios.get(`${config.server_url}/api/bans`, {
+        headers: {
+          authorization: token
+        }
+      });
       console.log(bans)
       let bansToShow = bans.data.data.map((item, index) => ({...item, no: index+1}));
       setRows(bansToShow);

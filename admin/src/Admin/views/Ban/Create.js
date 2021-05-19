@@ -55,7 +55,12 @@ export default function Create( {onClose} ) {
       payload.fromIp = fromIp;
       payload.toIp = toIp;
     }
-    const {data: {data}} = await axios.post(`${config.server_url}/api/bans`, payload);
+    let token = window.localStorage.getItem('token');
+    const {data: {data}} = await axios.post(`${config.server_url}/api/bans`, payload, {
+      headers: {
+        authorization: token
+      }
+    });
     onClose();
   }
 

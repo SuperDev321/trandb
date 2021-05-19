@@ -13,7 +13,8 @@ const useAuth = () => {
   useEffect(() => {
     (async () => {
       try {
-        const { data } = await axios.get(`${config.server_url}/api/checkToken`);
+        let token = window.localStorage.getItem('token');
+        const { data } = await axios.post(`${config.server_url}/api/checkToken`, {token});
         if (data === 'un-auth') {
           setLoading(false);
         } else {
@@ -36,6 +37,7 @@ const useAuth = () => {
   }, [auth]);
 
   const removeCurrentUser = () => {
+    window.localStorage.removeItem('token');
     setAuth(false);
     setUsername('');
     setRole('user');

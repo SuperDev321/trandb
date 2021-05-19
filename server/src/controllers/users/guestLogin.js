@@ -60,7 +60,7 @@ const guestLogin = async (req, res, next) => {
                 
             })
             .status(200)
-            .json({ statusCode: 200, message: 'login with guest successfully' });
+            .json({ statusCode: 200, message: 'login with guest successfully', token });
     } catch (err) {
         next(err);
     }
