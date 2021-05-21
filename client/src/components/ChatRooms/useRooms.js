@@ -89,6 +89,8 @@ const useRooms = ({initRoomName, ...initalState}) => {
     const { t } = useTranslation();
     const { enqueueSnackbar } = useSnackbar();
     const [openDisconnectModal, setOpenDisconnectModal] = useState(false);
+    const [openPasswordModal, setOpenPasswordModal] = useState(false);
+    const [roomNameForPassword, setRoomNameForPassword] = useState('');
 
     const roomNameRef = React.useRef(initRoomName);
 
@@ -594,8 +596,8 @@ const useRooms = ({initRoomName, ...initalState}) => {
 
             isPrivateRoom(initRoomName, ({isPrivate}) => {
                 if(isPrivate) {
-                //    setRoomNameForPassword(room);
-                //    setOpenPasswordModal(true);
+                    setRoomNameForPassword(initRoomName);
+                    setOpenPasswordModal(true);
                 } else {
                     
                     socket.emit('join room', { room: initRoomName }, (result, message) => {
@@ -814,7 +816,10 @@ const useRooms = ({initRoomName, ...initalState}) => {
         publicAudio,
         openDisconnectModal,
         setOpenDisconnectModal,
-        mediaClientRef
+        mediaClientRef,
+        openPasswordModal,
+        setOpenPasswordModal,
+        roomNameForPassword
     }
 
 }
