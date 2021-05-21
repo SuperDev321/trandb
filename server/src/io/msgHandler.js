@@ -18,7 +18,7 @@ const publicMessage = (io, socket) => async ({ msg, room, from, color, bold, typ
         return callback(false);
       }
     }
-    let isBlocked = await checkBlockById(_id);
+    let isBlocked = await checkBlockById(room, _id);
     if(isBlocked) {
       return callback(false, 'blocked');
     }
@@ -34,7 +34,6 @@ const publicMessage = (io, socket) => async ({ msg, room, from, color, bold, typ
       date,
     });
     callback(newChat);
-    
     socket.to(room).emit('room message', {
         type: 'public',
         room,
@@ -60,7 +59,7 @@ const pokeMessage = (io, socket) => async ({from, to, room}, callback) => {
     return callback(false);
   }
   let userIp = user.ip? ipInt(user.ip).toIP(): null;
-  let isBlocked = await checkBlockById(_id);
+  let isBlocked = await checkBlockById(room, _id);
     if(isBlocked) {
       return callback(false, 'blocked');
     }
@@ -82,7 +81,7 @@ const privateMessage = (io, socket) => async ({ roomName, msg, from, to, color, 
   try {
     const { _id } = socket.decoded;
     const date = Date.now();
-    let isBlocked = await checkBlockById(_id);
+    let isBlocked = await checkBlockById(null, _id);
     if(isBlocked) {
       return callback(false, 'blocked');
     }
@@ -143,10 +142,9 @@ const privateMessage = (io, socket) => async ({ roomName, msg, from, to, color, 
             roomName
           }, (res) => {
             if(res)
-            callback(newChat);
+              callback(newChat);
         });
       } else {
-        console.log('no user to receive private')
         callback(false, 'logout');
       }
     }

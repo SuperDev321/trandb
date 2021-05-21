@@ -42,8 +42,7 @@ class RoomObject  {
         if(item) mutes = JSON.parse(item);
         if(!Array.isArray(mutes)) mutes = [];
         if(mutes) {
-            let myMutes = mutes.filter((value) => (value.room === this.name));
-            mutes = myMutes.map(({user})=> (user));
+            mutes = mutes.filter((value) => (value.room === this.name));
         } else {
             mutes = [];
         }
