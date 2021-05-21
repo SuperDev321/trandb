@@ -127,8 +127,8 @@ const RoomUserName = ({user, role, roomName,
             setOpenBan(true);
         } else {
             setTimeout(() => {
-                if(role)
-                banUser(roomName, user);
+                if(role && user && user.username)
+                    banUser(roomName, user.username);
             }, 0);
         }
     }
