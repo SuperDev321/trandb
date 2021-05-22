@@ -271,7 +271,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
             if(sameRoom) {
                 let kickedUser = sameRoom.users.find(({username}) => (username === kickedUserName));
                 if(username !== kickedUserName) { // kick other
-                    if(kickUser) {
+                    if(kickedUser) {
                         sameRoom.removeOnlineUser(kickedUser._id);
                         let msg = (type === 'kick') 
                             ? t('ChatApp.sys_kick_room',{username: kickedUserName})
@@ -330,6 +330,16 @@ const useRooms = ({initRoomName, ...initalState}) => {
             }
         }
     }, [username])
+
+    const updateBlocks = useCallback(({room, blocks}) => {
+        if(roomsRef.current && room) {
+            let sameRoom = roomsRef.current.find((item) => (item.name === room));
+            if(sameRoom && Array.isArray(blocks)) {
+                sameRoom.updateBlocks(blocks);
+                dispatch({type: 'update', data: { name: room, blocks}});
+            }
+        }
+    }, [dispatch]);
 
     const removeRoom = React.useCallback(async (room, callback) => {
         if(status === 'resolved' && roomsStatus === 'resolved') {
@@ -525,7 +535,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
             });
             
             socket.on('update block', ({room, blocks}) => {
-                dispatch({type: 'update', data: { name: room, blocks}}); 
+                updateBlocks({room, blocks});
             })
             socket.on('update global block', ({blocks}) => {
 
@@ -599,7 +609,6 @@ const useRooms = ({initRoomName, ...initalState}) => {
                     setRoomNameForPassword(initRoomName);
                     setOpenPasswordModal(true);
                 } else {
-                    
                     socket.emit('join room', { room: initRoomName }, (result, message) => {
                         if(!result) {
                             if(message)
