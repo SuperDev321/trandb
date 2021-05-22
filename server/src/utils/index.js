@@ -32,6 +32,7 @@ const checkBlock = require('./block/checkBlock');
 const checkBlockById = require('./block/checkBlockById');
 const addBlock = require('./block/addBlock');
 const removeBlock = require('./block/removeBlock');
+const removeBlockAdmin = require('./block/removeBlockAdmin');
 const {isForbidden, hasFobiddenWord} = require('./forbiddenWord/isForbidden');
 const createAdminUser = require('./user/createAdminUser');
 const initSetting = require('./setting/initSetting')
@@ -73,6 +74,7 @@ module.exports = {
   checkBlockById,
   addBlock,
   removeBlock,
+  removeBlockAdmin,
   isForbidden,
   hasFobiddenWord,
   createAdminUser,
