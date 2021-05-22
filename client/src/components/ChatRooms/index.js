@@ -11,6 +11,7 @@ import SideBarLeft from '../SidebarLeft'
 import useStyles from './styles'
 import ChatRoomContent from '../ChatRoomContent';
 import AddRoomModal from '../Modals/AddRoomModal';
+import PasswordModal from '../Modals/PasswordModal'
 import PrivateChatList from '../PrivateChat/PrivateChatList'
 import VideoList from '../VideoList';
 import {StyledTab , StyledTabs} from '../StyledTab';
@@ -61,6 +62,9 @@ const ChatRooms = ({room}, ref) => {
         publicAudio,
         openDisconnectModal,
         setOpenDisconnectModal,
+        openPasswordModal,
+        setOpenPasswordModal,
+        roomNameForPassword,
         mediaClientRef
     } = useRooms({initRoomName: room});
 
@@ -426,6 +430,11 @@ const ChatRooms = ({room}, ref) => {
         <DisconnectModal
             open={openDisconnectModal}
             setOpen={setOpenDisconnectModal}
+        />
+        <PasswordModal
+            open={openPasswordModal}
+            setOpen={setOpenPasswordModal}
+            room={roomNameForPassword}
         />
         </>
     );
