@@ -144,7 +144,7 @@ const SideBarLeft = ({ roomName, username, mutes, blocks, globalBlocks, changeMu
         let blockedNames = blocks.map((item) => (item.username? item.username: null));
         let globalBlockedNames = globalBlocks.map((item) => (item.username? item.username: null));
         blockedNames = [...blockedNames, ...globalBlockedNames];
-        let blockedIps = blocks.map((item) => (item.ip? item.username: null));
+        let blockedIps = blocks.map((item) => (item.ip? item.ip: null));
         let globalBlockedIps = globalBlocks.map((item) => (item.ip? item.ip: null));
         blockedIps = [...blockedIps, ...globalBlockedIps];
         if((user.username && (blockedNames.includes(user.username)))
@@ -209,7 +209,7 @@ const SideBarLeft = ({ roomName, username, mutes, blocks, globalBlocks, changeMu
                                 roomName={roomName}
                                 username={username}
                                 role={role}
-                                user={user} key={user? user._id: null}
+                                user={user} key={user? user._id: index}
                                 isMuted={isMuted(user)}
                                 isBlocked = {isBlocked(user)}
                                 isBroadcasting={isBroadcasting(user)}
