@@ -60,6 +60,7 @@ const ChatRooms = ({room}, ref) => {
         pokeAudio,
         privateAudio,
         publicAudio,
+        requestAudio,
         openDisconnectModal,
         setOpenDisconnectModal,
         openPasswordModal,
@@ -427,6 +428,7 @@ const ChatRooms = ({room}, ref) => {
         <div>{pokeAudio}</div>
         <div>{publicAudio}</div>
         <div>{privateAudio}</div>
+        <div>{requestAudio}</div>
         <DisconnectModal
             open={openDisconnectModal}
             setOpen={setOpenDisconnectModal}

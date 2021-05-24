@@ -23,8 +23,8 @@ import config from '../../config';
 const useStyles = makeStyles((theme) => ({
     username: {
         fontWeight: 'bold',
-        fontSize: '1.1em',
-        lineHeight: 1.3,
+        fontSize: '1em',
+        lineHeight: 1.4,
         cursor: 'pointer',
         overflow: 'hidden',
         display: 'flex',
@@ -56,6 +56,64 @@ const useStyles = makeStyles((theme) => ({
     },
 }))
 
+function useDoubleClick({oneClick, doubleClick}) {
+    const [elem, setElem] = React.useState(null);
+    const countRef = React.useRef(0);
+    const timerRef = React.useRef(null);
+    const inputDoubleCallbackRef = React.useRef(null);
+    const inputClickCallbackRef = React.useRef(null);
+    const callbackRef = React.useCallback(node => {
+      setElem(node);
+      callbackRef.current = node;
+    }, []);
+  
+    React.useEffect(() => {
+        inputClickCallbackRef.current = oneClick;
+    }, [oneClick]);
+
+    React.useEffect(() => {
+        inputDoubleCallbackRef.current = doubleClick
+    }, [doubleClick])
+  
+    React.useEffect(() => {
+        function handler(event) {
+            const isDoubleClick = countRef.current + 1 === 2;
+            const timerIsPresent = timerRef.current;
+            if (timerIsPresent && isDoubleClick) {
+                clearTimeout(timerRef.current);
+                timerRef.current = null;
+                countRef.current = 0;
+                if (inputDoubleCallbackRef.current) {
+                    inputDoubleCallbackRef.current(event);
+                }
+            }
+            if (!timerIsPresent) {
+                countRef.current = countRef.current + 1;
+                const timer = setTimeout(() => {
+                    clearTimeout(timerRef.current);
+                    timerRef.current = null;
+                    countRef.current = 0;
+                    if(inputClickCallbackRef.current && elem) {
+                        inputClickCallbackRef.current(event);
+                        console.log(event)
+                    }
+                }, 200);
+                timerRef.current = timer;
+            }
+        }
+        if (elem) {
+            elem.addEventListener("click", handler);
+        }
+  
+        return () => {
+            if (elem) {
+            elem.removeEventListener("click", handler);
+            }
+        };
+    }, [elem]);
+    return [callbackRef, elem];
+}
+
 const RoomUserName = ({user, role, roomName,
     changeMuteState, sendPokeMessage, kickUser, banUser,addOrOpenPrivate, viewBroadcast, stopBroadcastTo,
     isMine, displayYou, isMuted, isBlocked
@@ -68,6 +126,15 @@ const RoomUserName = ({user, role, roomName,
     const {t} = useTranslation();
     const [anchorEl, setAnchorEl] = React.useState(null);
     const [openBan, setOpenBan] = React.useState(false);
+
+    const handleDbClick = (event) => {
+        handleClickPrivateChat(event);
+    }
+    const handleClick = (event) => {
+        setAnchorEl(event.target);
+    };
+
+    const [refCallback, elem] = useDoubleClick({doubleClick: handleDbClick, oneClick: handleClick});
     const handleClickPrivateChat = (event) => {
         setAnchorEl(null);
         event.preventDefault();
@@ -75,9 +142,8 @@ const RoomUserName = ({user, role, roomName,
             addOrOpenPrivate(user);
         }, 0);
     }
-    const handleClick = (event) => {
-        setAnchorEl(event.currentTarget);
-    };
+    
+    
     const handleClose = () => {
         setAnchorEl(null);
     };
@@ -165,7 +231,7 @@ const RoomUserName = ({user, role, roomName,
 
     return (
         <>
-        <span onClick={handleClick} className={classes.username}>
+        <span ref={refCallback} className={classes.username}>
             {user.username+((isMine && displayYou) ? ' (you)' : '')}
         </span>
         <Popover

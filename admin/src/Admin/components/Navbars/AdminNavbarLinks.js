@@ -44,14 +44,14 @@ export default function AdminNavbarLinks() {
     setOpenProfile(null);
   };
   const logout = async () => {
-    let res = await axios.get(config.server_url+'/api/logout');
-    if(res.status === 200) {
+    window.localStorage.removeItem('token');
+    // if(res.status === 200) {
       setUserData({
         avatar: undefined,
         username: undefined,
       });
       setAuth(false);
-    }
+    // }
   };
   return (
     <div>
