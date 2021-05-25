@@ -130,43 +130,17 @@ const OnlineUser = ({roomName, username, user, role, isMuted, isBlocked, isBroad
     const [anchorEl, setAnchorEl] = React.useState(null);
     // const [openBan, setOpenBan] = React.useState(false);
 
-    // const handleClick = (event) => {
-    //     setAnchorEl(event.currentTarget);
-    // };
-
-    // const handleClickPrivateChat = (event) => {
-    //     setAnchorEl(null);
-    //     event.preventDefault();
-    //     setTimeout(() => {
-    //         addOrOpenPrivate(user);
-    //     }, 0);
-    // }
-    // const handleMute = () => {
-    //     setAnchorEl(null);
-    //     setTimeout(() => {
-    //         changeMuteState(roomName, user);
-    //     }, 0)
-    // }
-    // const handleKick = (username) => {
-    //     setAnchorEl(null);
-    //     setTimeout(() => {
-    //         kickUser(roomName, username);
-    //     }, 0)
-    // }
-    // const handleBan = (username) => {
-    //     setAnchorEl(null);
-    //     if(role === 'admin') {
-    //         setOpenBan(true);
-    //     } else {
-    //         setTimeout(() => {
-    //             if(role)
-    //             banUser(roomName, username);
-    //         }, 0);
-    //     }
-    // }
     const handleClose = () => {
         setAnchorEl(null);
     };
+
+    const handleDoubleClickEye = () => {
+        stopBroadcastTo(roomName, user._id, user.username);
+    }
+
+    const handleDoubleClickVideo = () => {
+        viewBroadcast(roomName, user._id, user.username);
+    }
 
     // const handleClickProfile = () => {
     //     if(user && user.username)
@@ -206,12 +180,12 @@ const OnlineUser = ({roomName, username, user, role, isMuted, isBlocked, isBroad
                 {
                     isViewer
                     ?
-                    <Visibility style={{ color: green[300] }}/>
+                    <Visibility style={{ color: green[300] }} onDoubleClick={handleDoubleClickEye}/>
                     :
                     <VisibilityOff style={{ color: grey[200] }}/>
                 }
                 
-                <Videocam className={classes.camera}
+                <Videocam className={classes.camera}  onDoubleClick={handleDoubleClickVideo}
                     // color={(user && user.broadcasting)? 'primary': 'disabled'}
                     style={{ color: (isBroadcasting)? green[300]:grey[200] }}
                 />

@@ -13,7 +13,7 @@ const PrivateChatList = ({sendMessage, readMsg ,me, globalBlocks}, ref) => {
         if(!privateChat) {
             let ref = createRef();
             elRefs.current.push({key: roomName, ref});
-            let chatInfo = {to: to.username, ip: to.ip, roomName, initVal: {messages: unReadMsg, roomName}};
+            let chatInfo = {to: to.username, ip: to.ip, roomName, initVal: {messages: unReadMsg, roomName}, avatar: to.avatar};
             setChatList([...chatList, chatInfo]);
             setActiveChat(roomName);
         }
@@ -85,6 +85,7 @@ const PrivateChatList = ({sendMessage, readMsg ,me, globalBlocks}, ref) => {
                     ref={elRefs.current[index].ref}
                     me={me} to={item.to}
                     ip={item.ip}
+                    avatar={item.avatar}
                     initMessages={item.initVal.messages}
                     sendMessage={sendMessage}
                     deleteChat={deleteChat}

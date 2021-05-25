@@ -12,7 +12,7 @@ import {permissionRequest} from './notification';
 function roomReducer(state, action) {
     switch (action.type) {
         case 'pending': {
-            return {status: 'pending', data: null, error: null}
+            return {status: 'pending', data: state.data, error: null}
         }
         case 'init': {
             return {status: 'resolved', data: action.data, error: null}
@@ -103,6 +103,11 @@ const useRooms = ({initRoomName, ...initalState}) => {
         autoPlay: false ,
     });
     const [privateAudio, privateAudioState, privateAudioControls] = useAudio({
+        src: '/media/private.mp3',
+        autoPlay: false ,
+    });
+
+    const [requestAudio, requestAudioState, requestAudioControls] = useAudio({
         src: '/media/private.mp3',
         autoPlay: false ,
     });
@@ -601,7 +606,11 @@ const useRooms = ({initRoomName, ...initalState}) => {
             })
 
             mediaSocket.on('view request', ({username, roomName}, callback) => {
-                permissionRequest(username, roomName, callback);
+                requestAudioControls.seek(0);
+                requestAudioControls.play();
+                permissionRequest(username, roomName, (result) => {
+                    callback(result);
+                });
             })
 
             isPrivateRoom(initRoomName, ({isPrivate}) => {
@@ -823,6 +832,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
         pokeAudio,
         privateAudio,
         publicAudio,
+        requestAudio,
         openDisconnectModal,
         setOpenDisconnectModal,
         mediaClientRef,

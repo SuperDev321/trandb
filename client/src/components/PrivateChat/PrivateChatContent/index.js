@@ -135,10 +135,9 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const PrivateChat = ({ me, to, ip, sendMessage, active, setActive, initMessages, deleteChat, roomName, globalBlocks }, ref) => {
+const PrivateChat = ({ me, to, ip, avatar, sendMessage, active, setActive, initMessages, deleteChat, roomName, globalBlocks }, ref) => {
     const rndRef = useRef(null);
     const winRef = useRef(null);
-    const [avatar, setAvatar] = useState(null);
     const [messages, setMessages] = useState([]);
     const [hide, setHide] = useState(false);
     const [min, setMin] = useState(false);
@@ -230,29 +229,6 @@ const PrivateChat = ({ me, to, ip, sendMessage, active, setActive, initMessages,
         }
     }, [globalBlocks, ip, me, to])
 
-    // useEffect(() => {
-    //     getPrivateMessages({from: me.username, to},
-    //         (data) => {
-    //             setMessages(data);
-    //         },
-    //         (err) => {
-    //             console.log(err);
-    //         }
-    //     );
-    // }, [me, to])
-
-    useEffect(() => {
-        getUser(to, (data) => {
-            if(data && data.avatar) {
-                setAvatar(data.avatar);
-            } else {
-                setAvatar(null);
-            }
-        }, (err) => {
-            setAvatar(null);
-        })
-    }, [to])
-
     useEffect(() => {
         if(initMessages.length) {
             setUnRead(initMessages.length)
@@ -260,11 +236,6 @@ const PrivateChat = ({ me, to, ip, sendMessage, active, setActive, initMessages,
         setMessages(initMessages)
     }, [initMessages])
 
-    // useEffect(() => {
-    //     if(active) {
-    //         setUnRead(0);
-    //     }
-    // }, [active])
     return (
         <Rnd
             default={{
