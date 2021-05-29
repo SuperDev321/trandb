@@ -21,7 +21,6 @@ const getDevices = async () => {
                 }
             }
         }
-        console.log(audioDevices, videoDevices)
         return {
             audioDevices,
             videoDevices

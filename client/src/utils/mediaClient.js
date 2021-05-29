@@ -380,12 +380,12 @@ class MediaClient {
     async produce(room_id, locked = false , videoDeviceId = null ,audioDeviceId = null) {
         let mediaConstraints = {}
         mediaConstraints = {
-            audio: audioDeviceId? {
+            audio: (audioDeviceId && audioDeviceId !== '')? {
                 deviceId: {
                     exact: audioDeviceId
                 }
             }: false,
-            video: videoDeviceId? {
+            video: (videoDeviceId && videoDeviceId !== '') ? {
                 deviceId: {
                     exact: videoDeviceId,
                 },

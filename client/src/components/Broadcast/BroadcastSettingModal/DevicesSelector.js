@@ -25,7 +25,7 @@ const DevicesSelector = ({audio, video, setAudio, setVideo}) => {
     } else if (deviceStatus === 'pending') {
         return null;
     } else if (deviceStatus === 'rejected') {
-        return deviceError;
+        return null;
     } else if (deviceStatus === 'resolved') {
         const { audioDevices, videoDevices } = devices;
         return (

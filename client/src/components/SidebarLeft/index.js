@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
+import t from 'prop-types'
 import {
     InputBase,
 } from '@material-ui/core';
@@ -8,7 +9,7 @@ import OnlineUser from '../OnlineUser';
 import BroadcastSetting from '../Broadcast/BroadcastSettingModal';
 import SeparateLine from '../SeparateLine';
 import { useTranslation } from 'react-i18next';
-
+ 
 const useStyles = makeStyles((theme) => ({
     root: {
         width: '100%',
@@ -111,6 +112,7 @@ const SideBarLeft = ({ roomName, username, mutes, blocks, globalBlocks, changeMu
     const classes = useStyles();
     const [searchText, setSearchText] = useState('');
     const [sideUsers, setSideUsers] = useState([]);
+    const [filteredUsers, setFilteredUsers] = useState(null);
     const [role, setRole] = useState(null);
     const {t} = useTranslation();
 
@@ -119,81 +121,69 @@ const SideBarLeft = ({ roomName, username, mutes, blocks, globalBlocks, changeMu
         if(me) setRole(me.role);
     }, [users, username])
 
-
     useEffect(() => {
-        let filteredUsers = users;
-        if(searchText) {
-            filteredUsers = filteredUsers.filter((item) => (item.username.includes(searchText)));
-        } else {
+        const liveUserNames = broadcastingUsers?.map((user) => (user.name))
+        const blockedNames = blocks?.map((item) => (item.username? item.username: null))
+        const globalBlockedNames = globalBlocks?.map((item) => (item.username? item.username: null))
+        const mutedNames = mutes?.map((item) => ((item&&item.username)? item.username: null))
+        const mutedIps = mutes?.map((item) => ((item&&item.ip)? item.ip: null))
+        const newUsers = users.map((user) => {
+            let isBroadcasting = false
+            let isBlocked = false
+            let isMuted = false
+            let isViewer = false
             
-        }
-        setSideUsers(filteredUsers);
-    }, [searchText, users])
-
-    const isMuted = useCallback((user) => {
-        let mutedNames = Array.isArray(mutes)? mutes.map((item) => ((item&&item.username)? item.username: null)): [];
-        let mutedIps =  Array.isArray(mutes)? mutes.map((item) => ((item&&item.ip)? item.ip: null)): [];
-        if( mutedNames.includes(user.username) || mutedIps.includes(user.ip)) {
-            return true;
-        } else {
-            return false;
-        }
-    }, [mutes])
-
-    const isBlocked = useCallback((user) => {
-        let blockedNames = blocks.map((item) => (item.username? item.username: null));
-        let globalBlockedNames = globalBlocks.map((item) => (item.username? item.username: null));
-        blockedNames = [...blockedNames, ...globalBlockedNames];
-        let blockedIps = blocks.map((item) => (item.ip? item.ip: null));
-        let globalBlockedIps = globalBlocks.map((item) => (item.ip? item.ip: null));
-        blockedIps = [...blockedIps, ...globalBlockedIps];
-        if((user.username && (blockedNames.includes(user.username)))
-            || (user.ip && (blockedIps.includes(user.ip)))
-        ) {
-            return true;
-        } else {
-            return false;
-        }
-    }, [blocks, globalBlocks]);
-
-    const isBroadcasting = useCallback((user) => {
-        if(user.username === username) {
-            return cameraState;
-        } else {
-            if(Array.isArray(broadcastingUsers)) {
-                let result = broadcastingUsers.find(({name}) => (name === user.username));
-                if(result) {
-                    if(result.locked) {
-                        return 'locked';
-                    } else {
-                        return true;
+            if (globalBlockedNames && globalBlockedNames.includes(user.username)) isBlocked = true
+            if (!isBlocked && blockedNames && blockedNames.includes(user.username)) isBlocked = true
+            if(mutedNames && mutedNames.includes(user.username)) isMuted = true
+            if(!isMuted && mutedIps && mutedIps.includes(user.username)) isMuted = true
+            if (user.username === username && cameraState) {
+                isBroadcasting = cameraState
+                isViewer = true
+            } else {
+                if (liveUserNames && liveUserNames.includes(user.username)) {
+                    isBroadcasting = true
+                    const broadcastUser = broadcastingUsers.find(({name}) => (name === user.username))
+                    if(broadcastUser && broadcastUser.locked) {
+                        isBroadcasting = 'locked'
                     }
-                    
-                } else {
-                    return false;
+                }
+                if (viewers && viewers.includes(user.username)) {
+                    isViewer = true
                 }
             }
-            return false;
-        }
-        
-    }, [username, broadcastingUsers, cameraState]);
-
-    const isViewer = useCallback((user) => {
-        if(user.username === username) {
-            return cameraState;
-        } else {
-            if(Array.isArray(viewers) && viewers.includes(user.username)) {
-                return true
+            return {
+                isBroadcasting,
+                isBlocked,
+                isMuted,
+                isViewer,
+                ...user
             }
-            return false;
+        })
+        newUsers.sort((user1, user2) => {
+            if (!user1.isBroadcasting && user2.isBroadcasting) {
+                return 1;
+            } else {
+                return user1.username.localeCompare(user2.username)
+            }
+        })
+        setSideUsers(newUsers)
+    }, [users, broadcastingUsers, blocks, globalBlocks, mutes, viewers, username, cameraState])
+
+
+    useEffect(() => {
+        if(searchText) {
+            const filteredUsers = sideUsers.filter((item) => (item.username.includes(searchText)));
+            setFilteredUsers(filteredUsers);
+        } else {
+            setFilteredUsers(sideUsers)
         }
-        
-    }, [username, viewers, cameraState]);
+    }, [searchText, sideUsers])
 
     return (
         <div className={classes.root}>
             <BroadcastSetting cameraState={cameraState} users={users} roomName={roomName} className={classes.cameraBtn}
-                startBroadcast={startBroadcast} 
+                startBroadcast={startBroadcast}
                 stopBroadcast={stopBroadcast}
             />
             <SeparateLine />
@@ -203,17 +193,17 @@ const SideBarLeft = ({ roomName, username, mutes, blocks, globalBlocks, changeMu
             </div>
             <SeparateLine />
             <div  className={classes.list}>
-                { sideUsers &&
-                        sideUsers.map((user, index)=>(
+                { filteredUsers &&
+                    filteredUsers.map((user, index)=>(
                             <OnlineUser
                                 roomName={roomName}
                                 username={username}
                                 role={role}
                                 user={user} key={user? user._id: index}
-                                isMuted={isMuted(user)}
-                                isBlocked = {isBlocked(user)}
-                                isBroadcasting={isBroadcasting(user)}
-                                isViewer={isViewer(user)}
+                                isMuted={user.isMuted}
+                                isBlocked = {user.isBlocked}
+                                isBroadcasting={user.isBroadcasting}
+                                isViewer={user.isViewer}
                                 viewBroadcast={viewBroadcast}
                                 stopBroadcastTo={stopBroadcastTo}
                                 addOrOpenPrivate={addOrOpenPrivate}
@@ -246,6 +236,11 @@ const SideBarLeft = ({ roomName, username, mutes, blocks, globalBlocks, changeMu
             </div>
         </div>
     )
+}
+
+SideBarLeft.propTypes = {
+    blocks: t.array,
+    globalBlocks: t.array
 }
 
 export default SideBarLeft;
