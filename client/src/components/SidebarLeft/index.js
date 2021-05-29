@@ -53,7 +53,7 @@ const useStyles = makeStyles((theme) => ({
         scrollbarColor: `#585B5E #ecdbdb00`,
         WebkitOverflowScrolling: 'touch',
         '&::-webkit-scrollbar': {
-            width: '5px',
+            width: '8px',
         },
         '&::-webkit-scrollbar-track': {
             '-webkit-box-shadow': 'inset 0 0 6px rgba(0,0,0,0.00)'
@@ -162,9 +162,12 @@ const SideBarLeft = ({ roomName, username, mutes, blocks, globalBlocks, changeMu
         })
         newUsers.sort((user1, user2) => {
             if (!user1.isBroadcasting && user2.isBroadcasting) {
-                return 1;
-            } else {
-                return user1.username.localeCompare(user2.username)
+                return 1
+            } else if (user1.isBroadcasting && !user2.isBroadcasting) {
+                return -1
+            }
+            else {
+                return 0
             }
         })
         setSideUsers(newUsers)
