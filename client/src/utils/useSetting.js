@@ -13,6 +13,9 @@ const useSetting = () => {
   const [enablePublicSound, _setEnablePublicSound] = useState(true);
   const [enablePrivateSound, _setEnablePrivateSound] = useState(true);
   const [enableGuestPrivate, setEnableGuestPrivate] = useState(true);
+  const [messageTimeInterval, setMessageTimeInterval] = useState(200)
+  const [maxUsernameLength, setMaxUsernameLength] = useState(10)
+  const [maxMessageLength, setMaxMessageLength] = useState(200)
   const [language, _setLanguage] = useState(null);
   const [messageNum, setMessageNum] = useState(30);
   const [enableSysMessage, _setEnableSysMessage] = useState(true);
@@ -104,7 +107,7 @@ const useSetting = () => {
       if(response.status === 200) {
         let data = response.data;
         if(data) {
-          const {theme, messageNum, language, allowPrivate} = data;
+          const {theme, messageNum, language, allowPrivate, messageTimeInterval, maxMessageLength} = data;
           setDefaultTheme(theme);
           if(!currentLanguage)
             setLanguage(language);
@@ -113,6 +116,15 @@ const useSetting = () => {
           }
           if(messageNum) {
             setMessageNum(messageNum);
+          }
+          if (messageTimeInterval) {
+            setMessageTimeInterval(messageTimeInterval);
+          }
+          if (maxUsernameLength) {
+            setMaxUsernameLength(maxUsernameLength)
+          }
+          if (maxMessageLength) {
+            setMaxMessageLength(maxMessageLength)
           }
           setEnableGuestPrivate(allowPrivate);
         }
@@ -133,7 +145,8 @@ const useSetting = () => {
 
   return { defaultTheme, messageSize, enablePokeSound, enablePrivateSound, enablePublicSound,
     setDefaultTheme, setMessageSize, setEnablePokeSound, setEnablePrivateSound, setEnablePublicSound,
-    language, setLanguage, messageNum, enableSysMessage, setEnableSysMessage, enableGuestPrivate};
+    language, setLanguage, messageNum, enableSysMessage, setEnableSysMessage, enableGuestPrivate,
+    messageTimeInterval, maxUsernameLength, maxMessageLength};
 };
 
 export default useSetting;

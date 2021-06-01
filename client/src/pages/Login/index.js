@@ -19,7 +19,7 @@ import { makeStyles, withStyles } from '@material-ui/core/styles';
 import { green, red } from '@material-ui/core/colors';
 import LoginSelect from '../../components/LoginSelect';
 
-import {UserContext} from '../../context';
+import {UserContext, SettingContext} from '../../context';
 import { handleLogin, handleGuestLogin } from '../../utils';
 import OutlinedButton from '../../components/OutlinedButton';
 import CustomTextField from '../../components/CustomTextField';
@@ -104,6 +104,7 @@ const Login = () => {
     const { state } = useLocation();
     const { from } = state || { from: { pathname: "/" } };
     const { setAuth } = useContext(UserContext);
+    const {maxUsernameLength} = useContext(SettingContext)
     const classes = useStyles();
     const [selected, setSelected] = useState(false);
     const [guest, setGuest] = useState(false);
@@ -122,7 +123,8 @@ const Login = () => {
     const guestValidationSchema = yup.object({
         nickname: yup
         .string('Enter your nickname')
-        .required(t('LoginPage.error_username')),
+        .required(t('LoginPage.error_username'))
+        .max(maxUsernameLength, t('LoginPage.error_long_username')),
     });
 
     const handleSelectMode = (isGuest) => {

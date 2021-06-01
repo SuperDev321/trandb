@@ -4,14 +4,18 @@ const getSetting = async (req, res, next) => {
     try {
         let setting = await Settings.findOne({type: 'admin'});
         if(setting) {
-            let {theme, language, messageNum, allowPrivate} = setting;
+            const { theme, language, messageNum, allowPrivate, messageTimeInterval,
+                maxUsernameLength, maxMessageLength } = setting;
             res
             .status(200)
             .json({
                 theme,
                 language,
                 messageNum,
-                allowPrivate
+                allowPrivate,
+                messageTimeInterval,
+                maxUsernameLength,
+                maxMessageLength
             })
         }
     } catch(err) {

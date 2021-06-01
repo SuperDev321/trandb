@@ -1,4 +1,4 @@
-import React, { useState, useContext, forwardRef, useImperativeHandle } from 'react';
+import React, { useState, useContext, forwardRef, useImperativeHandle, useRef } from 'react';
 import {
     AppBar,
     Card,
@@ -20,7 +20,7 @@ import {UserContext} from '../../context';
 import { socket } from '../../utils';
 import { useTranslation } from 'react-i18next';
 import useRooms from './useRooms';
-
+import {SettingContext} from '../../context';
 
 import Loading from '../Loading';
 
@@ -44,6 +44,8 @@ const ChatRooms = ({room}, ref) => {
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
     };
+    const {messageTimeInterval, maxMessageLength} = useContext(SettingContext);
+    const messageTimeRef = useRef(null)
 
     const {status, data: currentRoomData, error,
         roomsStatus,
@@ -125,10 +127,24 @@ const ChatRooms = ({room}, ref) => {
     // remove a room
     const sendMessage = (roomName, to, color, msg, bold, type, messageType) => {
         if (msg) {
+            const date = Date.now()
+            let offset = 2000
+            if (messageTimeRef.current) {
+                offset = date - messageTimeRef.current
+                if (offset < messageTimeInterval) {
+                    enqueueSnackbar(t('Message.timeError'), {variant: 'error'});
+                    return
+                }
+            }
+            messageTimeRef.current = date
+            if (msg?.length > maxMessageLength) {
+                enqueueSnackbar(t('Message.error_long_message'), {variant: 'error'})
+                return
+            }
             if(type === 'private') {
                 privateListRef.current.addMessage({
                     _id: makeid(5),
-                    type, roomName, msg, from: username, to, color, bold, messageType
+                    type, roomName, msg, from: username, to, color, bold, messageType, date
                 }, roomName);
                 socket.emit('private message',
                     { type, roomName, msg, from: username, to, color, bold, messageType },
@@ -152,7 +168,7 @@ const ChatRooms = ({room}, ref) => {
                 socket.emit('public message', { type, msg, room: roomName, from: username, color, bold, messageType }, async (data) => {
                     
                 });
-                addMessage({message: { _id: makeid(5), type, msg, room: roomName, from: username, color, bold, messageType }, room: roomName})
+                addMessage({message: { _id: makeid(5), type, msg, room: roomName, from: username, color, bold, messageType, date }, room: roomName})
             }
         }
     };

@@ -111,6 +111,10 @@ const MessagesList = ({ users, messages, role, userAction, roomName, changeMuteS
                         (type ==='system' || type === 'poke') &&
                             <SystemMessage text={msg} />
                         }
+                        {
+                        (type ==='joinLeave') &&
+                            <SystemMessage text={msg} />
+                        }
                     </span>
                 ))
             }

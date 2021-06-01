@@ -31,6 +31,9 @@ export default function Setting() {
     const [language, setLanguage] = useState('en');
     const [messageNum, setMessageNum] = useState(20);
     const [allowPrivate, setAllowPrivate] = useState(false);
+    const [messageTimeInterval, setMessageTimeInterval] = useState(200);
+    const [maxUsernameLength, setMaxUsernameLength] = useState(20)
+    const [maxMessageLength, setMaxMessageLength] = useState(20)
     const { addToast } = useToasts();
 
     useEffect(() => {
@@ -42,8 +45,8 @@ export default function Setting() {
         })
         .then((response) => {
             if(response.status === 200) {
-                let {theme, language, messageNum, allowPrivate} = response.data;
-                console.log(response.data)
+                const {theme, language, messageNum, allowPrivate, messageTimeInterval,
+                    maxUsernameLength, maxMessageLength} = response.data;
                 if(theme) {
                     setTheme(theme);
                 }
@@ -58,13 +61,23 @@ export default function Setting() {
                 } else {
                     setAllowPrivate(false);
                 }
+                if (messageTimeInterval) {
+                    setMessageTimeInterval(messageTimeInterval)
+                }
+                if (maxUsernameLength) {
+                    setMaxUsernameLength(maxUsernameLength)
+                }
+                if (maxMessageLength) {
+                    setMaxMessageLength(maxMessageLength)
+                }
             }
         })
     }, [])
 
     const handleUpdate = () => {
         let token = window.localStorage.getItem('token');
-        Axios.post(`${config.server_url}/api/setting`, {theme, language, messageNum, allowPrivate}, {
+        Axios.post(`${config.server_url}/api/setting`, {theme, language, messageNum, allowPrivate,
+            messageTimeInterval, maxUsernameLength, maxMessageLength}, {
             headers: {
                 authorization: token
             }
@@ -182,6 +195,51 @@ export default function Setting() {
                                 inputProps={{ 'aria-label': 'allow private' }}
                             />
                             </FormControl>
+                        </Grid>
+                    </Grid>
+                    <Grid container spacing={2} style={{marginTop:'20px'}}>
+                        <Grid item sm={1}>
+                        </Grid>
+                        <Grid item sm={2} style={{textAlign: 'right'}}>
+                            <p className={classes.cardCategory}>Message Time Interval</p>
+                        </Grid>
+                        <Grid item sm={9}>
+                            <TextField
+                                type='number'
+                                style={{width: '100%'}}
+                                value={messageTimeInterval}
+                                onChange={(e) => setMessageTimeInterval(e.target.value)}
+                            />
+                        </Grid>
+                    </Grid>
+                    <Grid container spacing={2} style={{marginTop:'20px'}}>
+                        <Grid item sm={1}>
+                        </Grid>
+                        <Grid item sm={2} style={{textAlign: 'right'}}>
+                            <p className={classes.cardCategory}>Max Username Length</p>
+                        </Grid>
+                        <Grid item sm={9}>
+                            <TextField
+                                type='number'
+                                style={{width: '100%'}}
+                                value={maxUsernameLength}
+                                onChange={(e) => setMaxUsernameLength(e.target.value)}
+                            />
+                        </Grid>
+                    </Grid>
+                    <Grid container spacing={2} style={{marginTop:'20px'}}>
+                        <Grid item sm={1}>
+                        </Grid>
+                        <Grid item sm={2} style={{textAlign: 'right'}}>
+                            <p className={classes.cardCategory}>Max Message Length</p>
+                        </Grid>
+                        <Grid item sm={9}>
+                            <TextField
+                                type='number'
+                                style={{width: '100%'}}
+                                value={maxMessageLength}
+                                onChange={(e) => setMaxMessageLength(e.target.value)}
+                            />
                         </Grid>
                     </Grid>
                     <div style={{display:'flex', justifyContent:'space-between', marginTop: '20px', marginBottom: '20px'}}>

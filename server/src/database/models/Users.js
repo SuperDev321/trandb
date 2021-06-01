@@ -1,5 +1,4 @@
 const { Schema, model } = require('mongoose');
-const { boolean } = require('yup');
 
 const userSchema = new Schema({
   username: {

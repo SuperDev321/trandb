@@ -87,95 +87,131 @@ emoji.use_sheet = true;
 const StyledMessage = ({message, mine}) => {
     const [checked, setChecked] = useState(false);
     const classes = useStyles({mine, color: message.color, bold: message.bold});
-    // const emojiConverter = (text) => {
-    //     return emoji.replace_unified(text);
-    // }
-    const urlify = (text) => {
-    
-        let urlRegex = /(https?:\/\/[^\s]+)/g;
-        let arr = text.split(urlRegex);
-        let noRepeatArr = [...new Set(arr)];
-        for (let index = 0; index < noRepeatArr.length; index++) {
-          const element = noRepeatArr[index];
-          
-          if(new RegExp("([a-zA-Z0-9]+://)?([a-zA-Z0-9_]+:[a-zA-Z0-9_]+@)?([a-zA-Z0-9.-]+\\.[A-Za-z]{2,4})(:[0-9]+)?(/.*)?").test(element)) {
-            text = text.replace(element, `<a href="${element}" target="_blank"></a>`);
-          } else {
-            text = text.replace(element, `<span>${element}</span>`);
-          }
-        }
-        return text;
-        // or alternatively
-        // return text.replace(urlRegex, '<a href="$1">$1</a>')
-      }
-      const makeTag = (emojiText) => {
-        let arr = emojiText.split(/<img .*?>/g);
-        let noRepeatArr = [...new Set(arr)];
-        let urlText = emojiText;
-        if(noRepeatArr && noRepeatArr.length) {
-          for (let index = 0; index < noRepeatArr.length; index++) {
-            const element = noRepeatArr[index];
-            if(new RegExp("([a-zA-Z0-9]+://)?([a-zA-Z0-9_]+:[a-zA-Z0-9_]+@)?([a-zA-Z0-9.-]+\\.[A-Za-z]{2,4})(:[0-9]+)?(/.*)?").test(element)) {
-              urlText = urlText.replace(element, urlify(element));
-            }
-            else {
-              urlText = urlText.replace(element, `<span>${element}</span>`);
-            }
-          }
-        }
-        return urlText
-      }
-    
-      const emojiConverter = (text) => {
+    const emojiConverter = (text) => {
         let emojiText =  emoji.replace_unified(text);
         return emojiText;
-        
-      }
-    
-      const convertHTML = (text) => {
-        //   console.log('convertHTML',text)
-        // console.log(text) 
-        text = text.split('\" />').join('\">');
-        let result = [];
-        var html = parseHTML(text);
-        // console.log(text)
-
-        if (html.children.length > 0) {
-            for (let k = 0; k < html.children.length; k++) {
-            const element = html.children[k];
-            let key = randomstring.generate(8);
-            if (element.tagName === "IMG") {
-                key = randomstring.generate(8)
-                result.push(<img key={key} src={element.attributes[0].nodeValue}
-                                className={element.attributes[1].nodeValue}
-                                data-codepoints={element.attributes[2].nodeValue}
-                                alt="emoji"
-                                />)
-            } else if (element.tagName === "A") {
-                let url = element.href
-                result.push(<span key={key} className={classes.url_underline}
-                                onClick={() => {window.open(url, '_blank');}}>{url}</span>)
-            } else{
-                element.setAttribute('key', key);
-                result.push(<span key={key}>{element.innerHTML}</span>)
-            }
-            }
-        } else {
-            let key = randomstring.generate(8);
-            if (html.tagName === "IMG") {
-                result.push(<img key={key} src={html.attributes[0].nodeValue}
-                                className={html.attributes[1].nodeValue}
-                                data-codepoints={html.attributes[2].nodeValue} alt="emoji"/>)
-            } else if (html.tagName === "A") {
-                let url = html.href
-                result.push(<span key={key} className={classes.url_underline}
-                                onClick={() =>{window.open(url, '_blank');} }>{url}</span>)
-            } else{
-                result.push(<span key={key}>{html.innerHTML}</span>)
-            }
-        }
-        return result
     }
+    const urlify = (text) => {
+    
+      let urlRegex = /(https?:\/\/[^\s]+)/g;
+      let arr = text.split(urlRegex);
+      let noRepeatArr = [...new Set(arr)];
+      for (let index = 0; index < noRepeatArr.length; index++) {
+      const element = noRepeatArr[index];
+      
+      if(new RegExp("([a-zA-Z0-9]+://)?([a-zA-Z0-9_]+:[a-zA-Z0-9_]+@)?([a-zA-Z0-9.-]+\\.[A-Za-z]{2,4})(:[0-9]+)?(/.*)?").test(element)) {
+          text = text.replace(element, `<a href="${element}" target="_blank">${element}</a>`);
+      } else {
+          text = text.replace(element, `<span>${element}</span>`);
+      }
+      }
+      return text;
+      // or alternatively
+      // return text.replace(urlRegex, '<a href="$1">$1</a>')
+  }
+  const makeTag = (emojiText) => {
+      let arr = emojiText.split(/<img .*?>/g);
+      let noRepeatArr = [...new Set(arr)];
+      let urlText = emojiText;
+      if(noRepeatArr && noRepeatArr.length) {
+      for (let index = 0; index < noRepeatArr.length; index++) {
+          const element = noRepeatArr[index];
+          if(new RegExp("([a-zA-Z0-9]+://)?([a-zA-Z0-9_]+:[a-zA-Z0-9_]+@)?([a-zA-Z0-9.-]+\\.[A-Za-z]{2,4})(:[0-9]+)?(/.*)?").test(element)) {
+              urlText = urlText.replace(element, urlify(element));
+          }
+          else {
+              // urlText = urlText.replace(element, `<span>${element}</span>`);
+          }
+      }
+      }
+      return urlText
+  }
+    // const urlify = (text) => {
+    
+    //     let urlRegex = /(https?:\/\/[^\s]+)/g;
+    //     let arr = text.split(urlRegex);
+    //     let noRepeatArr = [...new Set(arr)];
+    //     for (let index = 0; index < noRepeatArr.length; index++) {
+    //       const element = noRepeatArr[index];
+          
+    //       if(new RegExp("([a-zA-Z0-9]+://)?([a-zA-Z0-9_]+:[a-zA-Z0-9_]+@)?([a-zA-Z0-9.-]+\\.[A-Za-z]{2,4})(:[0-9]+)?(/.*)?").test(element)) {
+    //         text = text.replace(element, `<a href="${element}" target="_blank"></a>`);
+    //       } else {
+    //         text = text.replace(element, `<span>${element}</span>`);
+    //       }
+    //     }
+    //     return text;
+    //     // or alternatively
+    //     // return text.replace(urlRegex, '<a href="$1">$1</a>')
+    //   }
+    //   const makeTag = (emojiText) => {
+    //     let arr = emojiText.split(/<img .*?>/g);
+    //     let noRepeatArr = [...new Set(arr)];
+    //     let urlText = emojiText;
+    //     if(noRepeatArr && noRepeatArr.length) {
+    //       for (let index = 0; index < noRepeatArr.length; index++) {
+    //         const element = noRepeatArr[index];
+    //         if(new RegExp("([a-zA-Z0-9]+://)?([a-zA-Z0-9_]+:[a-zA-Z0-9_]+@)?([a-zA-Z0-9.-]+\\.[A-Za-z]{2,4})(:[0-9]+)?(/.*)?").test(element)) {
+    //           urlText = urlText.replace(element, urlify(element));
+    //         }
+    //         else {
+    //           urlText = urlText.replace(element, `<span>${element}</span>`);
+    //         }
+    //       }
+    //     }
+    //     return urlText
+    //   }
+    
+    //   const emojiConverter = (text) => {
+    //     let emojiText =  emoji.replace_unified(text);
+    //     return emojiText;
+        
+    //   }
+    
+    //   const convertHTML = (text) => {
+    //     //   console.log('convertHTML',text)
+    //     // console.log(text) 
+    //     text = text.split('\" />').join('\">');
+    //     let result = [];
+    //     var html = parseHTML(text);
+    //     // console.log(text)
+
+    //     if (html.children.length > 0) {
+    //         for (let k = 0; k < html.children.length; k++) {
+    //         const element = html.children[k];
+    //         let key = randomstring.generate(8);
+    //         if (element.tagName === "IMG") {
+    //             key = randomstring.generate(8)
+    //             result.push(<img key={key} src={element.attributes[0].nodeValue}
+    //                             className={element.attributes[1].nodeValue}
+    //                             data-codepoints={element.attributes[2].nodeValue}
+    //                             alt="emoji"
+    //                             />)
+    //         } else if (element.tagName === "A") {
+    //             let url = element.href
+    //             result.push(<span key={key} className={classes.url_underline}
+    //                             onClick={() => {window.open(url, '_blank');}}>{url}</span>)
+    //         } else{
+    //             element.setAttribute('key', key);
+    //             result.push(<span key={key}>{element.innerHTML}</span>)
+    //         }
+    //         }
+    //     } else {
+    //         let key = randomstring.generate(8);
+    //         if (html.tagName === "IMG") {
+    //             result.push(<img key={key} src={html.attributes[0].nodeValue}
+    //                             className={html.attributes[1].nodeValue}
+    //                             data-codepoints={html.attributes[2].nodeValue} alt="emoji"/>)
+    //         } else if (html.tagName === "A") {
+    //             let url = html.href
+    //             result.push(<span key={key} className={classes.url_underline}
+    //                             onClick={() =>{window.open(url, '_blank');} }>{url}</span>)
+    //         } else{
+    //             result.push(<span key={key}>{html.innerHTML}</span>)
+    //         }
+    //     }
+    //     return result
+    // }
 
     return (
         <div className={classes.root}>
@@ -195,11 +231,8 @@ const StyledMessage = ({message, mine}) => {
             </span>
             :
                 <div  className={classes.message}
-                //  dangerouslySetInnerHTML={{__html: emojiConverter(message.msg)}}
+                 dangerouslySetInnerHTML={{__html: makeTag(emojiConverter(message.msg))}}
                 >
-                    {
-                convertHTML(makeTag(emojiConverter(message.msg)))
-              }
                 </div>
             }
             </>

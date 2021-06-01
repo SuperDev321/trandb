@@ -125,6 +125,7 @@
     "confirm_error": "משתמש זה חסום בשרת",
     "username_error": "משתמש זה אינו בשרת",
     "password_error": "סיסמא לא נכונה",
+    "error_long_username": "שם ארוך מדי",
     "unknown_error": "הכניסה נכשלה, אנא נסה שוב מאוחר יותר"
   },
   "UserActionArea": {
@@ -190,7 +191,9 @@
   },
   "Message": {
     "default": "default",
-    "forbidden": "ההודעה שלך נחסמה על ידי מנהל המערכת שלך"
+    "forbidden": "ההודעה שלך נחסמה על ידי מנהל המערכת שלך",
+    "timeError": "מרווח הזמן בין הודעות קצר מדי.",
+    "error_long_message": "הודעה ארוכה מדי"
   },
   "PasswordModal": {
     "default": "default",

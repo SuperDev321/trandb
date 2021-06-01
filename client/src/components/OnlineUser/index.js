@@ -180,15 +180,15 @@ const OnlineUser = ({roomName, username, user, role, isMuted, isBlocked, isBroad
                 {
                     isViewer
                     ?
-                    <Visibility style={{ color: green[300] }} onDoubleClick={handleDoubleClickEye}/>
-                    :
-                    <VisibilityOff style={{ color: grey[200] }}/>
+                    <Visibility style={{ color: green[300] }} onDoubleClick={handleDoubleClickEye}/>:null                }
+                { isBroadcasting ?
+                    <Videocam className={classes.camera}  onDoubleClick={handleDoubleClickVideo}
+                    // color={(user && user.broadcasting)? 'primary': 'disabled'}
+                        style={{ color: green[300] }}
+                    />
+                    :null
                 }
                 
-                <Videocam className={classes.camera}  onDoubleClick={handleDoubleClickVideo}
-                    // color={(user && user.broadcasting)? 'primary': 'disabled'}
-                    style={{ color: (isBroadcasting)? green[300]:grey[200] }}
-                />
                 { isBroadcasting === 'locked'?
                     <Lock className={classes.camera}
                         // color={(user && user.broadcasting)? 'primary': 'disabled'}

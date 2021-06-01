@@ -225,7 +225,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
                         if(sameRoom.addOnlineUser(joinedUser)) {
                             if(username !== joinedUser.username && enableSysMessage) {
                                 let sysMsg = {
-                                    type: 'system',
+                                    type: 'joinLeave',
                                     msg: t('ChatApp.sys_join_room', {username: joinedUser.username})
                                     // msg: joinedUser.username + ' joined the room'
                                 }
@@ -254,7 +254,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
                     newData.users = sameRoom.users;
                     if(enableSysMessage) {
                         let message = {
-                            type: 'system',
+                            type: 'joinLeave',
                             msg: t('ChatApp.sys_leave_room', {username: leavedUserInfo.username}) 
                         }
                         sameRoom.addMessages([message]);
@@ -282,7 +282,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
                             ? t('ChatApp.sys_kick_room',{username: kickedUserName})
                             : t('ChatApp.sys_ban_owner_room',{username: kickedUserName});
                         let message = {
-                            type: 'system',
+                            type: 'joinLeave',
                             msg
                         }
                         sameRoom.addMessages([message]);
@@ -311,7 +311,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
                         roomRef.removeOnlineUser(kickedUser._id);
                         let msg = t('ChatApp.sys_ban_admin_room_all', {username: kickedUserName});
                         let message = {
-                            type: 'system',
+                            type: 'joinLeave',
                             msg
                         }
                         roomRef.addMessages([message]);

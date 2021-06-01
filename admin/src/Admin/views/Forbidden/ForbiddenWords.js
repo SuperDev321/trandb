@@ -186,7 +186,6 @@ export default function Words( {onClickNew} ) {
           authorization: token
         }
       });
-      console.log(result)
       let wordsToShow = result.data.words.map((item, index) => ({...item, no: index+1}));
       setRows(wordsToShow);
     }
