@@ -242,15 +242,16 @@ const UserVideo = ({stream, locked, name, controlVideo, muted, total, streamNum,
     useEffect(() => {
         if(stream && userVideo.current) {
             let audioTrack = stream.getAudioTracks()[0];
-            let initVolume = 0
-            if (audioTrack && audioTrack.volume) {
-                initVolume = audioTrack.volume
+            let initVolume = null
+            if (audioTrack) {
                 audioTrackRef.current = audioTrack
+                if (audioTrack.volume)
+                    initVolume = audioTrack.volume
             }
             
             if(stream) {
                 userVideo.current.srcObject = stream;
-                if(initVolume === undefined || initVolume === null) {
+                if(!initVolume) {
                     initVolume = 50;
                 }
                 changeVolume(initVolume);

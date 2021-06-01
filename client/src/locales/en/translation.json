@@ -50,7 +50,6 @@
     "already_in_chat": "The same user is already chatting.",
     "private_logout_error": "This user logged out, message delivery failed. Please close this chat.",
     "default": "default"
-    
   },
   "AddRoomModal": {
     "error1": "You are already in this room",
@@ -125,6 +124,7 @@
     "confirm_error": "This user is blocked on server",
     "username_error": "This user is not on server",
     "password_error": "Wrong password",
+    "error_long_username": "Too long name",
     "unknown_error": "Login failed, please try again later"
   },
   "UserActionArea": {
@@ -191,7 +191,9 @@
   },
   "Message": {
     "default": "default",
-    "forbidden": "Your message has been blocked by admin"
+    "forbidden": "Your message has been blocked by admin",
+    "timeError": "Too short time interval between messages!",
+    "error_long_message": "Too long message"
   },
   "PasswordModal": {
     "title": "Enter the Password",

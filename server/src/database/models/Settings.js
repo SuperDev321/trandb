@@ -16,6 +16,15 @@ const settingSchema = new Schema({
   allowPrivate: {
     type: Boolean,
     required: true
+  },
+  messageTimeInterval: {
+    type: Number,
+  },
+  maxUsernameLength: {
+    type: Number
+  },
+  maxMessageLength: {
+    type: Number
   }
 });
 

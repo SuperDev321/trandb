@@ -2,7 +2,7 @@ const {
     getGuest,
     createUser,
     createToken,
-    isForbidden,
+    hasFobiddenWord,
     updateIp
 } = require('../../utils');
 const checkUserFromServer = require('../../utils/user/checkUserFromServer');
@@ -20,7 +20,7 @@ const guestLogin = async (req, res, next) => {
                 message: 'This nickname is already registered.'
             });
         }
-        let forbidden = await isForbidden(nickname);
+        let forbidden = await hasFobiddenWord(nickname);
         if(forbidden) {
             return res
                 .status(400)

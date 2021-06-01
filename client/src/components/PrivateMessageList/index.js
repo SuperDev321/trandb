@@ -107,7 +107,7 @@ const PrivateMessageList = ({messages, me, blocked, withBlocked}) => {
         <div className={classes.root} ref={listRef}>
             { messagesToShow &&
                 messagesToShow.map((message, index) => (
-                    <StyledMessage message={message} mine={Boolean(message.from === me.username)} key={index}
+                    <StyledMessage message={message} mine={Boolean(message.from === me.username)} key={message._id?message._id:null}
                     />
                 ))
             }

@@ -201,11 +201,11 @@ const PrivateChat = ({ me, to, ip, avatar, sendMessage, active, setActive, initM
         },
         addMessage: (message, roomName) => {
             let newMessages = [message, ...messages];
-            if(newMessages.length > messageNum) {
+            if (newMessages.length > messageNum) {
                 newMessages = newMessages.slice(0, messageNum);
             }
             setMessages(newMessages);
-            if(message.from!==me.username && !isFocus) {
+            if (message.from !== me.username && !isFocus) {
                 setUnRead(unRead+1);
             }
         },

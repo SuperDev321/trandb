@@ -1,5 +1,5 @@
 const { ForbiddenWords } = require('../../database/models');
-
+const BreakEvent = 'BREAK_EVENT'
 const isForbidden = async (word) => {
     try {
         let result = await ForbiddenWords.findOne({word});
@@ -17,16 +17,17 @@ const hasFobiddenWord = async (text) => {
     
     try {
         let words = await ForbiddenWords.find({});
-        let result = false;
+        console.log('check forbidden', words, text)
         let lowText = text.toLowerCase();
-        words.map(({word}) => {
+        words.every(({word}) => {
             if(lowText.includes(word.toLowerCase())) {
-                result = true;
+                throw BreakEvent;
             }
         })
-        return result;
-    } catch (err) {
         return false;
+    } catch (err) {
+        if (err === BreakEvent) return true
+        else return false;
     }
 }
 
