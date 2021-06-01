@@ -4,7 +4,7 @@ import config from '../config';
 import { useTranslation } from 'react-i18next';
 const useSetting = () => {
 
-  const currentMessageSize = parseInt(window.localStorage.getItem('messageSize'), 10) || 12;
+  const currentMessageSize = parseInt(window.localStorage.getItem('messageSize'), 10) || 16;
   
   
   const [defaultTheme, setDefaultTheme] = useState(false);
