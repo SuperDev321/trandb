@@ -234,7 +234,7 @@ const Login = () => {
                                     component="button"
                                     onClick={() => {
                                         // history.push('/signup');
-                                        window.open(config.main_site_url + 'register')
+                                        window.open(config.main_site_url + 'index.php/jomsocial/register')
                                     }}
                                     variant="body2"
                                 >

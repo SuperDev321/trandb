@@ -53,15 +53,18 @@ const useStyles = makeStyles((theme) => ({
         }
     },
     avatar: {
-        width: theme.spacing(3),
-        height: theme.spacing(3),
+        width: theme.spacing(3.5),
+        height: theme.spacing(3.5),
         
         minWidth: 0
     },
     avatarBadge: {
         '& .MuiBadge-badge': {
-           width: theme.spacing(3),
-            height: theme.spacing(3), 
+            width: theme.spacing(3.5),
+            height: theme.spacing(3.5), 
+        },
+        '& .MuiSvgIcon-root': {
+            fontSize: '2rem'
         }
     },
     camera: {
