@@ -7,6 +7,10 @@ const banSchema = new Schema({
   ip: Number,
   fromIp: Number,
   toIp: Number,
+}, {
+  timestamps: {
+    createdAt: 'created_at'
+  }
 });
 
 const Bans = model('Bans', banSchema);

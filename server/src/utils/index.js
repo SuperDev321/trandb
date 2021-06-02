@@ -21,6 +21,7 @@ const updateIp = require('./user/updateIp');
 const validateRoomName = require('./room/roomValidation');
 const isNewRoom = require('./room/isNewRoom');
 const createRoom = require('./room/createRoom');
+const createPrivateRoom = require('./room/createPrivateRoom');
 const getGuest = require('./user/getGuest');
 const getRoomPermission = require('./user/getRoomPermission');
 const banByUser = require('./ban/banByUser');
@@ -60,6 +61,7 @@ module.exports = {
   validateRoomName,
   isNewRoom,
   createRoom,
+  createPrivateRoom,
   getGuest,
   getRoomPermission,
   banByUser,

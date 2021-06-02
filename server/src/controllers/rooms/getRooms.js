@@ -2,11 +2,12 @@ const { Rooms } = require('../../database/models');
 const {findUserById} = require('../../utils')
 const getRooms = async (req, res, next) => {
     try {
-        const rooms = await Rooms.aggregate([
+        let rooms = await Rooms.aggregate([
             {
                 $project: {
                     _id: true,
                     name: true,
+                    type: true,
                     icon: true,
                     cover: true,
                     category: true,
@@ -18,9 +19,12 @@ const getRooms = async (req, res, next) => {
                 },
             },
         ]);
+        rooms = rooms.filter((item) => (item.type !== 'private'))
         await Promise.all(rooms.map(async (room) => {
-            let {username} = await findUserById(room.owner);
-            room.owner = username;
+            if(room && room.owner) {
+                let {username} = await findUserById(room.owner);
+                room.owner = username;
+            }
             return room;
         }))
         return res

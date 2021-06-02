@@ -1,5 +1,5 @@
 const { Rooms, Chats, Users, Settings } = require('../database/models');
-const { findUserByName } = require('../utils');
+const { findUserByName, createPrivateRoom } = require('../utils');
 var randomString = require('random-string')
 
 const addPrivate = (io, socket) => async ({ from, to, role }, callback) => {
@@ -26,6 +26,7 @@ const addPrivate = (io, socket) => async ({ from, to, role }, callback) => {
                     return callback(false, 'private_error_guest')
                 }
             }
+            createPrivateRoom(from, to)
             var newPrivateRoomName = randomString({
                 length: 8,
                 numeric: true,

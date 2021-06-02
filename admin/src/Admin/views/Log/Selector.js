@@ -88,11 +88,9 @@ export default function RoomSelector() {
         })
         .then((response) => {
             if(response.status === 200) {
-                console.log(response.data)
                 if(response.data && Array.isArray(response.data.rooms)) {
                     let {rooms} = response.data;
                     let roomNames = rooms.map((room) => (room.name));
-                    console.log(roomNames)
                     setActiveRooms(roomNames)
                 }
             }

@@ -6,9 +6,11 @@ const roomSchema = new Schema({
         type: String,
         required: true,
     },
+    type: {
+        type: String
+    },
     category: {
         type: String,
-        required: true
     },
     owner: {
         type: Schema.Types.ObjectId,
@@ -35,6 +37,10 @@ const roomSchema = new Schema({
             ref: 'Users',
         },
     ],
+}, {
+    timestamps: {
+        createdAt: 'created_at'
+    }
 });
 
 const Rooms = model('Rooms', roomSchema);

@@ -19,7 +19,7 @@ const hasFobiddenWord = async (text) => {
         let words = await ForbiddenWords.find({});
         console.log('check forbidden', words, text)
         let lowText = text.toLowerCase();
-        words.every(({word}) => {
+        words.forEach(({word}) => {
             if(lowText.includes(word.toLowerCase())) {
                 throw BreakEvent;
             }
