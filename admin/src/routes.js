@@ -32,6 +32,7 @@ import Words from 'Admin/views/Forbidden';
 import Setting from 'Admin/views/Setting';
 import Quiz from 'Admin/views/Quiz';
 import Log from 'Admin/views/Log';
+import PrivateLogs from 'Admin/views/PrivateLogs';
 
 const dashboardRoutes = [
   {
@@ -84,9 +85,17 @@ const dashboardRoutes = [
   },
   {
     path: "/logs",
-    name: "Logs",
+    name: "Public Logs",
     icon: QuestionAnswerIcon,
     component: Log,
+    layout: "/admin",
+    super: true,
+  },
+  {
+    path: "/private-logs",
+    name: "Private Logs",
+    icon: QuestionAnswerIcon,
+    component: PrivateLogs,
     layout: "/admin",
     super: true,
   },

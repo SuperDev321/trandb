@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
 import Axios from 'axios';
 import { makeStyles } from '@material-ui/core/styles';
+import RoomContext from './context';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -52,13 +53,10 @@ function stableSort(array, comparator) {
 
 const headCells = [
   { id: 'no', numeric: false, disablePadding: false, label: 'No'},
-  { id: 'type', numeric: false, disablePadding: false, label: 'type'},
-  { id: 'username', numeric: false, disablePadding: true, label: 'Username' },
-  { id: 'room', numeric: false, disablePadding: false, label: 'Room' },
-  { id: 'ip', numeric: false, disablePadding: false, label: 'Ip' },
-  { id: 'fromIp', numeric: false, disablePadding: false, label: 'from Ip' },
-  { id: 'toIp', numeric: false, disablePadding: false, label: 'to Ip' },
-  { id: 'created_at', numeric: false, disablePadding: false, label: 'Created At' },
+  { id: 'from', numeric: false, disablePadding: false, label: 'From'},
+  { id: 'to', numeric: false, disablePadding: false, label: 'To'},
+  { id: 'msg', numeric: false, disablePadding: false, label: 'Content'},
+  { id: 'date', numeric: false, disablePadding: false, label: 'Date'},
   // { id: 'action', numeric: true, disablePadding: false, label: 'action'}, 
 ];
 
@@ -138,9 +136,10 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function BanComponent( {onClickNew} ) {
+export default function Logs() {
   // donfsdodifj
   const classes = useStyles();
+  const {state} = useContext(RoomContext);
   const [order, setOrder] = React.useState('asc');
   const [orderBy, setOrderBy] = React.useState('no');
   const [page, setPage] = React.useState(0);
@@ -149,6 +148,8 @@ export default function BanComponent( {onClickNew} ) {
   const [rows, setRows] = React.useState([]);
   const [filteredRows, setFilteredRows] = React.useState([]);
   const { addToast } = useToasts();
+  
+  const {status, data, error} = state;
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -167,8 +168,7 @@ export default function BanComponent( {onClickNew} ) {
 
   const handleClickDelete = (id) => {
     let token = window.localStorage.getItem('token');
-    
-    Axios.delete(`${config.server_url}/api/bans/` + id, {
+    Axios.delete(`${config.server_url}/api/messages/` + id, {
       headers: {
         authorization: token
       }
@@ -177,7 +177,13 @@ export default function BanComponent( {onClickNew} ) {
       console.log(response);
       if(response.status === 204) {
         let newRows = rows.filter((row) => (row._id !== id));
+        newRows.map((row, index) => {
+            row.no = index + 1;
+            return row;
+        })
+        console.log(newRows);
         setRows(newRows);
+        addToast('Successfully deleted', { appearance: 'success' })
       }
     })
     .catch((err) => {
@@ -185,19 +191,32 @@ export default function BanComponent( {onClickNew} ) {
       addToast('Delete failed', { appearance: 'error' })
     })
   }
-
+  React.useEffect(() => {
+    let token = window.localStorage.getItem('token');
+    
+    const getPrivateLogs = async (from, to) => {
+        const result = await Axios.post(`${config.server_url}/api/messages/private`, {
+            from,
+            to
+        }, {
+          headers: {
+            authorization: token
+          }
+        });
+        let logsToShow = result.data.data.map((item, index) => ({...item, no: index+1}));
+        setRows(logsToShow);
+    }
+    if (data) {
+      let { from, to } = data
+      getPrivateLogs(from, to)
+    }
+  }, [data]);
   React.useEffect(() => {
     if(query !== '') {
       let filteredRows = rows.filter((row) => {
-        let strTmp = row.username + ' ';
-        if(row.no) strTmp += row.no + ' ';
-        if(row.room) strTmp += row.room + ' ';
-        if(row.ip) strTmp += row.ip + ' ';
-        if(row.fromIp) strTmp += row.fromIp + ' ';
-        if(row.toIp) strTmp += row.toIp + ' ';
+        let strTmp = row.from + ' ' + row.msg;
         if(strTmp.toLowerCase().indexOf(query.toLowerCase()) < 0) return false;
         else return true;
-
       })
       setFilteredRows(filteredRows);
     } else {
@@ -205,21 +224,9 @@ export default function BanComponent( {onClickNew} ) {
     }
   }, [query, rows])
 
-  React.useEffect(() => {
-    const banRead = async () => {
-      let token = window.localStorage.getItem('token');
-    
-      const bans = await Axios.get(`${config.server_url}/api/bans`, {
-        headers: {
-          authorization: token
-        }
-      });
-      console.log(bans)
-      let bansToShow = bans.data.data.map((item, index) => ({...item, no: index+1}));
-      setRows(bansToShow);
-    }
-    banRead()
-  }, []);
+  if (status !== 'resolved') {
+    return null
+  }
 
   return (
   	<Paper className={classes.paper}>
@@ -228,16 +235,8 @@ export default function BanComponent( {onClickNew} ) {
 	        <CardIcon color="primary">
 	          <AssignmentIcon />
 	        </CardIcon>
-	        <div style={{display:'flex', justifyContent:'space-between'}}>
-	        <p className={classes.cardCategory}>Banned Users</p>
-	        <Button 
-	          variant="contained" 
-	          color="primary"
-	          onClick={() => {onClickNew()} }
-	          style={{marginTop: '45px', height: '45px',}}
-	        >
-	          New
-	        </Button>
+	        <div style={{display:'flex', justifyContent:'flex-start'}}>
+	            <p className={classes.cardCategory}>Logs</p>
 	        </div>
 	      </CardHeader>
 	      <CardFooter style={{display: 'block'}}>
@@ -278,9 +277,6 @@ export default function BanComponent( {onClickNew} ) {
 	              {stableSort(filteredRows, getComparator(order, orderBy))
 	                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
 	                .map((row, index) => {
-	                  const labelId = `ban-table-username-${index}`;
-                    const createdAtId = `ban-table-createdat-${index}`
-
 	                  return (
 	                    <TableRow
 	                      hover
@@ -292,17 +288,18 @@ export default function BanComponent( {onClickNew} ) {
 	                        {row.no}
 	                      </TableCell>
                         <TableCell align="left">
-	                        {row.type}
-	                      </TableCell>
-	                      <TableCell component="th" id={labelId} scope="row" padding="none">
-	                        {row.username}
-	                      </TableCell>
-	                      <TableCell align="left">{row.room}</TableCell>
-	                      <TableCell align="left">{row.ip}</TableCell>
-	                      <TableCell align="left">{row.fromIp}</TableCell>
-	                      <TableCell align="left">{row.toIp}</TableCell>
-                        <TableCell align="left" id={createdAtId}>{row.created_at}</TableCell>
-	                      <TableCell align="right">
+	                        {row.from}
+                        </TableCell>
+                        <TableCell align="left">
+	                        {row.to}
+                        </TableCell>
+                        <TableCell align="left" style={{maxWidth: 300}}>
+                            {row.msg}
+                        </TableCell>
+                        <TableCell align="left">
+                            {row.date}
+                        </TableCell>
+                        <TableCell align="right">
                           <IconButton style={{color:"#f44336"}} onClick={() => {handleClickDelete(row._id)}}>
                             <DeleteIcon />
                           </IconButton>

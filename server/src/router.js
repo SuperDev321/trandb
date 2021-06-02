@@ -24,6 +24,7 @@ const {
   getUserByName,
   getUserDetail,
   getPublicRoomNames,
+  getPrivateRoomNames,
   addBan,
   deleteBan,
   getBans,
@@ -57,6 +58,7 @@ router.post('/setting', withAuth, isAdmin ,updateSetting);
 
 router.get('/rooms', getRooms);
 router.get('/room/names', getPublicRoomNames);
+router.get('/room/names/private', getPrivateRoomNames);
 router.post('/room', withAuth, addRoom);
 router.put('/room/general', withAuth, updateRoomGeneral);
 router.put('/room/media', withAuth, updateRoomMedia);
