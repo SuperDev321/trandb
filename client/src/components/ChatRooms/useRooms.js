@@ -108,7 +108,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
     });
 
     const [requestAudio, requestAudioState, requestAudioControls] = useAudio({
-        src: '/media/private.mp3',
+        src: '/media/request.mp3',
         autoPlay: false ,
     });
 

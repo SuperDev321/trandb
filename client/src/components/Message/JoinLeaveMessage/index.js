@@ -14,10 +14,11 @@ const useStyles = makeStyles((theme) => ({
         justifyContent: 'space-between',
         width: 'fit-content',
         background: '#28a3c9b8',
+        fontSize: '0.8rem'
     },
 }))
 
-const SystemMessage = ({ text }) => {
+const JoinLeaveMessage = ({ text }) => {
     const classes = useStyles();
     return (
         <div className={classes.root}>
@@ -28,8 +29,8 @@ const SystemMessage = ({ text }) => {
     );
 };
 
-SystemMessage.propTypes = {
+JoinLeaveMessage.propTypes = {
   text: propTypes.string.isRequired,
 };
 
-export default React.memo(SystemMessage);
+export default React.memo(JoinLeaveMessage);

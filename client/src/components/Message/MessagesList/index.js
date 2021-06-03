@@ -2,6 +2,7 @@ import React, { useState, useLayoutEffect, useRef, useContext } from 'react';
 import propTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
 import ClientMessage from '../ClientMessage';
+import JoinLeaveMessage from '../JoinLeaveMessage';
 import SystemMessage from '../SystemMessage';
 import BootMessage from '../BootMessage';
 import {CustomThemeContext} from '../../../themes/cutomThemeProvider';
@@ -56,14 +57,7 @@ const MessagesList = ({ users, messages, role, userAction, roomName, changeMuteS
         }
     }
 
-    // useEffect(() => {
-    //     if(Array.isArray(messages) && messages.length > 0 && loading) {
-    //         setLoading(false)
-    //     }
-    // }, [messages])
-
     const getUserFromList = (username) => {
-        // console.log(users)
         let user = users.find((item) => (item.username === username));
         if(user) {
             return user;
@@ -113,7 +107,7 @@ const MessagesList = ({ users, messages, role, userAction, roomName, changeMuteS
                         }
                         {
                         (type ==='joinLeave') &&
-                            <SystemMessage text={msg} />
+                            <JoinLeaveMessage text={msg} />
                         }
                     </span>
                 ))
