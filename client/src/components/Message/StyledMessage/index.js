@@ -57,7 +57,11 @@ const useStyles = makeStyles((theme) => ({
         boxShadow: '0 0 0px 1px #a0a0a0b5',
     },
     date: {
-        fontSize: 12
+        fontSize: 12,
+        color: (props) => 
+        props.color
+        ?(props.color === 'default'? theme.palette.textColor.main: props.color)
+        :theme.palette.getContrastText(grey[100]),
     },
     photo: {
         maxWidth: '250px !important',

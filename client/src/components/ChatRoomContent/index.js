@@ -48,7 +48,7 @@ const useStyles = makeStyles((theme) => ({
         display: 'flex',
     },
     actionButton: {
-        color: 'black'
+        color: theme.palette.textColor.main
     }
 }))
 
