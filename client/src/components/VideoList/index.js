@@ -245,13 +245,13 @@ const UserVideo = ({stream, locked, name, controlVideo, muted, total, streamNum,
             let initVolume = null
             if (audioTrack) {
                 audioTrackRef.current = audioTrack
-                if (audioTrack.volume)
+                if (typeof audioTrack.volume === 'number')
                     initVolume = audioTrack.volume
             }
             
             if(stream) {
                 userVideo.current.srcObject = stream;
-                if(initVolume === null || initVolume === undefined) {
+                if(typeof initVolume !== 'number') {
                     initVolume = 50;
                 }
                 changeVolume(initVolume);
