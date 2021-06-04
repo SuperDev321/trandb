@@ -64,16 +64,42 @@ const pokeMessage = (io, socket) => async ({from, to, room}, callback) => {
       return callback(false, 'blocked');
     }
   if(toUser) {
-    io.to(toUser._id.toString()).emit('poke message', {
-      type: 'poke',
-      room,
-      from,
-      to,
-      ip: userIp
-    });
-    callback('success');
+    const socketIds = await io.of('/').in(room).allSockets();
+    const socketIdArr = Array.from(socketIds);
+    if(socketIdArr.length < 2) {
+      callback(false, 'logout');
+      socket.leave(room);
+      return;
+    }
+    let socketToPoke = null;
+    for (let index = 0; index < socketIdArr.length; index++) {
+      const element = socketIdArr[index];
+      let socket = io.sockets.sockets.get(element);
+      if(toUser._id.equals(socket.decoded._id)) {
+        socketToPoke = socket;
+      }
+    }
+    if (socketToPoke) {
+      socketToPoke.emit('poke message', {
+        type: 'poke',
+        room,
+        from,
+        to,
+        ip: userIp
+      }, (res) => {
+        if (res) {
+          console.log('poke success')
+          return callback('success')
+        } else {
+          console.log('poke fail')
+          return callback('muted')
+        }
+      });
+    } else {
+      return callback('Can not find user')
+    }
   } else {
-    callback('Can not find user')
+    return callback('Can not find user')
   }
 }
 
@@ -105,11 +131,10 @@ const privateMessage = (io, socket) => async ({ roomName, msg, from, to, color, 
       color,
       bold
     });
-
     const toUser = await findUserByName(to);
     if(toUser) {
       let socketIds = await io.of('/').in(roomName).allSockets();
-      socketIdArr = Array.from(socketIds);
+      const socketIdArr = Array.from(socketIds);
       if(socketIdArr.length < 2) {
         callback(false, 'logout');
         socket.leave(roomName);

@@ -136,7 +136,7 @@ const SideBarLeft = ({ roomName, username, mutes, blocks, globalBlocks, changeMu
             if (globalBlockedNames && globalBlockedNames.includes(user.username)) isBlocked = true
             if (!isBlocked && blockedNames && blockedNames.includes(user.username)) isBlocked = true
             if(mutedNames && mutedNames.includes(user.username)) isMuted = true
-            if(!isMuted && mutedIps && mutedIps.includes(user.username)) isMuted = true
+            if(!isMuted && mutedIps && mutedIps.includes(user.ip)) isMuted = true
             if (user.username === username && cameraState) {
                 isBroadcasting = cameraState
                 isViewer = true

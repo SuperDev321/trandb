@@ -47,21 +47,15 @@ class RoomObject  {
             mutes = [];
         }
         this.mutes = mutes;
-        // if(Array.isArray(blocks)) {
-        //     mutes = [...mutes, ...blocks];
-        //     this.users = this.users.map((user) => {
-        //         if(blocks.includes(user.username)) {
-        //             user.blocked = true;
-        //         } else {
-        //             user.blocked = false;
-        //         }
-        //         return user;
-        //     })
-        // }
-        // mutes = [...mutes, ...blocks];
-        // let muteSet = new Set(mutes);
-        // this.mutes = Array.from(muteSet);
-        
+    }
+
+    checkMuteByName (name) {
+        const muteItem = this.mutes?.find((item) => (item.username === name))
+        if (muteItem) {
+            return true
+        } else {
+            return false
+        }
     }
 
     updateBlocks(blocks) {
