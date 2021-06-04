@@ -251,13 +251,10 @@ const UserVideo = ({stream, locked, name, controlVideo, muted, total, streamNum,
             
             if(stream) {
                 userVideo.current.srcObject = stream;
-                if(!initVolume) {
+                if(initVolume === null || initVolume === undefined) {
                     initVolume = 50;
                 }
                 changeVolume(initVolume);
-                
-                // userVideo.current.load();
-                // userVideo.current.play();
             }
             userVideo.current.onerror = () => {
             }
