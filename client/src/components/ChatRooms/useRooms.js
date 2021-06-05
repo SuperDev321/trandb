@@ -481,7 +481,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
         }
     }, []);
 
-    const receivePoke = useCallback((pokeMessage) => {
+    const receivePoke = useCallback((pokeMessage, callback) => {
         let {room} = pokeMessage;
         if(roomsRef.current && room) {
             let sameRoom = roomsRef.current.find((item) => (item.name === room));
@@ -494,9 +494,14 @@ const useRooms = ({initRoomName, ...initalState}) => {
                     }
                     sameRoom.addMessages([message]);
                     let userToReceive = sameRoom.users.find((item) => (item.username === pokeMessage.from));
-                    if(userToReceive && !userToReceive.muted) {
+                    if(userToReceive && !sameRoom.checkMuteByName(pokeMessage.from)) {
+                        console.log('poke success')
                         pokeAudioControls.seek(0);
-                        pokeAudioControls.play()
+                        pokeAudioControls.play();
+                        callback(true)
+                    } else {
+                        console.log('poke fail')
+                        callback(false)
                     }
                     dispatch({
                         type: 'update',
@@ -554,8 +559,8 @@ const useRooms = ({initRoomName, ...initalState}) => {
             });
             socket.on('private message', (message, callback) => {
             })
-            socket.on('poke message', payload => {
-                receivePoke(payload)
+            socket.on('poke message', (payload, callback) => {
+                receivePoke(payload, callback)
             })
 
             // socket.on('join error', payload => {

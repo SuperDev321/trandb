@@ -214,7 +214,8 @@
   },
   "PokeMessage": {
     "you_have_poked": "You have poked {{username}}",
-    "have_poked_you": "{{username}} has poked you"
+    "have_poked_you": "{{username}} has poked you",
+    "error_muted": "You are muted by user"
   },
   "BroadcastSettingModal" : {
     "broadcast_setting": "Broadcast Settings"

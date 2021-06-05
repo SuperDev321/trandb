@@ -193,7 +193,8 @@
     "default": "default",
     "forbidden": "×”×”×•×“×¢×” ×©×œ×š × ×—×¡×ž×” ×¢×œ ×™×“×™ ×ž× ×”×œ ×”×ž×¢×¨×›×ª ×©×œ×š",
     "timeError": "מרווח הזמן בין הודעות קצר מדי.",
-    "error_long_message": "הודעה ארוכה מדי"  },
+    "error_long_message": "הודעה ארוכה מדי"
+  },
   "PasswordModal": {
     "default": "default",
     "title": "×”×–×Ÿ ××ª ×”×¡×™×¡×ž×”",
@@ -213,7 +214,8 @@
   },
   "PokeMessage": {
     "you_have_poked": "×©×œ×—×ª ×¦×œ×¦×•×œ ×œ {{username}}",
-    "have_poked_you": "{{username}} ×©×œ×— ×œ×š ×¦×™×œ×¦×•×œ"
+    "have_poked_you": "{{username}} ×©×œ×— ×œ×š ×¦×™×œ×¦×•×œ",
+    "error_muted": "אתה מושתק על ידי המשתמש"
   },
   "BroadcastSettingModal" : {
     "broadcast_setting": "×”×’×“×¨×•×ª ×ž×¦×œ×ž×”"

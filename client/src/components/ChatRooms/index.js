@@ -255,9 +255,9 @@ const ChatRooms = ({room}, ref) => {
     const sendPokeMessage = (roomName, userToSend) => {
         socket.emit('poke message', {from: username, to: userToSend, room: roomName}, (response) => {
             // this is callback function that can excute on server side
-            if(response !== 'success') {
-                enqueueSnackbar('Error', {variant: 'error'});
-            } else {
+            if(response === 'muted') {
+                enqueueSnackbar(t('PokeMessage.error_muted'), {variant: 'error'});
+            } else if (response === 'success'){
                 addMessage({
                     room: roomName,
                     message: {
