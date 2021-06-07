@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import config from '../config';
 import { useTranslation } from 'react-i18next';
+import useLocalStorage from './useLocalStorage'
 const useSetting = () => {
 
   const currentMessageSize = parseInt(window.localStorage.getItem('messageSize'), 10) || 16;
@@ -19,6 +20,7 @@ const useSetting = () => {
   const [language, _setLanguage] = useState(null);
   const [messageNum, setMessageNum] = useState(30);
   const [enableSysMessage, _setEnableSysMessage] = useState(true);
+  const [privateMutes, setPrivateMutes] = useLocalStorage('private-mutes', [])
   const { t, i18n } = useTranslation();
   const setMessageSize = (messageSize) => {
     localStorage.setItem('messageSize', messageSize);
@@ -58,6 +60,23 @@ const useSetting = () => {
       _setEnableSysMessage(false);
     }
   }
+
+  const addPrivateMute = (mute) => {
+    if (mute && mute.username && mute.ip) {
+      let oldOne = privateMutes?.find((item) => (item.username===mute.username && item.ip === mute.ip))
+      if (!oldOne) {
+        setPrivateMutes([...privateMutes, mute])
+      }
+    }
+  }
+
+  const removePrivateMute = (mute) => {
+    if (mute && mute.username && mute.ip) {
+      let newMutes = privateMutes?.filter((item) => (item.username !== mute.username && item.ip !== mute.ip))
+      setPrivateMutes(newMutes)
+    }
+  }
+
   useEffect(() => {
     const currentPokeSound = localStorage.getItem('poke-sound');
     const currentLanguage = localStorage.getItem('language');
@@ -146,7 +165,7 @@ const useSetting = () => {
   return { defaultTheme, messageSize, enablePokeSound, enablePrivateSound, enablePublicSound,
     setDefaultTheme, setMessageSize, setEnablePokeSound, setEnablePrivateSound, setEnablePublicSound,
     language, setLanguage, messageNum, enableSysMessage, setEnableSysMessage, enableGuestPrivate,
-    messageTimeInterval, maxUsernameLength, maxMessageLength};
+    messageTimeInterval, maxUsernameLength, maxMessageLength, privateMutes, addPrivateMute, removePrivateMute};
 };
 
 export default useSetting;

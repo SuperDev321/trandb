@@ -6,6 +6,7 @@ import {
     CardMedia,
     Button,
     Divider,
+    Fade
 } from '@material-ui/core';
 import {
     QuestionAnswer,
@@ -18,6 +19,7 @@ import {useTranslation} from 'react-i18next';
 import { makeStyles } from '@material-ui/core/styles';
 import { pink } from '@material-ui/core/colors';
 import BanModal from '../Modals/BanModal';
+import CustomTooltip from '../CustomTooltip'
 import {socket} from '../../utils'
 import config from '../../config';
 const useStyles = makeStyles((theme) => ({
@@ -231,9 +233,16 @@ const RoomUserName = ({user, role, roomName,
 
     return (
         <>
-        <span ref={refCallback} className={classes.username}>
-            {user.username+((isMine && displayYou) ? ' (you)' : '')}
-        </span>
+        <CustomTooltip
+            disabled={(role && user && user.ip)? (role !== 'admin' && role !== 'super_admin'): true}
+            TransitionComponent={Fade}
+            TransitionProps={{ timeout: 600 }}
+            title={user.ip}
+        >
+            <span ref={refCallback} className={classes.username}>
+                {user.username+((isMine && displayYou) ? ' (you)' : '')}
+            </span>
+        </CustomTooltip>
         <Popover
             anchorOrigin={{
                 vertical: 'bottom',

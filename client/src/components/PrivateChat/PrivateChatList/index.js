@@ -1,16 +1,17 @@
-import React, { useState, useCallback, useImperativeHandle, forwardRef, useRef, createRef } from 'react';
+import React, { useState, useCallback, useImperativeHandle, forwardRef, useRef, createRef, useContext } from 'react';
 import PrivateChatContent from '../PrivateChatContent';
-
+import { SettingContext } from '../../../context';
 const PrivateChatList = ({sendMessage, readMsg ,me, globalBlocks}, ref) => {
     const [chatList, setChatList] = useState([]);
     const [activeChat, setActiveChat] = useState(null);
+    const {privateMutes} = useContext(SettingContext);
     const elRefs = useRef([]);
     const setActive = (roomName) => {
         setActiveChat(roomName);
     }
-    const addNewChat = useCallback((to, unReadMsg, roomName) => {
+    const addNewChat = useCallback((to, unReadMsg, roomName, willShow = true) => {
         let privateChat = chatList.find((item) => (item.roomName === roomName));
-        if(!privateChat) {
+        if(!privateChat && willShow) {
             let ref = createRef();
             elRefs.current.push({key: roomName, ref});
             let chatInfo = {to: to.username, ip: to.ip, roomName, initVal: {messages: unReadMsg, roomName}, avatar: to.avatar};
@@ -19,7 +20,7 @@ const PrivateChatList = ({sendMessage, readMsg ,me, globalBlocks}, ref) => {
         }
         else {
             let ref = elRefs.current.find((item) => (item.key === roomName));
-            if(ref) {
+            if(ref && willShow) {
                 ref.ref.current.show();
                 setActiveChat(roomName);
             }
@@ -58,18 +59,22 @@ const PrivateChatList = ({sendMessage, readMsg ,me, globalBlocks}, ref) => {
         },
         addMessage: (message, roomName) => {
             let ref = elRefs.current.find((item) => (item.key === roomName));
+            let result = false
             if(ref && ref.ref.current) {
-                ref.ref.current.addMessage(message);
-                if(ref.ref.current.isShow()) {
-                    return true;
-                } else {
+                result = ref.ref.current.addMessage(message);
+                if(result && !ref.ref.current.isShow()) {
                     ref.ref.current.show();
-                    return false;
                 }
             } else {
-                addNewChat({username: message.from, ip: message.ip}, [message], roomName);
+                let muted = privateMutes.find(({username, ip}) => (username === message.from || ip === message.ip))
+                if (muted) {
+                    result = false
+                } else {
+                    result = true
+                }
+                addNewChat({username: message.from, ip: message.ip}, [message], roomName, result);
             }
-            return false;
+            return result;
         },
         addErrorMessage: (roomName) => {
             let ref = elRefs.current.find((item) => (item.key === roomName));
