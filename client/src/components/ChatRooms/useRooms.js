@@ -404,8 +404,8 @@ const useRooms = ({initRoomName, ...initalState}) => {
             if(isMuted) {
                 let newMutes = mutes.filter((item) => (
                     item.room !== roomName ||
-                    item.username !== userToMute.username ||
-                    (item.ip && userToMute.ip && (item.ip !== userToMute.ip))
+                    (item.username !== userToMute.username &&
+                    (!item.ip || !userToMute.ip || (item.ip !== userToMute.ip)))
                 ));
                 setMutes(newMutes);
                 if(!room.deleteMute(userToMute)) {
@@ -444,7 +444,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 if(room && message.msg) {
                     if(message.msg) {
                         let userToReceive = room.users.find((item) => (item.username === message.from));
-                        if(userToReceive && !userToReceive.muted) {
+                        if(userToReceive && !room.checkMuteByName(message.from)) {
                             publicAudioControls.seek(0);
                             publicAudioControls.play();
                         }
@@ -467,7 +467,6 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 } 
                 
             } else if(message.type==='private' && privateListRef.current && message.msg && message.to) {
-                console.log(message)
                 if(privateListRef.current.addMessage(message, message.roomName)) {
                     privateAudioControls.seek(0);
                     privateAudioControls.play();
