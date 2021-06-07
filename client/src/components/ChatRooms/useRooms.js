@@ -437,7 +437,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
         }
     }, [data, mutes])
 
-    const receiveMessage = useCallback(({message}) => {
+    const receiveMessage = useCallback(({message}, callback) => {
         if(message) {
             if(message.type === 'public') {
                 let room = roomsRef.current.find((item) => (item.name === message.room))
@@ -470,6 +470,13 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 if(privateListRef.current.addMessage(message, message.roomName)) {
                     privateAudioControls.seek(0);
                     privateAudioControls.play();
+                    if (callback) {
+                        callback('success')
+                    }
+                } else {
+                    if (callback) {
+                        callback('muted')
+                    }
                 }
             }
             let infos = roomsRef.current.map(({name, unReadMessages}) => ({name, unReadMessages}));
@@ -546,10 +553,8 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 setGlobalBlocks(blocks);
             })
             socket.on('room message', (message, callback) => {
-                if(callback) {
-                    callback(true);
-                }
-                receiveMessage({message});
+                
+                receiveMessage({message}, callback);
             });
             socket.on('private message', (message, callback) => {
             })
