@@ -24,7 +24,7 @@ const App = () => {
     const { defaultTheme, messageSize, enablePokeSound, enablePrivateSound, enablePublicSound,
         setDefaultTheme, setMessageSize, setEnablePokeSound, setEnablePrivateSound, setEnablePublicSound,
         language, setLanguage, messageNum, enableSysMessage, setEnableSysMessage,
-        messageTimeInterval, maxUsernameLength, maxMessageLength
+        messageTimeInterval, maxUsernameLength, maxMessageLength, privateMutes, addPrivateMute, removePrivateMute
     } = useSetting();
     if (loading) {
         return <Loading />;
@@ -52,7 +52,7 @@ const App = () => {
                             setDefaultTheme,setMessageSize, setEnablePokeSound,
                             setEnablePrivateSound, setEnablePublicSound,
                             language, setLanguage, messageNum, enableSysMessage, setEnableSysMessage,
-                            messageTimeInterval, maxUsernameLength, maxMessageLength
+                            messageTimeInterval, maxUsernameLength, maxMessageLength, privateMutes, addPrivateMute, removePrivateMute
                         }}>
         <CustomThemeProvider defaultTheme={defaultTheme}>
             <UserContext.Provider

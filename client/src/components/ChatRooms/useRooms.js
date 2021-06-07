@@ -467,14 +467,11 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 } 
                 
             } else if(message.type==='private' && privateListRef.current && message.msg && message.to) {
-                if(!privateListRef.current.addMessage(message, message.roomName)) {
-                    // addUnReadMsg(newMessage.message);
+                console.log(message)
+                if(privateListRef.current.addMessage(message, message.roomName)) {
+                    privateAudioControls.seek(0);
+                    privateAudioControls.play();
                 }
-                // if(newMessage.callback) {
-                //     newMessage.callback(true);
-                // }
-                privateAudioControls.seek(0);
-                privateAudioControls.play();
             }
             let infos = roomsRef.current.map(({name, unReadMessages}) => ({name, unReadMessages}));
             roomsDispatch({type: 'set', data: infos});
@@ -495,12 +492,10 @@ const useRooms = ({initRoomName, ...initalState}) => {
                     sameRoom.addMessages([message]);
                     let userToReceive = sameRoom.users.find((item) => (item.username === pokeMessage.from));
                     if(userToReceive && !sameRoom.checkMuteByName(pokeMessage.from)) {
-                        console.log('poke success')
                         pokeAudioControls.seek(0);
                         pokeAudioControls.play();
                         callback(true)
                     } else {
-                        console.log('poke fail')
                         callback(false)
                     }
                     dispatch({
