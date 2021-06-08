@@ -195,7 +195,9 @@
     "default": "default",
     "forbidden": "Your message has been blocked by admin",
     "timeError": "Too short time interval between messages!",
-    "error_long_message": "Too long message"
+    "error_long_message": "Too long message",
+    "private_muted": "This user ignored you on private chat. Your message may have been ignored.",
+    "private_blocked": "You are blocked on private chat."
   },
   "PasswordModal": {
     "title": "Enter the Password",

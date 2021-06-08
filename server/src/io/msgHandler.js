@@ -168,8 +168,12 @@ const privateMessage = (io, socket) => async ({ roomName, msg, from, to, color, 
             roomName,
             ip: newChat.ip
           }, (res) => {
-            if(res)
-              callback(newChat);
+            if(res === 'success') {
+              callback(newChat)
+            } else if(res === 'muted') {
+              callback(false, 'muted')
+            }
+              
         });
       } else {
         callback(false, 'logout');

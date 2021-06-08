@@ -155,8 +155,12 @@ const ChatRooms = ({room}, ref) => {
                         } else {
                             if(err === 'logout') {
                                 privateListRef.current.addErrorMessage(roomName);
-                            } else if(err === 'forbidden') {
+                            } else if (err === 'forbidden') {
                                 enqueueSnackbar(t('Message.forbidden'), {variant: 'error'});
+                            } else if (err === 'muted') {
+                                enqueueSnackbar(t('Message.private_muted'), {variant: 'error'});
+                            } else if (err === 'blocked') {
+                                enqueueSnackbar(t('Message.private_blocked'), {variant: 'error'});
                             }
                             // enqueueSnackbar(to + ' was out of chat. Please close the private chat with '+ to +'.', {variant: 'error'});
                             
