@@ -148,6 +148,8 @@
     "unblock_this_person": "Unblock this person",
     "mute_this_person": "Mute this person",
     "unmute_this_person": "Unmute this person",
+    "mute_private": "Mute private",
+    "unmute_private": "Unmute private",
     "default": "default"
   },
   "SettingModal": {

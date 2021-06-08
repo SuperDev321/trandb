@@ -123,10 +123,10 @@ const StyledBadge = withStyles((theme) => ({
     />
 ))
 
-const OnlineUser = ({roomName, username, user, role, isMuted, isBlocked, isBroadcasting, isViewer,
+const OnlineUser = ({roomName, username, user, role, isMuted, isPrivateMuted, isBlocked, isBroadcasting, isViewer,
         changeMuteState, sendPokeMessage, kickUser, banUser, viewBroadcast, stopBroadcastTo,
         // , setOpenPrivate, setPrivateTo
-        addOrOpenPrivate,
+        addOrOpenPrivate, changePrivateMute
     }) => {
     const classes = useStyles({role: user.role});
     const [anchorEl, setAnchorEl] = React.useState(null);
@@ -216,8 +216,10 @@ const OnlineUser = ({roomName, username, user, role, isMuted, isBlocked, isBroad
                         open={open}
                         handleClose={handleClose}
                         isMuted={isMuted}
+                        isPrivateMuted={isPrivateMuted}
                         isBlocked={isBlocked}
                         stopBroadcastTo={stopBroadcastTo}
+                        changePrivateMute={changePrivateMute}
                     />
                 {( user.role === 'admin' || user.role === 'super_admin') &&
                     <StarRounded className={classes.adminStar} />

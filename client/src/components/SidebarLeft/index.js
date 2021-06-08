@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useContext } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import t from 'prop-types'
 import {
@@ -9,6 +9,7 @@ import OnlineUser from '../OnlineUser';
 import BroadcastSetting from '../Broadcast/BroadcastSettingModal';
 import SeparateLine from '../SeparateLine';
 import { useTranslation } from 'react-i18next';
+import { SettingContext } from '../../context';
  
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -114,7 +115,17 @@ const SideBarLeft = ({ roomName, username, mutes, blocks, globalBlocks, changeMu
     const [sideUsers, setSideUsers] = useState([]);
     const [filteredUsers, setFilteredUsers] = useState(null);
     const [role, setRole] = useState(null);
+    const {privateMutes, removePrivateMute, addPrivateMute} = useContext(SettingContext)
     const {t} = useTranslation();
+
+    const changePrivateMute = useCallback((user, isMuted) => {
+        let {username, ip} = user
+        if (isMuted) {
+            removePrivateMute({username, ip})
+        } else {
+            addPrivateMute({username, ip})
+        }
+    }, [privateMutes, removePrivateMute, addPrivateMute])
 
     useEffect(() => {
         let me = users.find((item) => (item.username === username));
@@ -125,6 +136,7 @@ const SideBarLeft = ({ roomName, username, mutes, blocks, globalBlocks, changeMu
         const liveUserNames = broadcastingUsers?.map((user) => (user.name))
         const blockedNames = blocks?.map((item) => (item.username? item.username: null))
         const globalBlockedNames = globalBlocks?.map((item) => (item.username? item.username: null))
+        const globalBlockedIps = globalBlocks?.map((item) => (item.ip? item.ip: null))
         const mutedNames = mutes?.map((item) => ((item&&item.username)? item.username: null))
         const mutedIps = mutes?.map((item) => ((item&&item.ip)? item.ip: null))
         const newUsers = users.map((user) => {
@@ -132,8 +144,10 @@ const SideBarLeft = ({ roomName, username, mutes, blocks, globalBlocks, changeMu
             let isBlocked = false
             let isMuted = false
             let isViewer = false
+            let isPrivateMuted = false
             
             if (globalBlockedNames && globalBlockedNames.includes(user.username)) isBlocked = true
+            if (globalBlockedIps && globalBlockedIps.includes(user.ip)) isBlocked = true
             if (!isBlocked && blockedNames && blockedNames.includes(user.username)) isBlocked = true
             if(mutedNames && mutedNames.includes(user.username)) isMuted = true
             if(!isMuted && mutedIps && mutedIps.includes(user.ip)) isMuted = true
@@ -152,11 +166,16 @@ const SideBarLeft = ({ roomName, username, mutes, blocks, globalBlocks, changeMu
                     isViewer = true
                 }
             }
+            
+            if (privateMutes?.find((item) => (item.username === user.username || item.ip === user.ip))) {
+                isPrivateMuted = true
+            }
             return {
                 isBroadcasting,
                 isBlocked,
                 isMuted,
                 isViewer,
+                isPrivateMuted,
                 ...user
             }
         })
@@ -171,7 +190,7 @@ const SideBarLeft = ({ roomName, username, mutes, blocks, globalBlocks, changeMu
             }
         })
         setSideUsers(newUsers)
-    }, [users, broadcastingUsers, blocks, globalBlocks, mutes, viewers, username, cameraState])
+    }, [users, broadcastingUsers, blocks, globalBlocks, mutes, privateMutes, viewers, username, cameraState])
 
 
     useEffect(() => {
@@ -204,6 +223,7 @@ const SideBarLeft = ({ roomName, username, mutes, blocks, globalBlocks, changeMu
                                 role={role}
                                 user={user} key={user? user._id: index}
                                 isMuted={user.isMuted}
+                                isPrivateMuted={user.isPrivateMuted}
                                 isBlocked = {user.isBlocked}
                                 isBroadcasting={user.isBroadcasting}
                                 isViewer={user.isViewer}
@@ -214,6 +234,7 @@ const SideBarLeft = ({ roomName, username, mutes, blocks, globalBlocks, changeMu
                                 sendPokeMessage={sendPokeMessage}
                                 kickUser={kickUser}
                                 banUser={banUser}
+                                changePrivateMute={changePrivateMute}
                             />
                         ))
                 }
