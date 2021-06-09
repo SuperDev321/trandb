@@ -4,14 +4,13 @@ import {
     Avatar,
     Badge,
 } from '@material-ui/core';
-import { deepOrange, pink, blue, green, grey, yellow } from '@material-ui/core/colors';
+import { deepOrange, pink, blue, green, yellow } from '@material-ui/core/colors';
 import {
     Videocam,
     Block,
     Check,
     StarRounded,
     Visibility,
-    VisibilityOff,
     Lock
 } from '@material-ui/icons';
 import RoomUserName from '../RoomUserName';
@@ -124,10 +123,10 @@ const StyledBadge = withStyles((theme) => ({
     />
 ))
 
-const OnlineUser = ({roomName, username, user, role, isMuted, isBlocked, isBroadcasting, isViewer,
+const OnlineUser = ({roomName, username, user, role, isMuted, isPrivateMuted, isBlocked, isBroadcasting, isViewer,
         changeMuteState, sendPokeMessage, kickUser, banUser, viewBroadcast, stopBroadcastTo,
         // , setOpenPrivate, setPrivateTo
-        addOrOpenPrivate,
+        addOrOpenPrivate, changePrivateMute
     }) => {
     const classes = useStyles({role: user.role});
     const [anchorEl, setAnchorEl] = React.useState(null);
@@ -199,11 +198,7 @@ const OnlineUser = ({roomName, username, user, role, isMuted, isBlocked, isBroad
                     />
                     :null
                 }
-                
-                <div className={classes.username}
-                // onClick={handleClick}
-                >
-                    {/* <span>{user.username+(username===user.username ? ' (you)' : '')}</span> */}
+                <div className={classes.username}>
                     <RoomUserName
                         user={user}
                         roomName={roomName}
@@ -221,119 +216,22 @@ const OnlineUser = ({roomName, username, user, role, isMuted, isBlocked, isBroad
                         open={open}
                         handleClose={handleClose}
                         isMuted={isMuted}
+                        isPrivateMuted={isPrivateMuted}
                         isBlocked={isBlocked}
                         stopBroadcastTo={stopBroadcastTo}
+                        changePrivateMute={changePrivateMute}
                     />
-                    {( user.role === 'admin' || user.role === 'super_admin') &&
-                        <StarRounded className={classes.adminStar} />
-                    }
-                    { user.role === 'owner' &&
-                        <StarRounded className={classes.ownerStar} />
-                    }
-                    { user.role === 'moderator' &&
-                        <StarRounded className={classes.moderatorStar} />
-                    }
+                {( user.role === 'admin' || user.role === 'super_admin') &&
+                    <StarRounded className={classes.adminStar} />
+                }
+                { user.role === 'owner' &&
+                    <StarRounded className={classes.ownerStar} />
+                }
+                { user.role === 'moderator' &&
+                    <StarRounded className={classes.moderatorStar} />
+                }
                 </div>
             </div>
-            {/* <Popover
-                anchorOrigin={{
-                    vertical: 'bottom',
-                    horizontal: 'left',
-                }}
-                transformOrigin={{
-                    vertical: 'top',
-                    horizontal: 'right',
-                }}
-                anchorEl={anchorEl}
-                open={open}
-                onClose={handleClose}
-            >
-                <Card className={classes.cardRoot}>
-                    <CardMedia
-                        className={classes.cardHeader}
-                    >
-                        <Avatar alt="User Avatar" src={
-                            user.avatar
-                            ? user.avatar
-                            :'/img/default_avatar.png'
-                        } />
-                        <span>{user.gender}</span>
-                    </CardMedia>
-                    <Divider />
-                    <Button size="small" color="primary" fullWidth className={classes.cardButton} onClick={handleClickProfile}>
-                        <AccountCircleOutlined />&nbsp;Profile
-                    </Button>
-                    { user.username != username &&
-                        <>
-                            <Divider />
-                            <Button size="small"
-                                color="primary"
-                                fullWidth
-                                className={classes.cardButton}
-                                onClick={ handleClickPrivateChat}
-                            >
-                                <QuestionAnswer />&nbsp;Private Chat
-                            </Button>
-                            <Button size="small" fullWidth
-                                color="primary"
-                                className={classes.cardButton}
-                                onClick={() => {sendPoke()}}
-                            >
-                                <Notifications />&nbsp;Poke Message
-                            </Button>
-                            <Divider />
-                            { (role === 'admin' || role === 'owner' || role === 'moderator')
-                                && (user.role !== 'admin') && (user.role !== 'owner') &&
-                                <>
-                                <Button size="small"
-                                    className={`${classes.cardButton} ${classes.kick}`}
-                                    fullWidth onClick={() => { handleBan(user.username) }}
-                                    name={user.username}
-                                >
-                                    Ban/Block
-                                </Button>
-                                <Button size="small"
-                                        className={`${classes.cardButton} ${classes.kick}`}
-                                        fullWidth onClick={() => { handleKick(user.username) }}
-                                        name={user.username}
-                                    >
-                                        Kick
-                                </Button>
-                                </>
-                            }
-                            <Button size="small"
-                                className={`${classes.cardButton} ${classes.mute}`}
-                                fullWidth onClick={() => { handleMute(user.username) }}
-                                name={user.username}
-                            >
-                            {
-                                user.muted
-                                ? 'Unmute / Ignore'
-                                : 'Silence / Ignorance'
-                            }
-                            </Button>
-                        </>
-                    }
-                </Card>
-            </Popover>
-            <BanModal open={openBan} setOpen={setOpenBan} initVal={{name: user.username, ip: user.ip}} 
-                roomName={roomName}
-            /> */}
-            {/* <RoomUserPopover
-                user={user}
-                roomName={roomName}
-                isMine={username === user.usernmae}
-                changeMuteState={changeMuteState}
-                sendPokeMessage={sendPokeMessage}
-                kickUser={kickUser}
-                banUser={banUser}
-                addOrOpenPrivate={addOrOpenPrivate}
-                role={role}
-                anchorEl={anchorEl}
-                setAnchorEl={setAnchorEl}
-                open={open}
-                handleClose={handleClose}
-            /> */}
         </div>
     );
 }

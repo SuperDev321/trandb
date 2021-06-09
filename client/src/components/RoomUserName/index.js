@@ -6,6 +6,7 @@ import {
     CardMedia,
     Button,
     Divider,
+    Fade
 } from '@material-ui/core';
 import {
     QuestionAnswer,
@@ -18,6 +19,7 @@ import {useTranslation} from 'react-i18next';
 import { makeStyles } from '@material-ui/core/styles';
 import { pink } from '@material-ui/core/colors';
 import BanModal from '../Modals/BanModal';
+import CustomTooltip from '../CustomTooltip'
 import {socket} from '../../utils'
 import config from '../../config';
 const useStyles = makeStyles((theme) => ({
@@ -95,7 +97,6 @@ function useDoubleClick({oneClick, doubleClick}) {
                     countRef.current = 0;
                     if(inputClickCallbackRef.current && elem) {
                         inputClickCallbackRef.current(event);
-                        console.log(event)
                     }
                 }, 200);
                 timerRef.current = timer;
@@ -116,7 +117,7 @@ function useDoubleClick({oneClick, doubleClick}) {
 
 const RoomUserName = ({user, role, roomName,
     changeMuteState, sendPokeMessage, kickUser, banUser,addOrOpenPrivate, viewBroadcast, stopBroadcastTo,
-    isMine, displayYou, isMuted, isBlocked
+    isMine, displayYou, isMuted, isBlocked, isPrivateMuted, changePrivateMute
     // open,
     // anchorEl,
     // setAnchorEl,
@@ -151,6 +152,12 @@ const RoomUserName = ({user, role, roomName,
         setAnchorEl(null);
         setTimeout(() => {
             changeMuteState(roomName, user, isMuted);
+        }, 0)
+    }
+    const handleMutePrivate = () => {
+        setAnchorEl(null);
+        setTimeout(() => {
+            changePrivateMute(user, isPrivateMuted)
         }, 0)
     }
     //block a user
@@ -231,9 +238,16 @@ const RoomUserName = ({user, role, roomName,
 
     return (
         <>
-        <span ref={refCallback} className={classes.username}>
-            {user.username+((isMine && displayYou) ? ' (you)' : '')}
-        </span>
+        <CustomTooltip
+            disabled={(role && user && user.ip)? (role !== 'admin' && role !== 'super_admin'): true}
+            TransitionComponent={Fade}
+            TransitionProps={{ timeout: 600 }}
+            title={user.ip}
+        >
+            <span ref={refCallback} className={classes.username}>
+                {user.username+((isMine && displayYou) ? ' (you)' : '')}
+            </span>
+        </CustomTooltip>
         <Popover
             anchorOrigin={{
                 vertical: 'bottom',
@@ -302,21 +316,18 @@ const RoomUserName = ({user, role, roomName,
                             <Button size="small"
                                 className={`${classes.cardButton} ${classes.kick}`}
                                 fullWidth onClick={() => { handleBan() }}
-                                name={user.username}
                             >
                                 {t('UserActionArea.ban_from_room')}
                             </Button>
                             <Button size="small"
                                     className={`${classes.cardButton} ${classes.kick}`}
                                     fullWidth onClick={() => { handleKick() }}
-                                    name={user.username}
                                 >
                                     {t('UserActionArea.kick_from_room')}
                             </Button>
                             <Button size="small"
                                 className={`${classes.cardButton} ${classes.mute}`}
                                 fullWidth onClick={handleBlock}
-                                name={user.username}
                             >
                             {
                                 isBlocked
@@ -326,18 +337,28 @@ const RoomUserName = ({user, role, roomName,
                             </Button>
                             </>
                         :
-                            (
+                            <>
                             <Button size="small"
                                 className={`${classes.cardButton} ${classes.mute}`}
                                 fullWidth onClick={() => { handleMute() }}
-                                name={user.username}
                             >
                             {
                                 isMuted
                                 ? t('UserActionArea.unmute_this_person')
                                 : t('UserActionArea.mute_this_person')
                             }
-                            </Button>)
+                            </Button>
+                            <Button size="small"
+                                className={`${classes.cardButton} ${classes.mute}`}
+                                fullWidth onClick={() => { handleMutePrivate() }}
+                            >
+                            {
+                                isPrivateMuted
+                                ? t('UserActionArea.unmute_private')
+                                : t('UserActionArea.mute_private')
+                            }
+                            </Button>
+                            </>
                         }
                     </>
                 }

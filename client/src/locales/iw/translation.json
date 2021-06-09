@@ -125,7 +125,7 @@
     "confirm_error": "×ž×©×ª×ž×© ×–×” ×—×¡×•× ×‘×©×¨×ª",
     "username_error": "×ž×©×ª×ž×© ×–×” ××™× ×• ×‘×©×¨×ª",
     "password_error": "×¡×™×¡×ž× ×œ× × ×›×•× ×”",
-    "error_long_username": "שם ארוך מדי",
+    "error_long_username": "?? ???? ???",
     "unknown_error": "×”×›× ×™×¡×” × ×›×©×œ×”, ×× × × ×¡×” ×©×•×‘ ×ž××•×—×¨ ×™×•×ª×¨"
   },
   "UserActionArea": {
@@ -149,6 +149,8 @@
     "unblock_this_person": "×‘×˜×œ ×—×¡×™×ž×” ×©×œ ××“× ×–×”",
     "mute_this_person": "×”×©×ª×§×”/×”×ª×¢×œ×ž×•×ª",
     "unmute_this_person": "×‘×™×˜×•×œ  ×”×©×ª×§×”/×”×ª×¢×œ×ž×•×ª",
+    "mute_private": "Mute private",
+    "unmute_private": "Unmute private",
     "default": "default"
   },
   "SettingModal": {
@@ -192,8 +194,8 @@
   "Message": {
     "default": "default",
     "forbidden": "×”×”×•×“×¢×” ×©×œ×š × ×—×¡×ž×” ×¢×œ ×™×“×™ ×ž× ×”×œ ×”×ž×¢×¨×›×ª ×©×œ×š",
-    "timeError": "מרווח הזמן בין הודעות קצר מדי.",
-    "error_long_message": "הודעה ארוכה מדי"
+    "timeError": "????? ???? ??? ?????? ??? ???.",
+    "error_long_message": "????? ????? ???"
   },
   "PasswordModal": {
     "default": "default",
@@ -214,8 +216,7 @@
   },
   "PokeMessage": {
     "you_have_poked": "×©×œ×—×ª ×¦×œ×¦×•×œ ×œ {{username}}",
-    "have_poked_you": "{{username}} ×©×œ×— ×œ×š ×¦×™×œ×¦×•×œ",
-    "error_muted": "אתה מושתק על ידי המשתמש"
+    "have_poked_you": "{{username}} ×©×œ×— ×œ×š ×¦×™×œ×¦×•×œ"
   },
   "BroadcastSettingModal" : {
     "broadcast_setting": "×”×’×“×¨×•×ª ×ž×¦×œ×ž×”"

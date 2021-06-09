@@ -1,16 +1,20 @@
 import React, { memo, useState, useRef, useEffect, useImperativeHandle, forwardRef, useContext } from 'react';
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles, withStyles } from '@material-ui/core/styles';
 import {
     Avatar,
     Paper,
     SvgIcon,
-    Badge
+    Badge,
+    IconButton,
+    Menu,
+    MenuItem
 } from '@material-ui/core';
 import {
     Close,
-    Minimize
+    Minimize,
+    Block
 } from '@material-ui/icons';
-import {red} from '@material-ui/core/colors'
+import {red, pink} from '@material-ui/core/colors'
 import { useTranslation } from 'react-i18next';
 import ChatForm from '../../ChatForm';
 import { Rnd } from "react-rnd";
@@ -18,7 +22,7 @@ import PrivateMessageList from '../../PrivateMessageList';
 import {ReactComponent as Maximium} from './square.svg'
 import {ReactComponent as Restore} from './restore.svg';
 import config from '../../../config';
-import getUser from '../../../utils/getUser';
+import SettingsIcon from '@material-ui/icons/Settings';
 import { SettingContext } from '../../../context';
 
 const defaultHeight = 250;
@@ -71,6 +75,15 @@ const useStyles = makeStyles((theme) => ({
         width: theme.spacing(3),
         height: theme.spacing(3),
         marginLeft: 10,
+    },
+    avatarBadge: {
+        '& .MuiBadge-badge': {
+            width: theme.spacing(3),
+            height: theme.spacing(3), 
+        },
+        '& .MuiSvgIcon-root': {
+            fontSize: '2rem'
+        }
     },
     main: {
         flexGrow: 1,
@@ -135,6 +148,24 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
+const StyledBadge = withStyles((theme) => ({
+    root: {
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: theme.spacing(0.5),
+    },
+    badge: {
+        padding: 0,
+        color: pink[500],
+        transform: 'none'
+    }
+}))((props) => (
+    <Badge
+        {...props}
+    />
+))
+
 const PrivateChat = ({ me, to, ip, avatar, sendMessage, active, setActive, initMessages, deleteChat, roomName, globalBlocks }, ref) => {
     const rndRef = useRef(null);
     const winRef = useRef(null);
@@ -148,9 +179,27 @@ const PrivateChat = ({ me, to, ip, avatar, sendMessage, active, setActive, initM
     const [blocked, setBlocked] = useState(false);
     const [withBlocked, setWithBlocked] = useState(false);
     const classes = useStyles({max});
-    const {messageNum} = useContext(SettingContext);
+    const {messageNum, addPrivateMute, removePrivateMute, privateMutes} = useContext(SettingContext);
     const { t } = useTranslation();
+    const [settingAnchorEl, setSettingAnchorEl] = React.useState(null);
+    const [muted, setMuted] = useState(false)
 
+    const handleClickSetting = (event) => {
+        setSettingAnchorEl(event.currentTarget);
+    };
+  
+    const handleCloseSetting = () => {
+        setSettingAnchorEl(null);
+    };
+
+    const handleIgnore = () => {
+        if (muted) {
+            removePrivateMute({username: to, ip})
+        } else {
+            addPrivateMute({username: to, ip})
+        }
+        setSettingAnchorEl(null);
+    }
 
     const handleMinimize = () => {
         let top = winRef.current.getBoundingClientRect().top;
@@ -196,6 +245,9 @@ const PrivateChat = ({ me, to, ip, avatar, sendMessage, active, setActive, initM
         show: () => {
             setHide(false);
         },
+        hide: () => {
+            setHide(true)
+        },
         isShow: () => {
             return !hide;
         },
@@ -207,6 +259,11 @@ const PrivateChat = ({ me, to, ip, avatar, sendMessage, active, setActive, initM
             setMessages(newMessages);
             if (message.from !== me.username && !isFocus) {
                 setUnRead(unRead+1);
+            }
+            if (muted) {
+                return false
+            } else {
+                return true
             }
         },
         addErrorMessage: () => {
@@ -235,6 +292,12 @@ const PrivateChat = ({ me, to, ip, avatar, sendMessage, active, setActive, initM
         }
         setMessages(initMessages)
     }, [initMessages])
+
+    useEffect(() => {
+        let muted = privateMutes?.find((item) => (item.username === to || item.ip === ip))
+        if (muted) setMuted (true)
+        else setMuted(false)
+    }, [privateMutes, to, ip])
 
     return (
         <Rnd
@@ -271,17 +334,51 @@ const PrivateChat = ({ me, to, ip, avatar, sendMessage, active, setActive, initM
                 onMouseDown={() => {setActive(roomName)}}
             >
                 <div className={classes.header} >
-                    <Badge badgeContent={unRead> 9? '9+': unRead} color="secondary"
-                        anchorOrigin={{
-                            vertical: 'top',
-                            horizontal: 'left',
-                        }}
-                        className={classes.badge}
+                { muted ? <StyledBadge
+                        className={classes.avatarBadge}
+                        badgeContent={<Block  />}
+                        className={classes.avatarBadge}
                     >
                         <Avatar className={classes.smallAvatar}
                             src={avatar? config.main_site_url+avatar: '/img/default_avatar.png'}
                         />
+                    </StyledBadge>
+                    :
+                    <Badge
+                        className={classes.badge}
+                        badgeContent={unRead> 9? '9+': unRead}
+                        color="secondary"
+                        anchorOrigin={{
+                            vertical: 'top',
+                            horizontal: 'left',
+                        }}
+                    >
+                    <Avatar className={classes.smallAvatar}
+                            src={avatar? config.main_site_url+avatar: '/img/default_avatar.png'}
+                        />
                     </Badge>
+                }
+                    <IconButton aria-controls="simple-menu" aria-haspopup="true" onClick={handleClickSetting} size="small" style={{color: 'white'}}>
+                        <SettingsIcon fontSize="inherit" />
+                    </IconButton>
+                    <Menu
+                        id="setting-menu"
+                        anchorEl={settingAnchorEl}
+                        keepMounted
+                        open={Boolean(settingAnchorEl)}
+                        onClose={handleCloseSetting}
+                        getContentAnchorEl={null}
+                        anchorOrigin={{
+                        vertical: 'bottom',
+                        horizontal: 'center',
+                        }}
+                        transformOrigin={{
+                        vertical: 'top',
+                        horizontal: 'center',
+                        }}
+                    >
+                        <MenuItem onClick={handleIgnore}>{muted? 'UnMute' : 'Mute'}</MenuItem>
+                    </Menu>
                     <div id="private-header" className={`private-header ${classes.headerContent}`} >{to}</div>
                     <div className={classes.icon}
                         onClick={handleMinimize}
@@ -309,7 +406,7 @@ const PrivateChat = ({ me, to, ip, avatar, sendMessage, active, setActive, initM
                 </div>
                 <div className={classes.main}>
                     <div className={classes.content}>
-                        <PrivateMessageList messages={messages} withBlocked={withBlocked} blocked={blocked} me={me}/>
+                        <PrivateMessageList messages={messages} withBlocked={withBlocked || muted} blocked={blocked} me={me}/>
                         { error &&
                             <div className={classes.errorContent}>{t('ChatApp.private_logout_error')}</div>
                         }

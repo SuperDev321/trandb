@@ -404,8 +404,8 @@ const useRooms = ({initRoomName, ...initalState}) => {
             if(isMuted) {
                 let newMutes = mutes.filter((item) => (
                     item.room !== roomName ||
-                    item.username !== userToMute.username ||
-                    (item.ip && userToMute.ip && (item.ip !== userToMute.ip))
+                    (item.username !== userToMute.username &&
+                    (!item.ip || !userToMute.ip || (item.ip !== userToMute.ip)))
                 ));
                 setMutes(newMutes);
                 if(!room.deleteMute(userToMute)) {
@@ -437,14 +437,14 @@ const useRooms = ({initRoomName, ...initalState}) => {
         }
     }, [data, mutes])
 
-    const receiveMessage = useCallback(({message}) => {
+    const receiveMessage = useCallback(({message}, callback) => {
         if(message) {
             if(message.type === 'public') {
                 let room = roomsRef.current.find((item) => (item.name === message.room))
                 if(room && message.msg) {
                     if(message.msg) {
                         let userToReceive = room.users.find((item) => (item.username === message.from));
-                        if(userToReceive && !userToReceive.muted) {
+                        if(userToReceive && !room.checkMuteByName(message.from)) {
                             publicAudioControls.seek(0);
                             publicAudioControls.play();
                         }
@@ -467,14 +467,17 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 } 
                 
             } else if(message.type==='private' && privateListRef.current && message.msg && message.to) {
-                if(!privateListRef.current.addMessage(message, message.roomName)) {
-                    // addUnReadMsg(newMessage.message);
+                if(privateListRef.current.addMessage(message, message.roomName)) {
+                    privateAudioControls.seek(0);
+                    privateAudioControls.play();
+                    if (callback) {
+                        callback('success')
+                    }
+                } else {
+                    if (callback) {
+                        callback('muted')
+                    }
                 }
-                // if(newMessage.callback) {
-                //     newMessage.callback(true);
-                // }
-                privateAudioControls.seek(0);
-                privateAudioControls.play();
             }
             let infos = roomsRef.current.map(({name, unReadMessages}) => ({name, unReadMessages}));
             roomsDispatch({type: 'set', data: infos});
@@ -495,12 +498,10 @@ const useRooms = ({initRoomName, ...initalState}) => {
                     sameRoom.addMessages([message]);
                     let userToReceive = sameRoom.users.find((item) => (item.username === pokeMessage.from));
                     if(userToReceive && !sameRoom.checkMuteByName(pokeMessage.from)) {
-                        console.log('poke success')
                         pokeAudioControls.seek(0);
                         pokeAudioControls.play();
                         callback(true)
                     } else {
-                        console.log('poke fail')
                         callback(false)
                     }
                     dispatch({
@@ -552,10 +553,8 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 setGlobalBlocks(blocks);
             })
             socket.on('room message', (message, callback) => {
-                if(callback) {
-                    callback(true);
-                }
-                receiveMessage({message});
+                
+                receiveMessage({message}, callback);
             });
             socket.on('private message', (message, callback) => {
             })
