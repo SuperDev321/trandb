@@ -60,9 +60,6 @@ const ioHandler = (io) => async (socket) => {
     socket.on('unblock user', unBlockUser(io, socket));
     // video events
     // socket.on('joinMedia', joinMedia(io, socket));
-    socket.on('createMediaRoom', () => {
-      console.log('create media room event')
-    });
     // socket.on('getProducers', getProducers(io, socket));
     // socket.on('getRouterRtpCapabilities', getRouterRtpCapabilities(io, socket));
     // socket.on('createWebRtcTransport', createWebRtcTransport(io, socket));
