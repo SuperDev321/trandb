@@ -12,8 +12,8 @@ const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const dbConnection = require('./database/dbConnection');
 const router = require('./router');
-// const { RateLimiterMemory } = require('rate-limiter-flexible');
 const {ioHandler, adminIoHandler} = require('./io');
+const bootManager = require('./constructors/bootManager');
 const { verifyToken, findUserById, createAdminUser, initSetting } = require('./utils');
 const cors = require('cors');
 const options = {
@@ -23,17 +23,22 @@ const options = {
 
 const app = express();
 const server = https.createServer(options, app);
-const io = socketIO(server);
+const io = socketIO(server, {
+    pingInterval: 60000,
+    pingTimeout: 60000,
+    upgradeTimeout: 30000,
+    agent: false,
+    reconnectionDelay: 1000,
+    reconnectDelayMax: 5000,
+});
 const initRooms = require('./utils/room/initRooms')
+const {initMediasoup} = require('./media');
 const fileUpload = require('express-fileupload');
 const cookie = require('cookie');
 initRooms();
-// app.disabled('x-powered-by');
-// app.enable('trust proxy');   
+bootManager.init(io);
 app.use(cookieParser());
 app.use(compression());
-// app.use(express.json());
-// app.use(express.urlencoded({ extended: true }));
 app.use(bodyParser.json());       // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
   extended: true
@@ -43,24 +48,20 @@ app.use(cors());
 app.use('/api', router);
 
 if (process.env.NODE_ENV === 'production') {
+    app.use('/admin', express.static(join(__dirname, '..', '..', 'admin', 'build')));
     app.use(express.static(join(__dirname, '..', '..', 'client', 'build')));
-    app.all('admin/*', (req, res) =>
+    app.get('admin/*', (req, res) =>
         res.sendFile(join(__dirname, '..', '..', 'admin', 'build', 'index.html'))
     );
-    app.all('*', (req, res) =>
+    app.get('*', (req, res) =>
         res.sendFile(join(__dirname, '..', '..', 'client', 'build', 'index.html'))
     );
 }
 io.use(async (socket, next) => {
     try {
-        // const token = (socket.request.headers.cookie + ';').match(/(?<=token=)(.*?)(?=;)/)[0];
-        const cookies = cookie.parse(socket.request.headers.cookie || '');
-        const token = (cookies&&cookies.token)?cookies.token:'ok';
-        // const token = cookies.token
+        const token = socket.request.headers.token;
         const decoded = await verifyToken(token);
-        // eslint-disable-next-line no-param-reassign
         socket.decoded = decoded;
-        socket.join(decoded._id);
         next();
     } catch (err) {
         console.log(err)
