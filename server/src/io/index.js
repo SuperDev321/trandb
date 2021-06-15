@@ -25,6 +25,7 @@ const ioHandler = (io) => async (socket) => {
     socket.emit('repeat connection');
     return;
   }
+  const isMobile = socket.request.headers.ismobile;
   let ip = socket.client.request.headers['cf-connecting-ip'] || socket.client.request.headers['x-forwarded-for'] || socket.client.request.connection.remoteAddress
   if(isIp(ip)) {
       if(!isIp.v4(ip)) {
@@ -40,7 +41,7 @@ const ioHandler = (io) => async (socket) => {
   }
   let user = await Users.findOne({_id: socket.decoded._id});
   if(!user) return;
-  let result = await Users.updateOne({_id: socket.decoded._id}, {ip: ipInt(ip).toInt(),isInChat: true});
+  let result = await Users.updateOne({_id: socket.decoded._id}, {ip: ipInt(ip).toInt(), isInChat: true, isMobile});
   LogManager.saveLogInfo(ip, user.username, user.role, 'Connect');
 
     socket.on('join room', joinRoom(io, socket));
@@ -60,9 +61,6 @@ const ioHandler = (io) => async (socket) => {
     socket.on('unblock user', unBlockUser(io, socket));
     // video events
     // socket.on('joinMedia', joinMedia(io, socket));
-    socket.on('createMediaRoom', () => {
-      console.log('create media room event')
-    });
     // socket.on('getProducers', getProducers(io, socket));
     // socket.on('getRouterRtpCapabilities', getRouterRtpCapabilities(io, socket));
     // socket.on('createWebRtcTransport', createWebRtcTransport(io, socket));

@@ -9,10 +9,10 @@ const {
 const getUserFromServer = require('../../utils/user/getUserFromServer');
 
 const login = async (req, res, next) => {
-  const { username, password } = req.body;
+  const { username, password, aboutMe } = req.body;
   try {
     let ipAddress = req.userIp;
-    await validateLoginCredentials({ username, password });
+    await validateLoginCredentials({ username, password, aboutMe });
 
     let user = await getUserFromServer(username, password);
     // let user = {
@@ -23,9 +23,9 @@ const login = async (req, res, next) => {
     if(user) {
       let currentUser = await getUserByNickname(username);
       if(!currentUser) {
-        currentUser = await Users.create({username, password, role: user.role, gender: user.gender, avatar: user.avatar});
+        currentUser = await Users.create({username, password, role: user.role, gender: user.gender, avatar: user.avatar, aboutMe});
       } else {
-        await Users.updateOne({username}, {password, role: user.role, gender: user.gender, avatar: user.avatar});
+        await Users.updateOne({username}, {password, role: user.role, gender: user.gender, avatar: user.avatar, aboutMe});
       }
       // await checkPassword(password, currentUser.password);
       await updateIp(currentUser._id, ipAddress);
@@ -38,7 +38,6 @@ const login = async (req, res, next) => {
         .json({ statusCode: 200, message: 'logged in successfully', token });
     }
   } catch (err) {
-    console.log(err);
     if(err === 'confirm_error' || err === 'username_error' || err === 'password_error') {
       res
         .status(400)

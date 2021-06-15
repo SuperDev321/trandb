@@ -8,7 +8,7 @@ const {
 const checkUserFromServer = require('../../utils/user/checkUserFromServer');
   
 const guestLogin = async (req, res, next) => {
-    const { nickname, gender } = req.body;
+    const { nickname, gender, aboutMe } = req.body;
     const ipAddress = req.userIp;
     try {
         let isRegistered = await checkUserFromServer(nickname);
@@ -31,14 +31,14 @@ const guestLogin = async (req, res, next) => {
         }
         let user = await getGuest(nickname);
         if(!user) {
-            user = await createUser({ username: nickname, role: 'guest', gender });
+            user = await createUser({ username: nickname, role: 'guest', gender, aboutMe });
         } else {
             if(user.isInChat) {
                 for (let index = 0; ; index++) {
                     let newUsername = nickname + ' ('+ (index+1) + ')';
                     user = await getGuest(newUsername);
                     if(!user) {
-                        user = await createUser({ username: newUsername, role: 'guest', gender });
+                        user = await createUser({ username: newUsername, role: 'guest', gender, aboutMe });
                         break;
                     } else if(!user.isInChat) {
                         break;

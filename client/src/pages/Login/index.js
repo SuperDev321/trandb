@@ -18,15 +18,11 @@ import {
 import { makeStyles, withStyles } from '@material-ui/core/styles';
 import { green, red } from '@material-ui/core/colors';
 import LoginSelect from '../../components/LoginSelect';
-
 import {UserContext, SettingContext} from '../../context';
 import { handleLogin, handleGuestLogin } from '../../utils';
 import OutlinedButton from '../../components/OutlinedButton';
 import CustomTextField from '../../components/CustomTextField';
 import config from '../../config';
-
-
-
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -119,12 +115,18 @@ const Login = () => {
         .string('Enter your password')
         .min(4, 'Password should be of minimum 4 characters length')
         .required(t('LoginPage.error_password')),
+        aboutMe: yup
+        .string('About me')
+        .max(16, 'It should be of maxium 16 characters length')
     });
     const guestValidationSchema = yup.object({
         nickname: yup
         .string('Enter your nickname')
         .required(t('LoginPage.error_username'))
         .max(maxUsernameLength, t('LoginPage.error_long_username')),
+        aboutMe: yup
+        .string('About me')
+        .max(16, 'It should be of maxium 16 characters length')
     });
 
     const handleSelectMode = (isGuest) => {
@@ -140,10 +142,10 @@ const Login = () => {
         initialValues: {
             username: '',
             password: '',
+            aboutMe: ''
         },
         validationSchema: loginValidationSchema,
         onSubmit: (values) => {
-            // alert(JSON.stringify(values, null, 2));
             handleLogin(values, () => {setAuth(true);setRedirectToReferrer(true);}, (error) => { setError(t('LoginPage.'+error)) } );
         },
     });
@@ -152,6 +154,7 @@ const Login = () => {
         initialValues: {
             nickname: '',
             gender: 'male',
+            aboutMe: ''
         },
         validationSchema: guestValidationSchema,
         onSubmit: (values) => {
@@ -168,7 +171,6 @@ const Login = () => {
                 <LoginSelect onSelect={handleSelectMode}/>
                 :
                 <>
-
                 <CssBaseline />
                 { !guest ?
                     <Card className={classes.card}>
@@ -179,33 +181,47 @@ const Login = () => {
                         <form className={classes.form} noValidate onSubmit={loginFormik.handleSubmit}>
                             <Grid container spacing={2}>
                                 <Grid item xs={12} sm={12}>
-                                <CustomTextField
-                                    fullWidth
-                                    id="username"
-                                    label={t('LoginPage.username')}
-                                    name="username"
-                                    autoComplete="off"
-                                    value={loginFormik.values.email}
-                                    onBlur={loginFormik.handleBlur}
-                                    onChange={loginFormik.handleChange}
-                                    error={loginFormik.touched.username && Boolean(loginFormik.errors.username)}
-                                    helperText={loginFormik.touched.username && loginFormik.errors.username}
-                                />
+                                    <CustomTextField
+                                        fullWidth
+                                        id="username"
+                                        label={t('LoginPage.username')}
+                                        name="username"
+                                        autoComplete="off"
+                                        value={loginFormik.values.email}
+                                        onBlur={loginFormik.handleBlur}
+                                        onChange={loginFormik.handleChange}
+                                        error={loginFormik.touched.username && Boolean(loginFormik.errors.username)}
+                                        helperText={loginFormik.touched.username && loginFormik.errors.username}
+                                    />
                                 </Grid>
                                 <Grid item xs={12}>
-                                <CustomTextField
-                                    fullWidth
-                                    name="password"
-                                    label={t('LoginPage.password')}
-                                    type="password"
-                                    id="password"
-                                    autoComplete="current-password"
-                                    value={loginFormik.values.password}
-                                    onBlur={loginFormik.handleBlur}
-                                    onChange={loginFormik.handleChange}
-                                    error={loginFormik.touched.password && Boolean(loginFormik.errors.password)}
-                                    helperText={loginFormik.touched.password && loginFormik.errors.password}
-                                />
+                                    <CustomTextField
+                                        fullWidth
+                                        name="password"
+                                        label={t('LoginPage.password')}
+                                        type="password"
+                                        id="password"
+                                        autoComplete="current-password"
+                                        value={loginFormik.values.password}
+                                        onBlur={loginFormik.handleBlur}
+                                        onChange={loginFormik.handleChange}
+                                        error={loginFormik.touched.password && Boolean(loginFormik.errors.password)}
+                                        helperText={loginFormik.touched.password && loginFormik.errors.password}
+                                    />
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <CustomTextField
+                                        fullWidth
+                                        name="aboutMe"
+                                        label={t('LoginPage.about_me')}
+                                        id="login-about-me"
+                                        autoComplete="off"
+                                        value={loginFormik.values.aboutMe}
+                                        onBlur={loginFormik.handleBlur}
+                                        onChange={loginFormik.handleChange}
+                                        error={loginFormik.touched.aboutMe && Boolean(loginFormik.errors.aboutMe)}
+                                        helperText={loginFormik.touched.aboutMe && loginFormik.errors.aboutMe}
+                                    />
                                 </Grid>
                             </Grid>
                             <div className={classes.actionField}>
@@ -253,18 +269,32 @@ const Login = () => {
                         <form className={classes.form} noValidate onSubmit={guestFormik.handleSubmit}>
                             <Grid container spacing={2}>
                                 <Grid item xs={12} sm={12}>
-                                <CustomTextField
-                                    fullWidth
-                                    id="nickname"
-                                    label={t('LoginPage.username')}
-                                    name="nickname"
-                                    autoComplete="off"
-                                    value={guestFormik.values.nickname}
-                                    onBlur={guestFormik.handleBlur}
-                                    onChange={guestFormik.handleChange}
-                                    error={guestFormik.touched.nickname && Boolean(guestFormik.errors.nickname)}
-                                    helperText={guestFormik.touched.nickname && guestFormik.errors.nickname}
-                                />
+                                    <CustomTextField
+                                        fullWidth
+                                        id="nickname"
+                                        label={t('LoginPage.username')}
+                                        name="nickname"
+                                        autoComplete="off"
+                                        value={guestFormik.values.nickname}
+                                        onBlur={guestFormik.handleBlur}
+                                        onChange={guestFormik.handleChange}
+                                        error={guestFormik.touched.nickname && Boolean(guestFormik.errors.nickname)}
+                                        helperText={guestFormik.touched.nickname && guestFormik.errors.nickname}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} sm={12}>
+                                    <CustomTextField
+                                        fullWidth
+                                        id="guest-about-me"
+                                        label={t('LoginPage.about_me')}
+                                        name="aboutMe"
+                                        autoComplete="off"
+                                        value={guestFormik.values.aboutMe}
+                                        onBlur={guestFormik.handleBlur}
+                                        onChange={guestFormik.handleChange}
+                                        error={guestFormik.touched.aboutMe && Boolean(guestFormik.errors.aboutMe)}
+                                        helperText={guestFormik.touched.aboutMe && guestFormik.errors.aboutMe}
+                                    />
                                 </Grid>
                                 <Grid item xs={12}>
                                     <FormControl component="fieldset">

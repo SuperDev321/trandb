@@ -14,9 +14,11 @@ const userSchema = new Schema({
     required: true
   },
   password: String,
+  aboutMe: String,    
   role: String,
   ip: String,
   isInChat: Boolean,
+  isMobile: Boolean,
   avatar: String,
   created_at: Date,
 });

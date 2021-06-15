@@ -16,9 +16,7 @@ const getRoomPermission = async (room, userId) => {
     } else {
         return null;
     }
-    
-    console.log(user)
-    return user;
+    return 'normal';
 };
 
 module.exports = getRoomPermission;
