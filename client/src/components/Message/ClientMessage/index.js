@@ -88,6 +88,7 @@ const MyMessage = ({user, roomName, message, messageSize, role, font_size, userA
                 addOrOpenPrivate={addOrOpenPrivate}
                 role={role}
                 isBlocked={false}
+                showAboutMe={false}
                 />
                 <span>:&nbsp;</span></span>
                 <>

@@ -15,7 +15,7 @@ const joinRoom = (io, socket) => async ({ room, password }, callback) => {
         let {isBan, banType} = await checkBan(room, user.username, user.ip);
 
         // baned guest user can't join to chat
-        if(isBan && user.role ==='guest') {
+        if(isBan && (banType || (!banType && user.role ==='guest'))) {
             return callback(false, banType? 'banned_from_owner': 'banned_from_admin');
         }
         let result = await Rooms.updateOne({ name: room }, { $addToSet: { users: _id} });

@@ -128,7 +128,7 @@ function useDoubleClick({oneClick, doubleClick}) {
 
 const RoomUserName = ({user, role, roomName,
     changeMuteState, sendPokeMessage, kickUser, banUser,addOrOpenPrivate, viewBroadcast, stopBroadcastTo,
-    isMine, displayYou, isMuted, isBlocked, isPrivateMuted, changePrivateMute
+    isMine, displayYou, isMuted, isBlocked, isPrivateMuted, changePrivateMute, showAboutMe
     // open,
     // anchorEl,
     // setAnchorEl,
@@ -259,7 +259,7 @@ const RoomUserName = ({user, role, roomName,
                 <span className={classes.username}>
                     {user.username+((isMine && displayYou) ? ' (you)' : '')}
                 </span>
-                { user.aboutMe && user.aboutMe !== '' &&
+                { showAboutMe && user.aboutMe && user.aboutMe !== '' &&
                     <span className={classes.aboutMe}>{user.aboutMe}</span>
                 }
             </div>

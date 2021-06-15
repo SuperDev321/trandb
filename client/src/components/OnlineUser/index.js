@@ -213,6 +213,7 @@ const OnlineUser = ({roomName, username, user, role, isMuted, isPrivateMuted, is
                         isBlocked={isBlocked}
                         stopBroadcastTo={stopBroadcastTo}
                         changePrivateMute={changePrivateMute}
+                        showAboutMe={true}
                     />
                 {( user.role === 'admin' || user.role === 'super_admin') &&
                     <StarRounded className={classes.adminStar} />
