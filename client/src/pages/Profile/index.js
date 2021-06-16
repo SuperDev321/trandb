@@ -11,7 +11,7 @@ import PersonIcon from '@material-ui/icons/Person';
 import BookmarksIcon from '@material-ui/icons/Bookmarks';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import CardGiftcardIcon from '@material-ui/icons/CardGiftcard';
-import SettingsIcon from '@material-ui/icons/Settings';
+import { Settings, Edit } from '@material-ui/icons';
 import useStyles from './styles'
 import { getUserDetail } from "../../utils";
 import { useHistory, useParams } from "react-router-dom";
@@ -76,6 +76,11 @@ export default function Profile() {
               <p className={classes.title}>Joined</p>
             </div>
             <p>2020-08-14T13:02:56.000Z</p>
+            <Button size="small" variant="outlined" color="primary" size='small' style={{width: 'inherit'}}
+                startIcon={<Edit/>}
+              >
+                Edit Profile
+            </Button>
           </Paper>
           <Paper elevation={3} className={classes.room}>
             <h5>
@@ -86,7 +91,7 @@ export default function Profile() {
             <div key={room._id} className={classes.roomBody}>
               <p className={classes.title}>{room.name}</p>
               <Button size="small" variant="outlined" color="primary" size='small'
-                startIcon={<SettingsIcon/>}
+                startIcon={<Settings/>}
                 onClick={() => handleSetting(room.name)}
               >
                 Setting

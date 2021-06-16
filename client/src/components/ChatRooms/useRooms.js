@@ -211,7 +211,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
                     socket.emit('join room', { room }, (result, message) => {
                         if(result) {
                             if (message) {
-                                enqueueSnackbar(t(`ChatApp.${message}`, { roomName: room }), {variant: 'error'})
+                                enqueueSnackbar(t(`ChatApp.${message}`, { roomName: room}), {variant: 'error'})
                             }
                         } else {
                             enqueueSnackbar(message, {variant: 'error'})
@@ -286,7 +286,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
         }
     }, [enableSysMessage]);
 
-    const kickUser = useCallback(({room, kickedUserName, type, role}) => {
+    const kickUser = useCallback(({room, kickedUserName, type, role, username: adminName}) => {
         if(roomsRef.current && room) {
             let sameRoom = roomsRef.current.find((item) => (item.name === room));
             if(sameRoom) {
@@ -295,8 +295,8 @@ const useRooms = ({initRoomName, ...initalState}) => {
                     if(kickedUser) {
                         sameRoom.removeOnlineUser(kickedUser._id);
                         let msg = (type === 'kick') 
-                            ? t('ChatApp.sys_kick',{username: kickedUserName, roomName: room, userRole: role})
-                            : t('ChatApp.sys_ban',{username: kickedUserName, roomName: room, userRole: role});
+                            ? t('ChatApp.sys_kick',{username: kickedUserName, roomName: room, userRole: role, adminName })
+                            : t('ChatApp.sys_ban',{username: kickedUserName, roomName: room, userRole: role, adminName});
                         let message = {
                             _id: makeid(10),
                             type: 'joinLeave',
@@ -315,7 +315,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
                     }
                     
                 } else { // kick you
-                    setRoomEvent({type: 'remove room', data: {room, reason: 'kick', role}});
+                    setRoomEvent({type: 'remove room', data: {room, reason: 'kick', role, adminName}});
                 }
                 
             }
@@ -326,7 +326,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
                     let kickedUser = roomRef.users.find(({username}) => (username === kickedUserName));
                     if(kickedUser) {
                         roomRef.removeOnlineUser(kickedUser._id);
-                        let msg = t('ChatApp.sys_ban', {username: kickedUserName, roomName: 'all rooms', userRole: 'admin'});
+                        let msg = t('ChatApp.sys_ban', {username: kickedUserName, roomName: 'all rooms', userRole: 'admin', adminName});
                         let message = {
                             _id: makeid(10),
                             type: 'joinLeave',
@@ -348,7 +348,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 // remove all room
                 roomsRef.current = null;
                 history.push('/');
-                let alertText = t('ChatApp.error_ban', {roomName: 'all rooms', userRole: 'admin'});
+                let alertText = t('ChatApp.error_ban', {roomName: 'all rooms', userRole: 'admin', adminName});
                 enqueueSnackbar(alertText, {variant: 'error'});
             }
         }
@@ -688,15 +688,14 @@ const useRooms = ({initRoomName, ...initalState}) => {
         socket.on('leave room', async ({room, onlineUsers, leavedUser}) => {
             removeUser({room, leavedUser});
         });
-        socket.on('kicked user', async ({room, kickedUserName, role}) => {
-            console.log(role)
-            kickUser({room, kickedUserName, type: 'kick', role});
+        socket.on('kicked user', async ({room, kickedUserName, role, username}) => {
+            kickUser({room, kickedUserName, type: 'kick', role, username});
         });
-        socket.on('banned user', async ({room, kickedUserName, role}) => {
-            kickUser({room, kickedUserName, type: 'ban', role}); 
+        socket.on('banned user', async ({room, kickedUserName, role, username}) => {
+            kickUser({room, kickedUserName, type: 'ban', role, username}); 
         });
-        socket.on('global banned user', async ({kickedUserName, role}) => {
-            kickUser({kickedUserName, type: 'global ban', role}); 
+        socket.on('global banned user', async ({kickedUserName, role, username}) => {
+            kickUser({kickedUserName, type: 'global ban', role, username});
         });
 
         return () => {
@@ -799,12 +798,12 @@ const useRooms = ({initRoomName, ...initalState}) => {
             let {type, data} = roomEvent;
             switch(type) {
                 case 'remove room':
-                    let {room, reason, role} = data;
+                    let {room, reason, role, adminName} = data;
                     removeRoom(room, (result, message) => {
                         if(result) {
                             let alertText = (reason === 'kick') 
-                                ?t('ChatApp.error_kicked', {roomName: room, userRole: role})
-                                :t('ChatApp.error_ban', {roomName: room, userRole: role});
+                                ?t('ChatApp.error_kicked', {roomName: room, userRole: role, adminName})
+                                :t('ChatApp.error_ban', {roomName: room, userRole: role, adminName});
                             enqueueSnackbar(alertText, {variant: 'error'});
                         } else {
                             console.log(result, message)

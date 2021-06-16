@@ -5,9 +5,9 @@ const {addBlock, removeBlock, removeBlockAdmin, getUserIp, getRoomBlocks, checkB
 const kickUser = (io, socket) => async ({room, to}) => {
     try {
         const { _id } = socket.decoded;
-        const role = await getRoomPermission(room, _id);
+        const {role, username} = await getRoomPermission(room, _id);
         const userToKick = await findUserByName(to);
-        if(role) {
+        if(role && username) {
             await Rooms.updateOne({ name: room }, { $pull: { users: userToKick._id} });
             let socketIds = await io.of('/').in(userToKick._id.toString()).allSockets();
             let it = socketIds.values();
@@ -17,7 +17,8 @@ const kickUser = (io, socket) => async ({room, to}) => {
             io.to(room).emit('kicked user', {
                 room,
                 kickedUserName: to,
-                role
+                role,
+                username
             });
             if(socketToKick) {
                 socketToKick.leave(room);
@@ -32,8 +33,10 @@ const kickUser = (io, socket) => async ({room, to}) => {
 const banUser = (io, socket) => async ({room , ip, to, role}) => {
     try {
         const { _id } = socket.decoded;
-        if(!role)
-            role = await getRoomPermission(room, _id);
+        const userData = await getRoomPermission(room, _id);
+        if(!role) {
+            role = userData.role;
+        }
         const userToBan = await findUserByName(to);
         if(role) {
             let res = null;
@@ -55,7 +58,8 @@ const banUser = (io, socket) => async ({room , ip, to, role}) => {
                     io.to(room).emit('banned user', {
                         room,
                         kickedUserName: to,
-                        role
+                        role,
+                        username: userData.username // admin or moderator's name
                     });
                     if(socketToBan) {
                         socketToBan.leave(room);
@@ -69,7 +73,8 @@ const banUser = (io, socket) => async ({room , ip, to, role}) => {
                     let socketToBan = io.sockets.sockets.get(id);
                     io.emit('global banned user', {
                         kickedUserName: to,
-                        role
+                        role,
+                        username: userData.username // admin or moderator's name
                     });
                     if(socketToBan) {
                         const rooms = [...socketToBan.rooms];
@@ -88,9 +93,9 @@ const banUser = (io, socket) => async ({room , ip, to, role}) => {
 }
 
 const banUserByAdmin = (io, socket) => async ({ room , ip, fromIp, toIp, to}) => {
-    console.log('banUserByAdmin')
     try {
         const { _id } = socket.decoded;
+        const userData = await getRoomPermission(room, _id);
         const userToBan = await findUserByName(to);
         let res = await banByNameAndIp(room , to, ip, fromIp, toIp);
         if(res) {
@@ -100,14 +105,14 @@ const banUserByAdmin = (io, socket) => async ({ room , ip, fromIp, toIp, to}) =>
             let first = it.next();
             let id = first.value;
             let socketToBan = io.sockets.sockets.get(id);
-            console.log('kick user', socketToBan);
             if(socketToBan) {
                 socketToBan.leave(room);
             }
             io.to(room).emit('banned user', {
                 room,
                 kickedUserName: to,
-                role: 'admin'
+                role: 'admin',
+                username: userData.username
             });
             
         }
@@ -119,7 +124,7 @@ const banUserByAdmin = (io, socket) => async ({ room , ip, fromIp, toIp, to}) =>
 
 const blockUser = (io, socket) => async ({room, username}, callback) => {
     const {_id, role} = socket.decoded;
-    const myRole = await getRoomPermission(room, _id);
+    const {role: myRole, username: blockingUsername} = await getRoomPermission(room, _id);
     if(myRole === 'super_admin' || myRole === 'admin' || myRole === 'owner' || myRole === 'moderator') {
         let userToBlock = await findUserByName(username);
         let userIp = ipToInt(userToBlock.ip).toIP();
@@ -147,7 +152,7 @@ const blockUser = (io, socket) => async ({room, username}, callback) => {
 
 const unBlockUser = (io, socket) => async ({room, username}, callback) => {
     const {_id} = socket.decoded;
-    const myRole = await getRoomPermission(room, _id);
+    const { role: myRole } = await getRoomPermission(room, _id);
     if(myRole === 'super_admin' || myRole === 'admin' || myRole === 'owner' || myRole === 'moderator') {
         console.log('unblock', username, myRole)
         let userToBlock = await findUserByName(username);

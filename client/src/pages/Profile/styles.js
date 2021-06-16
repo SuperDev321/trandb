@@ -64,11 +64,16 @@ const useStyles = makeStyles((theme) => ({
 
   general: {
   	padding: theme.spacing(3),
-  	PaddingLeft: '2%',
+  	paddingLeft: '2%',
     '& > *': {
       margin: theme.spacing(0),
       width: '100%',
     },
+    '& > button': {
+      width: 'inherit',
+      float: 'right',
+      marginTop: -30
+    }
   },
 
   room: {
