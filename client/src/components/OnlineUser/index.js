@@ -11,7 +11,8 @@ import {
     Check,
     StarRounded,
     Visibility,
-    Lock
+    Lock,
+    PhoneIphone
 } from '@material-ui/icons';
 import RoomUserName from '../RoomUserName';
 import config from '../../config';
@@ -26,7 +27,7 @@ const useStyles = makeStyles((theme) => ({
         padding: '2px 15px 2px 15px',
         width: '100%',
         '&:hover': {
-            background: '#00000014'
+            background: '#2f788814'
         }
     },
     username: {
@@ -52,22 +53,23 @@ const useStyles = makeStyles((theme) => ({
         }
     },
     avatar: {
-        width: theme.spacing(3.5),
-        height: theme.spacing(3.5),
-        
+        width: theme.spacing(3.8),
+        height: theme.spacing(3.8),
         minWidth: 0
     },
     avatarBadge: {
         '& .MuiBadge-badge': {
-            width: theme.spacing(3.5),
-            height: theme.spacing(3.5), 
+            width: theme.spacing(3.8),
+            height: theme.spacing(3.8), 
         },
         '& .MuiSvgIcon-root': {
             fontSize: '2rem'
         }
     },
-    camera: {
+    icon: {
         color: '#e6e6e6',
+        marginRight: 1,
+        cursor: 'pointer'
     },
     cardRoot: {
         width: 200,
@@ -130,7 +132,6 @@ const OnlineUser = ({roomName, username, user, role, isMuted, isPrivateMuted, is
     }) => {
     const classes = useStyles({role: user.role});
     const [anchorEl, setAnchorEl] = React.useState(null);
-    // const [openBan, setOpenBan] = React.useState(false);
 
     const handleClose = () => {
         setAnchorEl(null);
@@ -143,20 +144,6 @@ const OnlineUser = ({roomName, username, user, role, isMuted, isPrivateMuted, is
     const handleDoubleClickVideo = () => {
         viewBroadcast(roomName, user._id, user.username);
     }
-
-    // const handleClickProfile = () => {
-    //     if(user && user.username)
-    //         window.open('/profile/'+user.username);
-    //     setAnchorEl(null);
-    // }
-
-    // const sendPoke = () => {
-    //     setAnchorEl(null);
-    //     setTimeout(() => {
-    //         sendPokeMessage(roomName, user.username);
-    //     }, 0)
-        
-    // }
 
     const open = Boolean(anchorEl);
     return (
@@ -182,9 +169,9 @@ const OnlineUser = ({roomName, username, user, role, isMuted, isPrivateMuted, is
                 {
                     isViewer
                     ?
-                    <Visibility style={{ color: green[300] }} onDoubleClick={handleDoubleClickEye}/>:null                }
+                    <Visibility className={classes.icon} style={{ color: green[300] }} onDoubleClick={handleDoubleClickEye}/>:null                }
                 { isBroadcasting ?
-                    <Videocam className={classes.camera}  onDoubleClick={handleDoubleClickVideo}
+                    <Videocam className={classes.icon}  onDoubleClick={handleDoubleClickVideo}
                     // color={(user && user.broadcasting)? 'primary': 'disabled'}
                         style={{ color: green[300] }}
                     />
@@ -192,11 +179,17 @@ const OnlineUser = ({roomName, username, user, role, isMuted, isPrivateMuted, is
                 }
                 
                 { isBroadcasting === 'locked'?
-                    <Lock className={classes.camera}
+                    <Lock className={classes.icon}
                         // color={(user && user.broadcasting)? 'primary': 'disabled'}
                         style={{ color: yellow[700], fontSize: 17 }}
                     />
                     :null
+                }
+                { user.isMobile &&
+                    <PhoneIphone className={classes.icon}
+                        // color={(user && user.broadcasting)? 'primary': 'disabled'}
+                        style={{ color: blue[700], fontSize: 17 }}
+                    />
                 }
                 <div className={classes.username}>
                     <RoomUserName

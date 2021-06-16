@@ -353,7 +353,7 @@ const PrivateChat = ({ me, to, ip, avatar, sendMessage, active, setActive, initM
                             horizontal: 'left',
                         }}
                     >
-                    <Avatar className={classes.smallAvatar}
+                        <Avatar className={classes.smallAvatar}
                             src={avatar? config.main_site_url+avatar: '/img/default_avatar.png'}
                         />
                     </Badge>

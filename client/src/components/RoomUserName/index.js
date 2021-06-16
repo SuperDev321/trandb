@@ -23,13 +23,24 @@ import CustomTooltip from '../CustomTooltip'
 import {socket} from '../../utils'
 import config from '../../config';
 const useStyles = makeStyles((theme) => ({
+    content: {
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        cursor: 'pointer',
+    },
     username: {
         fontWeight: 'bold',
         fontSize: '1em',
         lineHeight: 1.4,
-        cursor: 'pointer',
         overflow: 'hidden',
         display: 'flex',
+        justifyContent: 'center'
+    },
+    aboutMe: {
+        fontSize: '0.7rem',
+        color: theme.palette.textColor.sub,
+        textAlign: 'center'
     },
     cardRoot: {
         width: 200,
@@ -244,9 +255,14 @@ const RoomUserName = ({user, role, roomName,
             TransitionProps={{ timeout: 600 }}
             title={user.ip}
         >
-            <span ref={refCallback} className={classes.username}>
-                {user.username+((isMine && displayYou) ? ' (you)' : '')}
-            </span>
+            <div  ref={refCallback} className={classes.content}>
+                <span className={classes.username}>
+                    {user.username+((isMine && displayYou) ? ' (you)' : '')}
+                </span>
+                { user.aboutMe && user.aboutMe !== '' &&
+                    <span className={classes.aboutMe}>{user.aboutMe}</span>
+                }
+            </div>
         </CustomTooltip>
         <Popover
             anchorOrigin={{
@@ -271,7 +287,6 @@ const RoomUserName = ({user, role, roomName,
                         :'/img/default_avatar.png'
                     } />
                     <span>{user.username}</span>
-                    {/* <span>{user.gender}</span> */}
                 </CardMedia>
                 <Divider />
                 <Button size="small" color="primary" fullWidth className={classes.cardButton} onClick={handleClickProfile}>

@@ -5,7 +5,7 @@ const {addBlock, removeBlock, removeBlockAdmin, getUserIp, getRoomBlocks, checkB
 const kickUser = (io, socket) => async ({room, to}) => {
     try {
         const { _id } = socket.decoded;
-        const role = getRoomPermission(room, _id);
+        const role = await getRoomPermission(room, _id);
         const userToKick = await findUserByName(to);
         if(role) {
             await Rooms.updateOne({ name: room }, { $pull: { users: userToKick._id} });
@@ -16,7 +16,8 @@ const kickUser = (io, socket) => async ({room, to}) => {
             let socketToKick = io.sockets.sockets.get(id);
             io.to(room).emit('kicked user', {
                 room,
-                kickedUserName: to
+                kickedUserName: to,
+                role
             });
             if(socketToKick) {
                 socketToKick.leave(room);
@@ -53,7 +54,8 @@ const banUser = (io, socket) => async ({room , ip, to, role}) => {
                     let socketToBan = io.sockets.sockets.get(id);
                     io.to(room).emit('banned user', {
                         room,
-                        kickedUserName: to
+                        kickedUserName: to,
+                        role
                     });
                     if(socketToBan) {
                         socketToBan.leave(room);
@@ -66,7 +68,8 @@ const banUser = (io, socket) => async ({room , ip, to, role}) => {
                     let id = first.value;
                     let socketToBan = io.sockets.sockets.get(id);
                     io.emit('global banned user', {
-                        kickedUserName: to
+                        kickedUserName: to,
+                        role
                     });
                     if(socketToBan) {
                         const rooms = [...socketToBan.rooms];
@@ -103,7 +106,8 @@ const banUserByAdmin = (io, socket) => async ({ room , ip, fromIp, toIp, to}) =>
             }
             io.to(room).emit('banned user', {
                 room,
-                kickedUserName: to
+                kickedUserName: to,
+                role: 'admin'
             });
             
         }

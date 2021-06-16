@@ -13,29 +13,26 @@ const joinRoom = (io, socket) => async ({ room, password }, callback) => {
         }
         let user = await Users.findOne({_id});
         let {isBan, banType} = await checkBan(room, user.username, user.ip);
-        if(isBan) {
+
+        // baned guest user can't join to chat
+        if(isBan && user.role ==='guest') {
             return callback(false, banType? 'banned_from_owner': 'banned_from_admin');
         }
         let result = await Rooms.updateOne({ name: room }, { $addToSet: { users: _id} });
         
         socket.join(room);
-        callback(true)
-        
+        if (isBan) {
+            callback(true, 'info_banned')
+        } else {
+            callback(true)
+        }
         const messages = await Chats.find({ room, type: 'public' }).sort({date: -1}).limit(30);
         const usersInfo = await findRoomUsers(room, user.role);
-        let onlineUsers = await Promise.all(usersInfo.map(async ({_id, username, ip, role, gender, avatar}) => {
-            let item = {};
-            let blocked = await checkBlock(room, username, ip);
-            item.blocked = blocked;
-            // if(user.role === 'admin' || user.role === 'super-admin') {
-            item.ip = ipInt(ip).toIP();
-            // }
-            item._id = _id;
-            item.username = username;
-            item.role = role;
-            item.gender = gender;
-            item.avatar = avatar;
-            return item;
+        let onlineUsers = await Promise.all(usersInfo.map(async (item) => {
+            const { username, ip } = item;
+            const blocked = await checkBlock(room, username, ip);
+            const ipStr = ipInt(ip).toIP();
+            return { ...item, ip: ipStr, blocked };
         }));
 
         const globalBlocks = await getGlobalBlocksWithIp();
@@ -91,19 +88,11 @@ const rejoinRoom = (io, socket) => async ({ room, type }, callback) => {
             // let {welcomeMessage} = await Rooms.findOne({name: room});
             const messages = await Chats.find({ room, type: 'public' }).sort({date: -1}).limit(30);
             const usersInfo = await findRoomUsers(room, user.role);
-            let onlineUsers = await Promise.all(usersInfo.map(async ({_id, username, ip, role, gender, avatar}) => {
-                let item = {};
-                let blocked = await checkBlock(room, username, ip);
-                item.blocked = blocked;
-                // if(user.role === 'admin' || user.role === 'super-admin') {
-                item.ip = ipInt(ip).toIP();
-                // }
-                item._id = _id;
-                item.username = username;
-                item.role = role;
-                item.gender = gender;
-                item.avatar = avatar;
-                return item;
+            let onlineUsers = await Promise.all(usersInfo.map(async (item) => {
+                const { username, ip } = item;
+                const blocked = await checkBlock(room, username, ip);
+                const ipStr = ipInt(ip).toIP();
+                return { ...item, ip: ipStr, blocked };
             }));
             
             let globalBlocks = await getGlobalBlocksWithIp();

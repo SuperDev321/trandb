@@ -9,6 +9,17 @@ import { useHistory } from 'react-router-dom';
 import {useAudio} from 'react-use';
 import {permissionRequest} from './notification';
 
+function makeid(length) {
+    var result           = [];
+    var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var charactersLength = characters.length;
+    for ( var i = 0; i < length; i++ ) {
+        result.push(characters.charAt(Math.floor(Math.random() * 
+        charactersLength)));
+   }
+   return result.join('');
+}
+
 function roomReducer(state, action) {
     switch (action.type) {
         case 'pending': {
@@ -199,6 +210,9 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 } else {
                     socket.emit('join room', { room }, (result, message) => {
                         if(result) {
+                            if (message) {
+                                enqueueSnackbar(t(`ChatApp.${message}`, { roomName: room }), {variant: 'error'})
+                            }
                         } else {
                             enqueueSnackbar(message, {variant: 'error'})
                         }
@@ -225,6 +239,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
                         if(sameRoom.addOnlineUser(joinedUser)) {
                             if(username !== joinedUser.username && enableSysMessage) {
                                 let sysMsg = {
+                                    _id: makeid(10),
                                     type: 'joinLeave',
                                     msg: t('ChatApp.sys_join_room', {username: joinedUser.username})
                                     // msg: joinedUser.username + ' joined the room'
@@ -254,6 +269,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
                     newData.users = sameRoom.users;
                     if(enableSysMessage) {
                         let message = {
+                            _id: makeid(10),
                             type: 'joinLeave',
                             msg: t('ChatApp.sys_leave_room', {username: leavedUserInfo.username}) 
                         }
@@ -270,7 +286,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
         }
     }, [enableSysMessage]);
 
-    const kickUser = useCallback(({room, kickedUserName, type}) => {
+    const kickUser = useCallback(({room, kickedUserName, type, role}) => {
         if(roomsRef.current && room) {
             let sameRoom = roomsRef.current.find((item) => (item.name === room));
             if(sameRoom) {
@@ -279,9 +295,10 @@ const useRooms = ({initRoomName, ...initalState}) => {
                     if(kickedUser) {
                         sameRoom.removeOnlineUser(kickedUser._id);
                         let msg = (type === 'kick') 
-                            ? t('ChatApp.sys_kick_room',{username: kickedUserName})
-                            : t('ChatApp.sys_ban_owner_room',{username: kickedUserName});
+                            ? t('ChatApp.sys_kick',{username: kickedUserName, roomName: room, userRole: role})
+                            : t('ChatApp.sys_ban',{username: kickedUserName, roomName: room, userRole: role});
                         let message = {
+                            _id: makeid(10),
                             type: 'joinLeave',
                             msg
                         }
@@ -298,7 +315,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
                     }
                     
                 } else { // kick you
-                    setRoomEvent({type: 'remove room', data: {room, reason: 'kick'}});
+                    setRoomEvent({type: 'remove room', data: {room, reason: 'kick', role}});
                 }
                 
             }
@@ -309,8 +326,9 @@ const useRooms = ({initRoomName, ...initalState}) => {
                     let kickedUser = roomRef.users.find(({username}) => (username === kickedUserName));
                     if(kickedUser) {
                         roomRef.removeOnlineUser(kickedUser._id);
-                        let msg = t('ChatApp.sys_ban_admin_room_all', {username: kickedUserName});
+                        let msg = t('ChatApp.sys_ban', {username: kickedUserName, roomName: 'all rooms', userRole: 'admin'});
                         let message = {
+                            _id: makeid(10),
                             type: 'joinLeave',
                             msg
                         }
@@ -330,7 +348,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 // remove all room
                 roomsRef.current = null;
                 history.push('/');
-                let alertText = t('ChatApp.error_admin_ban_all_room');
+                let alertText = t('ChatApp.error_ban', {roomName: 'all rooms', userRole: 'admin'});
                 enqueueSnackbar(alertText, {variant: 'error'});
             }
         }
@@ -362,6 +380,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
                         newRoomIndex = 0;
                     }
                     if(!newRoom) {
+                        if(callback) callback(true);
                         return history.push('/');
                     }
                     newRoom.mergeUnreadMessages();
@@ -491,6 +510,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
             if(sameRoom) {
                 if(pokeMessage.to === username) {
                     let message = {
+                        _id: makeid(10),
                         type: 'poke',
                         from: pokeMessage.from,
                         msg: t('PokeMessage.have_poked_you', {username: pokeMessage.from}) 
@@ -580,9 +600,9 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 roomNames.map(async (roomName) => {
                     socket.emit('rejoin room',{room: roomName, type: 'public'}, (result, error) => {
                         if(result) {
-                            console.log('rejoin success') 
+                            // console.log('rejoin success') 
                         } else {
-                            console.log('rejoin fail', error)
+                            // console.log('rejoin fail', error)
                         }
                         
                     })
@@ -590,9 +610,9 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 privateRooms.forEach((roomName) => {
                     socket.emit('rejoin room',{room: roomName, type: 'private'}, (result) => {
                         if(result) {
-                            console.log('rejoin success') 
+                            // console.log('rejoin success')
                         } else {
-                            console.log('rejoin fail')
+                            // console.log('rejoin fail')
                         }
                         
                     })
@@ -601,7 +621,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
             })
 
             socket.io.on('reconnect_attempt', () => {
-                console.log('reconnect_attempt');
+                // console.log('reconnect_attempt');
             })
 
             socket.on('repeat connection', () => {
@@ -627,6 +647,10 @@ const useRooms = ({initRoomName, ...initalState}) => {
                             if(message)
                                 enqueueSnackbar(t('ChatApp.'+message, {roomName: initRoomName}), {variant: 'error'});
                             dispatch({type: 'rejected', error: 'joine error'});
+                        } else {
+                            if (message) {
+                                enqueueSnackbar(t('ChatApp.'+message, {roomName: initRoomName}), {variant: 'info'});
+                            }
                         }
                     });
                 }
@@ -664,14 +688,15 @@ const useRooms = ({initRoomName, ...initalState}) => {
         socket.on('leave room', async ({room, onlineUsers, leavedUser}) => {
             removeUser({room, leavedUser});
         });
-        socket.on('kicked user', async ({room, kickedUserName}) => {
-            kickUser({room, kickedUserName, type: 'kick'});
+        socket.on('kicked user', async ({room, kickedUserName, role}) => {
+            console.log(role)
+            kickUser({room, kickedUserName, type: 'kick', role});
         });
-        socket.on('banned user', async ({room, kickedUserName}) => {
-            kickUser({room, kickedUserName, type: 'ban'}); 
+        socket.on('banned user', async ({room, kickedUserName, role}) => {
+            kickUser({room, kickedUserName, type: 'ban', role}); 
         });
-        socket.on('global banned user', async ({kickedUserName}) => {
-            kickUser({kickedUserName, type: 'global ban'}); 
+        socket.on('global banned user', async ({kickedUserName, role}) => {
+            kickUser({kickedUserName, type: 'global ban', role}); 
         });
 
         return () => {
@@ -774,12 +799,12 @@ const useRooms = ({initRoomName, ...initalState}) => {
             let {type, data} = roomEvent;
             switch(type) {
                 case 'remove room':
-                    let {room, reason} = data;
+                    let {room, reason, role} = data;
                     removeRoom(room, (result, message) => {
                         if(result) {
                             let alertText = (reason === 'kick') 
-                                ?t('ChatApp.kicked_from_owner',{roomName: room})
-                                :t('ChatApp.banned_from_admin',{roomName: room});
+                                ?t('ChatApp.error_kicked', {roomName: room, userRole: role})
+                                :t('ChatApp.error_ban', {roomName: room, userRole: role});
                             enqueueSnackbar(alertText, {variant: 'error'});
                         } else {
                             console.log(result, message)
