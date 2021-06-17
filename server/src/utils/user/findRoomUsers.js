@@ -1,7 +1,8 @@
-const { Rooms, Users } = require('../../database/models');
+const { Rooms, Users, Settings } = require('../../database/models');
 
 const findRoomUsers = async (room, myRole) => {
     const roomInfo = await Rooms.findOne({ name: room });
+    const { guestAboutMe } = await Settings.findOne({ type: 'admin' });
     if(roomInfo) {
         const owner = roomInfo.owner;
         const moderators = roomInfo.moderators;
@@ -22,8 +23,13 @@ const findRoomUsers = async (room, myRole) => {
                 } else {
                 }
             }
-            return { _id, username, gender, role: userRole, ip, avatar, aboutMe, isMobile };    
-        }// ({_id, username, gender, role, avatar }));
+            // if it don't show guest's about me field, it will return null on aboutMe field
+            if (userRole === 'guest' && !guestAboutMe) {
+                return { _id, username, gender, role: userRole, ip, avatar, aboutMe: null, isMobile };    
+            } else {
+                return { _id, username, gender, role: userRole, ip, avatar, aboutMe, isMobile };    
+            }
+        }
         );
         return usersInfo;
     }

@@ -22,7 +22,15 @@ import { handleCreateRoom } from '../../utils';
 const useStyles = makeStyles((theme) => ({
     root: {
         paddingTop: theme.spacing(8),
-        color: 'white'
+        color: 'white',
+        height: '100%',
+        overflow: 'auto',
+        '&::-webkit-scrollbar': {
+            display: 'none'
+        },
+        /* Hide scrollbar for IE, Edge and Firefox */
+        _msOverflowStyle: 'none',  /* IE and Edge */
+        scrollbarWidth: 'none'  /* Firefox */
     },
     card: {
         display: 'flex',

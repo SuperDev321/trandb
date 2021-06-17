@@ -5,8 +5,10 @@ const initSetting = async () => {
         let setting = await Settings.findOne({type: 'admin'});
         if(!setting) {
             await Settings.create({type: 'admin', theme: 'normal', messageNum: 30,
-            language: 'en', allowPrivate: true, messageTimeInterval: 200,
-            maxUsernameLength: 10, maxMessageLength: 200});
+                language: 'en', allowPrivate: true, messageTimeInterval: 200,
+                maxUsernameLength: 10, maxMessageLength: 200,
+                guestAboutMe: true
+            });
         }
     } catch(err) {
 

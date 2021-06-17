@@ -4,19 +4,19 @@ const getRoomPermission = async (room, userId) => {
 
     const user = await Users.findOne({_id: userId});
     if(user && (user.role === 'admin'|| user.role === 'super_admin')) {
-        return 'admin';
+        return { username: user.username, role: 'admin'}
     }
     const roomObject = await Rooms.findOne({ name: room });
     if(roomObject) {
         if(roomObject.owner.equals(userId)) {
-            return 'owner';
+            return { username: user.username, role: 'owner'};
         } else if(roomObject.moderators.includes(userId)) {
-            return 'moderator';
+            return { username: user.username, role: 'moderator'};
         }
     } else {
         return null;
     }
-    return 'normal';
+    return { username: user.username, role: 'normal'};
 };
 
 module.exports = getRoomPermission;

@@ -5,7 +5,7 @@ const getSetting = async (req, res, next) => {
         let setting = await Settings.findOne({type: 'admin'});
         if(setting) {
             const { theme, language, messageNum, allowPrivate, messageTimeInterval,
-                maxUsernameLength, maxMessageLength } = setting;
+                maxUsernameLength, maxMessageLength, guestAboutMe } = setting;
             res
             .status(200)
             .json({
@@ -15,7 +15,8 @@ const getSetting = async (req, res, next) => {
                 allowPrivate,
                 messageTimeInterval,
                 maxUsernameLength,
-                maxMessageLength
+                maxMessageLength,
+                guestAboutMe
             })
         }
     } catch(err) {
