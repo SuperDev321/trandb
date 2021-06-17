@@ -34,6 +34,7 @@ export default function Setting() {
     const [messageTimeInterval, setMessageTimeInterval] = useState(200);
     const [maxUsernameLength, setMaxUsernameLength] = useState(20)
     const [maxMessageLength, setMaxMessageLength] = useState(20)
+    const [guestAboutMe, setGuestAboutMe] = useState(true)
     const { addToast } = useToasts();
 
     useEffect(() => {
@@ -46,7 +47,7 @@ export default function Setting() {
         .then((response) => {
             if(response.status === 200) {
                 const {theme, language, messageNum, allowPrivate, messageTimeInterval,
-                    maxUsernameLength, maxMessageLength} = response.data;
+                    maxUsernameLength, maxMessageLength, guestAboutMe} = response.data;
                 if(theme) {
                     setTheme(theme);
                 }
@@ -70,6 +71,11 @@ export default function Setting() {
                 if (maxMessageLength) {
                     setMaxMessageLength(maxMessageLength)
                 }
+                if (guestAboutMe) {
+                    setGuestAboutMe(true)
+                } else {
+                    setGuestAboutMe(false)
+                }
             }
         })
     }, [])
@@ -77,7 +83,7 @@ export default function Setting() {
     const handleUpdate = () => {
         let token = window.localStorage.getItem('token');
         Axios.post(`${config.server_url}/api/setting`, {theme, language, messageNum, allowPrivate,
-            messageTimeInterval, maxUsernameLength, maxMessageLength}, {
+            messageTimeInterval, maxUsernameLength, maxMessageLength, guestAboutMe}, {
             headers: {
                 authorization: token
             }
@@ -193,6 +199,23 @@ export default function Setting() {
                                 onChange={(e) => setAllowPrivate(e.target.checked)}
                                 name="allowPrivate"
                                 inputProps={{ 'aria-label': 'allow private' }}
+                            />
+                            </FormControl>
+                        </Grid>
+                    </Grid>
+                    <Grid container spacing={2} style={{marginTop:'20px'}}>
+                        <Grid item sm={1}>
+                        </Grid>
+                        <Grid item sm={2} style={{textAlign: 'right'}}>
+                            <p className={classes.cardCategory}>Show Guest About Me</p>
+                        </Grid>
+                        <Grid item sm={9}>
+                            <FormControl style={{width: '100%'}}>
+                            <Switch
+                                checked={guestAboutMe}
+                                onChange={(e) => setGuestAboutMe(e.target.checked)}
+                                name="guestAboutMe"
+                                inputProps={{ 'aria-label': 'guest about me' }}
                             />
                             </FormControl>
                         </Grid>
