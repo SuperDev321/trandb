@@ -16,7 +16,7 @@ const deleteBan = async (req, res, next) => {
       } else {
         let {room} = await Bans.findById(banId);
         if(room) {
-          let role = await getRoomPermission(room, user._id);
+          const {role} = await getRoomPermission(room, user._id);
           if(role === 'owner') {
             await Bans.deleteOne({_id: banId});
             res

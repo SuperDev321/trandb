@@ -116,7 +116,6 @@ const CreateRoom = () => {
         },
         validationSchema: validationSchema,
         onSubmit: (values) => {
-           console.log(values);
             handleCreateRoom(values, () => history.push('/rooms'), message.error);
         },
     });

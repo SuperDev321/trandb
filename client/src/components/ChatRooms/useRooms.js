@@ -315,7 +315,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
                     }
                     
                 } else { // kick you
-                    setRoomEvent({type: 'remove room', data: {room, reason: 'kick', role, adminName}});
+                    setRoomEvent({type: 'remove room', data: {room, reason: type, role, adminName}});
                 }
                 
             }
@@ -550,6 +550,26 @@ const useRooms = ({initRoomName, ...initalState}) => {
         }
     }, [])
 
+    const updateUserInfo = (userData) => {
+        try {
+            roomsRef.current.map((room) => {
+                if (room.updateUserInfo(userData)) {
+                    if (roomNameRef.current === room.name) {
+                        dispatch({
+                            type: 'update',
+                            data: {
+                                name: room.name,
+                                users: room.users
+                            }
+                        })
+                    }
+                }
+            })
+        } catch (err) {
+
+        }
+    }
+
     useEffect(() => {
         if(initRoomName && username) {
             socket.open();
@@ -569,17 +589,19 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 updateBlocks({room, blocks});
             })
             socket.on('update global block', ({blocks}) => {
-
                 setGlobalBlocks(blocks);
             })
             socket.on('room message', (message, callback) => {
-                
                 receiveMessage({message}, callback);
             });
             socket.on('private message', (message, callback) => {
             })
             socket.on('poke message', (payload, callback) => {
                 receivePoke(payload, callback)
+            })
+
+            socket.on('update user info', (payload) => {
+                updateUserInfo(payload)
             })
 
             // socket.on('join error', payload => {

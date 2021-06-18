@@ -1,11 +1,11 @@
 const { findUserById } = require('../../utils');
 
-const getUserByName = async (req, res, next) => {
+const getUserById = async (req, res, next) => {
     try {
         const {userId} = req.params;
         if(username) {
-            let {_id, username, avatar, gender} = await findUserById(userId);
-            return res.status(200).json({_id, username, avatar, gender});
+            let {_id, username, avatarObj, currentAvatar, avatar, gender} = await findUserById(userId);
+            return res.status(200).json({_id, username, avatar, gender, avatarObj, currentAvatar});
         }
     } catch (err) {
         return next(err);
@@ -13,4 +13,4 @@ const getUserByName = async (req, res, next) => {
     
 }
 
-module.exports = getUserByName;
+module.exports = getUserById;

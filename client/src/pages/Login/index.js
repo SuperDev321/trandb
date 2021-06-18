@@ -154,7 +154,7 @@ const Login = () => {
         initialValues: {
             nickname: '',
             gender: 'male',
-            aboutMe: ''
+            // aboutMe: ''
         },
         validationSchema: guestValidationSchema,
         onSubmit: (values) => {
@@ -282,7 +282,7 @@ const Login = () => {
                                         helperText={guestFormik.touched.nickname && guestFormik.errors.nickname}
                                     />
                                 </Grid>
-                                <Grid item xs={12} sm={12}>
+                                {/* <Grid item xs={12} sm={12}>
                                     <CustomTextField
                                         fullWidth
                                         id="guest-about-me"
@@ -295,7 +295,7 @@ const Login = () => {
                                         error={guestFormik.touched.aboutMe && Boolean(guestFormik.errors.aboutMe)}
                                         helperText={guestFormik.touched.aboutMe && guestFormik.errors.aboutMe}
                                     />
-                                </Grid>
+                                </Grid> */}
                                 <Grid item xs={12}>
                                     <FormControl component="fieldset">
                                     <RadioGroup row aria-label="gender" name="gender" value={guestFormik.values.gender} onChange={guestFormik.handleChange}>

@@ -41,7 +41,7 @@ const FileUploader = props => {
     return (
         <div className={classes.root}>
             <Button className={classes.uploadButton}
-                type='button' onClick={handleClick} variant="contained" color="primary" component="span">
+                type='button' onClick={handleClick} variant="outlined" color="primary" component="span">
                 {props.title}
             </Button>
             <input

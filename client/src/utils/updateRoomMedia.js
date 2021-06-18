@@ -3,7 +3,6 @@ import config from '../config'
 const updateRoomMedia = async (data, successCallback, errCallback) => {
   try {
     let formData = new FormData();
-    console.log('axios data', data);
     formData.append('_id', data._id);
     formData.append('cover', data.cover);
     formData.append('icon', data.icon);

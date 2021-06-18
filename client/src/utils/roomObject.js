@@ -124,6 +124,19 @@ class RoomObject  {
         let usersToSet = this.users.filter((user) => (user._id !== userId));
         this.users = usersToSet;
     }
+    updateUserInfo (userData) {
+        const { username } = userData
+        const isInUsers = this.users.find((user) => (user.username === username))
+        if (!isInUsers) return false;
+        this.users = this.users?.map((user) => {
+            if (user.username === username) {
+                return { ...user, ...userData };
+            } else {
+                return user
+            }
+        })
+        return true;
+    }
 }
 
 export default RoomObject;

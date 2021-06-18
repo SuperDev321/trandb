@@ -29,7 +29,7 @@
     "owner_not_same_room": "{{username}} stopped broadcast.",
     "error_kicked": "You kicked from {{roomName}} by {{adminName}} ({{userRole}}).",
     "kicked_from_owner": "You kicked in the {{roomName}} by owner",
-    "banned_from_owner": "You banned in the {{roomName}} by owner",
+    "banned_from_owner": "You banned from the {{roomName}} by owner",
     "banned_from_admin": "You banned in the {{roomName}} by admin",
     "deleted_room_by_admin": "Room {{roomName}} deleted by Admin",
     "sys_closed_private_message": "This user logged out, message delivery failed. Close this room.",
@@ -54,6 +54,7 @@
     "already_in_chat": "The same user is already chatting.",
     "private_logout_error": "This user logged out, message delivery failed. Please close this chat.",
     "info_banned": "Only registered user can log from this  device",
+    "banned_from_room": "you are banned from this room",
     "default": "default"
   },
   "AddRoomModal": {

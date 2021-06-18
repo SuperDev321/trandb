@@ -20,6 +20,7 @@ import MessageSetting from './MessageSetting';
 import {SettingContext} from '../../../context';
 import SoundSetting from './SoundSetting';
 import LanguageSetting from './LanguageSetting';
+import AvatarSetting from './AvatarSetting';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import CloseIcon from '@material-ui/icons/Close';
 
@@ -59,7 +60,7 @@ return (
     <Typography variant="h6">{children}</Typography>
     {onBack ? (
         <IconButton aria-label="close" className={classes.closeButton} onClick={onBack}>
-        <ArrowBackIcon />
+        <ArrowBackIcon/>
         </IconButton>
     ) : null}
     {onClose ? (
@@ -79,7 +80,7 @@ const useStyles = makeStyles((theme) => ({
 
 const SettingModal = () => {
     const {messageSize, setMessageSize, enablePokeSound, setEnablePokeSound, enablePrivateSound, setEnablePrivateSound,
-        enablePublicSound, setEnablePublicSound, language, setLanguage, enableSysMessage, setEnableSysMessage
+        enablePublicSound, setEnablePublicSound, language, setLanguage, enableSysMessage, setEnableSysMessage, avatarOption
     } = useContext(SettingContext);
     const [open, setOpen] = useState(false);
     const [page, setPage] = useState(null);
@@ -129,6 +130,9 @@ const SettingModal = () => {
                         <ListItem button onClick={()=>setPage('notifications')}>
                             <ListItemText primary={t('SettingModal.notifications')}/>
                         </ListItem>
+                        <ListItem button onClick={()=>setPage('avatar')}>
+                            <ListItemText primary="Avatar"/>
+                        </ListItem>
                     </List>
                 }
                 {page === 'themes' ?
@@ -156,6 +160,11 @@ const SettingModal = () => {
                         setEnablePrivateSound={setEnablePrivateSound}
                         enablePublicSound={enablePublicSound}
                         setEnablePublicSound={setEnablePublicSound}
+                    />: null
+                }
+                {page === 'avatar' ?
+                    <AvatarSetting
+                        avatarOption={avatarOption}
                     />: null
                 }
                 

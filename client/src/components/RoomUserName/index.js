@@ -26,7 +26,7 @@ const useStyles = makeStyles((theme) => ({
     content: {
         display: 'flex',
         flexDirection: 'column',
-        justifyContent: 'center',
+        justifyContent: 'flex-start',
         cursor: 'pointer',
     },
     username: {

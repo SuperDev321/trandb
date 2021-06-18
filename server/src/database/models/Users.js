@@ -13,6 +13,11 @@ const userSchema = new Schema({
     type: String,
     required: true
   },
+  avatarObj: {
+    default: String,
+    joomula: String,
+  },
+  currentAvatar: String,
   password: String,
   aboutMe: String,    
   role: String,

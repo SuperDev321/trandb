@@ -34,7 +34,8 @@ export default function Setting() {
     const [messageTimeInterval, setMessageTimeInterval] = useState(200);
     const [maxUsernameLength, setMaxUsernameLength] = useState(20)
     const [maxMessageLength, setMaxMessageLength] = useState(20)
-    const [guestAboutMe, setGuestAboutMe] = useState(true)
+    const [avatarOption, setAvatarOption] = useState(true)
+    const [avatarColor, setAvatarColor] = useState(true)
     const { addToast } = useToasts();
 
     useEffect(() => {
@@ -47,7 +48,7 @@ export default function Setting() {
         .then((response) => {
             if(response.status === 200) {
                 const {theme, language, messageNum, allowPrivate, messageTimeInterval,
-                    maxUsernameLength, maxMessageLength, guestAboutMe} = response.data;
+                    maxUsernameLength, maxMessageLength, avatarOption, avatarColor} = response.data;
                 if(theme) {
                     setTheme(theme);
                 }
@@ -71,11 +72,8 @@ export default function Setting() {
                 if (maxMessageLength) {
                     setMaxMessageLength(maxMessageLength)
                 }
-                if (guestAboutMe) {
-                    setGuestAboutMe(true)
-                } else {
-                    setGuestAboutMe(false)
-                }
+                setAvatarOption(avatarOption)
+                setAvatarColor(avatarColor)
             }
         })
     }, [])
@@ -83,7 +81,7 @@ export default function Setting() {
     const handleUpdate = () => {
         let token = window.localStorage.getItem('token');
         Axios.post(`${config.server_url}/api/setting`, {theme, language, messageNum, allowPrivate,
-            messageTimeInterval, maxUsernameLength, maxMessageLength, guestAboutMe}, {
+            messageTimeInterval, maxUsernameLength, maxMessageLength, avatarOption, avatarColor}, {
             headers: {
                 authorization: token
             }
@@ -207,17 +205,42 @@ export default function Setting() {
                         <Grid item sm={1}>
                         </Grid>
                         <Grid item sm={2} style={{textAlign: 'right'}}>
-                            <p className={classes.cardCategory}>Show Guest About Me</p>
+                            <p className={classes.cardCategory}>Avatar Option</p>
                         </Grid>
-                        <Grid item sm={9}>
-                            <FormControl style={{width: '100%'}}>
-                            <Switch
-                                checked={guestAboutMe}
-                                onChange={(e) => setGuestAboutMe(e.target.checked)}
-                                name="guestAboutMe"
-                                inputProps={{ 'aria-label': 'guest about me' }}
-                            />
-                            </FormControl>
+                        <Grid item>
+                            <Grid component="label" container alignItems="center" spacing={1}>
+                                <Grid item>Self</Grid>
+                                <Grid item>
+                                <Switch
+                                    checked={avatarOption}
+                                    onChange={(e) => setAvatarOption(e.target.checked)}
+                                    name="avatarOption"
+                                    inputProps={{ 'aria-label': 'avatar option' }}
+                                />
+                                </Grid>
+                                <Grid item>Joomula</Grid>
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                    <Grid container spacing={2} style={{marginTop:'20px'}}>
+                        <Grid item sm={1}>
+                        </Grid>
+                        <Grid item sm={2} style={{textAlign: 'right'}}>
+                            <p className={classes.cardCategory}>Avatar Color</p>
+                        </Grid>
+                        <Grid item>
+                            <Grid component="label" container alignItems="center" spacing={1}>
+                                <Grid item>No</Grid>
+                                <Grid item>
+                                <Switch
+                                    checked={avatarColor}
+                                    onChange={(e) => setAvatarColor(e.target.checked)}
+                                    name="avatarColor"
+                                    inputProps={{ 'aria-label': 'avatar color' }}
+                                />
+                                </Grid>
+                                <Grid item>Yes</Grid>
+                            </Grid>
                         </Grid>
                     </Grid>
                     <Grid container spacing={2} style={{marginTop:'20px'}}>

@@ -7,6 +7,7 @@ const useAuth = () => {
   const [username, setUsername] = useState('');
   const [gender, setGender] = useState(null);
   const [avatar, setAvatar] = useState(null);
+  const [myUser, setMyUser] = useState(null)
   const [role, setRole] = useState('normal');
   const [prevUrl, setPrevUrl] = useState(null);
 
@@ -27,6 +28,7 @@ const useAuth = () => {
           if(data.avatar) setAvatar(data.avatar);
           else setAvatar(null);
           setUsername(data.username);
+          setMyUser(data)
           setAuth(true);
           setLoading(false);
         }
@@ -36,6 +38,32 @@ const useAuth = () => {
     })();
   }, [auth]);
 
+  const updateUser = async () => {
+    try {
+      let token = window.localStorage.getItem('token');
+      const { data } = await axios.post(`${config.server_url}/api/checkToken`, {token});
+      if (data === 'un-auth') {
+        setLoading(false);
+      } else {
+        if (data.role === 'super_admin') setRole('super_admin');
+        else if (data.role === 'admin') setRole('admin');
+        else if (data.role === 'guest') setRole('guest');
+        else setRole('normal');
+        if(data.gender === 'female') setGender('female');
+        else setGender('female');
+        if(data.avatar) setAvatar(data.avatar);
+        else setAvatar(null);
+        setUsername(data.username);
+        setMyUser(data)
+        setAuth(true);
+        setLoading(false);
+      }
+    } catch (err) {
+      console.log(err)
+      setLoading(false);
+    }
+  }
+
   const removeCurrentUser = () => {
     window.localStorage.removeItem('token');
     setAuth(false);
@@ -44,7 +72,7 @@ const useAuth = () => {
     setAvatar(null);
   };
 
-  return { auth, setAuth, gender, avatar, username, role, loading, setLoading, removeCurrentUser, prevUrl, setPrevUrl };
+  return { auth, setAuth, gender, avatar, username, role, loading, setLoading, removeCurrentUser, prevUrl, setPrevUrl, updateUser, myUser };
 };
 
 export default useAuth;

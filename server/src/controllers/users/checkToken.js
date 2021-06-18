@@ -3,15 +3,14 @@ const { Users } = require('../../database/models');
 
 const checkToken = async (req, res, next) => {
   try {
-    // const { token } = req.cookies;
     const {token} = req.body;
-    
     const { _id } = await verifyToken(token);
-    const { username, role, gender, avatar } = await Users.findOne({ _id });
+    const { username, role, gender, avatarObj, currentAvatar } = await Users.findOne({ _id });
     
-    return res.json({ username, role, gender, avatar });
+    return res.json({ username, role, gender, avatarObj, currentAvatar });
   } catch (err) {
-    if (err.message === 'jwt must be provided') return res.send('un-auth');
+    // if (err.message === 'jwt must be provided')
+    return res.send('un-auth');
     return next(err);
   }
 };

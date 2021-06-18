@@ -45,7 +45,6 @@ const addPrivate = (io, socket) => async ({ from, to, role }, callback) => {
             if(socketToPrivate) {
                 socketToPrivate.join(newPrivateRoomName);
                 socket.join(newPrivateRoomName);
-                console.log('add private callback', newPrivateRoomName)
                 return callback(newPrivateRoomName);
             } else {
                 return callback(null)

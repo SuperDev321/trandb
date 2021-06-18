@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { makeStyles, withStyles } from '@material-ui/core/styles';
 import {
     Avatar,
@@ -16,6 +16,7 @@ import {
 } from '@material-ui/icons';
 import RoomUserName from '../RoomUserName';
 import config from '../../config';
+import { SettingContext } from '../../context';
 const useStyles = makeStyles((theme) => ({
     listItem: {
         display: 'flex',
@@ -132,6 +133,8 @@ const OnlineUser = ({roomName, username, user, role, isMuted, isPrivateMuted, is
     }) => {
     const classes = useStyles({role: user.role});
     const [anchorEl, setAnchorEl] = React.useState(null);
+    const { avatarOption, avatarColor } = useContext(SettingContext);
+    const [avatarUrl, setAvatarUrl] = useState(null)
 
     const handleClose = () => {
         setAnchorEl(null);
@@ -144,6 +147,40 @@ const OnlineUser = ({roomName, username, user, role, isMuted, isPrivateMuted, is
     const handleDoubleClickVideo = () => {
         viewBroadcast(roomName, user._id, user.username);
     }
+
+    useEffect(() => {
+        const setRealAvatar = () => {    
+            if (typeof user === 'object' && user !== null) {
+                const {avatarObj, currentAvatar, gender} = user
+                if (!avatarOption) {
+                    // self avatar
+                    if (avatarObj[currentAvatar]) {
+                        if (currentAvatar === 'default') {
+                            return setAvatarUrl(config.image_path + 'avatar/' + avatarObj[currentAvatar])
+                        } else if (currentAvatar === 'joomula') {
+                            return setAvatarUrl(config.main_site_url+avatarObj[currentAvatar])
+                        }
+                    } else {
+                        
+                    }
+                } else {
+                    // joomula avatar
+                    if (avatarObj.joomula) {
+                        return setAvatarUrl(config.main_site_url+avatarObj.joomula)
+                    }
+                }
+                if (avatarColor) {
+                    if (gender === 'male') {
+                        return setAvatarUrl(config.image_path + 'male.png')
+                    } else if (gender === 'female') {
+                        return setAvatarUrl(config.image_path + 'female.png')
+                    }
+                }
+                setAvatarUrl(config.image_path + 'default_avatar.png')
+            }
+        }
+        setRealAvatar()
+    }, [user, avatarOption, avatarColor])
 
     const open = Boolean(anchorEl);
     return (
@@ -158,11 +195,7 @@ const OnlineUser = ({roomName, username, user, role, isMuted, isPrivateMuted, is
                     className={classes.avatarBadge}
                     badgeContent={(isMuted || isBlocked) && <Block  />}
                 >
-                    <Avatar alt="User avatar" src={
-                            user.avatar
-                            ?config.main_site_url+user.avatar 
-                            :user.gender === 'male' ? '/img/male.png': '/img/female.png'
-                        } 
+                    <Avatar alt="User avatar" src={avatarUrl}
                         className={classes.avatar}
                     />
                 </StyledBadge>
