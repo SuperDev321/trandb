@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import {
     Avatar,
     Popover,
@@ -22,6 +22,7 @@ import BanModal from '../Modals/BanModal';
 import CustomTooltip from '../CustomTooltip'
 import {socket} from '../../utils'
 import config from '../../config';
+import { SettingContext } from '../../context';
 const useStyles = makeStyles((theme) => ({
     content: {
         display: 'flex',
@@ -138,7 +139,8 @@ const RoomUserName = ({user, role, roomName,
     const {t} = useTranslation();
     const [anchorEl, setAnchorEl] = React.useState(null);
     const [openBan, setOpenBan] = React.useState(false);
-
+    const [avatarUrl, setAvatarUrl] = useState(null);
+    const { avatarOption, avatarColor } = useContext(SettingContext);
     const handleDbClick = (event) => {
         handleClickPrivateChat(event);
     }
@@ -245,6 +247,40 @@ const RoomUserName = ({user, role, roomName,
         }, 0);
     }
 
+    useEffect(() => {
+        const setRealAvatar = () => {    
+            if (typeof user === 'object' && user !== null) {
+                const {avatarObj, currentAvatar, gender} = user
+                if (!avatarOption) {
+                    // self avatar
+                    if (avatarObj && avatarObj[currentAvatar]) {
+                        if (currentAvatar === 'default') {
+                            return setAvatarUrl(config.image_path + 'avatar/' + avatarObj[currentAvatar])
+                        } else if (currentAvatar === 'joomula') {
+                            return setAvatarUrl(config.main_site_url+avatarObj[currentAvatar])
+                        }
+                    } else {
+                        
+                    }
+                } else {
+                    // joomula avatar
+                    if (avatarObj.joomula) {
+                        return setAvatarUrl(config.main_site_url+avatarObj.joomula)
+                    }
+                }
+                if (avatarColor) {
+                    if (gender === 'male') {
+                        return setAvatarUrl(config.image_path + 'male.png')
+                    } else if (gender === 'female') {
+                        return setAvatarUrl(config.image_path + 'female.png')
+                    }
+                }
+                setAvatarUrl(config.image_path + 'default_avatar.png')
+            }
+        }
+        setRealAvatar()
+    }, [user, avatarOption, avatarColor])
+
     const open = Boolean(anchorEl);
 
     return (
@@ -281,11 +317,7 @@ const RoomUserName = ({user, role, roomName,
                 <CardMedia
                     className={classes.cardHeader}
                 >
-                    <Avatar alt="User Avatar" src={
-                        user.avatar
-                        ? config.main_site_url+user.avatar
-                        :'/img/default_avatar.png'
-                    } />
+                    <Avatar alt="User Avatar" src={avatarUrl} />
                     <span>{user.username}</span>
                 </CardMedia>
                 <Divider />

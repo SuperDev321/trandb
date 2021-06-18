@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from "react";
+import React, {useState, useEffect, useContext} from "react";
 // import { Link } from "react-router-dom";
 // import Axios from "axios";
 import {
@@ -15,12 +15,17 @@ import { Settings, Edit } from '@material-ui/icons';
 import useStyles from './styles'
 import { getUserDetail } from "../../utils";
 import { useHistory, useParams } from "react-router-dom";
+import { SettingContext } from "../../context";
+import config from "../../config";
 
 export default function Profile() {
   const {username} = useParams();
   const classes = useStyles();
+  const history = useHistory();
+  const { avatarOption } = useContext(SettingContext)
 
   const [gender, setGender] = useState('');
+  const [avatar, setAvatar] = useState(null);
   const [rooms, setRooms] = useState([]);
 
   const handleSetting = (roomName) => {
@@ -36,6 +41,9 @@ export default function Profile() {
       if(data.gender) {
         setGender(data.gender)
       }
+      if(data.avatar) {
+        setAvatar(data.avatar)
+      }
     }, () => {
 
     });
@@ -47,7 +55,12 @@ export default function Profile() {
       <Grid container spacing={4} style={{marginTop: '12px'}}>
         <Grid item xs={12} sm={3}>
           <Paper elevation={3} className={classes.avatar}>
-            <img className={classes.roundedCircle} width="100px" src="/img/default_avatar.png" alt="Card img cap" />
+            <img className={classes.roundedCircle} width="100px" src={
+                            avatar
+                            ?(avatarOption? config.main_site_url+avatar: `${config.image_path}/avatar/${avatar}`)
+                            :gender === 'male' ? '/img/male.png': '/img/female.png'
+                        } alt="Card img cap"
+            />
             <p className={classes.avatarName}>{username}</p>
           </Paper>
           <Paper elevation={3} className={classes.about}>
@@ -76,11 +89,14 @@ export default function Profile() {
               <p className={classes.title}>Joined</p>
             </div>
             <p>2020-08-14T13:02:56.000Z</p>
-            <Button size="small" variant="outlined" color="primary" size='small' style={{width: 'inherit'}}
-                startIcon={<Edit/>}
+            {/* { !avatarOption &&
+              <Button size="small" variant="outlined" color="primary" size='small' style={{width: 'inherit'}}
+                  startIcon={<Edit/>}
+                  onClick={() => {history.push(`/profile/${username}/edit`)}}
               >
                 Edit Profile
-            </Button>
+              </Button>
+            } */}
           </Paper>
           <Paper elevation={3} className={classes.room}>
             <h5>

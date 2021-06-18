@@ -154,7 +154,7 @@ const OnlineUser = ({roomName, username, user, role, isMuted, isPrivateMuted, is
                 const {avatarObj, currentAvatar, gender} = user
                 if (!avatarOption) {
                     // self avatar
-                    if (avatarObj[currentAvatar]) {
+                    if (avatarObj && avatarObj[currentAvatar]) {
                         if (currentAvatar === 'default') {
                             return setAvatarUrl(config.image_path + 'avatar/' + avatarObj[currentAvatar])
                         } else if (currentAvatar === 'joomula') {
