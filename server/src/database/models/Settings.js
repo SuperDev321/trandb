@@ -31,7 +31,8 @@ const settingSchema = new Schema({
   },
   avatarColor: {
     type: Boolean
-  }
+  },
+  bypassBan: Boolean
 });
 
 const Settings = model('Settings', settingSchema);

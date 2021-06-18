@@ -4,10 +4,11 @@ const {Settings} = require('../../database/models');
 const updateSetting = async (req, res, next) => {
     try {
         const {language, theme, messageNum, allowPrivate, messageTimeInterval,
-            maxUsernameLength, maxMessageLength, avatarOption, avatarColor} = req.body;
+            maxUsernameLength, maxMessageLength, avatarOption, avatarColor, bypassBan} = req.body;
+            console.log(bypassBan)
         await Settings.updateOne({type: 'admin'}, {language, theme,
             messageNum, allowPrivate, messageTimeInterval, maxUsernameLength, maxMessageLength,
-            avatarOption, avatarColor
+            avatarOption, avatarColor, bypassBan
         });
         res
         .status(204)

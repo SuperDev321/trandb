@@ -1,4 +1,4 @@
-const { Rooms, Chats, Users } = require('../database/models');
+const { Rooms, Chats, Users, Settings } = require('../database/models');
 
 const { findRoomUsers, checkBan, getRoomBlocks, getGlobalBlocksWithIp, checkBlock } = require('../utils');
 const ipInt = require('ip-to-int');
@@ -13,6 +13,10 @@ const joinRoom = (io, socket) => async ({ room, password }, callback) => {
         }
         let user = await Users.findOne({_id});
         let {isBan, banType} = await checkBan(room, user.username, user.ip);
+        const {bypassBan} = await Settings.findOne({type: 'admin'});
+        if (isBan && !bypassBan) {
+            return callback(false, 'banned_from_room')
+        }
 
         // baned guest user can't join to chat
         if(isBan && (!banType && user.role ==='guest')) {

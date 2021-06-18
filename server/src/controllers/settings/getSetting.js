@@ -5,7 +5,7 @@ const getSetting = async (req, res, next) => {
         let setting = await Settings.findOne({type: 'admin'});
         if(setting) {
             const { theme, language, messageNum, allowPrivate, messageTimeInterval,
-                maxUsernameLength, maxMessageLength, avatarOption, avatarColor } = setting;
+                maxUsernameLength, maxMessageLength, avatarOption, avatarColor, bypassBan } = setting;
             res
             .status(200)
             .json({
@@ -17,7 +17,8 @@ const getSetting = async (req, res, next) => {
                 maxUsernameLength,
                 maxMessageLength,
                 avatarOption,
-                avatarColor
+                avatarColor,
+                bypassBan
             })
         }
     } catch(err) {

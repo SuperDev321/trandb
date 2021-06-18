@@ -36,6 +36,7 @@ export default function Setting() {
     const [maxMessageLength, setMaxMessageLength] = useState(20)
     const [avatarOption, setAvatarOption] = useState(true)
     const [avatarColor, setAvatarColor] = useState(true)
+    const [bypassBan, setBypassBan] = useState(true)
     const { addToast } = useToasts();
 
     useEffect(() => {
@@ -48,7 +49,7 @@ export default function Setting() {
         .then((response) => {
             if(response.status === 200) {
                 const {theme, language, messageNum, allowPrivate, messageTimeInterval,
-                    maxUsernameLength, maxMessageLength, avatarOption, avatarColor} = response.data;
+                    maxUsernameLength, maxMessageLength, avatarOption, avatarColor, bypassBan} = response.data;
                 if(theme) {
                     setTheme(theme);
                 }
@@ -74,6 +75,7 @@ export default function Setting() {
                 }
                 setAvatarOption(avatarOption)
                 setAvatarColor(avatarColor)
+                setBypassBan(bypassBan)
             }
         })
     }, [])
@@ -81,7 +83,7 @@ export default function Setting() {
     const handleUpdate = () => {
         let token = window.localStorage.getItem('token');
         Axios.post(`${config.server_url}/api/setting`, {theme, language, messageNum, allowPrivate,
-            messageTimeInterval, maxUsernameLength, maxMessageLength, avatarOption, avatarColor}, {
+            messageTimeInterval, maxUsernameLength, maxMessageLength, avatarOption, avatarColor, bypassBan}, {
             headers: {
                 authorization: token
             }
@@ -286,6 +288,27 @@ export default function Setting() {
                                 value={maxMessageLength}
                                 onChange={(e) => setMaxMessageLength(e.target.value)}
                             />
+                        </Grid>
+                    </Grid>
+                    <Grid container spacing={2} style={{marginTop:'20px'}}>
+                        <Grid item sm={1}>
+                        </Grid>
+                        <Grid item sm={2} style={{textAlign: 'right'}}>
+                            <p className={classes.cardCategory}>Register Bypass Ban</p>
+                        </Grid>
+                        <Grid item>
+                            <Grid component="label" container alignItems="center" spacing={1}>
+                                <Grid item>No</Grid>
+                                <Grid item>
+                                <Switch
+                                    checked={bypassBan}
+                                    onChange={(e) => setBypassBan(e.target.checked)}
+                                    name="bypassBan"
+                                    inputProps={{ 'aria-label': 'bypass ban' }}
+                                />
+                                </Grid>
+                                <Grid item>Yes</Grid>
+                            </Grid>
                         </Grid>
                     </Grid>
                     <div style={{display:'flex', justifyContent:'space-between', marginTop: '20px', marginBottom: '20px'}}>
