@@ -30,8 +30,13 @@ const login = async (req, res, next) => {
         currentAvatar: 'default'
       });
       } else {
+        const oldAvatar = currentUser.avatarObj;
+        let defaultAvatar = null;
+        if (oldAvatar && oldAvatar.default) {
+          defaultAvatar = oldAvatar.default
+        }
         await Users.updateOne({username}, {password, role: user.role, gender: user.gender, avatar: user.avatar, aboutMe, avatarObj: {
-          default: null,
+          default: defaultAvatar,
           joomula: user.avatar
         }});
       }

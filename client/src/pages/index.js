@@ -6,4 +6,5 @@ export { default as ChattingRoom } from './ChattingRoom';
 export { default as BlockUsers } from './Admin/BlockUsers';
 export { default as RoomSetting } from './RoomSetting';
 export { default as Profile } from './Profile';
+export { default as EditProfile } from './Profile/edit';
 export { default as Loading } from './Loading';
