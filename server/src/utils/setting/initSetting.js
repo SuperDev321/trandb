@@ -7,7 +7,7 @@ const initSetting = async () => {
             await Settings.create({type: 'admin', theme: 'normal', messageNum: 30,
                 language: 'en', allowPrivate: true, messageTimeInterval: 200,
                 maxUsernameLength: 10, maxMessageLength: 200,
-                guestAboutMe: true
+                avatarOption: true, avatarColor: true
             });
         }
     } catch(err) {

@@ -1,8 +1,6 @@
 const { Rooms } = require('../../database/models');
 
 const createPrivateRoom = async (from, to) => {
-  console.log('create private', from, to)
-
   let roomName = null;
   if (from > to) {
     roomName = `${to}-${from}`
@@ -10,8 +8,6 @@ const createPrivateRoom = async (from, to) => {
     roomName = `${from}-${to}`
   }
   const oldRoom = await Rooms.findOne({name: roomName, type: 'private'})
-  console.log('create private', from, to, oldRoom)
-
   if (!oldRoom) {
     Rooms.create({name: roomName, type: 'private'});
     return true

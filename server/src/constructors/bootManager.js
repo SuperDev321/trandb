@@ -1,4 +1,5 @@
 const {Boots} = require('../database/models');
+const { io } = require('../io')
 class BootManager {
     constructor () {
         this.open = false;

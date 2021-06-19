@@ -21,6 +21,8 @@ const {
   deleteChat,
   fileUploader,
   getUsers,
+  updateProfile,
+  updateAvatar,
   getUserByName,
   getUserDetail,
   getPublicRoomNames,
@@ -79,6 +81,8 @@ router.get('/user/:username', getUserByName);
 router.get('/users/:userId/rooms', withAuth, getUserRooms);
 router.get('/users/:userId', getUserDetail);
 router.get('/users/:username/ip', withAuth, isAdmin, getUserIp);
+router.post('/user/update/avatar', withAuth, updateAvatar)
+router.post('/profile/update', updateProfile)
 
 router.delete('/bans/:banId', withAuth, deleteBan);
 router.post('/bans', withAuth, addBan);

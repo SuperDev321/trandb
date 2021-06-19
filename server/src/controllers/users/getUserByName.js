@@ -5,10 +5,10 @@ const getUserByName = async (req, res, next) => {
         
         const {username} = req.params;
         if(username) {
-            let {_id, avatar, gender, role} = await findUserByName(username);
+            const {_id, avatar, gender, role, avatarObj, currentAvatar} = await findUserByName(username);
             return res
             .status(200)
-            .json({_id, username, avatar, gender, role});
+            .json({_id, username, avatar, gender, role, avatarObj, currentAvatar});
         }
     } catch (err) {
         console.log(err)

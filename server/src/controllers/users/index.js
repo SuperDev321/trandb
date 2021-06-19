@@ -7,6 +7,8 @@ const logout = require('./logout');
 const getUserByName = require('./getUserByName');
 const getUserDetail = require('./getUserDetail');
 const getUsers = require('./getUsers');
+const updateProfile = require('./updateProfile');
+const updateAvatar = require('./updateAvatar');
 module.exports = {
   signup,
   login,
@@ -16,5 +18,7 @@ module.exports = {
   logout,
   getUserByName,
   getUserDetail,
-  getUsers
+  getUsers,
+  updateProfile,
+  updateAvatar
 };

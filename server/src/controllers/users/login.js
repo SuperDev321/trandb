@@ -23,9 +23,17 @@ const login = async (req, res, next) => {
     if(user) {
       let currentUser = await getUserByNickname(username);
       if(!currentUser) {
-        currentUser = await Users.create({username, password, role: user.role, gender: user.gender, avatar: user.avatar, aboutMe});
+        currentUser = await Users.create({username, password, role: user.role, gender: user.gender, avatar: user.avatar, aboutMe, avatarObj: {
+          default: null,
+          joomula: user.avatar
+        },
+        currentAvatar: 'default'
+      });
       } else {
-        await Users.updateOne({username}, {password, role: user.role, gender: user.gender, avatar: user.avatar, aboutMe});
+        await Users.updateOne({username}, {password, role: user.role, gender: user.gender, avatar: user.avatar, aboutMe, avatarObj: {
+          default: null,
+          joomula: user.avatar
+        }});
       }
       // await checkPassword(password, currentUser.password);
       await updateIp(currentUser._id, ipAddress);

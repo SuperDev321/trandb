@@ -146,8 +146,6 @@ const blockUser = (io, socket) => async ({room, username}, callback) => {
     } else {
         callback(false, 'Permission denied')
     }
-    
-
 }
 
 const unBlockUser = (io, socket) => async ({room, username}, callback) => {
@@ -184,7 +182,5 @@ const unBlockUser = (io, socket) => async ({room, username}, callback) => {
     } else {
         callback(false, 'Permission denied')
     }
-    
-
 }
 module.exports = { kickUser, banUser, banUserByAdmin, blockUser, unBlockUser };

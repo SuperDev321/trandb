@@ -26,7 +26,10 @@ const settingSchema = new Schema({
   maxMessageLength: {
     type: Number
   },
-  guestAboutMe: {
+  avatarOption: {
+    type: Boolean
+  },
+  avatarColor: {
     type: Boolean
   }
 });

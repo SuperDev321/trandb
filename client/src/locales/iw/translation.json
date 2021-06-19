@@ -202,8 +202,8 @@
     "forbidden": "ההודעה שלך נחסמה על ידי מנהל המערכת שלך",
     "timeError": "מרווח הזמן בין הודעות קצר מדי.",
     "error_long_message": "הודעה ארוכה מדי",
-    "private_muted": "This user ignored you on private chat. Your message may have been ignored.",
-    "private_blocked": "You are blocked on private chat."
+    "private_muted": "המשתמש בחר להתעלם ממך ההודעה לא נשלחה",
+    "private_blocked": "אין באפשרותך לשלוח הודעה פרטית"
   },
   "PasswordModal": {
     "default": "default",

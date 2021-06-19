@@ -90,7 +90,6 @@ const PrivateChatList = ({sendMessage, readMsg ,me, globalBlocks}, ref) => {
                     ref={elRefs.current[index].ref}
                     me={me} to={item.to}
                     ip={item.ip}
-                    avatar={item.avatar}
                     initMessages={item.initVal.messages}
                     sendMessage={sendMessage}
                     deleteChat={deleteChat}

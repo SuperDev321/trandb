@@ -20,7 +20,9 @@ const useSetting = () => {
   const [language, _setLanguage] = useState(null);
   const [messageNum, setMessageNum] = useState(30);
   const [enableSysMessage, _setEnableSysMessage] = useState(true);
-  const [privateMutes, setPrivateMutes] = useLocalStorage('private-mutes', [])
+  const [privateMutes, setPrivateMutes] = useLocalStorage('private-mutes', []);
+  const [avatarOption, setAvatarOption] = useState(true);
+  const [avatarColor, setAvatarColor] = useState(true);
   const { t, i18n } = useTranslation();
   const setMessageSize = (messageSize) => {
     localStorage.setItem('messageSize', messageSize);
@@ -126,7 +128,7 @@ const useSetting = () => {
       if(response.status === 200) {
         let data = response.data;
         if(data) {
-          const {theme, messageNum, language, allowPrivate, messageTimeInterval, maxMessageLength} = data;
+          const {theme, messageNum, language, allowPrivate, messageTimeInterval, maxMessageLength, avatarOption, avatarColor} = data;
           setDefaultTheme(theme);
           if(!currentLanguage)
             setLanguage(language);
@@ -145,7 +147,9 @@ const useSetting = () => {
           if (maxMessageLength) {
             setMaxMessageLength(maxMessageLength)
           }
+          setAvatarOption(avatarOption);
           setEnableGuestPrivate(allowPrivate);
+          setAvatarColor(avatarColor)
         }
       }
     })
@@ -165,7 +169,9 @@ const useSetting = () => {
   return { defaultTheme, messageSize, enablePokeSound, enablePrivateSound, enablePublicSound,
     setDefaultTheme, setMessageSize, setEnablePokeSound, setEnablePrivateSound, setEnablePublicSound,
     language, setLanguage, messageNum, enableSysMessage, setEnableSysMessage, enableGuestPrivate,
-    messageTimeInterval, maxUsernameLength, maxMessageLength, privateMutes, addPrivateMute, removePrivateMute};
+    messageTimeInterval, maxUsernameLength, maxMessageLength, privateMutes, addPrivateMute, removePrivateMute,
+    avatarOption, avatarColor
+  };
 };
 
 export default useSetting;

@@ -24,6 +24,7 @@ import {ReactComponent as Restore} from './restore.svg';
 import config from '../../../config';
 import SettingsIcon from '@material-ui/icons/Settings';
 import { SettingContext } from '../../../context';
+import { getUser } from '../../../utils'
 
 const defaultHeight = 250;
 const defaultWidth = 350;
@@ -166,7 +167,7 @@ const StyledBadge = withStyles((theme) => ({
     />
 ))
 
-const PrivateChat = ({ me, to, ip, avatar, sendMessage, active, setActive, initMessages, deleteChat, roomName, globalBlocks }, ref) => {
+const PrivateChat = ({ me, to, ip, sendMessage, active, setActive, initMessages, deleteChat, roomName, globalBlocks }, ref) => {
     const rndRef = useRef(null);
     const winRef = useRef(null);
     const [messages, setMessages] = useState([]);
@@ -179,10 +180,12 @@ const PrivateChat = ({ me, to, ip, avatar, sendMessage, active, setActive, initM
     const [blocked, setBlocked] = useState(false);
     const [withBlocked, setWithBlocked] = useState(false);
     const classes = useStyles({max});
-    const {messageNum, addPrivateMute, removePrivateMute, privateMutes} = useContext(SettingContext);
+    const {messageNum, addPrivateMute, removePrivateMute, privateMutes, avatarColor, avatarOption} = useContext(SettingContext);
     const { t } = useTranslation();
     const [settingAnchorEl, setSettingAnchorEl] = React.useState(null);
     const [muted, setMuted] = useState(false)
+    const [toUserInfo, setToUserInfo] = useState(null);
+    const [avatarUrl, setAvatarUrl] = useState(null)
 
     const handleClickSetting = (event) => {
         setSettingAnchorEl(event.currentTarget);
@@ -299,6 +302,52 @@ const PrivateChat = ({ me, to, ip, avatar, sendMessage, active, setActive, initM
         else setMuted(false)
     }, [privateMutes, to, ip])
 
+    useEffect(() => {
+        if (to && !hide) {
+            getUser(to, (data) => {
+                if (data) {
+                    setToUserInfo(data)
+                }
+            }, (err) => {
+                console.log(err)
+            })
+        }
+    }, [to, hide])
+
+    useEffect(() => {
+        const setRealAvatar = () => {    
+            if (typeof toUserInfo === 'object' && toUserInfo !== null) {
+                const {avatarObj, currentAvatar, gender} = toUserInfo
+                if (!avatarOption) {
+                    // self avatar
+                    if (avatarObj[currentAvatar]) {
+                        if (currentAvatar === 'default') {
+                            return setAvatarUrl(config.image_path + 'avatar/' + avatarObj[currentAvatar])
+                        } else if (currentAvatar === 'joomula') {
+                            return setAvatarUrl(config.main_site_url+avatarObj[currentAvatar])
+                        }
+                    } else {
+                        
+                    }
+                } else {
+                    // joomula avatar
+                    if (avatarObj.joomula) {
+                        return setAvatarUrl(config.main_site_url+avatarObj.joomula)
+                    }
+                }
+                if (avatarColor) {
+                    if (gender === 'male') {
+                        return setAvatarUrl(config.image_path + 'male.png')
+                    } else if (gender === 'female') {
+                        return setAvatarUrl(config.image_path + 'female.png')
+                    }
+                }
+                setAvatarUrl(config.image_path + 'default_avatar.png')
+            }
+        }
+        setRealAvatar()
+    }, [toUserInfo, avatarOption, avatarColor])
+
     return (
         <Rnd
             default={{
@@ -340,7 +389,7 @@ const PrivateChat = ({ me, to, ip, avatar, sendMessage, active, setActive, initM
                         className={classes.avatarBadge}
                     >
                         <Avatar className={classes.smallAvatar}
-                            src={avatar? config.main_site_url+avatar: '/img/default_avatar.png'}
+                            src={avatarUrl}
                         />
                     </StyledBadge>
                     :
@@ -354,7 +403,7 @@ const PrivateChat = ({ me, to, ip, avatar, sendMessage, active, setActive, initM
                         }}
                     >
                         <Avatar className={classes.smallAvatar}
-                            src={avatar? config.main_site_url+avatar: '/img/default_avatar.png'}
+                            src={avatarUrl}
                         />
                     </Badge>
                 }

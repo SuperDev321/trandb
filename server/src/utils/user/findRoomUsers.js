@@ -1,14 +1,13 @@
-const { Rooms, Users, Settings } = require('../../database/models');
+const { Rooms, Users } = require('../../database/models');
 
 const findRoomUsers = async (room, myRole) => {
     const roomInfo = await Rooms.findOne({ name: room });
-    const { guestAboutMe } = await Settings.findOne({ type: 'admin' });
     if(roomInfo) {
         const owner = roomInfo.owner;
         const moderators = roomInfo.moderators;
         let liveUserIds = roomInfo.users;
         const roomUsers = await Users.find({ _id: { $in: liveUserIds? liveUserIds: []  } });
-        const usersInfo = roomUsers.map(({ _id, username, gender, role, avatar, ip, aboutMe, isMobile }) => {
+        const usersInfo = roomUsers.map(({ _id, username, gender, role, avatar, ip, aboutMe, isMobile, avatarObj, currentAvatar }) => {
             // let ip;
             // // if(myRole === 'admin') {
             //     let result = roomInfo.users.find((item)=>(item._id.equals(_id)));
@@ -24,10 +23,10 @@ const findRoomUsers = async (room, myRole) => {
                 }
             }
             // if it don't show guest's about me field, it will return null on aboutMe field
-            if (userRole === 'guest' && !guestAboutMe) {
-                return { _id, username, gender, role: userRole, ip, avatar, aboutMe: null, isMobile };    
+            if (userRole === 'guest') {
+                return { _id, username, gender, role: userRole, ip, avatar, aboutMe: null, isMobile, avatarObj, currentAvatar };    
             } else {
-                return { _id, username, gender, role: userRole, ip, avatar, aboutMe, isMobile };    
+                return { _id, username, gender, role: userRole, ip, avatar, aboutMe, isMobile, avatarObj, currentAvatar };    
             }
         }
         );
