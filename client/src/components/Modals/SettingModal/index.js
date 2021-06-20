@@ -17,7 +17,7 @@ import {
 import {useTranslation} from 'react-i18next';
 import ThemeSetting from './ThemeSetting';
 import MessageSetting from './MessageSetting';
-import {SettingContext} from '../../../context';
+import {SettingContext, UserContext} from '../../../context';
 import SoundSetting from './SoundSetting';
 import LanguageSetting from './LanguageSetting';
 import AvatarSetting from './AvatarSetting';
@@ -80,8 +80,9 @@ const useStyles = makeStyles((theme) => ({
 
 const SettingModal = () => {
     const {messageSize, setMessageSize, enablePokeSound, setEnablePokeSound, enablePrivateSound, setEnablePrivateSound,
-        enablePublicSound, setEnablePublicSound, language, setLanguage, enableSysMessage, setEnableSysMessage, avatarOption
+        enablePublicSound, setEnablePublicSound, language, setLanguage, enableSysMessage, setEnableSysMessage, avatarOption, allowGuestAvatarUpload
     } = useContext(SettingContext);
+    const {myUser} = useContext(UserContext);
     const [open, setOpen] = useState(false);
     const [page, setPage] = useState(null);
     const classes = useStyles();
@@ -97,9 +98,11 @@ const SettingModal = () => {
             setPage(null)
         }
     }, [open])
+
+    const {role} = myUser;
     return (
         <>
-        <IconButton aria-label="show 17 new notifications" color="inherit"
+        <IconButton aria-label="new notifications" color="inherit"
             onClick={() => {setOpen(true)}}
         >
             <Settings/>
@@ -130,9 +133,11 @@ const SettingModal = () => {
                         <ListItem button onClick={()=>setPage('notifications')}>
                             <ListItemText primary={t('SettingModal.notifications')}/>
                         </ListItem>
-                        <ListItem button onClick={()=>setPage('avatar')}>
-                            <ListItemText primary="Avatar"/>
-                        </ListItem>
+                        {(role !=='guest' || allowGuestAvatarUpload) &&
+                            <ListItem button onClick={()=>setPage('avatar')}>
+                                <ListItemText primary="Avatar"/>
+                            </ListItem>
+                        }
                     </List>
                 }
                 {page === 'themes' ?

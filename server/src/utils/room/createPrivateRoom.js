@@ -12,6 +12,7 @@ const createPrivateRoom = async (from, to) => {
     Rooms.create({name: roomName, type: 'private'});
     return true
   } else {
+    await Rooms.updateOne({name: roomName}, {type: 'private'});
     return false
   }
   

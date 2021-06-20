@@ -23,6 +23,7 @@ const useSetting = () => {
   const [privateMutes, setPrivateMutes] = useLocalStorage('private-mutes', []);
   const [avatarOption, setAvatarOption] = useState(true);
   const [avatarColor, setAvatarColor] = useState(true);
+  const [allowGuestAvatarUpload, setAllowGuestAvatarUpload] = useState(false)
   const { t, i18n } = useTranslation();
   const setMessageSize = (messageSize) => {
     localStorage.setItem('messageSize', messageSize);
@@ -128,7 +129,7 @@ const useSetting = () => {
       if(response.status === 200) {
         let data = response.data;
         if(data) {
-          const {theme, messageNum, language, allowPrivate, messageTimeInterval, maxMessageLength, avatarOption, avatarColor} = data;
+          const {theme, messageNum, language, allowPrivate, messageTimeInterval, maxMessageLength, avatarOption, avatarColor, allowGuestAvatarUpload} = data;
           setDefaultTheme(theme);
           if(!currentLanguage)
             setLanguage(language);
@@ -149,7 +150,8 @@ const useSetting = () => {
           }
           setAvatarOption(avatarOption);
           setEnableGuestPrivate(allowPrivate);
-          setAvatarColor(avatarColor)
+          setAvatarColor(avatarColor);
+          setAllowGuestAvatarUpload(allowGuestAvatarUpload);
         }
       }
     })
@@ -170,7 +172,7 @@ const useSetting = () => {
     setDefaultTheme, setMessageSize, setEnablePokeSound, setEnablePrivateSound, setEnablePublicSound,
     language, setLanguage, messageNum, enableSysMessage, setEnableSysMessage, enableGuestPrivate,
     messageTimeInterval, maxUsernameLength, maxMessageLength, privateMutes, addPrivateMute, removePrivateMute,
-    avatarOption, avatarColor
+    avatarOption, avatarColor, allowGuestAvatarUpload
   };
 };
 

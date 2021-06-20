@@ -16,7 +16,6 @@ const addPrivate = (io, socket) => async ({ from, to, role }, callback) => {
             return false;
         });
         if(privateRoom) {
-            console.log('find private')
             privateRoomName = privateRoom;
             return callback(privateRoom);
         } else {

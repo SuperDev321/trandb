@@ -1,3 +1,4 @@
+const { Users } = require('../../database/models');
 const {
     getGuest,
     createUser,
@@ -46,6 +47,9 @@ const guestLogin = async (req, res, next) => {
                         continue;
                     }
                 }
+            } else {
+                await Users.updateOne({username: nickname}, {gender, aboutMe});
+                user = await getGuest(nickname);
             }
         }
         
