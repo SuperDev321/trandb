@@ -14,6 +14,15 @@ const useStyles = makeStyles((theme) => ({
         width: '20px',
         height: '20px',
         borderRadius: '50%',
+        backgroundColor: props => {
+            if (props.userColor && theme.palette.messageColors[props.userColor]) {
+                return theme.palette.messageColors[props.userColor]
+            } else if (theme.palette.messageColors.default) {
+                return theme.palette.messageColors.default
+            } else {
+                return '#fff'
+            }
+        }
     },
     colorPanel: {
         position: 'absolute',
@@ -46,24 +55,24 @@ const useStyles = makeStyles((theme) => ({
             left: '25px',
         },
     },
-    colorSnap: {
-        width: '20px',
-        height: '20px',
-        margin: '4px 3px',
-        borderRadius: '50%',
-        float: 'left',
-        fontSize: '1rem',
-        '&.active::after': {
-            // top: '-3px',
-            content: '"\\2713"',
-            left: '4px',
-            position: 'relative',
-            color: props =>
-            props.defaultColor
-            ?theme.palette.getContrastText(props.defaultColor)
-            :'#fff'
-        }
-    }
+    // colorSnap: {
+    //     width: '20px',
+    //     height: '20px',
+    //     margin: '4px 3px',
+    //     borderRadius: '50%',
+    //     float: 'left',
+    //     fontSize: '1rem',
+    //     '&.active::after': {
+    //         // top: '-3px',
+    //         content: '"\\2713"',
+    //         left: '4px',
+    //         position: 'relative',
+    //         color: props =>
+    //         props.defaultColor
+    //         ?theme.palette.getContrastText(props.defaultColor)
+    //         :'#fff'
+    //     }
+    // }
     // end
 }));
 

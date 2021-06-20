@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import {EmojiConvertor} from 'emoji-js';
-import parseHTML from 'parsehtml';
 import moment from 'moment';
-import randomstring from "randomstring";
 import {grey} from '@material-ui/core/colors'
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -33,10 +31,15 @@ const useStyles = makeStyles((theme) => ({
     },
     message: {
         background: '#17171829',
-        color: (props) => 
-        props.color
-        ?(props.color === 'default'? theme.palette.textColor.main: props.color)
-        :theme.palette.getContrastText(grey[100]),
+        color: props => {
+            if (props.color && theme.palette.messageColors[props.color]) {
+                return theme.palette.messageColors[props.color]
+            } else if (theme.palette.messageColors.default) {
+                return theme.palette.messageColors.default
+            } else {
+                return '#fff'
+            }
+        },
         fontSize: '0.9rem',
         fontWeight: (props) =>
         props.bold
