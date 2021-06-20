@@ -54,6 +54,10 @@
     "already_in_chat": "אותו משתמש כבר משוחח.",
     "private_logout_error": "המשתמש עזב את הצאט או  רענן את הצאט נא לסגור חלון  זה.",
     "info_banned": "התחברות לצאט  ממכשיר זה אפשרית רק לרשומים",
+    "owner": "owner",
+    "all_rooms": "hahahhaha",
+    "moderator": "moderator",
+    "admin": "admin",
     "default": "default"
   },
  "AddRoomModal": {
@@ -187,7 +191,12 @@
     "remove": "הסרה",
     "default": "default",
     "show": "הצג",
-    "hide": "הסתר"
+    "hide": "הסתר",
+    "avatar": "Avatar",
+    "new": "New",
+    "avatar_option": "Avatar Option",
+    "upload": "Upload",
+    "from_main_site": "From Main Site"
   },
   "BanModal": {
     "default": "default"

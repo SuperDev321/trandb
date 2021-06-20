@@ -55,6 +55,10 @@
     "private_logout_error": "This user logged out, message delivery failed. Please close this chat.",
     "info_banned": "Only registered user can log from this  device",
     "banned_from_room": "you are banned from this room",
+    "owner": "owner",
+    "all_rooms": "all rooms",
+    "moderator": "moderator",
+    "admin": "admin",
     "default": "default"
   },
   "AddRoomModal": {
@@ -188,7 +192,12 @@
     "remove": "Remove",
     "default": "default",
     "show": "Show",
-    "hide": "Hide"
+    "hide": "Hide",
+    "avatar": "Avatar",
+    "new": "New",
+    "avatar_option": "Avatar Option",
+    "upload": "Upload",
+    "from_main_site": "From Main Site"
   },
   "BanModal": {
     "default": "default"
