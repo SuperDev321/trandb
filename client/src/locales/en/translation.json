@@ -14,6 +14,7 @@
     "message_placeholder": "Write message...",
     "error_create_room": "Only member can create a room",
     "error_ban": "You banned from {{roomName}} by {{adminName}} ({{ userRole }}).",
+    "error_ban_with_reason": "You banned from {{roomName}} by {{adminName}} ({{ userRole }}) reason: {{reason}}.",
     "error_admin_ban_all_room": "You banned in all rooms by admin",
     "sys_private_message": "Private chat with: {{username}}",
     "system_user_request_video_permission": "{{username}} requests permission to view your broadcast in {{roomName}}.",
@@ -35,6 +36,7 @@
     "sys_closed_private_message": "This user logged out, message delivery failed. Close this room.",
     "sys_join_room": "{{username}} entered in the room",
     "sys_ban": "{{username}} has banned from {{roomName}} by {{adminName}} ({{userRole}}).",
+    "sys_ban_with_reason": "{{username}} has banned from {{roomName}} by {{adminName}} ({{userRole}}) reason: {{reason}}.",
     "sys_ban_owner_room": "{{username}} has banned by owner",
     "sys_ban_admin_room": "{{username}} has banned by admin",
     "sys_ban_admin_room_all": "{{username}} has banned in all rooms by admin",
@@ -203,6 +205,12 @@
     "from_main_site": "From Main Site"
   },
   "BanModal": {
+    "ban_user": "Ban User",
+    "reason": "Reason",
+    "ip": "IP",
+    "ban_type": "Ban Type",
+    "ban": "Ban",
+    "cancel": "Cancel",
     "default": "default"
   },
   "LandingPage": {
