@@ -7,6 +7,7 @@ const banSchema = new Schema({
   ip: Number,
   fromIp: Number,
   toIp: Number,
+  reason: String
 }, {
   timestamps: {
     createdAt: 'created_at'

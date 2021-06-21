@@ -14,6 +14,7 @@ import IpMaskInput from '../../IpMaskInput';
 import { socket } from '../../../utils';
 import Axios from 'axios';
 import config from '../../../config';
+import { useTranslation } from 'react-i18next';
 
 
 export default function BanModal({open, setOpen, initVal, roomName}) {
@@ -22,9 +23,9 @@ export default function BanModal({open, setOpen, initVal, roomName}) {
     const name = initVal.name || '';
     const [type, setType] = useState('all');
     const [ip, setIp] = useState(initVal.ip?initVal.ip: '');
-    // const [toIp, setToIp] = useState(initVal.ip?initVal.ip: '');
-    // const [fromIp, setFromIp] = useState(initVal.ip?initVal.ip: ''); 
-    // const [ipSel, setIpSel] = useState(true);
+    const [reason, setReason] = useState('');
+    const { t } = useTranslation();
+
     useEffect(() => {
         if(initVal.name && open) {
             let token = window.localStorage.getItem('token');
@@ -49,29 +50,14 @@ export default function BanModal({open, setOpen, initVal, roomName}) {
             setIp(e.target.value);
         }
     }
-    // const handleFromIpChange = (e) => {
-    //     if(e.target.value) {
-    //         setFromIp(e.target.value); console.log(ip)
-    //     }
-    // }
-    // const handleToIpChange = (e) => {
-    //     if(e.target.value) {
-    //         setToIp(e.target.value); console.log(ip)
-    //     }
-    // }
 
     const handleBan = () => {
-        
         let payload = {}
         if(type === 'this' && roomName) {
             payload.room = roomName;
         }
-        // if(ipSel) {
         payload.ip = ip;
-        // } else if(fromIp && toIp){
-        //     payload.fromIp = fromIp;
-        //     payload.toIp = toIp
-        // }
+        payload.reason = reason;
         payload.to = name;
         socket.emit('ban user', payload);
         setOpen(false);
@@ -82,7 +68,7 @@ export default function BanModal({open, setOpen, initVal, roomName}) {
         <Dialog className={classes.dialog} fullWidth={true} maxWidth="xs"
             open={open} onClose={handleClose} aria-labelledby="form-dialog-title"
         >
-            <DialogTitle id="form-dialog-title">Ban User</DialogTitle>
+            <DialogTitle id="form-dialog-title">{t('BanModal.ban_user')}</DialogTitle>
             <DialogContent className={classes.content}>
             
             <CustomTextField
@@ -92,8 +78,7 @@ export default function BanModal({open, setOpen, initVal, roomName}) {
                 type="text"
                 fullWidth
                 value={name}
-                // onChange={(e) => {setName(e.target.value)}}
-                className={classes.username}
+                className={classes.textInput}
             />
             <CustomTextField
                 autoComplete="off"
@@ -103,7 +88,7 @@ export default function BanModal({open, setOpen, initVal, roomName}) {
                 select
                 id="banType"
                 type="text"
-                label="Ban Type"
+                label={t('BanModal.ban_type')}
                 InputLabelProps={{
                     shrink: true,
                 }}
@@ -118,74 +103,38 @@ export default function BanModal({open, setOpen, initVal, roomName}) {
                     This Room
                 </MenuItem>
             </CustomTextField>
-            {/* <Grid component="label" container alignItems="center" spacing={1}>
-                <Grid item>Range</Grid>
-                <Grid item>
-                    <Switch
-                        checked={ipSel}
-                        onChange={(e) => {setIpSel(e.target.checked)}}
-                        name="ipSel"
-                        color="default"
-                        inputProps={{ 'aria-label': 'secondary checkbox' }}
-                    />
-                </Grid>
-                <Grid item>IP</Grid>
-            </Grid> */}
             <Grid component="label" container alignItems="center" spacing={1}>
-                {/* { ipSel && */}
-                    <Grid  item xs={12} sm={12} >
-                        <CustomTextField className={classes.ipField}
-                            label='IP'
-                            value={ip}
-                            fullWidth
-                            onChange={handleIpChange}
-                            name="ipInput"
-                            id="ip-input"
-                            InputProps={{
-                                inputComponent: IpMaskInput,
-                            }}
-                    />
-                    </Grid>
-                {/* } */}
-                
-                {/* { !ipSel &&
-                <> */}
-                {/* <Grid  item xs={12} sm={6} >
-                <CustomTextField className={classes.ipField}
-                    label="From"
-                    value={fromIp}
-                    fullWidth
-                    onChange={handleFromIpChange}
-                    name="fromIpInput"
-                    id="from-ip-input"
-                    InputProps={{
-                        inputComponent: IpMaskInput,
-                    }}
-                />
-                </Grid> */}
-                {/* <Grid  item xs={12} sm={6} >
-                <CustomTextField  className={classes.ipField}
-                    label="To"
-                    value={toIp}
-                    onChange={handleToIpChange}
-                    name="toIpInput"
-                    id="to-ip-input"
-                    InputProps={{
-                        inputComponent: IpMaskInput,
-                    }}
+                <Grid  item xs={12} sm={12} >
+                    <CustomTextField className={classes.ipField}
+                        label={t('BanModal.ip')}
+                        value={ip}
+                        fullWidth
+                        onChange={handleIpChange}
+                        name="ipInput"
+                        id="ip-input"
+                        InputProps={{
+                            inputComponent: IpMaskInput,
+                        }}
                 />
                 </Grid>
-                </>
-                } */}
             </Grid>
-            
+            <CustomTextField
+                margin="dense"
+                id="ban reason"
+                label={t('BanModal.reason')}
+                type="text"
+                fullWidth
+                value={reason}
+                onChange={(e) => setReason(e.target.value)}
+                className={classes.textInput}
+            />
             </DialogContent>
             <DialogActions>
             <OutlinedButton onClick={handleClose} variant="outlined" color="primary">
-                Cancel
+                {t('BanModal.cancel')}
             </OutlinedButton>
             <OutlinedButton onClick={handleBan} variant="outlined" color="primary">
-                Ban
+                {t('BanModal.ban')}
             </OutlinedButton>
             </DialogActions>
         </Dialog>
