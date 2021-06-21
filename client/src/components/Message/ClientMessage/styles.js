@@ -10,12 +10,15 @@ const useStyles = makeStyles((theme) => ({
         [theme.breakpoints.down('xs')]: {
             maxWidth: 600,
         },
-        color: (props) =>
-            props.color
-            ? (props.color === 'default')? theme.palette.textColor.main : props.color
-            : 'black'
-        ,
-        
+        color: props => {
+            if (props.color && theme.palette.messageColors[props.color]) {
+                return theme.palette.messageColors[props.color]
+            } else if (theme.palette.messageColors.default) {
+                return theme.palette.messageColors.default
+            } else {
+                return '#fff'
+            }
+        },
         '&:hover': {
             backgroundColor: '#00000017',
         }

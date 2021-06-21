@@ -89,7 +89,7 @@ const ChatForm = ({roomName, to, sendMessage, onFocus, onBlur, type, blocked}) =
                         onChange={(e) => handleChangeFile(e.target.files)}
                     />
                 </label>
-                        
+
                 </div>:null
                 }
                 <div className={classes.boldSelector} onClick={() => setBold(!bold)}>
@@ -105,7 +105,7 @@ const ChatForm = ({roomName, to, sendMessage, onFocus, onBlur, type, blocked}) =
                     onFocus={onFocus}
                     onBlur={onBlur}
                     onEnter={handleOnEnter}
-                    color={userColor === 'default' ? defaultColor: userColor}
+                    color={userColor}
                     fontWeight={bold?'bold': 'inherit'}
                     placeholder={t('InputMessage.type_message')}
                 />

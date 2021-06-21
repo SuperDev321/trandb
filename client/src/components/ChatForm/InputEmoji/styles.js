@@ -3,7 +3,16 @@ import { makeStyles } from '@material-ui/core/styles';
 const useStyles = makeStyles((theme) => ({
     inputEmojiContainer: {
         // color: '#4b4b4b',
-        color: theme.palette.menu.color,
+        color: props => {
+          console.log(props.color);
+            if (props.color && theme.palette.messageColors[props.color]) {
+                return theme.palette.messageColors[props.color]
+            } else if (theme.palette.messageColors.default) {
+                return theme.palette.messageColors.default
+            } else {
+                return '#fff'
+            }
+        },
         textRendering: 'optimizeLegibility',
         // backgroundColor: theme.,
         // border: '1px solid',

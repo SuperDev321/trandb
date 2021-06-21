@@ -1,41 +1,42 @@
 import React, { useState } from 'react';
 import useStyles from './styles'
 import { useEffect } from 'react';
+import ColorSnap from './ColorSnap'
 
 const colorPanels = [
     'default',
-    '#656565',
-    '#0400E6',
-    '#6f4341',
-    '#990703',
-    '#ca226b',
-    '#f778a1',
-    '#f32f2f',
-    '#FF6600',
-    '#FF9900',
-    '#f1c85e',
-    '#006666',
-    '#2F4F4F',
-    '#6633CC',
-    '#47b617',
-    '#5cd87e',
-    '#6db4e9',
-    '#CC0066',
-    '#077104',
-    '#0a40f5',
-    '#1a61e3',
-    '#800080',
-    '#993399',
-    '#009900',
-    '#33CC66',
-    '#660000',
-    '#6666FF',
-    '#20264d',
+    'color1',
+    'color2',
+    'color3',
+    'color4',
+    'color5',
+    'color6',
+    'color7',
+    'color8',
+    'color9',
+    'color10',
+    'color11',
+    'color12',
+    'color13',
+    'color14',
+    'color15',
+    'color16',
+    'color17',
+    'color18',
+    'color19',
+    'color20',
+    'color21',
+    'color22',
+    'color23',
+    'color24',
+    'color25',
+    'color26',
+    'color27',
 ];
 
 const ColorPicker = ({userColor, setUserColor, backgroundColor, defaultColor}) => {
     // my code start
-    const classes = useStyles({backgroundColor});
+    const classes = useStyles({userColor, backgroundColor});
     const [colorPanel, setColorPanel] = useState(false);
     
     // end
@@ -61,14 +62,14 @@ const ColorPicker = ({userColor, setUserColor, backgroundColor, defaultColor}) =
     return (
         <>
         <div className={classes.colorArea} onClick={openColorArea}>
-            <div className={classes.userColor} style={{backgroundColor: userColor === 'default' ? defaultColor: userColor}}>&nbsp;</div>
+            <div className={classes.userColor}>&nbsp;</div>
                 {colorPanel && <div className={classes.colorPanel}>
                     {colorPanels.map((color, key) => {
                         return (
-                            <div className={`${classes.colorSnap} ${userColor === color ? 'active' : ''}`}
-                            style={{backgroundColor: color? (color==='default' ? defaultColor: color): '#fff' }}
-                                key={key} onClick={() => onSelectColor(color)}>
-                            </div>
+                            <ColorSnap color={color} active={(userColor === color)}
+                                onClick={() => onSelectColor(color)}
+                                key={key}
+                            />
                         );
                     })}
             </div>}
@@ -78,3 +79,8 @@ const ColorPicker = ({userColor, setUserColor, backgroundColor, defaultColor}) =
 }
 
 export default ColorPicker;
+
+  {/* <div className={`${classes.colorSnap} ${userColor === color ? 'active' : ''}`}
+                            style={{backgroundColor: color? (color==='default' ? defaultColor: color): '#fff' }}
+                                key={key} onClick={() => onSelectColor(color)}>
+                            </div> */}

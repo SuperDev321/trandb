@@ -46,7 +46,7 @@ function InputEmoji ({
     color,
     fontWeight,
 }, ref) {
-    const classes = useStyles();
+    const classes = useStyles({color});
     const [showPicker, setShowPicker] = useState(false)
     // const [currentSize, setCurrentSize] = useState(null)
 
