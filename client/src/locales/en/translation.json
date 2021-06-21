@@ -209,6 +209,8 @@
     "reason": "Reason",
     "ip": "IP",
     "ban_type": "Ban Type",
+    "all_rooms": "All rooms",
+    "this_room": "This room",
     "ban": "Ban",
     "cancel": "Cancel",
     "default": "default"

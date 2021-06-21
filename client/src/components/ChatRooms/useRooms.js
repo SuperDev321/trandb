@@ -340,7 +340,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
                     }
                     
                 } else { // kick you
-                    setRoomEvent({type: 'remove room', data: {room, reason: type, role, adminName}});
+                    setRoomEvent({type: 'remove room', data: {room, reason: type, role, adminName, banReason: reason}});
                 }
                 
             }
@@ -390,7 +390,8 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 roomsRef.current = null;
                 history.push('/');
                 let alertText = null;
-                if (reason) {
+                if (reason && reason !== '') {
+                    console.log('ban1')
                     alertText = t('ChatApp.error_ban_with_reason', {
                         roomName: t(`ChatApp.all_rooms`),
                         userRole: t(`ChatApp.admin`),
@@ -875,12 +876,21 @@ const useRooms = ({initRoomName, ...initalState}) => {
             let {type, data} = roomEvent;
             switch(type) {
                 case 'remove room':
-                    let {room, reason, role, adminName} = data;
+                    let {room, reason, role, adminName, banReason} = data;
                     removeRoom(room, (result, message) => {
                         if(result) {
-                            let alertText = (reason === 'kick') 
-                                ?t('ChatApp.error_kicked', {roomName: room, userRole: role, adminName})
-                                :t('ChatApp.error_ban', {roomName: room, userRole: role, adminName});
+                            let alertText = null;
+                            if (reason === 'kick') {
+                                alertText = t('ChatApp.error_kicked', {roomName: room, userRole: role, adminName})
+                            } else if (reason = 'ban') {
+                                if (banReason && banReason !== '') {
+                                    alertText = t('ChatApp.error_ban_with_reason', {roomName: room, userRole: role, adminName, reason: banReason});
+                                } else {
+                                    alertText = t('ChatApp.error_ban', {roomName: room, userRole: role, adminName});
+                                }
+                            } else {
+                                return;
+                            }
                             enqueueSnackbar(alertText, {variant: 'error'});
                         } else {
                             console.log(result, message)
