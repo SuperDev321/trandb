@@ -32,8 +32,8 @@ const useStyles = makeStyles((theme) => ({
         },
         color: props => {
             if (props.gender && props.avatarColor) {
-                if (props.gender === 'male') return blue[400];
-                else if (props.gender === 'female') return pink[300]
+                if (props.gender === 'male') return '#1e84ba';
+                else if (props.gender === 'female') return '#f466e8'
             }
             return 'inherit'
         }

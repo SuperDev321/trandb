@@ -75,11 +75,11 @@ const AvatarSetting = ({avatarOption}) => {
         <div className={classes.root}>
             <Grid container alignItems="center" spacing={0}>
                 <Grid item xs={12}>
-                    <span>Avatar Option</span>
+                    <span>{t('SettingModal.avatar_option')}</span>
                 </Grid>
                 <Grid item xs={12}>
                   <Grid container alignItems="center">
-                    <Grid item>From Main Site</Grid>
+                    <Grid item>{t('SettingModal.from_main_site')}</Grid>
                     <Grid item>
                       <Switch
                           checked={allowUpload}
@@ -90,7 +90,7 @@ const AvatarSetting = ({avatarOption}) => {
                           disabled={avatarOption}
                       />
                     </Grid>
-                    <Grid item>Upload</Grid>
+                    <Grid item>{t('SettingModal.upload')}</Grid>
                   </Grid>
                 </Grid>
                 { allowUpload &&
@@ -108,7 +108,7 @@ const AvatarSetting = ({avatarOption}) => {
                         onClick={handleSave}
                         disabled={loading}
                     >
-                        Save
+                        {t('global.save')}
                     </Button>
                 </Grid>
             </Grid>

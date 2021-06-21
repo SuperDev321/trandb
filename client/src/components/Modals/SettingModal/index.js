@@ -135,7 +135,7 @@ const SettingModal = () => {
                         </ListItem>
                         {(role !=='guest' || allowGuestAvatarUpload) &&
                             <ListItem button onClick={()=>setPage('avatar')}>
-                                <ListItemText primary="Avatar"/>
+                                <ListItemText primary={t('SettingModal.avatar')}/>
                             </ListItem>
                         }
                     </List>

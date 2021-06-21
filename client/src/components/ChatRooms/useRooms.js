@@ -295,8 +295,17 @@ const useRooms = ({initRoomName, ...initalState}) => {
                     if(kickedUser) {
                         sameRoom.removeOnlineUser(kickedUser._id);
                         let msg = (type === 'kick') 
-                            ? t('ChatApp.sys_kick',{username: kickedUserName, roomName: room, userRole: role, adminName })
-                            : t('ChatApp.sys_ban',{username: kickedUserName, roomName: room, userRole: role, adminName});
+                            ? t('ChatApp.sys_kick',{
+                                username: kickedUserName,
+                                roomName: room,
+                                userRole: t(`ChatApp.${role}`),
+                                adminName
+                            })
+                            : t('ChatApp.sys_ban',{
+                                username: kickedUserName,
+                                roomName: room,
+                                userRole: t(`ChatApp.${role}`),
+                                adminName});
                         let message = {
                             _id: makeid(10),
                             type: 'joinLeave',
@@ -326,7 +335,12 @@ const useRooms = ({initRoomName, ...initalState}) => {
                     let kickedUser = roomRef.users.find(({username}) => (username === kickedUserName));
                     if(kickedUser) {
                         roomRef.removeOnlineUser(kickedUser._id);
-                        let msg = t('ChatApp.sys_ban', {username: kickedUserName, roomName: 'all rooms', userRole: 'admin', adminName});
+                        let msg = t('ChatApp.sys_ban', {
+                            username: kickedUserName,
+                            roomName: t('ChatApp.all_rooms'),
+                            userRole: t(`ChatApp.admin`),
+                            adminName
+                        });
                         let message = {
                             _id: makeid(10),
                             type: 'joinLeave',
@@ -348,7 +362,11 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 // remove all room
                 roomsRef.current = null;
                 history.push('/');
-                let alertText = t('ChatApp.error_ban', {roomName: 'all rooms', userRole: 'admin', adminName});
+                let alertText = t('ChatApp.error_ban', {
+                    roomName: t(`ChatApp.all_rooms`),
+                    userRole: t(`ChatApp.admin`),
+                    adminName
+                });
                 enqueueSnackbar(alertText, {variant: 'error'});
             }
         }
