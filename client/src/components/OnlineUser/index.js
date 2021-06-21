@@ -29,6 +29,13 @@ const useStyles = makeStyles((theme) => ({
         width: '100%',
         '&:hover': {
             background: '#2f788814'
+        },
+        color: props => {
+            if (props.gender && props.avatarColor) {
+                if (props.gender === 'male') return blue[400];
+                else if (props.gender === 'female') return pink[300]
+            }
+            return 'inherit'
         }
     },
     username: {
@@ -131,10 +138,10 @@ const OnlineUser = ({roomName, username, user, role, isMuted, isPrivateMuted, is
         // , setOpenPrivate, setPrivateTo
         addOrOpenPrivate, changePrivateMute
     }) => {
-    const classes = useStyles({role: user.role});
     const [anchorEl, setAnchorEl] = React.useState(null);
     const { avatarOption, avatarColor } = useContext(SettingContext);
-    const [avatarUrl, setAvatarUrl] = useState(null)
+    const [avatarUrl, setAvatarUrl] = useState(null);
+    const classes = useStyles({role: user.role, gender: user.gender, avatarColor});
 
     const handleClose = () => {
         setAnchorEl(null);

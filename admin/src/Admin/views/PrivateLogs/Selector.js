@@ -56,6 +56,7 @@ const headCells = [
   { id: 'from', numeric: false, disablePadding: false, label: 'From'},
   { id: 'to', numeric: false, disablePadding: false, label: 'To' },
   { id: 'created_at', numeric: false, disablePadding: false, label: 'Created at' },
+  { id: 'updated_at', numeric: false, disablePadding: false, label: 'Updated at' },
 ];
 
 function EnhancedTableHead(props) {
@@ -185,6 +186,7 @@ export default function RoomTable( {onClickEdit} ) {
         if(row.description) strTmp += row.description + ' ';
         if(row.maxUsers) strTmp += row.maxUsers + ' ';
         if(row.created_at) strTmp += row.created_at;
+        if(row.updated_at) strTmp += row.updated_at;
         if(strTmp.toLowerCase().indexOf(query.toLowerCase()) < 0) return false;
         else return true;
       })
@@ -271,6 +273,7 @@ export default function RoomTable( {onClickEdit} ) {
                         <TableCell align="left" className={classes.space}>{row.from}</TableCell>
                         <TableCell align="left" className={classes.space}>{row.to}</TableCell>
                         <TableCell align="left" className={classes.space}>{row.created_at}</TableCell>
+                        <TableCell align="left" className={classes.space}>{row.updated_at}</TableCell>
                         <TableCell align="right" className={classes.space}>
                            <IconButton style={{color:"#4caf50"}} onClick={() => {onClickView(row)}}>
                             <VisibilityIcon />

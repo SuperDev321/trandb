@@ -26,7 +26,7 @@ const App = () => {
         setDefaultTheme, setMessageSize, setEnablePokeSound, setEnablePrivateSound, setEnablePublicSound,
         language, setLanguage, messageNum, enableSysMessage, setEnableSysMessage,
         messageTimeInterval, maxUsernameLength, maxMessageLength, privateMutes, addPrivateMute, removePrivateMute,
-        avatarOption, avatarColor
+        avatarOption, avatarColor, allowGuestAvatarUpload
     } = useSetting();
     if (loading) {
         return <Loading />;
@@ -55,7 +55,7 @@ const App = () => {
                 setEnablePrivateSound, setEnablePublicSound,
                 language, setLanguage, messageNum, enableSysMessage, setEnableSysMessage,
                 messageTimeInterval, maxUsernameLength, maxMessageLength, privateMutes, addPrivateMute, removePrivateMute,
-                avatarOption, avatarColor
+                avatarOption, avatarColor, allowGuestAvatarUpload
             }}
         >
         <CustomThemeProvider defaultTheme={defaultTheme}>

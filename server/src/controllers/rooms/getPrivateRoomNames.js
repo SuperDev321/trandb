@@ -2,12 +2,13 @@ const { Rooms } = require('../../database/models');
 const getPrivateRoomNames = async (req, res, next) => {
     try {
         let rooms = await Rooms.aggregate([
-            
+            { $sort: { updated_at: -1 } },
             {
                 $project: {
                     name: true,
                     type: true,
-                    created_at: true
+                    created_at: true,
+                    updated_at: true
                 },
             },
         ]);
@@ -19,7 +20,6 @@ const getPrivateRoomNames = async (req, res, next) => {
                 room.from = userNames[0]
                 room.to = userNames[1]
             }
-            console.log(userNames)
             return room
         })
         return res

@@ -29,6 +29,7 @@ const settingSchema = new Schema({
   avatarOption: {
     type: Boolean
   },
+  allowGuestAvatarUpload: Boolean,
   avatarColor: {
     type: Boolean
   },

@@ -37,6 +37,7 @@ export default function Setting() {
     const [avatarOption, setAvatarOption] = useState(true)
     const [avatarColor, setAvatarColor] = useState(true)
     const [bypassBan, setBypassBan] = useState(true)
+    const [allowGuestAvatarUpload, setAllowGuestAvatarUpload] = useState(false)
     const { addToast } = useToasts();
 
     useEffect(() => {
@@ -49,7 +50,7 @@ export default function Setting() {
         .then((response) => {
             if(response.status === 200) {
                 const {theme, language, messageNum, allowPrivate, messageTimeInterval,
-                    maxUsernameLength, maxMessageLength, avatarOption, avatarColor, bypassBan} = response.data;
+                    maxUsernameLength, maxMessageLength, avatarOption, avatarColor, bypassBan, allowGuestAvatarUpload} = response.data;
                 if(theme) {
                     setTheme(theme);
                 }
@@ -76,6 +77,7 @@ export default function Setting() {
                 setAvatarOption(avatarOption)
                 setAvatarColor(avatarColor)
                 setBypassBan(bypassBan)
+                setAllowGuestAvatarUpload(allowGuestAvatarUpload)
             }
         })
     }, [])
@@ -83,7 +85,7 @@ export default function Setting() {
     const handleUpdate = () => {
         let token = window.localStorage.getItem('token');
         Axios.post(`${config.server_url}/api/setting`, {theme, language, messageNum, allowPrivate,
-            messageTimeInterval, maxUsernameLength, maxMessageLength, avatarOption, avatarColor, bypassBan}, {
+            messageTimeInterval, maxUsernameLength, maxMessageLength, avatarOption, avatarColor, bypassBan, allowGuestAvatarUpload}, {
             headers: {
                 authorization: token
             }
@@ -239,6 +241,27 @@ export default function Setting() {
                                     onChange={(e) => setAvatarColor(e.target.checked)}
                                     name="avatarColor"
                                     inputProps={{ 'aria-label': 'avatar color' }}
+                                />
+                                </Grid>
+                                <Grid item>Yes</Grid>
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                    <Grid container spacing={2} style={{marginTop:'20px'}}>
+                        <Grid item sm={1}>
+                        </Grid>
+                        <Grid item sm={2} style={{textAlign: 'right'}}>
+                            <p className={classes.cardCategory}>Allow Guest Avatar upload</p>
+                        </Grid>
+                        <Grid item>
+                            <Grid component="label" container alignItems="center" spacing={1}>
+                                <Grid item>No</Grid>
+                                <Grid item>
+                                <Switch
+                                    checked={allowGuestAvatarUpload}
+                                    onChange={(e) => setAllowGuestAvatarUpload(e.target.checked)}
+                                    name="allowGuestAvatarUpload"
+                                    inputProps={{ 'aria-label': 'allow guest avatar upload' }}
                                 />
                                 </Grid>
                                 <Grid item>Yes</Grid>
