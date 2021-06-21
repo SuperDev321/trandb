@@ -256,8 +256,8 @@ const ChatRooms = ({room}, ref) => {
     // }, [mediaEvent]);
 
     // send poke message
-    const sendPokeMessage = (roomName, userToSend) => {
-        socket.emit('poke message', {from: username, to: userToSend, room: roomName}, (response) => {
+    const sendPokeMessage = (roomName, userToSend, pokeType) => {
+        socket.emit('poke message', {from: username, to: userToSend, room: roomName, pokeType}, (response) => {
             // this is callback function that can excute on server side
             if(response === 'muted') {
                 enqueueSnackbar(t('PokeMessage.error_muted'), {variant: 'error'});
@@ -266,7 +266,10 @@ const ChatRooms = ({room}, ref) => {
                     room: roomName,
                     message: {
                         type: 'poke',
-                        msg: t('PokeMessage.you_have_poked', {username: userToSend}),
+                        msg: t(`PokeMessage.poke_${pokeType}`, {
+                            sender: t('PokeMessage.you'),
+                            receiver: userToSend
+                        }),
                     }
                 })
             }

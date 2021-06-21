@@ -531,7 +531,10 @@ const useRooms = ({initRoomName, ...initalState}) => {
                         _id: makeid(10),
                         type: 'poke',
                         from: pokeMessage.from,
-                        msg: t('PokeMessage.have_poked_you', {username: pokeMessage.from}) 
+                        msg: t(`PokeMessage.poke_${pokeMessage.pokeType}`, {
+                            sender: pokeMessage.from,
+                            receiver: t('PokeMessage.you')
+                        }),
                     }
                     sameRoom.addMessages([message]);
                     let userToReceive = sameRoom.users.find((item) => (item.username === pokeMessage.from));

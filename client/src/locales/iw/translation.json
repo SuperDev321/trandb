@@ -161,6 +161,9 @@
     "unmute_this_person": "ביטול  השתקה/התעלמות",
     "mute_private": "התעלמות מהפרטי גם",
     "unmute_private": "הסרת התעלמות מהפרטי",
+    "good_morning": "Good morning",
+    "where_are_you": "Where are you",
+    "nock": "Nock",
     "default": "default"
   },
   "SettingModal": {
@@ -234,6 +237,11 @@
   "PokeMessage": {
     "you_have_poked": "שלחת צלצול ל {{username}}",
     "have_poked_you": "{{username}} שלח לך צילצול",
+    "poke_default": "{{sender}} send {{receiver}} poke",
+    "poke_good_morning": "{{sender}} send {{receiver}} good morning",
+    "poke_where_are_you": "{{sender}} send {{receiver}} where are you",
+    "poke_nock": "{{sender}} knocked on {{receiver}}",
+    "you": "you",
     "error_muted": "משתמש זה מתעלם ממך הצלמול לא נשלח"
   },
   "BroadcastSettingModal" : {

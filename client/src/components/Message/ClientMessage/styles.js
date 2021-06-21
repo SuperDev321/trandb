@@ -67,13 +67,13 @@ const useStyles = makeStyles((theme) => ({
         '& img.emoji': {
             verticalAlign: 'bottom',
             width: (props) =>
-            props.messageSize? props.messageSize + 7 : 21,
+            props.messageSize? props.messageSize + 7 : 28,
             height: (props) =>
-            props.messageSize? props.messageSize + 7 : 21,
+            props.messageSize? props.messageSize + 7 : 28,
         },
         '& img': {
-            width: 21,
-            height: 21
+            width: 28,
+            height: 28
         },
         '& a': {
             cursor: 'pointer',
