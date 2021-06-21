@@ -161,6 +161,9 @@
     "unmute_this_person": "Unmute this person",
     "mute_private": "Mute private",
     "unmute_private": "Unmute private",
+    "good_morning": "Good morning",
+    "where_are_you": "Where are you",
+    "nock": "Nock",
     "default": "default"
   },
   "SettingModal": {
@@ -235,6 +238,11 @@
   "PokeMessage": {
     "you_have_poked": "You have poked {{username}}",
     "have_poked_you": "{{username}} has poked you",
+    "poke_default": "{{sender}} send {{receiver}} poke",
+    "poke_good_morning": "{{sender}} send {{receiver}} good morning",
+    "poke_where_are_you": "{{sender}} send {{receiver}} where are you",
+    "poke_nock": "{{sender}} knocked on {{receiver}}",
+    "you": "you",
     "error_muted": "You are muted by user"
   },
   "BroadcastSettingModal" : {

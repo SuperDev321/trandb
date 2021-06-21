@@ -68,7 +68,17 @@ const useStyles = makeStyles((theme) => ({
         color: pink[500],
         textTransform: 'none',
     },
+    pokeContent: {
+        width: 200
+    }
 }))
+
+const pokeTypes = [
+    'default',
+    'good_morning',
+    'where_are_you',
+    'nock'
+]
 
 function useDoubleClick({oneClick, doubleClick}) {
     const [elem, setElem] = React.useState(null);
@@ -138,6 +148,7 @@ const RoomUserName = ({user, role, roomName,
     const classes = useStyles();
     const {t} = useTranslation();
     const [anchorEl, setAnchorEl] = React.useState(null);
+    const [anchorPokeEl, setAnchorPokeEl] = React.useState(null)
     const [openBan, setOpenBan] = React.useState(false);
     const [avatarUrl, setAvatarUrl] = useState(null);
     const { avatarOption, avatarColor } = useContext(SettingContext);
@@ -225,10 +236,11 @@ const RoomUserName = ({user, role, roomName,
         setAnchorEl(null);
     }
 
-    const sendPoke = () => {
+    const sendPoke = (poke) => {
         setAnchorEl(null);
+        setAnchorPokeEl(null);
         setTimeout(() => {
-            sendPokeMessage(roomName, user.username);
+            sendPokeMessage(roomName, user.username, poke);
         }, 0)
         
     }
@@ -246,6 +258,14 @@ const RoomUserName = ({user, role, roomName,
             stopBroadcastTo(roomName, user._id, user.username);
         }, 0);
     }
+
+    const handleClickPoke = (event) => {
+        setAnchorPokeEl(event.currentTarget);
+    }
+
+    const handleClosePokeContent = () => {
+        setAnchorPokeEl(null);
+    };
 
     useEffect(() => {
         const setRealAvatar = () => {    
@@ -282,6 +302,7 @@ const RoomUserName = ({user, role, roomName,
     }, [user, avatarOption, avatarColor])
 
     const open = Boolean(anchorEl);
+    const openPoke = Boolean(anchorEl && anchorPokeEl)
 
     return (
         <>
@@ -338,10 +359,38 @@ const RoomUserName = ({user, role, roomName,
                         <Button size="small" fullWidth
                             color="primary"
                             className={classes.cardButton}
-                            onClick={() => {sendPoke()}}
+                            aria-describedby="poke-content" onClick={handleClickPoke}
                         >
                             <Notifications />&nbsp;{t('UserActionArea.poke')}
                         </Button>
+                        <Popover
+                            id="poke-content"
+                            open={openPoke}
+                            anchorEl={anchorPokeEl}
+                            onClose={handleClosePokeContent}
+                            anchorOrigin={{
+                                vertical: 'top',
+                                horizontal: 'left',
+                            }}
+                            transformOrigin={{
+                                vertical: 'top',
+                                horizontal: 'right',
+                            }}
+                        >
+                            <div className={classes.pokeContent}>
+                            {
+                                pokeTypes.map((poke) => (
+                                    <Button size="small" key={poke} fullWidth
+                                        color="primary"
+                                        className={classes.cardButton}
+                                        onClick={() => {sendPoke(poke)}}
+                                    >
+                                        {t(`UserActionArea.${poke}`)}
+                                    </Button>
+                                ))
+                            }
+                            </div>
+                        </Popover>
                         <Button size="small" fullWidth
                             color="primary"
                             className={classes.cardButton}

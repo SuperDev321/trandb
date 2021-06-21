@@ -51,7 +51,7 @@ const publicMessage = (io, socket) => async ({ msg, room, from, color, bold, typ
   }
 };
 
-const pokeMessage = (io, socket) => async ({from, to, room}, callback) => {
+const pokeMessage = (io, socket) => async ({from, to, room, pokeType}, callback) => {
   const toUser = await findUserByName(to);
   const { _id } = socket.decoded;
   let user = await findUserById(_id);
@@ -85,6 +85,7 @@ const pokeMessage = (io, socket) => async ({from, to, room}, callback) => {
         room,
         from,
         to,
+        pokeType,
         ip: userIp
       }, (res) => {
         if (res) {
