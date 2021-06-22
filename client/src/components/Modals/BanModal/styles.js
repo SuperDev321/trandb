@@ -23,7 +23,7 @@ const useStyles = makeStyles((theme) => ({
     content: {
         width: '100%'
     },
-    username: {
+    textInput: {
         color: 'white',
         paddingBottom: theme.spacing(1)
     },

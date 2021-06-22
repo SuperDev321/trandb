@@ -86,10 +86,19 @@ const rejoinRoom = (io, socket) => async ({ room, type }, callback) => {
         if(type === 'public') {
             let user = await Users.findOne({_id});
             let {isBan, banType} = await checkBan(room, user.username, user.ip);
-            if(isBan) {
-                return callback(false, banType? 'banned_from_owner': 'banned_from_admin');
+            const {bypassBan} = await Settings.findOne({type: 'admin'});
+            if (isBan && !bypassBan) {
+                return callback(false, 'banned_from_room')
             }
-            let result = await Rooms.updateOne({ name: room }, { $addToSet: { users: _id } });
+
+            // baned guest user can't join to chat
+            if(isBan && (!banType && user.role ==='guest')) {
+                // return callback(false, banType? 'banned_from_owner': 'banned_from_admin');
+                return callback(false, 'info_banned');
+            } else if (isBan && banType) {
+                return callback(false, 'banned_from_room')
+            }
+            let result = await Rooms.updateOne({ name: room }, { $addToSet: { users: _id} });
             socket.join(room);
             
             // let {welcomeMessage} = await Rooms.findOne({name: room});

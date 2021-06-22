@@ -99,7 +99,7 @@ const SettingModal = () => {
         }
     }, [open])
 
-    const {role} = myUser;
+    const role = myUser && myUser.role? myUser.role: null;
     return (
         <>
         <IconButton aria-label="new notifications" color="inherit"
@@ -133,7 +133,7 @@ const SettingModal = () => {
                         <ListItem button onClick={()=>setPage('notifications')}>
                             <ListItemText primary={t('SettingModal.notifications')}/>
                         </ListItem>
-                        {(role !=='guest' || allowGuestAvatarUpload) &&
+                        {(role && (role !=='guest' || allowGuestAvatarUpload)) &&
                             <ListItem button onClick={()=>setPage('avatar')}>
                                 <ListItemText primary={t('SettingModal.avatar')}/>
                             </ListItem>
