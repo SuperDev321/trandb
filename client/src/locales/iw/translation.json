@@ -14,6 +14,7 @@
     "message_placeholder": "הקלידו כאן...",
     "error_create_room": "רק רשומים יכולים לפתוח חדר",
     "error_ban": "נחסמת מ- {{roomName}} על ידיי {{adminName}} ({{ userRole }}).",
+    "error_ban_with_reason": "You banned from {{roomName}} by {{adminName}} ({{ userRole }}) reason: {{reason}}.",
     "error_admin_ban_all_room": "נחסמתם לצאט יש לפנות באתר ל-פניות להנהלה",
     "sys_private_message": "שיחה פרטית עם: {{username}}",
     "system_user_request_video_permission": "{{username}} מבקש לצפות  בך בחדר-- {{roomName}}",
@@ -35,6 +36,7 @@
     "sys_closed_private_message": "משתמש  אינו קיים או שהתנתק,ההודעה לא נשלחה נא לסגור חלון זה",
     "sys_join_room": "{{username}}  נכנס/ה לחדר {{roomName}}",
     "sys_ban": "{{username}} נחסם מ- {{roomName}} על ידיי {{adminName}} ({{userRole}}).",
+    "sys_ban_with_reason": "{{username}} has banned from {{roomName}} by {{adminName}} ({{userRole}}) reason: {{reason}}.",
     "sys_ban_owner_room": "{{username}} נחסם מהחדר על ידיי המנהלים",
     "sys_ban_admin_room": "{{username}} נחסם מהחדר על ידיי המערכת",
     "sys_ban_admin_room_all": "{{username}} נחסם מהצאט ",
@@ -202,6 +204,12 @@
     "from_main_site": "From Main Site"
   },
   "BanModal": {
+    "ban_user": "Ban User",
+    "reason": "Reason",
+    "ip": "IP",
+    "ban_type": "Ban Type",
+    "ban": "Ban",
+    "cancel": "Cancel",
     "default": "default"
   },
   "LandingPage": {
