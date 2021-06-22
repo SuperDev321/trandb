@@ -220,14 +220,14 @@ const RoomUserName = ({user, role, roomName,
     }
     const handleBan = () => {
         setAnchorEl(null);
-        if(role === 'admin' || role === 'super_admin') {
+        // if(role === 'admin' || role === 'super_admin') {
             setOpenBan(true);
-        } else {
-            setTimeout(() => {
-                if(role && user && user.username)
-                    banUser(roomName, user.username);
-            }, 0);
-        }
+        // } else {
+        //     setTimeout(() => {
+        //         if(role && user && user.username)
+        //             banUser(roomName, user.username);
+        //     }, 0);
+        // }
     }
 
     const handleClickProfile = () => {
@@ -460,8 +460,8 @@ const RoomUserName = ({user, role, roomName,
                 }
             </Card>
         </Popover>
-        {(role === 'admin' || role === 'super_admin')&& <BanModal open={openBan} setOpen={setOpenBan} initVal={{name: user.username}}
-            roomName={roomName}
+        {(role === 'admin' || role === 'super_admin'|| role === 'owner'|| role === 'moderator') && <BanModal open={openBan} setOpen={setOpenBan} initVal={{name: user.username}}
+            roomName={roomName} isAdmin={(role === 'admin' || role === 'super_admin')}
         />
         }
         </>

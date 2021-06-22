@@ -17,7 +17,7 @@ import config from '../../../config';
 import { useTranslation } from 'react-i18next';
 
 
-export default function BanModal({open, setOpen, initVal, roomName}) {
+export default function BanModal({open, setOpen, initVal, roomName, isAdmin}) {
     const classes = useStyles();
     // const name = initVal.name?initVal.name: '';
     const name = initVal.name || '';
@@ -53,10 +53,14 @@ export default function BanModal({open, setOpen, initVal, roomName}) {
 
     const handleBan = () => {
         let payload = {}
-        if(type === 'this' && roomName) {
+        if (isAdmin) {
+            if(type === 'this' && roomName) {
+                payload.room = roomName;
+            }
+            payload.ip = ip;
+        } else {
             payload.room = roomName;
         }
-        payload.ip = ip;
         payload.reason = reason;
         payload.to = name;
         socket.emit('ban user', payload);
@@ -80,6 +84,8 @@ export default function BanModal({open, setOpen, initVal, roomName}) {
                 value={name}
                 className={classes.textInput}
             />
+            { isAdmin &&
+            <>
             <CustomTextField
                 autoComplete="off"
                 name="banType"
@@ -97,10 +103,10 @@ export default function BanModal({open, setOpen, initVal, roomName}) {
                 onChange={(e)=>{setType(e.target.value)}}
             >
                 <MenuItem value='all'>
-                    All Rooms
+                    {t('BanModal.all_rooms')}
                 </MenuItem>
                 <MenuItem value='this'>
-                    This Room
+                    {t('BanModal.this_room')}
                 </MenuItem>
             </CustomTextField>
             <Grid component="label" container alignItems="center" spacing={1}>
@@ -118,6 +124,8 @@ export default function BanModal({open, setOpen, initVal, roomName}) {
                 />
                 </Grid>
             </Grid>
+            </>
+            }
             <CustomTextField
                 margin="dense"
                 id="ban reason"
