@@ -379,7 +379,7 @@ export default function Gifts( {onClickNew, onClickEdit} ) {
                             padding: 4,
                             width: 'fit-content',
                           }}>
-                            <img src={'/gifts/' + row.src} />
+                            <video src={'/gifts/' + row.src} width="40" height="40" />
                           </div>
                         </TableCell>
                         <TableCell align="right">

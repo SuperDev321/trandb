@@ -3,7 +3,7 @@ const Gifts = require("../../database/models/Gifts");
 
 const deleteGift = async (req, res, next) => {
     try {
-        const { _id } = req.params;
+        const { id: _id } = req.params;
         let result = await Gifts.deleteOne({ _id });
         if (result) {
             res
