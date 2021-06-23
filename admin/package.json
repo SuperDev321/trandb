@@ -2,6 +2,7 @@
   "name": "mern-auth",
   "version": "0.1.0",
   "private": true,
+  "homepage": "/admin",
   "dependencies": {
     "@material-ui/core": "^4.11.2",
     "@material-ui/icons": "^4.11.2",
@@ -12,6 +13,7 @@
     "axios": "^0.19.2",
     "material-ui-search-bar": "^1.0.0",
     "perfect-scrollbar": "^1.5.0",
+    "rc-color-picker": "^1.2.6",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-material-ui-form-validator": "^2.1.1",

@@ -13,7 +13,6 @@ function getFileName(prefix, filename) {
   }
 
 const fileUploader = async (req, res) => {
-    console.log('fileupload')
     if (req.files && req.files.file_icon) {
       var photoIcon = req.files.file_icon;
       var newIconFileName = getFileName("icon_", req.files.file_icon.name);
@@ -27,9 +26,11 @@ const fileUploader = async (req, res) => {
         })
       } catch (err) {
         console.log(err);
+        next(err);
       }
     } else {
       console.log(err);
+      next(err)
     }
 }
 

@@ -28,6 +28,7 @@
     "ip-to-int": "^0.3.1",
     "is-ip": "^3.1.0",
     "jsonwebtoken": "^8.5.1",
+    "mediasoup": "^3.6.16",
     "mongoose": "^5.10.8",
     "mysql": "^2.18.1",
     "random-string": "^0.2.0",

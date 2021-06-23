@@ -29,7 +29,6 @@ export default function App() {
       const { data } = await axios.post(`${config.server_url}/api/checkToken`, {
         token
       });
-      console.log(data)
         if (data === 'un-auth') {
           setLoading(false);
           setSuperAdmin(false);

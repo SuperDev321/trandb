@@ -1,7 +1,6 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import propTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
-import { SettingContext } from '../../../context';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -15,16 +14,10 @@ const useStyles = makeStyles((theme) => ({
         justifyContent: 'space-between',
         width: 'fit-content',
         background: '#28a3c9b8',
-        direction: props => (
-            props.language === 'en'?
-            'ltr':
-            'rtl'
-        )
     },
 }))
 
 const SystemMessage = ({ text }) => {
-    const { language } = useContext(SettingContext)
     const classes = useStyles();
     return (
         <div className={classes.root}>
