@@ -26,6 +26,7 @@ const userSchema = new Schema({
   isMobile: Boolean,
   avatar: String,
   created_at: Date,
+  point: Number
 });
 
 const Users = model('Users', userSchema);

@@ -13,7 +13,8 @@ import {
     AccountCircleOutlined,
     Videocam,
     Notifications,
-    VisibilityOff
+    VisibilityOff,
+    CardGiftcard
 } from '@material-ui/icons';
 import {useTranslation} from 'react-i18next';
 import { makeStyles } from '@material-ui/core/styles';
@@ -22,7 +23,7 @@ import BanModal from '../Modals/BanModal';
 import CustomTooltip from '../CustomTooltip'
 import {socket} from '../../utils'
 import config from '../../config';
-import { SettingContext } from '../../context';
+import { ChatContext, SettingContext } from '../../context';
 const useStyles = makeStyles((theme) => ({
     content: {
         display: 'flex',
@@ -138,7 +139,7 @@ function useDoubleClick({oneClick, doubleClick}) {
 }
 
 const RoomUserName = ({user, role, roomName,
-    changeMuteState, sendPokeMessage, kickUser, banUser,addOrOpenPrivate, viewBroadcast, stopBroadcastTo,
+    changeMuteState, sendPokeMessage, kickUser, banUser, addOrOpenPrivate, viewBroadcast, stopBroadcastTo,
     isMine, displayYou, isMuted, isBlocked, isPrivateMuted, changePrivateMute, showAboutMe
     // open,
     // anchorEl,
@@ -152,6 +153,7 @@ const RoomUserName = ({user, role, roomName,
     const [openBan, setOpenBan] = React.useState(false);
     const [avatarUrl, setAvatarUrl] = useState(null);
     const { avatarOption, avatarColor } = useContext(SettingContext);
+    const { setOpenGiftModal, setGiftUsername } = useContext(ChatContext);
     const handleDbClick = (event) => {
         handleClickPrivateChat(event);
     }
@@ -163,11 +165,12 @@ const RoomUserName = ({user, role, roomName,
     const handleClickPrivateChat = (event) => {
         setAnchorEl(null);
         event.preventDefault();
-        setTimeout(() => {
-            addOrOpenPrivate(user);
-        }, 0);
+        if (!isMine) {
+             setTimeout(() => {
+                addOrOpenPrivate(user);
+            }, 0);
+        }
     }
-    
     
     const handleClose = () => {
         setAnchorEl(null);
@@ -242,7 +245,6 @@ const RoomUserName = ({user, role, roomName,
         setTimeout(() => {
             sendPokeMessage(roomName, user.username, poke);
         }, 0)
-        
     }
 
     const view = () => {
@@ -250,6 +252,14 @@ const RoomUserName = ({user, role, roomName,
         setTimeout(() => {
             viewBroadcast(roomName, user._id, user.username);
         }, 0);
+    }
+
+    const gift = () => {
+        setAnchorEl(null);
+        setTimeout(() => {
+            setGiftUsername(user.username)
+            setOpenGiftModal(true)
+        }, 0)
     }
 
     const stopView = () => {
@@ -404,6 +414,13 @@ const RoomUserName = ({user, role, roomName,
                             onClick={() => {stopView()}}
                         >
                             <VisibilityOff />&nbsp;{t('UserActionArea.stopView')}
+                        </Button>
+                        <Button size="small" fullWidth
+                            color="primary"
+                            className={classes.cardButton}
+                            onClick={() => {gift()}}
+                        >
+                            <CardGiftcard />&nbsp;{t('UserActionArea.gift')}
                         </Button>
                         <Divider />
                         { ((role === 'super_admin' || role === 'admin' || role === 'owner' || role === 'moderator')

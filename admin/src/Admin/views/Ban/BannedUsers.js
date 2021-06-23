@@ -174,7 +174,6 @@ export default function BanComponent( {onClickNew} ) {
       }
     })
     .then((response) => {
-      console.log(response);
       if(response.status === 204) {
         let newRows = rows.filter((row) => (row._id !== id));
         setRows(newRows);
@@ -214,7 +213,6 @@ export default function BanComponent( {onClickNew} ) {
           authorization: token
         }
       });
-      console.log(bans)
       let bansToShow = bans.data.data.map((item, index) => ({...item, no: index+1}));
       setRows(bansToShow);
     }

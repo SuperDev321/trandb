@@ -6,6 +6,7 @@ const { publicMessage, privateMessage, pokeMessage } = require('./msgHandler');
 const { kickUser, banUser, banUserByAdmin, blockUser, unBlockUser } = require('./userHandler');
 const {sendSignal, returnSignal} = require('./videoHandler');
 const socketDisconnect = require('./disconnect');
+const { sendGift } = require('./gift')
 const { Users } = require('../database/models');
 const LogManager = require('../constructors/logManager');
 const { verifyToken, findUserById, initSetting } = require('../utils');
@@ -66,6 +67,7 @@ const ioHandler = (io) => async (socket) => {
     socket.on('ban user', banUser(io, socket));
     socket.on('block user', blockUser(io, socket));
     socket.on('unblock user', unBlockUser(io, socket));
+    socket.on('send gift', sendGift(io, socket));
     // video events
     // socket.on('joinMedia', joinMedia(io, socket));
     // socket.on('getProducers', getProducers(io, socket));
@@ -98,8 +100,8 @@ const adminIoHandler = (io) => (socket) => {
 
 const initIO = (server) => {
   io = socketIO(server, {
-    pingInterval: 60000,
-    pingTimeout: 60000,
+    pingInterval: 25000,
+    pingTimeout: 60000 * 3,
     upgradeTimeout: 30000,
     agent: false,
     reconnectionDelay: 1000,

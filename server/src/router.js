@@ -43,7 +43,10 @@ const {
   addBoot,
   deleteBoot,
   getBoots,
-  editBoot
+  editBoot,
+  addGift,
+  deleteGift,
+  getGifts
 } = require('./controllers');
 const getUserIp = require('./controllers/users/getUserIp');
 
@@ -105,6 +108,11 @@ router.post('/boot/edit', editBoot);
 router.post('/boot/start', startBoot);
 router.post('/boot/stop', stopBoot);
 router.delete('/boots/:id', deleteBoot);
+
+router.get('/gifts', getGifts);
+router.post('/gift', addGift);
+router.delete('/gift/:id', deleteGift);
+
 
 router.use(clientError);
 router.use(serverError);

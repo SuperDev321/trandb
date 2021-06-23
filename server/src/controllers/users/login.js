@@ -15,20 +15,17 @@ const login = async (req, res, next) => {
     await validateLoginCredentials({ username, password, aboutMe });
 
     let user = await getUserFromServer(username, password);
-    // let user = {
-    //   username,
-    //   role: 'admin',
-    //   gender: 'male'
-    // }
     if(user) {
       let currentUser = await getUserByNickname(username);
       if(!currentUser) {
-        currentUser = await Users.create({username, password, role: user.role, gender: user.gender, avatar: user.avatar, aboutMe, avatarObj: {
-          default: null,
-          joomula: user.avatar
-        },
-        currentAvatar: 'default'
-      });
+        currentUser = await Users.create({username, password, role: user.role, gender: user.gender, avatar: user.avatar,
+          aboutMe, avatarObj: {
+            default: null,
+            joomula: user.avatar
+          },
+          currentAvatar: 'default',
+          point: 1000
+        });
       } else {
         const oldAvatar = currentUser.avatarObj;
         let defaultAvatar = null;
