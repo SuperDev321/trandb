@@ -14,6 +14,7 @@ import SeparateLine from '../../SeparateLine';
 import { socket } from '../../../utils';
 import getGifts from '../../../utils/getGifts';
 import config from '../../../config';
+import { UserContext } from '../../../context';
 // const useStyles = makeStyles((theme) => ({
 //     root: {
 //       width: '100%',
@@ -38,6 +39,7 @@ export default function GiftModal({open, setOpen, username}) {
     const [currentGift, setCurrentGift] = React.useState(null);
     const [gifts, setGifts] = React.useState([]);
     const [amount, setAmount] = React.useState(1);
+    const { updateUser } = React.useContext(UserContext);
     const changeGift = (giftName) => {
         const gift = gifts.find(({name}) => (name === giftName));
         setCurrentGift(gift)
@@ -53,9 +55,12 @@ export default function GiftModal({open, setOpen, username}) {
                 to: username,
                 giftId: currentGift._id
             }, (res) => {
-                console.log('callback of gift', res)
+                if (res) {
+                    updateUser()
+                }
             })
         }
+        setOpen(false);
     }
 
     useEffect(() => {
