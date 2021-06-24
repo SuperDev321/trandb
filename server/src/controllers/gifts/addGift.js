@@ -18,7 +18,7 @@ const addGift = async (req, res, next) => {
         console.log(name, detail, cost)
         if (req.files && req.files.gift_file) {
             var giftFile = req.files.gift_file;
-            var newGiftFileName = getFileName("icon_", giftFile.name);
+            var newGiftFileName = getFileName("gift_", giftFile.name);
             try {
                 await giftFile.mv(path.join(__dirname, '..', '..', '..', '..', 'client', 'build/gifts/', newGiftFileName));
                 await giftFile.mv(path.join(__dirname, '..', '..', '..', '..', 'client', 'public/gifts/', newGiftFileName));

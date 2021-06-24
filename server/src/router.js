@@ -46,7 +46,9 @@ const {
   editBoot,
   addGift,
   deleteGift,
-  getGifts
+  updateGift,
+  getGifts,
+  initPoints
 } = require('./controllers');
 const getUserIp = require('./controllers/users/getUserIp');
 
@@ -74,6 +76,7 @@ router.post('/signup', signup);
 router.post('/login', withIp, login);
 router.post('/login/guest', withIp, guestLogin);
 router.post('/login/google', googleLogin);
+router.post('/users/init/point', initPoints);
 
 router.post('/messages/private', withAuth, isAdmin, getPrivateChat);
 router.get('/messages/public/:roomName', withAuth, isAdmin, getPublicChat);
@@ -112,6 +115,7 @@ router.delete('/boots/:id', deleteBoot);
 router.get('/gifts', getGifts);
 router.post('/gift', addGift);
 router.delete('/gift/:id', deleteGift);
+router.post('/gift/edit', updateGift);
 
 
 router.use(clientError);
