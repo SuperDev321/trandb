@@ -104,6 +104,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
     const [roomNameForPassword, setRoomNameForPassword] = useState('');
     const [giftUsername, setGiftUsername] = useState(null);
     const [gift, setGift] = useState(null);
+    const [roomNameForGift, setRoomNameForGift] = useState(null);
 
     const roomNameRef = React.useRef(initRoomName);
 
@@ -632,16 +633,20 @@ const useRooms = ({initRoomName, ...initalState}) => {
 
     const receiveGift = (payload) => {
         try {
-            const { gift, from } = payload;
-            if (gift && from) {
-                setGift(payload.gift);
-                updateUser()
-                let message = {
+            const { gift, from, to, room } = payload;
+            if (gift && from && to && room) {
+                if (username === to) {
+                    setGift(payload.gift);
+                    updateUser()
+                }
+                const message = {
                     _id: makeid(10),
                     type: 'gift',
-                    from: from.username,
-                    msg: `${from.username} sent to you ${gift.name}`
+                    from,
+                    to,
+                    msg: `${from} sent to ${to} ${gift.name}`
                 }
+                addMessage({ message, room });
             }
         } catch (err) {
             // console.log(err)
@@ -684,7 +689,6 @@ const useRooms = ({initRoomName, ...initalState}) => {
             })
 
             socket.on('received gift', (payload) => {
-                console.log('received gift', payload)
                 receiveGift(payload);
             })
 
@@ -985,7 +989,9 @@ const useRooms = ({initRoomName, ...initalState}) => {
         setGiftUsername,
         roomNameForPassword,
         gift,
-        setGift
+        setGift,
+        roomNameForGift,
+        setRoomNameForGift
     }
 
 }

@@ -7,6 +7,7 @@ import SystemMessage from '../SystemMessage';
 import BootMessage from '../BootMessage';
 import {CustomThemeContext} from '../../../themes/cutomThemeProvider';
 import { SettingContext } from '../../../context';
+import GiftMessage from '../GiftMessage';
 
 const useStyles =  makeStyles((theme) => ({
     root: {
@@ -108,6 +109,10 @@ const MessagesList = ({ users, messages, role, userAction, roomName, changeMuteS
                         {
                         (type ==='joinLeave') &&
                             <JoinLeaveMessage text={msg} />
+                        }
+                        {
+                        (type ==='gift') &&
+                            <GiftMessage text={msg} />
                         }
                     </span>
                 ))
