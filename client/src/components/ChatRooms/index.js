@@ -15,12 +15,14 @@ import PasswordModal from '../Modals/PasswordModal'
 import PrivateChatList from '../PrivateChat/PrivateChatList'
 import VideoList from '../VideoList';
 import {StyledTab , StyledTabs} from '../StyledTab';
-import DisconnectModal from '../Modals/DisconnectModal'
+import DisconnectModal from '../Modals/DisconnectModal';
+import GiftModal from '../Modals/GiftModal';
+import GiftView from '../common/GiftView';
 import {UserContext} from '../../context';
 import { socket } from '../../utils';
 import { useTranslation } from 'react-i18next';
 import useRooms from './useRooms';
-import {SettingContext} from '../../context';
+import {SettingContext, ChatContext} from '../../context';
 
 import Loading from '../Loading';
 
@@ -67,8 +69,14 @@ const ChatRooms = ({room}, ref) => {
         setOpenDisconnectModal,
         openPasswordModal,
         setOpenPasswordModal,
+        openGiftModal,
+        setOpenGiftModal,
+        giftUsername,
+        setGiftUsername,
         roomNameForPassword,
-        mediaClientRef
+        mediaClientRef,
+        gift,
+        setGift
     } = useRooms({initRoomName: room});
 
     const controlVideo = (data) => {
@@ -298,170 +306,175 @@ const ChatRooms = ({room}, ref) => {
         })
     }
 
-
     return (
-        <>
-        <div className={classes.root} color="primary">
-            <Hidden xsDown implementation="css" className={classes.drawerWrapper}>
-                <div className={classes.drawer}>
-                { (status === 'resolved' && currentRoomData) ?
-                    <SideBarLeft
-                        users={currentRoomData.users}
-                        broadcastingUsers={currentRoomData.liveUsers}
-                        viewers={currentRoomData.viewers}
-                        changeMuteState={changeMuteState}
-                        sendPokeMessage={sendPokeMessage}
-                        kickUser={kickUser}
-                        banUser={banUser}
-                        // unReadInfo={currentRoom && currentRoom.private}
-                        roomName={currentRoomData.name}
-                        mutes={currentRoomData.mutes}
-                        blocks={currentRoomData.blocks}
-                        globalBlocks={globalBlocks}
-                        // setOpenPrivate={setOpenPrivate}
-                        // setPrivateTo={setPrivateTo}
-                        addOrOpenPrivate={addOrOpenPrivate}
-                        cameraState={currentRoomData.localStream? (currentRoomData.localStream.locked? 'locked': true): false}
-                        startBroadcast={startBroadcast}
-                        stopBroadcast={stopBroadcast}
-                        stopBroadcastTo={stopBroadcastTo}
-                        viewBroadcast={viewBroadcast}
-                        username={username}
-                    />  
-                    : <Loading />
-                }
-                </div>
-            </Hidden>
-            
-            <div className={classes.mainWrapper}>
-                <AppBar className={classes.chatBar} position="static">
-                    <div className={classes.chatBarContent}>
-                    <IconButton
-                                color="inherit"
-                                aria-label="open drawer"
-                                onClick={handleDrawerToggle}
-                                className={classes.menuButton}
-                            >
-                                <MenuIcon />
-                            </IconButton>
-                    {
-                        (roomsStatus === 'resolved') ?
-                        <>
-                            <StyledTabs value={roomIndex}
-                                variant="scrollable"
-                                scrollButtons="auto"
-                                aria-label='scrollable-auto-tab'
-                                aria-label="scrollable force tabs example"
-                            >
-                                {
-                                    roomsData.map((item, index) => (
-                                        <StyledTab
-                                            key={item.name} label={<span>{item.name}</span>}
-                                            id={`scrollable-auto-tabpanel-${index}`}
-                                            aria-labelledby={`scrollable-auto-tab-${index}`}
-                                            onClick={() => handleChangeRoom(index)}
-                                            unRead={item.unReadMessages ? item.unReadMessages.length: 0}
-                                            onClose={roomsData.length < 2 ? null: () => {leaveRoomByUser(item.name)}}
-                                        />
-                                    ))
-                                }
-                            </StyledTabs>
-                            <AddRoomModal addRoom={addRoom}/>
-                        </>
-                        :
-                        <Loading />
-                    }
-                    </div>
-                </AppBar>
-                <Hidden smUp implementation="css">
-                    { mobileOpen &&
-                        <Card className={classes.modbileDrawer}>
-                        { (status === 'resolved' && currentRoomData) ?
-                            <SideBarLeft
-                                users={currentRoomData.users}
-                                broadcastingUsers={currentRoomData.liveUsers}
-                                viewers={currentRoomData.viewers}
-                                changeMuteState={changeMuteState}
-                                sendPokeMessage={sendPokeMessage}
-                                kickUser={kickUser}
-                                banUser={banUser}
-                                // unReadInfo={currentRoom && currentRoom.private}
-                                roomName={currentRoomData.name}
-                                mutes={currentRoomData.mutes}
-                                blocks={currentRoomData.blocks}
-                                globalBlocks={globalBlocks}
-                                // setOpenPrivate={setOpenPrivate}
-                                // setPrivateTo={setPrivateTo}
-                                addOrOpenPrivate={addOrOpenPrivate}
-                                cameraState={currentRoomData.localStream? (currentRoomData.localStream.locked? 'locked': true): false}
-                                startBroadcast={startBroadcast}
-                                stopBroadcast={stopBroadcast}
-                                stopBroadcastTo={stopBroadcastTo}
-                                viewBroadcast={viewBroadcast}
-                                username={username}
-                            />  
-                            : <Loading />
-                        }
-                        </Card>
-                    }
-                </Hidden>
-
-                <main className={classes.main}>
-                    <div className={classes.content}>
+        <ChatContext.Provider value={{openGiftModal, setOpenGiftModal, giftUsername, setGiftUsername}}>
+            <div className={classes.root} color="primary">
+                <Hidden xsDown implementation="css" className={classes.drawerWrapper}>
+                    <div className={classes.drawer}>
                     { (status === 'resolved' && currentRoomData) ?
-                        <ChatRoomContent
-                            username={username}
-                            roomName={currentRoomData.name}
-                            mutes={currentRoomData.mutes}
-                            blocks={currentRoomData.blocks}
-                            globalBlocks={globalBlocks}
-                            messages={currentRoomData.messages}
+                        <SideBarLeft
                             users={currentRoomData.users}
-                            sendMessage={sendMessage}
+                            broadcastingUsers={currentRoomData.liveUsers}
+                            viewers={currentRoomData.viewers}
                             changeMuteState={changeMuteState}
                             sendPokeMessage={sendPokeMessage}
                             kickUser={kickUser}
                             banUser={banUser}
                             // unReadInfo={currentRoom && currentRoom.private}
+                            roomName={currentRoomData.name}
+                            mutes={currentRoomData.mutes}
+                            blocks={currentRoomData.blocks}
+                            globalBlocks={globalBlocks}
                             // setOpenPrivate={setOpenPrivate}
                             // setPrivateTo={setPrivateTo}
                             addOrOpenPrivate={addOrOpenPrivate}
-                        />
-                        :
-                        <Loading />
+                            cameraState={currentRoomData.localStream? (currentRoomData.localStream.locked? 'locked': true): false}
+                            startBroadcast={startBroadcast}
+                            stopBroadcast={stopBroadcast}
+                            stopBroadcastTo={stopBroadcastTo}
+                            viewBroadcast={viewBroadcast}
+                            username={username}
+                        />  
+                        : <Loading />
                     }
                     </div>
-                </main>
+                </Hidden>
+                
+                <div className={classes.mainWrapper}>
+                    <AppBar className={classes.chatBar} position="static">
+                        <div className={classes.chatBarContent}>
+                        <IconButton
+                                    color="inherit"
+                                    aria-label="open drawer"
+                                    onClick={handleDrawerToggle}
+                                    className={classes.menuButton}
+                                >
+                                    <MenuIcon />
+                                </IconButton>
+                        {
+                            (roomsStatus === 'resolved') ?
+                            <>
+                                <StyledTabs value={roomIndex}
+                                    variant="scrollable"
+                                    scrollButtons="auto"
+                                    aria-label='scrollable-auto-tab'
+                                    aria-label="scrollable force tabs example"
+                                >
+                                    {
+                                        roomsData.map((item, index) => (
+                                            <StyledTab
+                                                key={item.name} label={<span>{item.name}</span>}
+                                                id={`scrollable-auto-tabpanel-${index}`}
+                                                aria-labelledby={`scrollable-auto-tab-${index}`}
+                                                onClick={() => handleChangeRoom(index)}
+                                                unRead={item.unReadMessages ? item.unReadMessages.length: 0}
+                                                onClose={roomsData.length < 2 ? null: () => {leaveRoomByUser(item.name)}}
+                                            />
+                                        ))
+                                    }
+                                </StyledTabs>
+                                <AddRoomModal addRoom={addRoom}/>
+                            </>
+                            :
+                            <Loading />
+                        }
+                        </div>
+                    </AppBar>
+                    <Hidden smUp implementation="css">
+                        { mobileOpen &&
+                            <Card className={classes.modbileDrawer}>
+                            { (status === 'resolved' && currentRoomData) ?
+                                <SideBarLeft
+                                    users={currentRoomData.users}
+                                    broadcastingUsers={currentRoomData.liveUsers}
+                                    viewers={currentRoomData.viewers}
+                                    changeMuteState={changeMuteState}
+                                    sendPokeMessage={sendPokeMessage}
+                                    kickUser={kickUser}
+                                    banUser={banUser}
+                                    // unReadInfo={currentRoom && currentRoom.private}
+                                    roomName={currentRoomData.name}
+                                    mutes={currentRoomData.mutes}
+                                    blocks={currentRoomData.blocks}
+                                    globalBlocks={globalBlocks}
+                                    // setOpenPrivate={setOpenPrivate}
+                                    // setPrivateTo={setPrivateTo}
+                                    addOrOpenPrivate={addOrOpenPrivate}
+                                    cameraState={currentRoomData.localStream? (currentRoomData.localStream.locked? 'locked': true): false}
+                                    startBroadcast={startBroadcast}
+                                    stopBroadcast={stopBroadcast}
+                                    stopBroadcastTo={stopBroadcastTo}
+                                    viewBroadcast={viewBroadcast}
+                                    username={username}
+                                />  
+                                : <Loading />
+                            }
+                            </Card>
+                        }
+                    </Hidden>
+
+                    <main className={classes.main}>
+                        <div className={classes.content}>
+                        { (status === 'resolved' && currentRoomData) ?
+                            <ChatRoomContent
+                                username={username}
+                                roomName={currentRoomData.name}
+                                mutes={currentRoomData.mutes}
+                                blocks={currentRoomData.blocks}
+                                globalBlocks={globalBlocks}
+                                messages={currentRoomData.messages}
+                                users={currentRoomData.users}
+                                sendMessage={sendMessage}
+                                changeMuteState={changeMuteState}
+                                sendPokeMessage={sendPokeMessage}
+                                kickUser={kickUser}
+                                banUser={banUser}
+                                // unReadInfo={currentRoom && currentRoom.private}
+                                // setOpenPrivate={setOpenPrivate}
+                                // setPrivateTo={setPrivateTo}
+                                addOrOpenPrivate={addOrOpenPrivate}
+                            />
+                            :
+                            <Loading />
+                        }
+                        </div>
+                    </main>
+                </div>
+                <>
+                {
+                    (status === 'resolved' && currentRoomData) ?
+                    <VideoList roomName={currentRoomData.name}
+                        streams={currentRoomData.remoteStreams} localStream={currentRoomData.localStream} controlVideo={controlVideo}/>
+                    : null
+                }
+                </>
             </div>
-            <>
-            {
-                (status === 'resolved' && currentRoomData) ?
-                <VideoList roomName={currentRoomData.name}
-                    streams={currentRoomData.remoteStreams} localStream={currentRoomData.localStream} controlVideo={controlVideo}/>
-                : null
-            }
-            </>
-        </div>
-        <PrivateChatList ref={privateListRef}
-            sendMessage={sendMessage}
-            leaveFromPrivate={leaveFromPrivate}
-            me={{username, avatar, gender}}
-            globalBlocks={globalBlocks}
-        />
-        <div>{pokeAudio}</div>
-        <div>{publicAudio}</div>
-        <div>{privateAudio}</div>
-        <div>{requestAudio}</div>
-        <DisconnectModal
-            open={openDisconnectModal}
-            setOpen={setOpenDisconnectModal}
-        />
-        <PasswordModal
-            open={openPasswordModal}
-            setOpen={setOpenPasswordModal}
-            room={roomNameForPassword}
-        />
-        </>
+            <PrivateChatList ref={privateListRef}
+                sendMessage={sendMessage}
+                leaveFromPrivate={leaveFromPrivate}
+                me={{username, avatar, gender}}
+                globalBlocks={globalBlocks}
+            />
+            <div>{pokeAudio}</div>
+            <div>{publicAudio}</div>
+            <div>{privateAudio}</div>
+            <div>{requestAudio}</div>
+            <DisconnectModal
+                open={openDisconnectModal}
+                setOpen={setOpenDisconnectModal}
+            />
+            <PasswordModal
+                open={openPasswordModal}
+                setOpen={setOpenPasswordModal}
+                room={roomNameForPassword}
+            />
+            <GiftModal
+                open={openGiftModal}
+                setOpen={setOpenGiftModal}
+                username={giftUsername}
+            />
+            <GiftView gift={gift} setGift={setGift} />
+        </ChatContext.Provider>
     );
 }
 export default forwardRef(ChatRooms);

@@ -166,6 +166,7 @@
     "good_morning": "Good morning",
     "where_are_you": "Where are you",
     "nock": "Nock",
+    "gift": "Gift",
     "default": "default"
   },
   "SettingModal": {
@@ -264,5 +265,8 @@
   },
   "InputMessage": {
     "type_message": "Type a message"
+  },
+  "GiftModal": {
+
   }
 }

@@ -32,14 +32,14 @@ const guestLogin = async (req, res, next) => {
         }
         let user = await getGuest(nickname);
         if(!user) {
-            user = await createUser({ username: nickname, role: 'guest', gender, aboutMe });
+            user = await createUser({ username: nickname, role: 'guest', gender, aboutMe, point: 0 });
         } else {
             if(user.isInChat) {
                 for (let index = 0; ; index++) {
                     let newUsername = nickname + ' ('+ (index+1) + ')';
                     user = await getGuest(newUsername);
                     if(!user) {
-                        user = await createUser({ username: newUsername, role: 'guest', gender, aboutMe });
+                        user = await createUser({ username: newUsername, role: 'guest', gender, aboutMe, point: 0 });
                         break;
                     } else if(!user.isInChat) {
                         break;
@@ -48,7 +48,7 @@ const guestLogin = async (req, res, next) => {
                     }
                 }
             } else {
-                await Users.updateOne({username: nickname}, {gender, aboutMe});
+                await Users.updateOne({username: nickname}, {gender, aboutMe, point: 0});
                 user = await getGuest(nickname);
             }
         }

@@ -4,7 +4,6 @@ const useStyles = makeStyles((theme) => ({
     inputEmojiContainer: {
         // color: '#4b4b4b',
         color: props => {
-          console.log(props.color);
             if (props.color && theme.palette.messageColors[props.color]) {
                 return theme.palette.messageColors[props.color]
             } else if (theme.palette.messageColors.default) {

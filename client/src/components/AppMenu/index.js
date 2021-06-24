@@ -5,7 +5,8 @@ import {
     Grow,
     Paper,
     ClickAwayListener,
-    MenuList
+    MenuList,
+    SvgIcon
 } from '@material-ui/core';
 import UserAvatar from '../UserAvatar';
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
@@ -15,17 +16,22 @@ import axios from 'axios';
 import {UserContext} from '../../context';
 import { message } from 'antd';
 import { useTranslation } from 'react-i18next';
+import {ReactComponent as Money} from '../../icons/money.svg'
 
 const useStyles = makeStyles((theme) => ({
     avatar: {
         width: theme.spacing(4),
         height: theme.spacing(4),
     },
+    content: {
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        flexDirection: 'column',
+        lineHeight: 1
+    },
     username: {
         color: theme.palette.primary.text,
-        textAlign: 'end',
-        marginLeft: theme.spacing(0.5),
-        marginTop: '2px',
         textTransform: 'none',
         whiteSpace: 'nowrap'
     },
@@ -35,6 +41,16 @@ const useStyles = makeStyles((theme) => ({
     },
     menu: {
         minWidth: '120px'
+    },
+    point: {
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 1,
+        '& svg': {
+            paddingRight: 2
+        },
+        color: '#edba31'
     }
 }))
 
@@ -73,7 +89,7 @@ export default function AppMenu() {
         }
     }
 
-    const { removeCurrentUser, avatar, username } = useContext(UserContext);
+    const { removeCurrentUser, avatar, username, point } = useContext(UserContext);
 
     const handleClickProfile = () => {
         if(username) {
@@ -105,9 +121,16 @@ export default function AppMenu() {
                 onClick={handleToggle}
             >
                 <UserAvatar avatar={avatar} />
-                <span className={classes.username}>
-                    {username}
-                </span>
+                
+                <div className={classes.content}>
+                    <span className={classes.username}>
+                        {username}
+                    </span>
+                    <div className={classes.point}>
+                        <SvgIcon style={{fontSize: '1.3em'}} component={Money} viewBox="0 0 600 476.6" />
+                        <span>{point ? point: 0}</span>
+                    </div>
+                </div>
                 <ArrowDropDownIcon className={classes.dropIcon} />
             </Button>
             <Popper open={open} style={{zIndex: 100}} anchorEl={anchorRef.current} role={undefined} transition>

@@ -33,6 +33,7 @@ import Setting from 'Admin/views/Setting';
 import Quiz from 'Admin/views/Quiz';
 import Log from 'Admin/views/Log';
 import PrivateLogs from 'Admin/views/PrivateLogs';
+import Gifts from 'Admin/views/Gift'
 
 const dashboardRoutes = [
   {
@@ -96,6 +97,14 @@ const dashboardRoutes = [
     name: "Private Logs",
     icon: QuestionAnswerIcon,
     component: PrivateLogs,
+    layout: "/admin",
+    super: true,
+  },
+  {
+    path: "/gifts",
+    name: "Gifts",
+    icon: QuestionAnswerIcon,
+    component: Gifts,
     layout: "/admin",
     super: true,
   },

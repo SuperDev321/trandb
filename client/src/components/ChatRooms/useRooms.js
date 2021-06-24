@@ -8,7 +8,6 @@ import { useSnackbar } from 'notistack';
 import { useHistory } from 'react-router-dom';
 import {useAudio} from 'react-use';
 import {permissionRequest} from './notification';
-
 function makeid(length) {
     var result           = [];
     var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -101,7 +100,10 @@ const useRooms = ({initRoomName, ...initalState}) => {
     const { enqueueSnackbar } = useSnackbar();
     const [openDisconnectModal, setOpenDisconnectModal] = useState(false);
     const [openPasswordModal, setOpenPasswordModal] = useState(false);
+    const [openGiftModal, setOpenGiftModal] = useState(false);
     const [roomNameForPassword, setRoomNameForPassword] = useState('');
+    const [giftUsername, setGiftUsername] = useState(null);
+    const [gift, setGift] = useState(null);
 
     const roomNameRef = React.useRef(initRoomName);
 
@@ -663,8 +665,16 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 updateUserInfo(payload)
             })
 
+            socket.on('received gift', (payload) => {
+                console.log('received gift', payload)
+                if (payload && payload.gift) {
+                    setGift(payload.gift)
+                }
+            })
+
             socket.on('disconnect', (reason) => {
                 setOpenDisconnectModal(true);
+                console.log('disconnect', reason)
                 if (reason === 'io server disconnect') {
                     // the disconnection was initiated by the server, you need to reconnect manually
                     socket.connect();
@@ -953,7 +963,13 @@ const useRooms = ({initRoomName, ...initalState}) => {
         mediaClientRef,
         openPasswordModal,
         setOpenPasswordModal,
-        roomNameForPassword
+        openGiftModal,
+        setOpenGiftModal,
+        giftUsername,
+        setGiftUsername,
+        roomNameForPassword,
+        gift,
+        setGift
     }
 
 }

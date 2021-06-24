@@ -10,7 +10,7 @@ const useAuth = () => {
   const [myUser, setMyUser] = useState(null)
   const [role, setRole] = useState('normal');
   const [prevUrl, setPrevUrl] = useState(null);
-
+  const [point, setPoint] = useState(0);
   useEffect(() => {
     (async () => {
       try {
@@ -19,6 +19,7 @@ const useAuth = () => {
         if (data === 'un-auth') {
           setLoading(false);
         } else {
+          console.log(data)
           if (data.role === 'super_admin') setRole('super_admin');
           else if (data.role === 'admin') setRole('admin');
           else if (data.role === 'guest') setRole('guest');
@@ -28,6 +29,7 @@ const useAuth = () => {
           if(data.avatar) setAvatar(data.avatar);
           else setAvatar(null);
           setUsername(data.username);
+          setPoint(data.point);
           setMyUser(data)
           setAuth(true);
           setLoading(false);
@@ -53,6 +55,7 @@ const useAuth = () => {
         else setGender('female');
         if(data.avatar) setAvatar(data.avatar);
         else setAvatar(null);
+        setPoint(data.point);
         setUsername(data.username);
         setMyUser(data)
         setAuth(true);
@@ -72,7 +75,7 @@ const useAuth = () => {
     setAvatar(null);
   };
 
-  return { auth, setAuth, gender, avatar, username, role, loading, setLoading, removeCurrentUser, prevUrl, setPrevUrl, updateUser, myUser };
+  return { auth, setAuth, gender, avatar, username, role, loading, setLoading, removeCurrentUser, prevUrl, setPrevUrl, updateUser, myUser, point };
 };
 
 export default useAuth;
