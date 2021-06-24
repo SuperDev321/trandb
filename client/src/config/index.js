@@ -1,14 +1,10 @@
-require('dotenv').config();
-
 const config = {
-  db_host: process.env.PRO_DB,
-  db_name: process.env.DB_NAME,
-  ssl_key: process.env.SSL_KEY,
-  ssl_cert: process.env.SSL_CERT,
-  serverPort: process.env.SERVER_PORT,
-  debugging_mode: false,
-  server_image_path: 'img',
-  VERSION: '1.0.50',
+
+  server_url: '',
+  media_server_url: 'https://192.168.30.128:3016/',
+  image_path: '/img/',
+  gift_path: '/gifts/',
+  main_site_url: 'https://www.trand.co.il/',
 };
 
 module.exports = config;

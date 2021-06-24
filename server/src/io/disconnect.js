@@ -11,8 +11,8 @@ const disconnectSocket = async (io, socket) => {
     let user = await Users.findOne({_id});
     if(user) {
         await Users.updateOne({_id}, {isInChat: false});
-        console.log('disconnect rooms', socket.rooms, user.username)
     }
+    let user1 = await Users.findOne({_id});
     for (let index = 0; index < rooms.length; index++) {
         const room = rooms[index];
         if(room) {
@@ -27,7 +27,7 @@ const disconnectSocket = async (io, socket) => {
 
 const socketDisconnect = (io, socket) => async (reason) => {
     try {
-        console.log(reason)
+        // console.log(reason)
         // if(reason === 'ping timeout') {
         //     let state = false;
         //     socket.emit('hey', null, (response) => {
