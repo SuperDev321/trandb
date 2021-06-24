@@ -7,6 +7,7 @@ const {addBan, deleteBan, getBans} = require('./bans');
 const {getWords, addWord, deleteWord} = require('./forbiddenWords');
 const {getSetting, updateSetting} = require('./settings');
 const {startBoot, deleteBoot, addBoot, getBoots, stopBoot, editBoot} = require('./boots');
+const { getGifts, addGift, deleteGift } = require('./gifts');
 
 module.exports = {
   clientError,
@@ -55,5 +56,9 @@ module.exports = {
   addBoot,
   editBoot,
   getBoots,
-  stopBoot
+  stopBoot,
+  // gift
+  addGift,
+  deleteGift,
+  getGifts
 };
