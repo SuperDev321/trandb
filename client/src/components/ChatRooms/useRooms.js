@@ -84,7 +84,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
         roomIndex: null,
         error: null,
     });
-    const { username } = useContext(UserContext);
+    const { username, updateUser } = useContext(UserContext);
     const {enablePokeSound, enablePrivateSound, enablePublicSound, enableSysMessage, messageNum} = useContext(SettingContext);
     // current room state
     const [state, dispatch] = useReducer(roomReducer, {
@@ -627,8 +627,26 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 }
             })
         } catch (err) {
-
         }
+    }
+
+    const receiveGift = (payload) => {
+        try {
+            const { gift, from } = payload;
+            if (gift && from) {
+                setGift(payload.gift);
+                updateUser()
+                let message = {
+                    _id: makeid(10),
+                    type: 'gift',
+                    from: from.username,
+                    msg: `${from.username} sent to you ${gift.name}`
+                }
+            }
+        } catch (err) {
+            // console.log(err)
+        }
+
     }
 
     useEffect(() => {
@@ -667,9 +685,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
 
             socket.on('received gift', (payload) => {
                 console.log('received gift', payload)
-                if (payload && payload.gift) {
-                    setGift(payload.gift)
-                }
+                receiveGift(payload);
             })
 
             socket.on('disconnect', (reason) => {

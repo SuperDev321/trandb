@@ -26,12 +26,21 @@ const GiftView = ({gift, setGift}) => {
         setGift(null);
     }
 
+    useEffect(() => {
+        if (videoRef.current) {
+            videoRef.current.play();
+            videoRef.current.oncanplay = () => {
+                videoRef.current.play();
+            }
+        }
+    }, [gift, videoRef])
+
     if (!gift) {
         return null
     }
     return (
         <div className={classes.root}>
-            <video ref={videoRef} autoPlay src = {config.gift_path + gift.src} onEnded={handleEnded} />
+            <video ref={videoRef} src={config.gift_path + gift.src} onEnded={handleEnded} />
         </div>
     )
 }
