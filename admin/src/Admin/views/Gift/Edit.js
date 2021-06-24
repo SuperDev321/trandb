@@ -123,7 +123,6 @@ export default function Edit( {onClose, row} ) {
   }
 
   const handleChange = (e) => {
-    console.log(e.target.value, e.target);
     const newData = { ...data };
     newData[e.target.name] = e.target.value;
     dispatch({ type: 'resolved', data: newData});
@@ -174,7 +173,7 @@ export default function Edit( {onClose, row} ) {
               <CardIcon color="rose">
                 <PersonOutlineIcon />
               </CardIcon>
-              <p className={classes.cardCategory} style={{color:'#3c4858', fontSize:'20px', paddingTop:'16px',}}>Create A New Boot Message</p>
+              <p className={classes.cardCategory} style={{color:'#3c4858', fontSize:'20px', paddingTop:'16px',}}>Edit Gift</p>
             </CardHeader>
             <CardFooter style={{display: 'block'}}>
               <Grid container spacing={2} style={{marginTop:'20px'}}>

@@ -85,7 +85,7 @@ export default function Edit( {onClose, row} ) {
             <CardIcon color="rose">
               <PersonOutlineIcon />
             </CardIcon>
-            <p className={classes.cardCategory} style={{color:'#3c4858', fontSize:'20px', paddingTop:'16px',}}>Create A New Boot Message</p>
+            <p className={classes.cardCategory} style={{color:'#3c4858', fontSize:'20px', paddingTop:'16px',}}>Edit Boot Message</p>
           </CardHeader>
           <CardFooter style={{display: 'block'}}>
             <Grid container spacing={2} style={{marginTop:'20px'}}>
