@@ -1,5 +1,8 @@
 const { clientError, serverError } = require('./errorHandlers');
-const { signup, login, guestLogin, googleLogin, checkToken, logout, getUserByName, getUserDetail, getUsers, updateProfile, updateAvatar } = require('./users');
+const { signup, login, guestLogin, googleLogin, checkToken,
+  logout, getUserByName, getUserDetail, getUsers, updateProfile, updateAvatar,
+  initPoints
+} = require('./users');
 const { getRooms, getRoomsAdmin, addRoom, deleteRoom, getRoomDetail, getPublicRoomNames, getPrivateRoomNames,
   checkRoomPermission, getUserRooms, addModerator, deleteModerator, updateRoomGeneral, updateRoomMedia } = require('./rooms');
 const { getPrivateChat, getPublicChat, fileUploader, deleteChat } = require('./chats');
@@ -7,7 +10,7 @@ const {addBan, deleteBan, getBans} = require('./bans');
 const {getWords, addWord, deleteWord} = require('./forbiddenWords');
 const {getSetting, updateSetting} = require('./settings');
 const {startBoot, deleteBoot, addBoot, getBoots, stopBoot, editBoot} = require('./boots');
-const { getGifts, addGift, deleteGift } = require('./gifts');
+const { getGifts, addGift, deleteGift, updateGift } = require('./gifts');
 
 module.exports = {
   clientError,
@@ -24,6 +27,7 @@ module.exports = {
   updateProfile,
   updateAvatar,
   checkRoomPermission,
+  initPoints,
   getRooms,
   getRoomsAdmin,
   addRoom,
@@ -60,5 +64,6 @@ module.exports = {
   // gift
   addGift,
   deleteGift,
+  updateGift,
   getGifts
 };
