@@ -10,7 +10,8 @@ const useStyles = makeStyles((theme) => ({
         width: 'fit-content'
     },
     giftName: {
-        textAlign: 'center'
+        textAlign: 'center',
+        maxWidth: 70
     },
     giftVideo: {
         width: 70,

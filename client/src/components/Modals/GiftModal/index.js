@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import {
     Dialog,
@@ -14,7 +14,7 @@ import SeparateLine from '../../SeparateLine';
 import { socket } from '../../../utils';
 import getGifts from '../../../utils/getGifts';
 import config from '../../../config';
-import { UserContext } from '../../../context';
+import { ChatContext, UserContext } from '../../../context';
 // const useStyles = makeStyles((theme) => ({
 //     root: {
 //       width: '100%',
@@ -34,12 +34,13 @@ import { UserContext } from '../../../context';
 //     {name: 'female', src: '/gifts/female.mp4'}
 // ]
 
-export default function GiftModal({open, setOpen, username}) {
+export default function GiftModal() {
     // const classes = useStyles();]
     const [currentGift, setCurrentGift] = React.useState(null);
     const [gifts, setGifts] = React.useState([]);
     const [amount, setAmount] = React.useState(1);
     const { updateUser } = React.useContext(UserContext);
+    const { openGiftModal: open, setOpenGiftModal: setOpen, giftUsername: username, roomNameForGift: room } = useContext(ChatContext)
     const changeGift = (giftName) => {
         const gift = gifts.find(({name}) => (name === giftName));
         setCurrentGift(gift)
@@ -53,7 +54,8 @@ export default function GiftModal({open, setOpen, username}) {
         if (currentGift) {
             socket.emit('send gift', {
                 to: username,
-                giftId: currentGift._id
+                giftId: currentGift._id,
+                room
             }, (res) => {
                 if (res) {
                     updateUser()

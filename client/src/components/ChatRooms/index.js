@@ -76,7 +76,9 @@ const ChatRooms = ({room}, ref) => {
         roomNameForPassword,
         mediaClientRef,
         gift,
-        setGift
+        setGift,
+        roomNameForGift,
+        setRoomNameForGift
     } = useRooms({initRoomName: room});
 
     const controlVideo = (data) => {
@@ -307,7 +309,11 @@ const ChatRooms = ({room}, ref) => {
     }
 
     return (
-        <ChatContext.Provider value={{openGiftModal, setOpenGiftModal, giftUsername, setGiftUsername}}>
+        <ChatContext.Provider value={{openGiftModal, setOpenGiftModal,
+            giftUsername, setGiftUsername,
+            roomNameForGift, setRoomNameForGift
+            }}
+        >
             <div className={classes.root} color="primary">
                 <Hidden xsDown implementation="css" className={classes.drawerWrapper}>
                     <div className={classes.drawer}>
@@ -468,11 +474,7 @@ const ChatRooms = ({room}, ref) => {
                 setOpen={setOpenPasswordModal}
                 room={roomNameForPassword}
             />
-            <GiftModal
-                open={openGiftModal}
-                setOpen={setOpenGiftModal}
-                username={giftUsername}
-            />
+            <GiftModal/>
             <GiftView gift={gift} setGift={setGift} />
         </ChatContext.Provider>
     );

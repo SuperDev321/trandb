@@ -153,7 +153,7 @@ const RoomUserName = ({user, role, roomName,
     const [openBan, setOpenBan] = React.useState(false);
     const [avatarUrl, setAvatarUrl] = useState(null);
     const { avatarOption, avatarColor } = useContext(SettingContext);
-    const { setOpenGiftModal, setGiftUsername } = useContext(ChatContext);
+    const { setOpenGiftModal, setGiftUsername, setRoomNameForGift } = useContext(ChatContext);
     const handleDbClick = (event) => {
         handleClickPrivateChat(event);
     }
@@ -258,6 +258,7 @@ const RoomUserName = ({user, role, roomName,
         setAnchorEl(null);
         setTimeout(() => {
             setGiftUsername(user.username)
+            setRoomNameForGift(roomName)
             setOpenGiftModal(true)
         }, 0)
     }
