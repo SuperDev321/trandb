@@ -14,7 +14,7 @@
     "message_placeholder": "הקלידו כאן...",
     "error_create_room": "רק רשומים יכולים לפתוח חדר",
     "error_ban": "נחסמת מ- {{roomName}} על ידיי {{adminName}} ({{ userRole }}).",
-    "error_ban_with_reason": "You banned from {{roomName}} by {{adminName}} ({{ userRole }}) reason: {{reason}}.",
+    "error_ban_with_reason": "נחסמת מ- {{roomName}} על ידיי {{adminName}} ({{ userRole }}) סיבת החסימה: {{reason}}.",
     "error_admin_ban_all_room": "נחסמתם לצאט יש לפנות באתר ל-פניות להנהלה",
     "sys_private_message": "שיחה פרטית עם: {{username}}",
     "system_user_request_video_permission": "{{username}} מבקש לצפות  בך בחדר-- {{roomName}}",
@@ -36,7 +36,7 @@
     "sys_closed_private_message": "משתמש  אינו קיים או שהתנתק,ההודעה לא נשלחה נא לסגור חלון זה",
     "sys_join_room": "{{username}}  נכנס/ה לחדר {{roomName}}",
     "sys_ban": "{{username}} נחסם מ- {{roomName}} על ידיי {{adminName}} ({{userRole}}).",
-    "sys_ban_with_reason": "{{username}} has banned from {{roomName}} by {{adminName}} ({{userRole}}) reason: {{reason}}.",
+    "sys_ban_with_reason": "{{username}} נחסם מ- {{roomName}} על ידיי {{adminName}} ({{userRole}}) סיבת החסימה: {{reason}}.",
     "sys_ban_owner_room": "{{username}} נחסם מהחדר על ידיי המנהלים",
     "sys_ban_admin_room": "{{username}} נחסם מהחדר על ידיי המערכת",
     "sys_ban_admin_room_all": "{{username}} נחסם מהצאט ",
@@ -56,10 +56,10 @@
     "already_in_chat": "אותו משתמש כבר משוחח.",
     "private_logout_error": "המשתמש עזב את הצאט או  רענן את הצאט נא לסגור חלון  זה.",
     "info_banned": "התחברות לצאט  ממכשיר זה אפשרית רק לרשומים",
-    "owner": "owner",
-    "all_rooms": "all rooms",
-    "moderator": "moderator",
-    "admin": "admin",
+    "owner": "בעלים",
+    "all_rooms": "כל החדרים",
+    "moderator": "מנהל/ת",
+    "admin": "אדמין",
     "default": "default"
   },
  "AddRoomModal": {
@@ -198,21 +198,21 @@
     "default": "default",
     "show": "הצג",
     "hide": "הסתר",
-    "avatar": "Avatar",
-    "new": "New",
-    "avatar_option": "Avatar Option",
-    "upload": "Upload",
-    "from_main_site": "From Main Site"
+    "avatar": "תמונת פרופיל",
+    "new": "חדש",
+    "avatar_option": "אפשרויות תמונה",
+    "upload": "העלאה",
+    "from_main_site": "מהפרופיל באתר"
   },
   "BanModal": {
-    "ban_user": "Ban User",
-    "reason": "Reason",
+    "ban_user": "חסימת משתמש",
+    "reason": "סיבת החסימה",
     "ip": "IP",
-    "ban_type": "Ban Type",
-    "all_rooms": "All rooms",
-    "this_room": "This room",
-    "ban": "Ban",
-    "cancel": "Cancel",
+    "ban_type": "סוג חסימה",
+    "all_rooms": "כל החדרים",
+    "this_room": "חדר זה",
+    "ban": "באן",
+    "cancel": "ביטול",
     "default": "default"
   },
   "LandingPage": {
@@ -253,7 +253,7 @@
     "poke_where_are_you": "{{sender}} send {{receiver}} where are you",
     "poke_nock": "{{sender}} knocked on {{receiver}}",
     "you": "you",
-    "error_muted": "משתמש זה מתעלם ממך הצלמול לא נשלח"
+    "error_muted": "משתמש זה מתעלם ממך הצלצול לא נשלח"
   },
   "BroadcastSettingModal" : {
     "broadcast_setting": "הגדרות מצלמה"
