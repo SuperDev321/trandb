@@ -23,7 +23,9 @@ const addGift = async (req, res, next) => {
         const newGiftImageFileName = getFileName("gift_", giftImageFile.name);
         try {
             await giftFile.mv(path.join(__dirname, '..', '..', '..', '..', 'client', 'public/gifts/', newGiftFileName));
+            await giftFile.mv(path.join(__dirname, '..', '..', '..', '..', 'client', 'build/gifts/', newGiftFileName));
             await giftImageFile.mv(path.join(__dirname, '..', '..', '..', '..', 'client', 'public/gifts/', newGiftImageFileName));
+            await giftImageFile.mv(path.join(__dirname, '..', '..', '..', '..', 'client', 'build/gifts/', newGiftImageFileName));
             await Gifts.create({ name, detail, cost, src: newGiftFileName, imageSrc: newGiftImageFileName });
             res
             .status(204)
