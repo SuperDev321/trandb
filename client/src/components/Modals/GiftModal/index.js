@@ -12,7 +12,7 @@ import GiftSelector from '../../common/GiftSelector';
 import GiftForm from '../../common/GiftForm';
 import SeparateLine from '../../SeparateLine';
 import { socket } from '../../../utils';
-import getGifts from '../../../utils/getGifts';
+import { getGifts } from '../../../apis';
 import config from '../../../config';
 import { ChatContext, UserContext } from '../../../context';
 // const useStyles = makeStyles((theme) => ({
@@ -55,7 +55,8 @@ export default function GiftModal() {
             socket.emit('send gift', {
                 to: username,
                 giftId: currentGift._id,
-                room
+                room,
+                amount
             }, (res) => {
                 if (res) {
                     updateUser()
@@ -71,7 +72,8 @@ export default function GiftModal() {
                 if (data && Array.isArray(data.gifts)) {
                     const gifts = data.gifts.map((item) => {
                         const src = config.gift_path + item.src;
-                        return { ...item, src };
+                        const imageSrc = config.gift_path + item.imageSrc;
+                        return { ...item, src, imageSrc };
                     })
                     setGifts(gifts);
                     if (gifts.length) {

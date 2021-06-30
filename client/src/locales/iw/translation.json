@@ -60,6 +60,8 @@
     "all_rooms": "כל החדרים",
     "moderator": "מנהל/ת",
     "admin": "אדמין",
+    "gift_send": "{{sender}} send {{receiver}} {{amount}} {{giftName}}",
+    "gift_send_to_you": "{{sender}} send you {{amount}} {{giftName}}",
     "default": "default"
   },
  "AddRoomModal": {

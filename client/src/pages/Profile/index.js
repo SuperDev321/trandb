@@ -13,7 +13,7 @@ import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import CardGiftcardIcon from '@material-ui/icons/CardGiftcard';
 import { Settings, Edit } from '@material-ui/icons';
 import useStyles from './styles'
-import { getUserDetail } from "../../utils";
+import { getUserDetail } from "../../apis";
 import { useHistory, useParams } from "react-router-dom";
 import { SettingContext } from "../../context";
 import config from "../../config";

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import config from '../config'
+import config from '../../config'
 const useAuth = () => {
   const [auth, setAuth] = useState(false);
   const [loading, setLoading] = useState(true);

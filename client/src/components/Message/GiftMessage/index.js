@@ -1,7 +1,7 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import CardGiftcardIcon from '@material-ui/icons/CardGiftcard';
-import { green } from '@material-ui/core/colors';
+import { green, orange } from '@material-ui/core/colors';
 const useStyles = makeStyles((theme) => ({
     root: {
         margin: 3,
@@ -12,20 +12,25 @@ const useStyles = makeStyles((theme) => ({
         justifyContent: 'space-between',
         width: 'fit-content',
         padding: '0.1rem 1rem',
-        background: '#367a84b8',
-        alignItems: 'center'
+        background: orange[500],
+        alignItems: 'center',
+        padding: 5
     },
     icon: {
         color: green[200]
     },
 }))
 
-const GiftMessage = ({ text }) => {
+const GiftMessage = ({ text, image }) => {
     const classes = useStyles();
     return (
         <div className={classes.root}>
+        { image ?
+            <img src={image} width='20' height='20' alt=''/>
+            :
             <CardGiftcardIcon fontSize='large' className={classes.icon} />
-            <span>:&nbsp;</span>
+        }
+            <span>&nbsp;</span>
             <span className={classes.text}>
                 {text.trim()}
             </span>

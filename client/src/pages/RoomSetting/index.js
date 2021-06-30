@@ -23,7 +23,7 @@ import {
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 import DeleteIcon from '@material-ui/icons/Delete';
 import useStyles from './styles'
-import { getRoomDetail, deleteBan, addModerator, deleteModerator, updateRoomGeneral, updateRoomMedia } from "../../utils";
+import { getRoomDetail, deleteBan, addModerator, deleteModerator, updateRoomGeneral, updateRoomMedia } from "../../apis";
 import { Loading } from "../../pages";
 import { useSnackbar } from 'notistack';
 import ImageUploader from 'react-images-upload';

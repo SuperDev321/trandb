@@ -1,13 +1,13 @@
 import React, { useState, useReducer, useEffect, useContext, useRef, useCallback } from 'react';
-import { socket, mediaSocket, useLocalStorage, isPrivateRoom } from '../../utils';
-import {MediaClient, mediaEvents} from '../../utils';
-import RoomObject from '../../utils/roomObject';
-import {UserContext, SettingContext} from '../../context';
+import { socket, mediaSocket, useLocalStorage, RoomObject, MediaClient, mediaEvents } from '../../utils';
+import { isPrivateRoom } from '../../apis';
+import { UserContext, SettingContext } from '../../context';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { useHistory } from 'react-router-dom';
-import {useAudio} from 'react-use';
-import {permissionRequest} from './notification';
+import { useAudio } from 'react-use';
+import { permissionRequest } from './notification';
+import config from '../../config';
 function makeid(length) {
     var result           = [];
     var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -108,8 +108,20 @@ const useRooms = ({initRoomName, ...initalState}) => {
 
     const roomNameRef = React.useRef(initRoomName);
 
-    const [pokeAudio, pokeAudioState, pokeAudioControls] = useAudio({
-        src: '/media/poke.mp3',
+    const [pokeAudio1, pokeAudioState1, pokeAudioControls1] = useAudio({
+        src: '/media/poke_default.mp3',
+        autoPlay: false ,
+    });
+    const [pokeAudio2, pokeAudioState2, pokeAudioControls2] = useAudio({
+        src: '/media/poke_good_morning.mp3',
+        autoPlay: false ,
+    });
+    const [pokeAudio3, pokeAudioState3, pokeAudioControls3] = useAudio({
+        src: '/media/poke_where_are_you.mp3',
+        autoPlay: false ,
+    });
+    const [pokeAudio4, pokeAudioState4, pokeAudioControls4] = useAudio({
+        src: '/media/poke_nock.mp3',
         autoPlay: false ,
     });
     const [publicAudio, publicAudioState, publicAudioControls] = useAudio({
@@ -123,6 +135,11 @@ const useRooms = ({initRoomName, ...initalState}) => {
 
     const [requestAudio, requestAudioState, requestAudioControls] = useAudio({
         src: '/media/request.mp3',
+        autoPlay: false ,
+    });
+
+    const [giftAudio, giftAudioState, giftAudioControls] = useAudio({
+        src: '/media/gift.mp3',
         autoPlay: false ,
     });
 
@@ -580,8 +597,27 @@ const useRooms = ({initRoomName, ...initalState}) => {
                     sameRoom.addMessages([message]);
                     let userToReceive = sameRoom.users.find((item) => (item.username === pokeMessage.from));
                     if(userToReceive && !sameRoom.checkMuteByName(pokeMessage.from)) {
-                        pokeAudioControls.seek(0);
-                        pokeAudioControls.play();
+                        switch(pokeMessage.pokeType) {
+                            case 'default':
+                                pokeAudioControls1.seek(0);
+                                pokeAudioControls1.play();
+                                break;
+                            case 'good_morning':
+                                pokeAudioControls2.seek(0);
+                                pokeAudioControls2.play();
+                                break;
+                            case 'where_are_you':
+                                pokeAudioControls3.seek(0);
+                                pokeAudioControls3.play();
+                                break;
+                            case 'nock':
+                                pokeAudioControls4.seek(0);
+                                pokeAudioControls4.play();
+                                break;
+                            default:
+                                break;
+                        }
+                        
                         callback(true)
                     } else {
                         callback(false)
@@ -633,20 +669,29 @@ const useRooms = ({initRoomName, ...initalState}) => {
 
     const receiveGift = (payload) => {
         try {
-            const { gift, from, to, room } = payload;
+            const { gift, from, to, room, amount } = payload;
             if (gift && from && to && room) {
                 if (username === to) {
                     setGift(payload.gift);
                     updateUser()
                 }
+                const isForMe = to === username;
                 const message = {
                     _id: makeid(10),
                     type: 'gift',
                     from,
                     to,
-                    msg: `${from} sent to ${to} ${gift.name}`
+                    msg: t(isForMe? 'ChatApp.gift_send_to_you': 'ChatApp.gift_send', {
+                        sender: from,
+                        receiver: to,
+                        amount,
+                        giftName: gift.name
+                    }),
+                    giftImage: config.gift_path + gift.imageSrc
                 }
                 addMessage({ message, room });
+                giftAudioControls.seek(0);
+                giftAudioControls.play();
             }
         } catch (err) {
             // console.log(err)
@@ -686,6 +731,11 @@ const useRooms = ({initRoomName, ...initalState}) => {
 
             socket.on('update user info', (payload) => {
                 updateUserInfo(payload)
+            })
+
+            socket.on('update user', () => {
+                console.log('update user')
+                updateUser()
             })
 
             socket.on('received gift', (payload) => {
@@ -937,11 +987,17 @@ const useRooms = ({initRoomName, ...initalState}) => {
     useEffect(() => {
 
         if(enablePokeSound) {
-            pokeAudioControls.unmute();
+            pokeAudioControls1.unmute();
+            pokeAudioControls2.unmute();
+            pokeAudioControls3.unmute();
+            pokeAudioControls4.unmute();
         } else {
-            pokeAudioControls.mute();
+            pokeAudioControls1.mute();
+            pokeAudioControls2.mute();
+            pokeAudioControls3.mute();
+            pokeAudioControls4.mute();
         }
-    }, [enablePokeSound, pokeAudioControls])
+    }, [enablePokeSound, pokeAudioControls1, pokeAudioControls2, pokeAudioControls3, pokeAudioControls4])
     useEffect(() => {
 
         if(enablePublicSound) {
@@ -974,10 +1030,14 @@ const useRooms = ({initRoomName, ...initalState}) => {
         addRoom,
         addMessage,
         changeMuteState,
-        pokeAudio,
+        pokeAudio1,
+        pokeAudio2,
+        pokeAudio3,
+        pokeAudio4,
         privateAudio,
         publicAudio,
         requestAudio,
+        giftAudio,
         openDisconnectModal,
         setOpenDisconnectModal,
         mediaClientRef,

@@ -15,12 +15,15 @@ function getFileName(prefix, filename) {
 const updateGift = async (req, res, next) => {
     try {
         const { _id, name, detail, cost } = req.body;
-        if (req.files && req.files.gift_file) {
-            var giftFile = req.files.gift_file;
-            var newGiftFileName = getFileName("gift_", giftFile.name);
+        if (req.files && req.files.gift_file && req.files.gift_image_file) {
+          const giftFile = req.files.gift_file;
+          const newGiftFileName = getFileName("gift_", giftFile.name);
+          const giftImageFile = req.files.gift_image_file;
+          const newGiftImageFileName = getFileName("gift_", giftImageFile.name);
             try {
                 await giftFile.mv(path.join(__dirname, '..', '..', '..', '..', 'client', 'public/gifts/', newGiftFileName));
-                await Gifts.updateOne({ _id }, { name, detail, cost, src: newGiftFileName });
+                await giftImageFile.mv(path.join(__dirname, '..', '..', '..', '..', 'client', 'public/gifts/', newGiftImageFileName));
+                await Gifts.updateOne({ _id }, { name, detail, cost, src: newGiftFileName, imageSrc: newGiftImageFileName });
                 res
                 .status(204)
                 .json({})

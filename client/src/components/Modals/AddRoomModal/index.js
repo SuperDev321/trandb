@@ -18,7 +18,7 @@ import AddIcon from '@material-ui/icons/Add';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import { useTheme } from '@material-ui/core/styles';
 import PasswordModal from '../PasswordModal'
-import { getRooms } from '../../../utils';
+import { getRooms } from '../../../apis';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 

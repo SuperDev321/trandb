@@ -79,9 +79,10 @@ const HomeLayout = ({children, unReadMsgs, openPrivate, messageSize, setMessageS
                     className={classes.logo}
                     onClick={()=>history.push('/')}
                 />
-                <div className={classes.grow} >{ frameShow &&
+                <div className={classes.grow} >
+                {/* { frameShow &&
                     <iframe title="header-title" src="https://widget.walla.co.il/fxp4" height="40px" width="100%" frameBorder={0} scrolling="no" />
-                }
+                } */}
                 </div>
                 <div className={classes.sectionDesktop}>
                     <SettingModal />

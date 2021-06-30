@@ -3,7 +3,8 @@
     "save": "Save",
     "cancel": "Cancel",
     "logout": "Log out",
-    "profile": "Profile"
+    "profile": "Profile",
+    "you": "you"
   },
   "ChatApp": {
     "rooms": "ROOMS",
@@ -61,6 +62,8 @@
     "all_rooms": "all rooms",
     "moderator": "moderator",
     "admin": "admin",
+    "gift_send": "{{sender}} send {{receiver}} {{amount}} {{giftName}}",
+    "gift_send_to_you": "{{sender}} send you {{amount}} {{giftName}}",
     "default": "default"
   },
   "AddRoomModal": {

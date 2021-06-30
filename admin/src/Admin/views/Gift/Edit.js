@@ -87,12 +87,13 @@ export default function Edit( {onClose, row} ) {
   const { data, status, error, run, dispatch } = useGift();
   const classes = useStyles();
   const hiddenFileInput = useRef(null)
+  const hiddenImageFileInput = useRef(null)
 
   const onSubmit = async () => {
     if (status !== 'resolved' || !data) {
       return;
     }
-    const { _id, name, detail, cost, src, srcFile } = data;
+    const { _id, name, detail, cost, src, srcFile, imageSrc, imageSrcFile } = data;
     try {
       const formData = new FormData();
       formData.append('_id', _id);
@@ -100,6 +101,7 @@ export default function Edit( {onClose, row} ) {
       formData.append('detail', detail);
       formData.append('cost', cost);
       formData.append('gift_file', srcFile);
+      formData.append('gift_image_file', imageSrcFile);
       
       let token = window.localStorage.getItem('token');
       axios.post(`${config.server_url}/api/gift/edit`, formData,
@@ -142,6 +144,19 @@ export default function Edit( {onClose, row} ) {
   const handleClickGiftFile = () => {
     hiddenFileInput.current.click();
   }
+  const handleChangeGiftImageFile = (event) => {
+    const fileUploaded = event.target.files[0];
+    if(fileUploaded) {
+      const newData = { ...data };
+      newData.imageSrc = fileUploaded.name;
+      newData.imageSrcFile = fileUploaded;
+      dispatch({ type: 'resolved', data: newData });
+    }
+  }
+
+  const handleClickGiftImageFile = () => {
+    hiddenImageFileInput.current.click();
+  }
 
   useEffect(() => {
     if (row) {
@@ -164,7 +179,7 @@ export default function Edit( {onClose, row} ) {
       </div>
     )
   } else if (status === 'resolved'){
-    const { name, detail, cost, src } = data;
+    const { name, detail, cost, src, imageSrc } = data;
     return (
       <GridContainer>
         <GridItem xs={12} sm={8} md={8}>
@@ -224,6 +239,29 @@ export default function Edit( {onClose, row} ) {
                   <Button className={classes.uploadButton}
                     type='button' variant="outlined" color="primary" component="span"
                     onClick={handleClickGiftFile}
+                  >
+                    Select File
+                  </Button>
+                </Grid>
+              </Grid>
+              <Grid container spacing={2} style={{marginTop:'20px'}}>
+                <Grid item sm={1}>
+                </Grid>
+                <Grid item sm={2} style={{textAlign: 'right'}}>
+                  <p className={classes.cardCategory}>Gift Image File</p>
+                </Grid>
+                <Grid item sm={9}>
+                  <input
+                      type="file"
+                      ref={hiddenImageFileInput}
+                      onChange={handleChangeGiftImageFile}
+                      style={{display: 'none'}} 
+                  />
+                  <Input className={classes.name}
+                    value={imageSrc} disabled inputProps={{ 'aria-label': 'file-name' }} />
+                  <Button className={classes.uploadButton}
+                    type='button' variant="outlined" color="primary" component="span"
+                    onClick={handleClickGiftImageFile}
                   >
                     Select File
                   </Button>

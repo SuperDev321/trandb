@@ -1,5 +1,5 @@
 import * as mediasoupClient from 'mediasoup-client';
-import {mediaSocket} from './socketHandler';
+import { mediaSocket } from './socketHandler';
 const maxStream = 8;
 const mediaType = {
     audio: 'audioType',

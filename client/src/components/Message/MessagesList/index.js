@@ -78,7 +78,7 @@ const MessagesList = ({ users, messages, role, userAction, roomName, changeMuteS
     return (
         <>
         <div ref={messagesRef} className={classes.root}>
-            { messages?.map(({ _id, from, msg, date, type, color, bold, messageType, size }, index) => (
+            { messages?.map(({ _id, from, msg, date, type, color, bold, messageType, size, giftImage }, index) => (
                     // <Message key={_id} text={msg} from={from} date={date} />
                     <span key={_id? _id: index}>
                         { (type==='public' && (messageType === 'general' || messageType === 'image'))  &&
@@ -112,7 +112,7 @@ const MessagesList = ({ users, messages, role, userAction, roomName, changeMuteS
                         }
                         {
                         (type ==='gift') &&
-                            <GiftMessage text={msg} />
+                            <GiftMessage text={msg} image={giftImage}/>
                         }
                     </span>
                 ))

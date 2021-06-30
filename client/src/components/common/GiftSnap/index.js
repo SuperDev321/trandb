@@ -25,7 +25,7 @@ const GiftSnap = ({src, name, ...props}) => {
 
     return (
         <div className={classes.root} {...props}>
-            <video className={classes.giftVideo} src={src} autoPlay loop muted/>
+            <img className={classes.giftVideo} src={src} alt="gift"/>
             <span className={classes.giftName}>{name}</span>
         </div>
     )
