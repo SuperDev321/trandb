@@ -7,13 +7,13 @@ const useStyles = makeStyles((theme) => ({
         left: 0,
         right: 0,
         textAlign: 'center',
-        top: 20,
+        top: 50,
         margin: 'auto',
         '& video': {
             width: 200,
             borderRadius: '50%',
-            zIndex: 3000
-        }
+        },
+        zIndex: 1000
     }
 }))
 

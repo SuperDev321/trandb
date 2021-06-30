@@ -38,6 +38,17 @@ const updateGift = async (req, res, next) => {
             .status(204)
             .json({})
           }
+          if (req.files && req.files.gift_image_file) {
+            const giftImageFile = req.files.gift_image_file;
+            const newGiftImageFileName = getFileName("gift_", giftImageFile.name);
+            await giftImageFile.mv(path.join(__dirname, '..', '..', '..', '..', 'client', 'public/gifts/', newGiftImageFileName));
+            await giftImageFile.mv(path.join(__dirname, '..', '..', '..', '..', 'client', 'build/gifts/', newGiftImageFileName));
+            await Gifts.updateOne({ _id }, { imageSrc: newGiftImageFileName });
+          }
+          await Gifts.updateOne({ _id }, { name, detail, cost });
+          res
+          .status(204)
+          .json({})
     } catch (err) {
         console.log(err)
         next(err)
