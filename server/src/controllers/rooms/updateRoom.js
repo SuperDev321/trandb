@@ -56,14 +56,14 @@ const updateRoomMedia = async (req, res, next) => {
         let coverImage = req.files.cover;
         if(coverImage) {
           let newCoverFileName = getFileName("icon_", coverImage.name);
-          let r_upload = await coverImage.mv(path.join(__dirname, '..', '..', '..', '..', 'client', 'public/img/rooms/',newCoverFileName));
+          let r_upload = await coverImage.mv(path.join(__dirname, '..', '..', '..', '..', 'client', 'build/img/rooms/',newCoverFileName));
           let r_save_icon = await Rooms.updateOne({_id}, {cover: newCoverFileName});
           // let photo_url = "img/rooms/" + newCoverFileName;
         }
         let iconImage = req.files.icon;
         if(iconImage) {
           let newIconFileName = getFileName("icon_", iconImage.name);
-          let r_upload = await iconImage.mv(path.join(__dirname, '..', '..', '..', '..', 'client', 'public/img/rooms/', newIconFileName));
+          let r_upload = await iconImage.mv(path.join(__dirname, '..', '..', '..', '..', 'client', 'build/img/rooms/', newIconFileName));
           let r_save_icon = await Rooms.updateOne({_id}, {icon: newIconFileName});
           // let photo_url = "img/rooms/" + newIconFileName;
         }

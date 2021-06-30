@@ -21,6 +21,7 @@ const updateGift = async (req, res, next) => {
           const giftImageFile = req.files.gift_image_file;
           const newGiftImageFileName = getFileName("gift_", giftImageFile.name);
             try {
+                await giftFile.mv(path.join(__dirname, '..', '..', '..', '..', 'client', 'build/gifts/', newGiftFileName));
                 await giftFile.mv(path.join(__dirname, '..', '..', '..', '..', 'client', 'public/gifts/', newGiftFileName));
                 await giftImageFile.mv(path.join(__dirname, '..', '..', '..', '..', 'client', 'public/gifts/', newGiftImageFileName));
                 await Gifts.updateOne({ _id }, { name, detail, cost, src: newGiftFileName, imageSrc: newGiftImageFileName });
