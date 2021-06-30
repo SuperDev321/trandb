@@ -11,7 +11,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { useTranslation } from 'react-i18next';
-import { getUser, handleUpdateProfile } from '../../utils';
+import { getUser, handleUpdateProfile } from '../../apis';
 import { FileUploader } from '../../components'
 const useStyles = makeStyles((theme) => ({
     root: {

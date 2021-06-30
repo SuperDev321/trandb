@@ -56,7 +56,8 @@ const headCells = [
   { id: 'name', numeric: false, disablePadding: false, label: 'Name'},
   { id: 'detail', numeric: false, disablePadding: false, label: 'Detail'},
   { id: 'cost', numeric: false, disablePadding: false, label: 'Cost'},
-  { id: 'src', numeric: false, disablePadding: false, label: 'Image'},
+  { id: 'src', numeric: false, disablePadding: false, label: 'Video'},
+  { id: 'imageSrc', numeric: false, disablePadding: false, label: 'Image'},
 ];
 
 function EnhancedTableHead({ classes, order, orderBy, onRequestSort }) {
@@ -380,6 +381,15 @@ export default function Gifts( {onClickNew, onClickEdit} ) {
                             width: 'fit-content',
                           }}>
                             <video src={'/gifts/' + row.src} width="40" height="40" />
+                          </div>
+                        </TableCell>
+                        <TableCell align="left">
+                          <div  style={{
+                            borderRadius: 4,
+                            padding: 4,
+                            width: 'fit-content',
+                          }}>
+                            <img src={'/gifts/' + row.imageSrc} width="40" height="40" />
                           </div>
                         </TableCell>
                         <TableCell align="right">

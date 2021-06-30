@@ -61,10 +61,14 @@ const ChatRooms = ({room}, ref) => {
         removeRoom,
         addMessage,
         changeMuteState,
-        pokeAudio,
+        pokeAudio1,
+        pokeAudio2,
+        pokeAudio3,
+        pokeAudio4,
         privateAudio,
         publicAudio,
         requestAudio,
+        giftAudio,
         openDisconnectModal,
         setOpenDisconnectModal,
         openPasswordModal,
@@ -461,10 +465,14 @@ const ChatRooms = ({room}, ref) => {
                 me={{username, avatar, gender}}
                 globalBlocks={globalBlocks}
             />
-            <div>{pokeAudio}</div>
+            <div>{pokeAudio1}</div>
+            <div>{pokeAudio2}</div>
+            <div>{pokeAudio3}</div>
+            <div>{pokeAudio4}</div>
             <div>{publicAudio}</div>
             <div>{privateAudio}</div>
             <div>{requestAudio}</div>
+            <div>{giftAudio}</div>
             <DisconnectModal
                 open={openDisconnectModal}
                 setOpen={setOpenDisconnectModal}

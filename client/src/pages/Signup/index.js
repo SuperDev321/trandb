@@ -19,7 +19,7 @@ import { makeStyles, withStyles } from '@material-ui/core/styles';
 import { green, red } from '@material-ui/core/colors';
 import {useTranslation} from 'react-i18next';
 import {UserContext} from '../../context';
-import { handleSignup } from '../../utils';
+import { handleSignup } from '../../apis';
 import CustomTextField from '../../components/CustomTextField';
 import OutlinedButton from '../../components/OutlinedButton';
 

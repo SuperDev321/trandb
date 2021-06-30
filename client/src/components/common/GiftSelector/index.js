@@ -18,8 +18,8 @@ const GiftSelector = ({gifts, onPick}) => {
     return (
         <div className={classes.root}>
         {
-            gifts.map(({name, src}) => (
-                <GiftSnap key={name} onClick={() => onClickGift(name)} src={src} name={name} />
+            gifts.map(({name, src, imageSrc}) => (
+                <GiftSnap key={name} onClick={() => onClickGift(name)} src={imageSrc} name={name} />
             ))
         }
         </div>

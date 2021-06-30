@@ -33,8 +33,11 @@ export default function Create( {onClose} ) {
   const [cost, setCost] = React.useState(16);
   const [detail, setDetail] = React.useState('');
   const [giftFile, setGiftFile] = React.useState(null);
+  const [giftImageFile, setGiftImageFile] = React.useState(null);
   const [fileName, setFileName] = useState('');
+  const [imageFileName, setImageFileName] = useState('');
   const hiddenFileInput = useRef(null);
+  const hiddenImageFileInput = useRef(null);
 
   const handleClickGiftFile = () => {
     hiddenFileInput.current.click();
@@ -46,7 +49,19 @@ export default function Create( {onClose} ) {
         setFileName(fileUploaded.name);
         setGiftFile(fileUploaded);
     }
-};
+  };
+
+  const handleClickGiftImageFile = () => {
+    hiddenImageFileInput.current.click();
+  }
+
+  const handleChangeGiftImageFile = event => {
+    const fileUploaded = event.target.files[0];
+    if(fileUploaded) {
+      setImageFileName(fileUploaded.name);
+      setGiftImageFile(fileUploaded);
+    }
+  };
 
   const classes = useStyles();
   const onSubmit = async () => {
@@ -61,6 +76,7 @@ export default function Create( {onClose} ) {
       formData.append('detail', detail);
       formData.append('cost', cost);
       formData.append('gift_file', giftFile)
+      formData.append('gift_image_file', giftImageFile)
       console.log(giftFile)
       const {data: {data}} = await axios.post(`${config.server_url}/api/gift`, formData, {
         headers: {
@@ -70,7 +86,7 @@ export default function Create( {onClose} ) {
       });
       onClose();
     } catch (err) {
-        addToast('Can not create this boot', { appearance: 'error' });
+        addToast('Can not create this gift', { appearance: 'error' });
         onClose();
     }
   }
@@ -120,7 +136,7 @@ export default function Create( {onClose} ) {
               <Grid item sm={1}>
               </Grid>
               <Grid item sm={2} style={{textAlign: 'right'}}>
-                <p className={classes.cardCategory}>Gift File</p>
+                <p className={classes.cardCategory}>Gift File (MP4)</p>
               </Grid>
               <Grid item sm={9}>
                 <input
@@ -133,6 +149,27 @@ export default function Create( {onClose} ) {
                   value={fileName} disabled inputProps={{ 'aria-label': 'file-name' }} />
                 <Button className={classes.uploadButton}
                   type='button' onClick={handleClickGiftFile} variant="outlined" color="primary" component="span">
+                  Select File
+                </Button>
+              </Grid>
+            </Grid>
+            <Grid container spacing={2} style={{marginTop:'20px'}}>
+              <Grid item sm={1}>
+              </Grid>
+              <Grid item sm={2} style={{textAlign: 'right'}}>
+                <p className={classes.cardCategory}>Gift Image File</p>
+              </Grid>
+              <Grid item sm={9}>
+                <input
+                    type="file"
+                    ref={hiddenImageFileInput}
+                    onChange={handleChangeGiftImageFile}
+                    style={{display: 'none'}} 
+                />
+                <Input className={classes.name}
+                  value={imageFileName} disabled inputProps={{ 'aria-label': 'file-name' }} />
+                <Button className={classes.uploadButton}
+                  type='button' onClick={handleClickGiftImageFile} variant="outlined" color="primary" component="span">
                   Select File
                 </Button>
               </Grid>

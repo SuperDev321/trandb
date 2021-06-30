@@ -24,7 +24,7 @@ import {ReactComponent as Restore} from './restore.svg';
 import config from '../../../config';
 import SettingsIcon from '@material-ui/icons/Settings';
 import { SettingContext } from '../../../context';
-import { getUser } from '../../../utils'
+import { getUser } from '../../../apis'
 
 const defaultHeight = 250;
 const defaultWidth = 350;

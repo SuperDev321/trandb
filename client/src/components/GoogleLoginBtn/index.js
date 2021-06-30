@@ -5,7 +5,7 @@ import { message } from 'antd';
 
 import './style.css';
 
-import { handleGoogleLogin } from '../../utils';
+import { handleGoogleLogin } from '../../apis';
 
 const GoogleLoginBtn = ({ setAuth }) => {
   const onGoogleLoginFailure = () =>

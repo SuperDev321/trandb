@@ -7,7 +7,7 @@ import {
 } from '@material-ui/core';
 import {useTranslation} from 'react-i18next';
 import { FileUploader } from '../../../components'
-import { handleUpdateAvatar } from '../../../utils';
+import { handleUpdateAvatar } from '../../../apis';
 import { UserContext } from '../../../context';
 const useStyles = makeStyles((theme) => ({
     root: {

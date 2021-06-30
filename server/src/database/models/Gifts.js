@@ -4,7 +4,8 @@ const giftSchecma = new Schema({
     name: { type: String, required: true },
     src: String,
     cost: { type: Number, required: true },
-    detail: String
+    detail: String,
+    imageSrc: String
 });
 
 const Gifts = model('Gifts', giftSchecma);

@@ -5,7 +5,7 @@ import { RoomsList, PublicLayout } from '../../components';
 import { makeStyles } from '@material-ui/styles';
 import {UserContext} from '../../context';
 import {useTranslation} from 'react-i18next';
-import { getRooms } from '../../utils';
+import { getRooms } from '../../apis';
 import './style.css';
 
 

@@ -1,9 +1,9 @@
 import axios from 'axios';
-import config from '../config';
-import {createNewSocket} from './socketHandler';
+import config from '../config'
+import { createNewSocket } from '../utils';
 const handleLogin = async (credentials, successCallback, errCallback) => {
   try {
-    let result = await axios.post(`${config.server_url}/api/login/guest`, credentials);
+    let result = await axios.post(`${config.server_url}/api/login`, credentials);
     if(result && result.status === 200) {
       let token = result.data.token;
       window.localStorage.setItem('token', token);
@@ -14,7 +14,7 @@ const handleLogin = async (credentials, successCallback, errCallback) => {
     let errMessage;
 
     if (err && err.response && err.response.status) {
-      if(err.response.data.error === 'forbidden' || err.response.data.error === 'already_exist' )
+      if(err.response.data.error)
         errMessage = err.response.data.error;
       else {
         errMessage = 'unknown_error';

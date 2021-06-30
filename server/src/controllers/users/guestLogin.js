@@ -12,15 +12,15 @@ const guestLogin = async (req, res, next) => {
     const { nickname, gender, aboutMe } = req.body;
     const ipAddress = req.userIp;
     try {
-        let isRegistered = await checkUserFromServer(nickname);
-        if(isRegistered) {
-            return res
-            .status(400)
-            .json({
-                error: 'already_exist',
-                message: 'This nickname is already registered.'
-            });
-        }
+        // let isRegistered = await checkUserFromServer(nickname);
+        // if(isRegistered) {
+        //     return res
+        //     .status(400)
+        //     .json({
+        //         error: 'already_exist',
+        //         message: 'This nickname is already registered.'
+        //     });
+        // }
         let forbidden = await hasFobiddenWord(nickname);
         if(forbidden) {
             return res
@@ -61,7 +61,6 @@ const guestLogin = async (req, res, next) => {
                 sameSite: 'none',
                 secure: true,
                 httpOnly: true,
-                
             })
             .status(200)
             .json({ statusCode: 200, message: 'login with guest successfully', token });

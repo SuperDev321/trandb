@@ -5,7 +5,7 @@ import { useHistory } from 'react-router-dom';
 import './style.css';
 
 import {UserContext} from '../../context';
-import { handleSignup } from '../../utils';
+import { handleSignup } from '../../apis';
 import { GoogleLoginBtn } from '../../components';
 
 const Signup = () => {

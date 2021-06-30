@@ -33,7 +33,7 @@ const ioHandler = (io) => async (socket) => {
     socket.emit('repeat connection');
     return;
   }
-  const isMobile = socket.request.headers.ismobile;
+  const isMobile = socket.handshake.query.ismobile;
   let ip = socket.client.request.headers['cf-connecting-ip'] || socket.client.request.headers['x-forwarded-for'] || socket.client.request.connection.remoteAddress
   if(isIp(ip)) {
       if(!isIp.v4(ip)) {
@@ -111,7 +111,7 @@ const initIO = (server) => {
     try {
       // const token = (socket.request.headers.cookie + ';').match(/(?<=token=)(.*?)(?=;)/)[0];
       // await rateLimiter.consume(socket.handshake.address)
-      token = socket.request.headers.token;
+      token = socket.handshake.query.token;
       // const token = cookies.token
       const decoded = await verifyToken(token);
       // eslint-disable-next-line no-param-reassign

@@ -23,11 +23,11 @@ const GiftForm = ({gift, username, amount, setAmount}) => {
         return null;
     }
 
-    const { name, src } = gift;
+    const { name, src, imageSrc } = gift;
     
     return (
         <div className={classes.root}>
-            <GiftSnap src={src} name={name} />
+            <GiftSnap src={imageSrc} name={name} />
             <div className={classes.detail}>
                 <TextField name="receiver" id="gift-receiver" value={username} type="text" />
                 <TextField name="gift-amount" id="gift-amount" value={amount}

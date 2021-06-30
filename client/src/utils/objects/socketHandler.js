@@ -1,17 +1,17 @@
 import io from 'socket.io-client';
-import config from '../config';
-import mobileAndTabletCheck from './mobileCheck'
+import config from '../../config';
+import mobileAndTabletCheck from '../functions/mobileCheck'
 
 let token = window.localStorage.getItem('token');
 
 let socket = io(`${config.server_url}`,{
     autoConnect: false,
-    transport: ['polling', 'websocket'],
+    transports: ['polling', 'websocket'],
     timeout: 60000,
     pingTimeout: 60000,
     secure: true,
     reconnectionDelay: 1000,
-    extraHeaders: {
+    query: {
         token,
         ismobile: mobileAndTabletCheck()
     }
@@ -26,12 +26,12 @@ const createNewSocket = (token) => {
     console.log(ismobile)
     socket = io(`${config.server_url}`,{
         autoConnect: false,
-        transport: ['polling', 'websocket'],
+        transports: ['polling', 'websocket'],
         timeout: 60000,
         pingTimeout: 60000,
         secure: true,
         reconnectionDelay: 1000,
-        extraHeaders: {
+        query: {
             token,
             ismobile
         },

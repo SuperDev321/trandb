@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import config from '../config';
+import config from '../../config';
 import { useTranslation } from 'react-i18next';
 import useLocalStorage from './useLocalStorage'
 const useSetting = () => {
