@@ -68,7 +68,6 @@ const ChatRooms = ({room}, ref) => {
         privateAudio,
         publicAudio,
         requestAudio,
-        giftAudio,
         openDisconnectModal,
         setOpenDisconnectModal,
         openPasswordModal,
@@ -472,7 +471,6 @@ const ChatRooms = ({room}, ref) => {
             <div>{publicAudio}</div>
             <div>{privateAudio}</div>
             <div>{requestAudio}</div>
-            <div>{giftAudio}</div>
             <DisconnectModal
                 open={openDisconnectModal}
                 setOpen={setOpenDisconnectModal}
