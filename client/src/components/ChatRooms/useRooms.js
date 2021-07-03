@@ -138,11 +138,6 @@ const useRooms = ({initRoomName, ...initalState}) => {
         autoPlay: false ,
     });
 
-    const [giftAudio, giftAudioState, giftAudioControls] = useAudio({
-        src: '/media/gift.mp3',
-        autoPlay: false ,
-    });
-
     const {status, data, error} = state;
     const {status: roomsStatus, data: roomsData, roomIndex, error: roomsError} = roomsState;
 
@@ -690,8 +685,9 @@ const useRooms = ({initRoomName, ...initalState}) => {
                     giftImage: config.gift_path + gift.imageSrc
                 }
                 addMessage({ message, room });
-                giftAudioControls.seek(0);
-                giftAudioControls.play();
+                if (isForMe && roomNameRef.current !== room) {
+                    addMessage({ message, room: roomNameRef.current})
+                }
             }
         } catch (err) {
             // console.log(err)
@@ -1037,7 +1033,6 @@ const useRooms = ({initRoomName, ...initalState}) => {
         privateAudio,
         publicAudio,
         requestAudio,
-        giftAudio,
         openDisconnectModal,
         setOpenDisconnectModal,
         mediaClientRef,
