@@ -21,7 +21,7 @@ const useStyles = makeStyles((theme) =>({
 const App = () => {
     const classes = useStyles();
     const { loading, auth, role, setAuth, setLoading, username, removeCurrentUser,
-        avatar, gender, updateUser, myUser, point } = useAuth();
+        avatar, gender, updateUser, myUser, point, updateUserPoint } = useAuth();
     const { defaultTheme, messageSize, enablePokeSound, enablePrivateSound, enablePublicSound,
         setDefaultTheme, setMessageSize, setEnablePokeSound, setEnablePrivateSound, setEnablePublicSound,
         language, setLanguage, messageNum, enableSysMessage, setEnableSysMessage,
@@ -61,7 +61,7 @@ const App = () => {
         <CustomThemeProvider defaultTheme={defaultTheme}>
             <UserContext.Provider
                 value={{ auth, role, gender, avatar, loading, setAuth, setLoading, username,
-                removeCurrentUser, updateUser, myUser, point }}
+                removeCurrentUser, updateUser, myUser, point, updateUserPoint }}
             >
             <div className={classes.app} id='app' dir="rtl">
                 <Switch>

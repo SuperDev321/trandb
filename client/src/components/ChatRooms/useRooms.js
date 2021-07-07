@@ -84,7 +84,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
         roomIndex: null,
         error: null,
     });
-    const { username, updateUser } = useContext(UserContext);
+    const { username, updateUserPoint } = useContext(UserContext);
     const {enablePokeSound, enablePrivateSound, enablePublicSound, enableSysMessage, messageNum} = useContext(SettingContext);
     // current room state
     const [state, dispatch] = useReducer(roomReducer, {
@@ -643,23 +643,24 @@ const useRooms = ({initRoomName, ...initalState}) => {
         }
     }, [])
 
-    const updateUserInfo = (userData) => {
-        try {
-            roomsRef.current.map((room) => {
-                if (room.updateUserInfo(userData)) {
-                    if (roomNameRef.current === room.name) {
-                        dispatch({
-                            type: 'update',
-                            data: {
-                                name: room.name,
-                                users: room.users
-                            }
-                        })
-                    }
-                }
-            })
-        } catch (err) {
+    const updatePoints = (usersWithPoints) => {
+        const userToUpdate = usersWithPoints.find(({ username: usernameToUpdate }) => (username === usernameToUpdate));
+        if (userToUpdate) {
+            updateUserPoint(userToUpdate.point)
         }
+        roomsRef.current.map((room) => {
+            if (room.updateUserPoints(usersWithPoints)) {
+                if (roomNameRef.current === room.name) {
+                    dispatch({
+                        type: 'update',
+                        data: {
+                            name: room.name,
+                            users: room.users
+                        }
+                    })
+                }
+            }
+        })
     }
 
     const receiveGift = (payload) => {
@@ -668,7 +669,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
             if (gift && from && to && room) {
                 if (username === to) {
                     setGift(payload.gift);
-                    updateUser()
+                    // updateUser()
                 }
                 const isForMe = to === username;
                 const message = {
@@ -725,13 +726,8 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 receivePoke(payload, callback)
             })
 
-            socket.on('update user info', (payload) => {
-                updateUserInfo(payload)
-            })
-
-            socket.on('update user', () => {
-                console.log('update user')
-                updateUser()
+            socket.on('update points', (usersWithPoints) => {
+                updatePoints(usersWithPoints)
             })
 
             socket.on('received gift', (payload) => {

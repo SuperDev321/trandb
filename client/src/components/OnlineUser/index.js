@@ -112,6 +112,11 @@ const useStyles = makeStyles((theme) => ({
     },
     moderatorStar: {
         color: blue[300]
+    },
+    userPoint: {
+        color: yellow[700],
+        paddingLeft: 3,
+        paddingRight: 3
     }
 }))
 
@@ -230,6 +235,10 @@ const OnlineUser = ({roomName, username, user, role, isMuted, isPrivateMuted, is
                         // color={(user && user.broadcasting)? 'primary': 'disabled'}
                         style={{ color: blue[700], fontSize: 17 }}
                     />
+                }
+                { (user.point && user.point > 0)
+                    ?<span className={classes.userPoint}>{user.point}</span>
+                    :null
                 }
                 <div className={classes.username}>
                     <RoomUserName
