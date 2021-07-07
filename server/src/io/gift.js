@@ -6,7 +6,7 @@ const sendGift = (io, socket) => async ({to, giftId, room, amount}, callback) =>
         const sender = await Users.findById(_id);
         const receiver = await Users.findOne({ username: to })
         const gift = await Gifts.findById(giftId);
-        if (sender && receiver && gift && amount) {
+        if (sender && receiver && gift && amount > 0) {
             const { cost } = gift;
             const { point: senderPoint } = sender;
             const { point: receiverPoint } = receiver;
@@ -28,6 +28,20 @@ const sendGift = (io, socket) => async ({to, giftId, room, amount}, callback) =>
                     room,
                     amount
                 })
+                const senderWithPoint = await Users.findById(_id);
+                const receiverWithPoint = await Users.findOne({ username: to });
+                const usersWithPoints = [];
+                usersWithPoints.push({
+                    _id: senderWithPoint._id,
+                    username: senderWithPoint.username,
+                    point: senderWithPoint.point
+                })
+                usersWithPoints.push({
+                    _id: receiverWithPoint._id,
+                    username: receiverWithPoint.username,
+                    point: receiverWithPoint.point
+                })
+                io.emit('update points', usersWithPoints);
                 callback(true)
                 // const socketIds = await io.of('/').in(receiver._id.toString()).allSockets();
                 // const it = socketIds.values();
@@ -45,10 +59,12 @@ const sendGift = (io, socket) => async ({to, giftId, room, amount}, callback) =>
                 //     return callback(false)
                 // }
             } else {
-                callback(false);
+                callback(false, 'small_point_for_gift');
             }
             
-        }       
+        } else {
+            callback(false, 'wrong_gift')
+        }  
     } catch (err) {
         console.log(err)
     }

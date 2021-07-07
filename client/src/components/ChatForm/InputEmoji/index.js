@@ -64,7 +64,7 @@ function InputEmoji ({
         
         if (cleanOnEnter) {
             updateHTML('');
-            cleanedText.current = '';
+            cleanedTextRef.current = '';
             emitChange();
         }
     }

@@ -186,7 +186,13 @@ const SideBarLeft = ({ roomName, username, mutes, blocks, globalBlocks, changeMu
                 return -1
             }
             else {
-                return 0
+                if (user1.point < user2.point) {
+                    return 1;
+                } else if (user1.point > user2.point) {
+                    return -1;
+                } else {
+                    return 0;
+                }
             }
         })
         setSideUsers(newUsers)

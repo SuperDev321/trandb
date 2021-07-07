@@ -51,15 +51,17 @@ export default function GiftModal() {
     };
 
     const handleSubmit = () => {
-        if (currentGift) {
+        if (currentGift && amount > 0) {
             socket.emit('send gift', {
                 to: username,
                 giftId: currentGift._id,
                 room,
                 amount
-            }, (res) => {
+            }, (res, error) => {
                 if (res) {
                     updateUser()
+                } else {
+                    
                 }
             })
         }

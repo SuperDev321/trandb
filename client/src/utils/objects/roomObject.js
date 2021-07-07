@@ -137,6 +137,23 @@ class RoomObject  {
         })
         return true;
     }
+    updateUserPoints (usersWithPoints) {
+        let result = false
+
+        const newUsers = this.users?.map((user) => {
+            const userToUpdate = usersWithPoints.find(({ _id, point }) => (_id === user._id))
+            if (userToUpdate) {
+                result = true;
+                return { ... user, point: userToUpdate.point}
+            } else {
+                return user
+            }
+        });
+        if (result) {
+            this.users = newUsers;
+        }
+        return true;
+    }
 }
 
 export default RoomObject;

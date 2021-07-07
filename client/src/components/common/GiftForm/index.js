@@ -31,7 +31,7 @@ const GiftForm = ({gift, username, amount, setAmount}) => {
             <div className={classes.detail}>
                 <TextField name="receiver" id="gift-receiver" value={username} type="text" />
                 <TextField name="gift-amount" id="gift-amount" value={amount}
-                    type="number"
+                    type="number" InputProps={{ inputProps: { min: 1 } }}
                     onChange={(e) => setAmount(e.target.value) }
                 />
                 <div>
