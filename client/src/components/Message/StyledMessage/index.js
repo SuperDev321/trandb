@@ -90,7 +90,17 @@ emoji.supports_css = false;
 emoji.allow_native = false;
 emoji.replace_mode = 'img';// 'unified';
 emoji.use_sheet = true;
-
+var emojiStringToArray = function (str) {
+    let split = str.split(/([\uD800-\uDBFF][\uDC00-\uDFFF])/);
+    const arr = [];
+    for (var i=0; i<split.length; i++) {
+      let char = split[i]
+      if (char !== "") {
+        arr.push(char);
+      }
+    }
+    return arr;
+};
 const StyledMessage = ({message, mine}) => {
     const [checked, setChecked] = useState(false);
     const classes = useStyles({mine, color: message.color, bold: message.bold});
@@ -115,24 +125,28 @@ const StyledMessage = ({message, mine}) => {
       return text;
       // or alternatively
       // return text.replace(urlRegex, '<a href="$1">$1</a>')
-  }
-  const makeTag = (emojiText) => {
-      let arr = emojiText.split(/<img .*?>/g);
-      let noRepeatArr = [...new Set(arr)];
-      let urlText = emojiText;
-      if(noRepeatArr && noRepeatArr.length) {
-      for (let index = 0; index < noRepeatArr.length; index++) {
-          const element = noRepeatArr[index];
-          if(new RegExp("([a-zA-Z0-9]+://)?([a-zA-Z0-9_]+:[a-zA-Z0-9_]+@)?([a-zA-Z0-9.-]+\\.[A-Za-z]{2,4})(:[0-9]+)?(/.*)?").test(element)) {
-              urlText = urlText.replace(element, urlify(element));
-          }
-          else {
-              // urlText = urlText.replace(element, `<span>${element}</span>`);
-          }
-      }
-      }
-      return urlText
-  }
+    }
+    const makeTag = (text) => {
+        let arr = emojiStringToArray(text);
+        let noRepeatArr = [...new Set(arr)];
+        let htmlObj = [];
+        if (noRepeatArr && noRepeatArr.length) {
+            for (let index = 0; index < noRepeatArr.length; index++) {
+                const element = noRepeatArr[index];
+                if(new RegExp("([a-zA-Z0-9]+://)?([a-zA-Z0-9_]+:[a-zA-Z0-9_]+@)?([a-zA-Z0-9.-]+\\.[A-Za-z]{2,4})(:[0-9]+)?(/.*)?").test(element)) {
+                    // urlText = urlText.replace(element, urlify(element));
+                    htmlObj.push(<a href={element} target="_blank">{element}</a>)
+                } else if(new RegExp(/([\uD800-\uDBFF][\uDC00-\uDFFF])/).test(element)) {
+                    const emojiText = emoji.replace_unified(element);
+                    htmlObj.push(<div dangerouslySetInnerHTML={{ __html: emojiText }}></div>)
+                } else {
+                    // urlText = urlText.replace(element, `<span>${element}</span>`);
+                    htmlObj.push(<span>{element}</span>)
+                }
+            }
+        }
+        return htmlObj
+    }
     // const urlify = (text) => {
     
     //     let urlRegex = /(https?:\/\/[^\s]+)/g;
@@ -238,8 +252,10 @@ const StyledMessage = ({message, mine}) => {
             </span>
             :
                 <div  className={classes.message}
-                 dangerouslySetInnerHTML={{__html: makeTag(emojiConverter(message.msg))}}
                 >
+                {
+                    makeTag(message.msg)
+                }
                 </div>
             }
             </>
