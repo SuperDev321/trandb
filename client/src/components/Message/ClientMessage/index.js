@@ -1,6 +1,7 @@
 import React, { useContext, useState } from 'react';
 import {UserContext} from '../../../context';
 import {EmojiConvertor} from 'emoji-js';
+import parseHTML from 'parsehtml';
 import ImageView from './ImageView';
 import moment from 'moment';
 import RoomUserName from '../../RoomUserName';
@@ -15,6 +16,18 @@ emoji.allow_native = false;
 emoji.replace_mode = 'img';// 'unified';
 emoji.use_sheet = true;
 
+var emojiStringToArray = function (str) {
+    let split = str.split(/([\uD800-\uDBFF][\uDC00-\uDFFF])/);
+    const arr = [];
+    for (var i=0; i<split.length; i++) {
+      let char = split[i]
+      if (char !== "") {
+        arr.push(char);
+      }
+    }
+    return arr;
+};
+
 const MyMessage = ({user, roomName, message, messageSize, role, font_size, userAction, changeMuteState, sendPokeMessage, 
     kickUser, banUser, addOrOpenPrivate, scrollEvent, ...props}) => {
     const classes = useStyles({color: message.color, bold: message.bold, messageSize});
@@ -26,39 +39,39 @@ const MyMessage = ({user, roomName, message, messageSize, role, font_size, userA
         let arr = text.split(urlRegex);
         let noRepeatArr = [...new Set(arr)];
         for (let index = 0; index < noRepeatArr.length; index++) {
-        const element = noRepeatArr[index];
-        
-        if(new RegExp("([a-zA-Z0-9]+://)?([a-zA-Z0-9_]+:[a-zA-Z0-9_]+@)?([a-zA-Z0-9.-]+\\.[A-Za-z]{2,4})(:[0-9]+)?(/.*)?").test(element)) {
-            text = text.replace(element, `<a href="${element}" target="_blank">${element}</a>`);
-        } else {
-            text = text.replace(element, `<span>${element}</span>`);
-        }
+            const element = noRepeatArr[index];
+            
+            if(new RegExp("([a-zA-Z0-9]+://)?([a-zA-Z0-9_]+:[a-zA-Z0-9_]+@)?([a-zA-Z0-9.-]+\\.[A-Za-z]{2,4})(:[0-9]+)?(/.*)?").test(element)) {
+                
+                text = text.replace(element, <a href="${element}" target="_blank">${element}</a>);
+            } else {
+                text = text.replace(element, <span>${element}</span>);
+            }
         }
         return text;
         // or alternatively
         // return text.replace(urlRegex, '<a href="$1">$1</a>')
     }
-    const makeTag = (emojiText) => {
-        let arr = emojiText.split(/<img .*?>/g);
+    const makeTag = (text) => {
+        let arr = emojiStringToArray(text);
         let noRepeatArr = [...new Set(arr)];
-        let urlText = emojiText;
-        if(noRepeatArr && noRepeatArr.length) {
-        for (let index = 0; index < noRepeatArr.length; index++) {
-            const element = noRepeatArr[index];
-            if(new RegExp("([a-zA-Z0-9]+://)?([a-zA-Z0-9_]+:[a-zA-Z0-9_]+@)?([a-zA-Z0-9.-]+\\.[A-Za-z]{2,4})(:[0-9]+)?(/.*)?").test(element)) {
-                urlText = urlText.replace(element, urlify(element));
-            }
-            else {
-                // urlText = urlText.replace(element, `<span>${element}</span>`);
+        let htmlObj = [];
+        if (noRepeatArr && noRepeatArr.length) {
+            for (let index = 0; index < noRepeatArr.length; index++) {
+                const element = noRepeatArr[index];
+                if(new RegExp("([a-zA-Z0-9]+://)?([a-zA-Z0-9_]+:[a-zA-Z0-9_]+@)?([a-zA-Z0-9.-]+\\.[A-Za-z]{2,4})(:[0-9]+)?(/.*)?").test(element)) {
+                    // urlText = urlText.replace(element, urlify(element));
+                    htmlObj.push(<a href={element} target="_blank">{element}</a>)
+                } else if(new RegExp(/([\uD800-\uDBFF][\uDC00-\uDFFF])/).test(element)) {
+                    const emojiText = emoji.replace_unified(element);
+                    htmlObj.push(<div dangerouslySetInnerHTML={{ __html: emojiText }}></div>)
+                } else {
+                    // urlText = urlText.replace(element, `<span>${element}</span>`);
+                    htmlObj.push(<span>{element}</span>)
+                }
             }
         }
-        }
-        return urlText
-    }
-
-    const emojiConverter = (text) => {
-        let emojiText =  emoji.replace_unified(text);
-        return emojiText;
+        return htmlObj
     }
 
     const handleClick = (e) => {
@@ -98,11 +111,8 @@ const MyMessage = ({user, roomName, message, messageSize, role, font_size, userA
                 <span
                     className={classes.text}
                     onClick={handleClick}
-                    dangerouslySetInnerHTML={{__html: makeTag(emojiConverter(message.msg))}}
                 >
-                {/* {
-                    convertHTML(makeTag(emojiConverter(message.msg)))
-                } */}
+                    {makeTag(message.msg)}
                 </span>
                 }
                 </>
