@@ -90,7 +90,7 @@ emoji.supports_css = false;
 emoji.allow_native = false;
 emoji.replace_mode = 'img';// 'unified';
 emoji.use_sheet = true;
-var emojiStringToArray = function (str) {
+const emojiStringToArray = (str) => {
     let split = str.split(/([\uD800-\uDBFF][\uDC00-\uDFFF])/);
     const arr = [];
     for (var i=0; i<split.length; i++) {
@@ -101,6 +101,17 @@ var emojiStringToArray = function (str) {
     }
     return arr;
 };
+const isValidHttpUrl = (string) => {
+    let url;
+    
+    try {
+      url = new URL(string);
+    } catch (_) {
+      return false;  
+    }
+  
+    return url.protocol === "http:" || url.protocol === "https:";
+}
 const StyledMessage = ({message, mine}) => {
     const [checked, setChecked] = useState(false);
     const classes = useStyles({mine, color: message.color, bold: message.bold});
@@ -133,7 +144,7 @@ const StyledMessage = ({message, mine}) => {
         if (noRepeatArr && noRepeatArr.length) {
             for (let index = 0; index < noRepeatArr.length; index++) {
                 const element = noRepeatArr[index];
-                if(new RegExp("([a-zA-Z0-9]+://)?([a-zA-Z0-9_]+:[a-zA-Z0-9_]+@)?([a-zA-Z0-9.-]+\\.[A-Za-z]{2,4})(:[0-9]+)?(/.*)?").test(element)) {
+                if(isValidHttpUrl(element)) {
                     // urlText = urlText.replace(element, urlify(element));
                     htmlObj.push(<a href={element} target="_blank">{element}</a>)
                 } else if(new RegExp(/([\uD800-\uDBFF][\uDC00-\uDFFF])/).test(element)) {

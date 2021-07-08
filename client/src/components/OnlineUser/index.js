@@ -32,8 +32,8 @@ const useStyles = makeStyles((theme) => ({
         },
         color: props => {
             if (props.gender && props.avatarColor) {
-                if (props.gender === 'male') return '#1e84ba';
-                else if (props.gender === 'female') return '#f466e8'
+                if (props.gender === 'male') return '#1e31ba';
+                else if (props.gender === 'female') return '#9e59ca'
             }
             return 'inherit'
         }
@@ -113,11 +113,7 @@ const useStyles = makeStyles((theme) => ({
     moderatorStar: {
         color: blue[300]
     },
-    userPoint: {
-        color: yellow[700],
-        paddingLeft: 3,
-        paddingRight: 3
-    }
+
 }))
 
 const StyledBadge = withStyles((theme) => ({
@@ -236,10 +232,6 @@ const OnlineUser = ({roomName, username, user, role, isMuted, isPrivateMuted, is
                         style={{ color: blue[700], fontSize: 17 }}
                     />
                 }
-                { (user.point && user.point > 0)
-                    ?<span className={classes.userPoint}>{user.point}</span>
-                    :null
-                }
                 <div className={classes.username}>
                     <RoomUserName
                         user={user}
@@ -263,6 +255,7 @@ const OnlineUser = ({roomName, username, user, role, isMuted, isPrivateMuted, is
                         stopBroadcastTo={stopBroadcastTo}
                         changePrivateMute={changePrivateMute}
                         showAboutMe={true}
+                        showPoint={true}
                     />
                 {( user.role === 'admin' || user.role === 'super_admin') &&
                     <StarRounded className={classes.adminStar} />

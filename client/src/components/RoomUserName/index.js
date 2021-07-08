@@ -18,7 +18,7 @@ import {
 } from '@material-ui/icons';
 import {useTranslation} from 'react-i18next';
 import { makeStyles } from '@material-ui/core/styles';
-import { pink } from '@material-ui/core/colors';
+import { pink, yellow } from '@material-ui/core/colors';
 import BanModal from '../Modals/BanModal';
 import CustomTooltip from '../CustomTooltip'
 import {socket} from '../../utils'
@@ -71,6 +71,13 @@ const useStyles = makeStyles((theme) => ({
     },
     pokeContent: {
         width: 200
+    },
+    userPoint: {
+        fontSize: '0.7rem',
+        color: yellow[700],
+        paddingLeft: 3,
+        paddingRight: 3,
+        
     }
 }))
 
@@ -80,6 +87,16 @@ const pokeTypes = [
     'where_are_you',
     'nock'
 ]
+
+const extractPoint = (point) => {
+    if (point > 1000) {
+        return Math.floor(point/1000) + 'K';
+    } else if (point > 100) {
+        return Math.floor(point/100) + 'L';
+    } else {
+        return Math.floor(point)
+    }
+}
 
 function useDoubleClick({oneClick, doubleClick}) {
     const [elem, setElem] = React.useState(null);
@@ -140,7 +157,7 @@ function useDoubleClick({oneClick, doubleClick}) {
 
 const RoomUserName = ({user, role, roomName,
     changeMuteState, sendPokeMessage, kickUser, banUser, addOrOpenPrivate, viewBroadcast, stopBroadcastTo,
-    isMine, displayYou, isMuted, isBlocked, isPrivateMuted, changePrivateMute, showAboutMe
+    isMine, displayYou, isMuted, isBlocked, isPrivateMuted, changePrivateMute, showAboutMe, showPoint = false
     // open,
     // anchorEl,
     // setAnchorEl,
@@ -324,6 +341,10 @@ const RoomUserName = ({user, role, roomName,
             title={user.ip}
         >
             <div  ref={refCallback} className={classes.content}>
+                { (showPoint && user.point && user.point > 0)
+                    ?<span className={classes.userPoint}>{extractPoint(user.point)}</span>
+                    :null
+                }
                 <span className={classes.username}>
                     {user.username+((isMine && displayYou) ? ' (you)' : '')}
                 </span>
