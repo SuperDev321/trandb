@@ -75,14 +75,14 @@ const useStyles = makeStyles((theme) => ({
     },
     userPoint: {
         fontSize: '0.7rem',
-        color: green[700],
+        color: '#fbc02d',
         paddingLeft: 3,
         paddingRight: 3,
     },
     userPointK: {
-        color: yellow[700]
+        color: '#008000'
     },
-    userPointL: {
+    userPointV: {
         color: red[500]
     }
 }))
