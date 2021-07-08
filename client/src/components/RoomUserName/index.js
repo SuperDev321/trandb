@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
+import clsx from 'clsx';
 import {
     Avatar,
     Popover,
@@ -18,7 +19,7 @@ import {
 } from '@material-ui/icons';
 import {useTranslation} from 'react-i18next';
 import { makeStyles } from '@material-ui/core/styles';
-import { pink, yellow } from '@material-ui/core/colors';
+import { green, pink, red, yellow } from '@material-ui/core/colors';
 import BanModal from '../Modals/BanModal';
 import CustomTooltip from '../CustomTooltip'
 import {socket} from '../../utils'
@@ -74,10 +75,15 @@ const useStyles = makeStyles((theme) => ({
     },
     userPoint: {
         fontSize: '0.7rem',
-        color: yellow[700],
+        color: green[700],
         paddingLeft: 3,
         paddingRight: 3,
-        
+    },
+    userPointK: {
+        color: yellow[700]
+    },
+    userPointL: {
+        color: red[500]
     }
 }))
 
@@ -89,12 +95,14 @@ const pokeTypes = [
 ]
 
 const extractPoint = (point) => {
-    if (point > 1000) {
-        return Math.floor(point/1000) + 'K';
+    if (point > 100000) {
+        return { point: Math.floor(point/100000) + 'V', pointRange: 'V' };
+    } else if (point > 1000) {
+        return { point: Math.floor(point/1000) + 'K', pointRange: 'K' };
     } else if (point > 100) {
-        return Math.floor(point/100) + 'L';
+        return { point: Math.floor(point/100) + 'L', pointRange: 'L' };
     } else {
-        return Math.floor(point)
+        return { point: Math.floor(point), pointRange: 'L' };
     }
 }
 
@@ -330,7 +338,8 @@ const RoomUserName = ({user, role, roomName,
     }, [user, avatarOption, avatarColor])
 
     const open = Boolean(anchorEl);
-    const openPoke = Boolean(anchorEl && anchorPokeEl)
+    const openPoke = Boolean(anchorEl && anchorPokeEl);
+    const { point, pointRange } = extractPoint(user.point);
 
     return (
         <>
@@ -342,7 +351,16 @@ const RoomUserName = ({user, role, roomName,
         >
             <div  ref={refCallback} className={classes.content}>
                 { (showPoint && user.point && user.point > 0)
-                    ?<span className={classes.userPoint}>{extractPoint(user.point)}</span>
+                    ?
+                    <span
+                        className={clsx(classes.userPoint, {
+                            [classes.userPointV]: pointRange === 'V',
+                            [classes.userPointK]: pointRange === 'K',
+                            })
+                        }
+                        >
+                        {point}
+                    </span>
                     :null
                 }
                 <span className={classes.username}>
