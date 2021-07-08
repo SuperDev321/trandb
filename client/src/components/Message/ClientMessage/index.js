@@ -28,6 +28,18 @@ var emojiStringToArray = function (str) {
     return arr;
 };
 
+function isValidHttpUrl(string) {
+    let url;
+    
+    try {
+      url = new URL(string);
+    } catch (_) {
+      return false;  
+    }
+  
+    return url.protocol === "http:" || url.protocol === "https:";
+}
+
 const MyMessage = ({user, roomName, message, messageSize, role, font_size, userAction, changeMuteState, sendPokeMessage, 
     kickUser, banUser, addOrOpenPrivate, scrollEvent, ...props}) => {
     const classes = useStyles({color: message.color, bold: message.bold, messageSize});
@@ -59,8 +71,9 @@ const MyMessage = ({user, roomName, message, messageSize, role, font_size, userA
         if (noRepeatArr && noRepeatArr.length) {
             for (let index = 0; index < noRepeatArr.length; index++) {
                 const element = noRepeatArr[index];
-                if(new RegExp("([a-zA-Z0-9]+://)?([a-zA-Z0-9_]+:[a-zA-Z0-9_]+@)?([a-zA-Z0-9.-]+\\.[A-Za-z]{2,4})(:[0-9]+)?(/.*)?").test(element)) {
+                if(isValidHttpUrl(element)) {
                     // urlText = urlText.replace(element, urlify(element));
+                    console.log(element)
                     htmlObj.push(<a href={element} target="_blank">{element}</a>)
                 } else if(new RegExp(/([\uD800-\uDBFF][\uDC00-\uDFFF])/).test(element)) {
                     const emojiText = emoji.replace_unified(element);
