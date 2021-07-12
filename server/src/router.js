@@ -23,6 +23,7 @@ const {
   getUsers,
   updateProfile,
   updateAvatar,
+  updatePoint,
   getUserByName,
   getUserDetail,
   getPublicRoomNames,
@@ -48,7 +49,10 @@ const {
   deleteGift,
   updateGift,
   getGifts,
-  initPoints
+  initPoints,
+  getPointBotStatus,
+  startPointBot,
+  stopPointBot
 } = require('./controllers');
 const getUserIp = require('./controllers/users/getUserIp');
 
@@ -88,6 +92,7 @@ router.get('/users/:userId/rooms', withAuth, getUserRooms);
 router.get('/users/:userId', getUserDetail);
 router.get('/users/:username/ip', withAuth, isAdmin, getUserIp);
 router.post('/user/update/avatar', withAuth, updateAvatar)
+router.post('/user/update/point', withAuth, isAdmin, updatePoint)
 router.post('/profile/update', updateProfile)
 
 router.delete('/bans/:banId', withAuth, deleteBan);
@@ -117,6 +122,9 @@ router.post('/gift', addGift);
 router.delete('/gift/:id', deleteGift);
 router.post('/gift/edit', updateGift);
 
+router.get('/point/status', getPointBotStatus);
+router.post('/point/start', startPointBot);
+router.post('/point/stop', stopPointBot);
 
 router.use(clientError);
 router.use(serverError);

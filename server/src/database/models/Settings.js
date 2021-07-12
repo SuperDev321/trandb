@@ -33,7 +33,10 @@ const settingSchema = new Schema({
   avatarColor: {
     type: Boolean
   },
-  bypassBan: Boolean
+  bypassBan: Boolean,
+  showGiftMessage: Boolean,
+  showGift: Boolean,
+  pointOption: Boolean
 });
 
 const Settings = model('Settings', settingSchema);

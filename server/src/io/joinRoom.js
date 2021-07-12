@@ -41,7 +41,6 @@ const joinRoom = (io, socket) => async ({ room, password }, callback) => {
             const ipStr = ipInt(ip).toIP();
             return { ...item, ip: ipStr, blocked };
         }));
-
         const globalBlocks = await getGlobalBlocksWithIp();
         const blocks = await getRoomBlocks(room);
         // let blocked = await checkBlock(room, user.username, user.ip);
@@ -58,8 +57,6 @@ const joinRoom = (io, socket) => async ({ room, password }, callback) => {
                 }
             }
         );
-
-        
     } catch (err) {
         console.log(err);
         callback(false, 'You cannot join to this room')
