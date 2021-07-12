@@ -25,7 +25,6 @@ class BootManager {
                     this.bootNum = 0;
                 }
                 let boot = boots[this.bootNum];
-                console.log('boot message', boot)
                 if(this.io && boot && boot.content) {
                     let {content, size, bold, color} = boot;
                     this.io.to(room).emit('room message', {
@@ -47,14 +46,12 @@ class BootManager {
     }
 
     stop() {
-        // if(this.room === room) {
         this.room = null;
         if(this.timer) {
             clearInterval(this.timer);
             this.timer = null;
         }
         return true;
-        // }
     }
 
 }

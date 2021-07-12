@@ -49,9 +49,6 @@ const addPrivate = (io, socket) => async ({ from, to, role }, callback) => {
                 return callback(null)
             }
         }
-        
-        
-        
     } catch (err) {
         console.log(err);
         callback(null);

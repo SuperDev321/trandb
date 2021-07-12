@@ -34,6 +34,7 @@ import Quiz from 'Admin/views/Quiz';
 import Log from 'Admin/views/Log';
 import PrivateLogs from 'Admin/views/PrivateLogs';
 import Gifts from 'Admin/views/Gift'
+import Point from 'Admin/views/Point'
 
 const dashboardRoutes = [
   {
@@ -105,6 +106,14 @@ const dashboardRoutes = [
     name: "Gifts",
     icon: QuestionAnswerIcon,
     component: Gifts,
+    layout: "/admin",
+    super: true,
+  },
+  {
+    path: "/point",
+    name: "Point",
+    icon: QuestionAnswerIcon,
+    component: Point,
     layout: "/admin",
     super: true,
   },

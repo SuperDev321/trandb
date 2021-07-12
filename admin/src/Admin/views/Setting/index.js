@@ -38,6 +38,9 @@ export default function Setting() {
     const [avatarColor, setAvatarColor] = useState(true)
     const [bypassBan, setBypassBan] = useState(true)
     const [allowGuestAvatarUpload, setAllowGuestAvatarUpload] = useState(false)
+    const [showGift, setShowGift] = useState(true)
+    const [showGiftMessage, setShowGiftMessage] = useState(true)
+    const [pointOption, setPointOption] = useState(false)
     const { addToast } = useToasts();
 
     useEffect(() => {
@@ -50,7 +53,9 @@ export default function Setting() {
         .then((response) => {
             if(response.status === 200) {
                 const {theme, language, messageNum, allowPrivate, messageTimeInterval,
-                    maxUsernameLength, maxMessageLength, avatarOption, avatarColor, bypassBan, allowGuestAvatarUpload} = response.data;
+                    maxUsernameLength, maxMessageLength, avatarOption, avatarColor, bypassBan, allowGuestAvatarUpload,
+                    showGift, showGiftMessage, pointOption
+                } = response.data;
                 if(theme) {
                     setTheme(theme);
                 }
@@ -78,6 +83,9 @@ export default function Setting() {
                 setAvatarColor(avatarColor)
                 setBypassBan(bypassBan)
                 setAllowGuestAvatarUpload(allowGuestAvatarUpload)
+                setShowGift(showGift);
+                setShowGiftMessage(showGiftMessage)
+                setPointOption(pointOption)
             }
         })
     }, [])
@@ -85,7 +93,9 @@ export default function Setting() {
     const handleUpdate = () => {
         let token = window.localStorage.getItem('token');
         Axios.post(`${config.server_url}/api/setting`, {theme, language, messageNum, allowPrivate,
-            messageTimeInterval, maxUsernameLength, maxMessageLength, avatarOption, avatarColor, bypassBan, allowGuestAvatarUpload}, {
+            messageTimeInterval, maxUsernameLength, maxMessageLength, avatarOption, avatarColor, bypassBan, allowGuestAvatarUpload,
+            showGift, showGiftMessage, pointOption
+        }, {
             headers: {
                 authorization: token
             }
@@ -331,6 +341,69 @@ export default function Setting() {
                                 />
                                 </Grid>
                                 <Grid item>Yes</Grid>
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                    <Grid container spacing={2} style={{marginTop:'20px'}}>
+                        <Grid item sm={1}>
+                        </Grid>
+                        <Grid item sm={2} style={{textAlign: 'right'}}>
+                            <p className={classes.cardCategory}>Show Gift</p>
+                        </Grid>
+                        <Grid item>
+                            <Grid component="label" container alignItems="center" spacing={1}>
+                                <Grid item>No</Grid>
+                                <Grid item>
+                                <Switch
+                                    checked={showGift}
+                                    onChange={(e) => setShowGift(e.target.checked)}
+                                    name="showGift"
+                                    inputProps={{ 'aria-label': 'show gift' }}
+                                />
+                                </Grid>
+                                <Grid item>Yes</Grid>
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                    <Grid container spacing={2} style={{marginTop:'20px'}}>
+                        <Grid item sm={1}>
+                        </Grid>
+                        <Grid item sm={2} style={{textAlign: 'right'}}>
+                            <p className={classes.cardCategory}>Show Gift Message</p>
+                        </Grid>
+                        <Grid item>
+                            <Grid component="label" container alignItems="center" spacing={1}>
+                                <Grid item>No</Grid>
+                                <Grid item>
+                                <Switch
+                                    checked={showGiftMessage}
+                                    onChange={(e) => setShowGiftMessage(e.target.checked)}
+                                    name="showGiftMessage"
+                                    inputProps={{ 'aria-label': 'show gift message' }}
+                                />
+                                </Grid>
+                                <Grid item>Yes</Grid>
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                    <Grid container spacing={2} style={{marginTop:'20px'}}>
+                        <Grid item sm={1}>
+                        </Grid>
+                        <Grid item sm={2} style={{textAlign: 'right'}}>
+                            <p className={classes.cardCategory}>Point Option</p>
+                        </Grid>
+                        <Grid item>
+                            <Grid component="label" container alignItems="center" spacing={1}>
+                                <Grid item>Hide points on nicklist</Grid>
+                                <Grid item>
+                                <Switch
+                                    checked={pointOption}
+                                    onChange={(e) => setBypassBan(e.target.checked)}
+                                    name="pointOption"
+                                    inputProps={{ 'aria-label': 'point option' }}
+                                />
+                                </Grid>
+                                <Grid item>Show points on nicklist</Grid>
                             </Grid>
                         </Grid>
                     </Grid>

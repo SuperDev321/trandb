@@ -10,6 +10,7 @@ const getUsers = require('./getUsers');
 const updateProfile = require('./updateProfile');
 const updateAvatar = require('./updateAvatar');
 const initPoints = require('./initPoints');
+const updatePoint = require('./updatePoint');
 module.exports = {
   signup,
   login,
@@ -22,5 +23,6 @@ module.exports = {
   getUsers,
   updateProfile,
   updateAvatar,
-  initPoints
+  initPoints,
+  updatePoint
 };
