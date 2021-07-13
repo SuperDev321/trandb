@@ -74,6 +74,7 @@ const useStyles = makeStyles((theme) => ({
         width: 200
     },
     userPoint: {
+        fontWeight: 'bold',
         fontSize: '0.7rem',
         color: '#fbc02d',
         paddingLeft: 3,
