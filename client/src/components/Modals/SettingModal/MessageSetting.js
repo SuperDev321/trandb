@@ -42,7 +42,10 @@ const PrettoSlider = withStyles({
       borderRadius: 4,
     },
 })(Slider);
-const MessageSetting = ({messageSize, setMessageSize, enableSysMessage, setEnableSysMessage}) => {
+const MessageSetting = ({
+    messageSize, setMessageSize, enableSysMessage, setEnableSysMessage,
+    showGift, showGiftMessage, setShowGift, setShowGiftMessage
+}) => {
     const classes = useStyles();
     const [value, setValue] = React.useState(30);
     const { t } = useTranslation();
@@ -74,8 +77,48 @@ const MessageSetting = ({messageSize, setMessageSize, enableSysMessage, setEnabl
                           checked={enableSysMessage}
                           onChange={(e) => {setEnableSysMessage(e.target.checked)}}
                           color="secondary"
-                          name="checkedB"
+                          name="join_leave_message"
                           inputProps={{ 'aria-label': 'system message checkbox' }}
+                      />
+                    </Grid>
+                    <Grid item>{t('SettingModal.show')}</Grid>
+                  </Grid>
+                </Grid>
+            </Grid>
+            <Grid container alignItems="center" spacing={0}>
+                <Grid item xs={12} spacing={5}>
+                    <span>{t('SettingModal.gift_messages')}</span>
+                </Grid>
+                <Grid item xs={12} spacing={5}>
+                  <Grid container alignItems="center">
+                    <Grid item>{t('SettingModal.hide')}</Grid>
+                    <Grid item>
+                      <Switch
+                          checked={showGiftMessage}
+                          onChange={(e) => {setShowGiftMessage(e.target.checked)}}
+                          color="secondary"
+                          name="gift_message"
+                          inputProps={{ 'aria-label': 'gift message checkbox' }}
+                      />
+                    </Grid>
+                    <Grid item>{t('SettingModal.show')}</Grid>
+                  </Grid>
+                </Grid>
+            </Grid>
+            <Grid container alignItems="center" spacing={0}>
+                <Grid item xs={12} spacing={5}>
+                    <span>{t('SettingModal.gift_for_me')}</span>
+                </Grid>
+                <Grid item xs={12} spacing={5}>
+                  <Grid container alignItems="center">
+                    <Grid item>{t('SettingModal.hide')}</Grid>
+                    <Grid item>
+                      <Switch
+                          checked={showGift}
+                          onChange={(e) => {setShowGift(e.target.checked)}}
+                          color="secondary"
+                          name="gift_movie"
+                          inputProps={{ 'aria-label': 'gift checkbox' }}
                       />
                     </Grid>
                     <Grid item>{t('SettingModal.show')}</Grid>

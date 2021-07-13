@@ -206,7 +206,9 @@
     "new": "New",
     "avatar_option": "Avatar Option",
     "upload": "Upload",
-    "from_main_site": "From Main Site"
+    "from_main_site": "From Main Site",
+    "gift_messages": "Gift Messages",
+    "gift_for_me": "Gift For Me"
   },
   "BanModal": {
     "ban_user": "Ban User",

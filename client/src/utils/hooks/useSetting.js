@@ -24,6 +24,9 @@ const useSetting = () => {
   const [avatarOption, setAvatarOption] = useState(true);
   const [avatarColor, setAvatarColor] = useState(true);
   const [allowGuestAvatarUpload, setAllowGuestAvatarUpload] = useState(false)
+  const [pointOption, setPointOption] = useState(false)
+  const [showGift, _setShowGift] = useState(false)
+  const [showGiftMessage, _setShowGiftMessage] = useState(false)
   const { t, i18n } = useTranslation();
   const setMessageSize = (messageSize) => {
     localStorage.setItem('messageSize', messageSize);
@@ -63,6 +66,24 @@ const useSetting = () => {
       _setEnableSysMessage(false);
     }
   }
+  const setShowGiftMessage = (setting) => {
+    if(setting) {
+      localStorage.setItem('gift-message', 'on');
+      _setShowGiftMessage(true);
+    } else {
+      localStorage.setItem('gift-message', 'off');
+      _setShowGiftMessage(false);
+    }
+  }
+  const setShowGift = (setting) => {
+    if(setting) {
+      localStorage.setItem('gift-movie', 'on');
+      _setShowGift(true);
+    } else {
+      localStorage.setItem('gift-movie', 'off');
+      _setShowGift(false);
+    }
+  }
 
   const addPrivateMute = (mute) => {
     if (mute && mute.username && mute.ip) {
@@ -83,6 +104,9 @@ const useSetting = () => {
   useEffect(() => {
     const currentPokeSound = localStorage.getItem('poke-sound');
     const currentLanguage = localStorage.getItem('language');
+    const currentPrivateSound = localStorage.getItem('private-sound');
+    const currentShowGift = localStorage.getItem('gift-movie');
+    const currentShowGiftMessage = localStorage.getItem('gift-message');
     if(!currentPokeSound) {
       setEnablePokeSound(true);
     } else {
@@ -93,7 +117,6 @@ const useSetting = () => {
       }
     }
     
-    const currentPrivateSound = localStorage.getItem('private-sound');
     if(!currentPrivateSound) {
       setEnablePrivateSound(true)
     } else {
@@ -129,7 +152,8 @@ const useSetting = () => {
       if(response.status === 200) {
         let data = response.data;
         if(data) {
-          const {theme, messageNum, language, allowPrivate, messageTimeInterval, maxMessageLength, avatarOption, avatarColor, allowGuestAvatarUpload} = data;
+          const { theme, messageNum, language, allowPrivate, messageTimeInterval, maxMessageLength, avatarOption, avatarColor, 
+            allowGuestAvatarUpload, showGift, showGiftMessage, pointOption } = data;
           setDefaultTheme(theme);
           if(!currentLanguage)
             setLanguage(language);
@@ -152,6 +176,26 @@ const useSetting = () => {
           setEnableGuestPrivate(allowPrivate);
           setAvatarColor(avatarColor);
           setAllowGuestAvatarUpload(allowGuestAvatarUpload);
+          setPointOption(pointOption);
+          if (!currentShowGift) {
+            setShowGift(showGift);
+          } else {
+            if (currentShowGift === 'on') {
+              _setShowGift(true);
+            } else {
+              _setShowGift(false);
+            }
+            
+          }
+          if (!currentShowGiftMessage) {
+            setShowGiftMessage(showGiftMessage);
+          } else {
+            if (currentShowGiftMessage === 'on') {
+              _setShowGiftMessage(true);
+            } else {
+              _setShowGiftMessage(false);
+            }
+          }
         }
       }
     })
@@ -172,7 +216,7 @@ const useSetting = () => {
     setDefaultTheme, setMessageSize, setEnablePokeSound, setEnablePrivateSound, setEnablePublicSound,
     language, setLanguage, messageNum, enableSysMessage, setEnableSysMessage, enableGuestPrivate,
     messageTimeInterval, maxUsernameLength, maxMessageLength, privateMutes, addPrivateMute, removePrivateMute,
-    avatarOption, avatarColor, allowGuestAvatarUpload
+    avatarOption, avatarColor, allowGuestAvatarUpload, pointOption, showGift, showGiftMessage, setShowGift, setShowGiftMessage
   };
 };
 

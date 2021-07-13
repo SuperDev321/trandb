@@ -85,7 +85,8 @@ const useRooms = ({initRoomName, ...initalState}) => {
         error: null,
     });
     const { username, updateUserPoint } = useContext(UserContext);
-    const {enablePokeSound, enablePrivateSound, enablePublicSound, enableSysMessage, messageNum} = useContext(SettingContext);
+    const {enablePokeSound, enablePrivateSound, enablePublicSound, enableSysMessage,
+        messageNum, showGift, showGiftMessage} = useContext(SettingContext);
     // current room state
     const [state, dispatch] = useReducer(roomReducer, {
         status: 'idle',
@@ -667,27 +668,29 @@ const useRooms = ({initRoomName, ...initalState}) => {
         try {
             const { gift, from, to, room, amount } = payload;
             if (gift && from && to && room) {
-                if (username === to) {
+                const isForMe = to === username;
+                if (showGift && isForMe) {
                     setGift(payload.gift);
                     // updateUser()
                 }
-                const isForMe = to === username;
-                const message = {
-                    _id: makeid(10),
-                    type: 'gift',
-                    from,
-                    to,
-                    msg: t(isForMe? 'ChatApp.gift_send_to_you': 'ChatApp.gift_send', {
-                        sender: from,
-                        receiver: to,
-                        amount,
-                        giftName: gift.name
-                    }),
-                    giftImage: config.gift_path + gift.imageSrc
-                }
-                addMessage({ message, room });
-                if (isForMe && roomNameRef.current !== room) {
-                    addMessage({ message, room: roomNameRef.current})
+                if (showGiftMessage) {
+                    const message = {
+                        _id: makeid(10),
+                        type: 'gift',
+                        from,
+                        to,
+                        msg: t(isForMe? 'ChatApp.gift_send_to_you': 'ChatApp.gift_send', {
+                            sender: from,
+                            receiver: to,
+                            amount,
+                            giftName: gift.name
+                        }),
+                        giftImage: config.gift_path + gift.imageSrc
+                    }
+                    addMessage({ message, room });
+                    if (isForMe && roomNameRef.current !== room) {
+                        addMessage({ message, room: roomNameRef.current})
+                    }
                 }
             }
         } catch (err) {
@@ -730,9 +733,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 updatePoints(usersWithPoints)
             })
 
-            socket.on('received gift', (payload) => {
-                receiveGift(payload);
-            })
+            
 
             socket.on('disconnect', (reason) => {
                 setOpenDisconnectModal(true);
@@ -855,6 +856,16 @@ const useRooms = ({initRoomName, ...initalState}) => {
             socket.off('global banned user');
         }
     }, [enableSysMessage, username])
+
+    useEffect(() => {
+        socket.on('received gift', (payload) => {
+            receiveGift(payload);
+        })
+
+        return () => {
+            socket.off('received gift');
+        }
+    }, [showGift, showGiftMessage])
 
     useEffect(() => {
         let mediaObj = new MediaClient(username);

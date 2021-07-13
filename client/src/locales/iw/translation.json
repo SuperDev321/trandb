@@ -204,7 +204,9 @@
     "new": "חדש",
     "avatar_option": "אפשרויות תמונה",
     "upload": "העלאה",
-    "from_main_site": "מהפרופיל באתר"
+    "from_main_site": "מהפרופיל באתר",
+    "gift_messages": "Gift Messages",
+    "gift_for_me": "Gift For Me"
   },
   "BanModal": {
     "ban_user": "חסימת משתמש",

@@ -398,7 +398,7 @@ export default function Setting() {
                                 <Grid item>
                                 <Switch
                                     checked={pointOption}
-                                    onChange={(e) => setBypassBan(e.target.checked)}
+                                    onChange={(e) => setPointOption(e.target.checked)}
                                     name="pointOption"
                                     inputProps={{ 'aria-label': 'point option' }}
                                 />
