@@ -80,7 +80,8 @@ const useStyles = makeStyles((theme) => ({
 
 const SettingModal = () => {
     const {messageSize, setMessageSize, enablePokeSound, setEnablePokeSound, enablePrivateSound, setEnablePrivateSound,
-        enablePublicSound, setEnablePublicSound, language, setLanguage, enableSysMessage, setEnableSysMessage, avatarOption, allowGuestAvatarUpload
+        enablePublicSound, setEnablePublicSound, language, setLanguage, enableSysMessage, setEnableSysMessage, avatarOption, allowGuestAvatarUpload,
+        showGift, showGiftMessage, setShowGift, setShowGiftMessage
     } = useContext(SettingContext);
     const {myUser} = useContext(UserContext);
     const [open, setOpen] = useState(false);
@@ -155,6 +156,10 @@ const SettingModal = () => {
                         setMessageSize={setMessageSize}
                         enableSysMessage={enableSysMessage}
                         setEnableSysMessage={setEnableSysMessage}
+                        showGift={showGift}
+                        showGiftMessage={showGiftMessage}
+                        setShowGift={setShowGift}
+                        setShowGiftMessage={setShowGiftMessage}
                     />: null
                 }
                 {page === 'notifications' ?

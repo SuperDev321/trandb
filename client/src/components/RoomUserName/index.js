@@ -177,7 +177,7 @@ const RoomUserName = ({user, role, roomName,
     const [anchorPokeEl, setAnchorPokeEl] = React.useState(null)
     const [openBan, setOpenBan] = React.useState(false);
     const [avatarUrl, setAvatarUrl] = useState(null);
-    const { avatarOption, avatarColor } = useContext(SettingContext);
+    const { avatarOption, avatarColor, pointOption } = useContext(SettingContext);
     const { setOpenGiftModal, setGiftUsername, setRoomNameForGift } = useContext(ChatContext);
     const handleDbClick = (event) => {
         handleClickPrivateChat(event);
@@ -350,7 +350,7 @@ const RoomUserName = ({user, role, roomName,
             title={user.ip}
         >
             <div  ref={refCallback} className={classes.content}>
-                { (showPoint && user.point && user.point > 0)
+                { (pointOption && showPoint && user.point && user.point > 0)
                     ?
                     <span
                         className={clsx(classes.userPoint, {
