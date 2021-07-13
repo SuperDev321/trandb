@@ -60,8 +60,8 @@
     "all_rooms": "כל החדרים",
     "moderator": "מנהל/ת",
     "admin": "אדמין",
-    "gift_send": "{{sender}} send {{receiver}} {{amount}} {{giftName}}",
-    "gift_send_to_you": "{{sender}} send you {{amount}} {{giftName}}",
+    "gift_send": "נשלחה מתנה {{amount}} {{giftName}} מאת {{sender}} אל {{receiver}} ",
+    "gift_send_to_you": "קיבלת מ {{sender}} מתנה של {{amount}} {{giftName}}",
     "default": "default"
   },
  "AddRoomModal": {
@@ -154,7 +154,7 @@
     "view": "צפיה",
     "stopView": "הפסק את צפיית משתמש זה בך",
     "message": "לפרטי",
-   "poke": "ג'ננו משתמש זה",
+   "poke": "הטרדת משתמש זה",
     "report": "דווח",
     "view_profile": "לפרופיל",
     "kick_from_room": "בעיטת אזהרה",
@@ -165,11 +165,11 @@
     "unmute_this_person": "ביטול  השתקה/התעלמות",
     "mute_private": "התעלמות מהפרטי גם",
     "unmute_private": "הסרת התעלמות מהפרטי",
-    "good_morning": "Good morning",
-    "where_are_you": "Where are you",
-    "nock": "Nock",
-    "gift": "Gift",
-    "default": "default"
+    "good_morning": "מי מתעסק",
+    "where_are_you": "מג'נונה",
+    "nock": "הקש בדלת",
+    "gift": "מ ת נ ו ת",
+    "default": "ניג'וס"
   },
   "SettingModal": {
     "settings": "הגדרות",
@@ -252,11 +252,11 @@
   "PokeMessage": {
     "you_have_poked": "שלחת צלצול ל {{username}}",
     "have_poked_you": "{{username}} שלח לך צילצול",
-    "poke_default": "{{sender}} send {{receiver}} poke",
-    "poke_good_morning": "{{sender}} send {{receiver}} good morning",
-    "poke_where_are_you": "{{sender}} send {{receiver}} where are you",
-    "poke_nock": "{{sender}} knocked on {{receiver}}",
-    "you": "you",
+    "poke_default": "{{sender}} מנאג'ס את  {{receiver}} ",
+    "poke_good_morning": "{{sender}} בודק עם מי- {{receiver}} מתעסק על הבוקר",
+    "poke_where_are_you": "{{sender}} מאג'נן את {{receiver}} ",
+    "poke_nock": "{{sender}} דפק את {{receiver}}",
+    "you": "הכינוי שלך",
     "error_muted": "משתמש זה מתעלם ממך הצלצול לא נשלח"
   },
   "BroadcastSettingModal" : {
