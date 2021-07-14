@@ -66,7 +66,7 @@ const banUser = (io, socket) => async ({room , ip, to, role, reason}) => {
                         socketToBan.leave(room);
                     }
                 } else {
-                    await Rooms.updateMany({}, { $pull: { users: userToBan._id }});
+                    await Rooms.updateMany({ type: { $ne: 'private' } }, { $pull: { users: userToBan._id }});
                     let socketIds = await io.of('/').in(userToBan._id.toString()).allSockets();
                     let it = socketIds.values();
                     let first = it.next();
