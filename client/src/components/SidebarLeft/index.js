@@ -115,7 +115,7 @@ const SideBarLeft = ({ roomName, username, mutes, blocks, globalBlocks, changeMu
     const [sideUsers, setSideUsers] = useState([]);
     const [filteredUsers, setFilteredUsers] = useState(null);
     const [role, setRole] = useState(null);
-    const {privateMutes, removePrivateMute, addPrivateMute} = useContext(SettingContext)
+    const {privateMutes, removePrivateMute, addPrivateMute, pointOption} = useContext(SettingContext)
     const {t} = useTranslation();
 
     const changePrivateMute = useCallback((user, isMuted) => {
@@ -186,17 +186,22 @@ const SideBarLeft = ({ roomName, username, mutes, blocks, globalBlocks, changeMu
                 return -1
             }
             else {
-                if (user1.point < user2.point) {
-                    return 1;
-                } else if (user1.point > user2.point) {
-                    return -1;
+                if (pointOption) {
+                    if (user1.point < user2.point) {
+                        return 1;
+                    } else if (user1.point > user2.point) {
+                        return -1;
+                    } else {
+                        return 0;
+                    }
                 } else {
                     return 0;
                 }
+                
             }
         })
         setSideUsers(newUsers)
-    }, [users, broadcastingUsers, blocks, globalBlocks, mutes, privateMutes, viewers, username, cameraState])
+    }, [users, broadcastingUsers, blocks, globalBlocks, mutes, privateMutes, viewers, username, cameraState, pointOption])
 
 
     useEffect(() => {

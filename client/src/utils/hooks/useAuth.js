@@ -71,6 +71,14 @@ const useAuth = () => {
     setPoint(point);
   }
 
+  const updateProfile = (userInfo) => {
+    const { avatar, aboutMe } = userInfo;
+    if (avatar) {
+      setAvatar(avatar)
+    }
+    setMyUser({ ...myUser, ...userInfo });
+  }
+ 
   const removeCurrentUser = () => {
     window.localStorage.removeItem('token');
     setAuth(false);
@@ -79,7 +87,7 @@ const useAuth = () => {
     setAvatar(null);
   };
 
-  return { auth, setAuth, gender, avatar, username, role, loading, setLoading, removeCurrentUser, prevUrl, setPrevUrl, updateUser, myUser, point, updateUserPoint };
+  return { auth, setAuth, gender, avatar, username, role, loading, setLoading, removeCurrentUser, prevUrl, setPrevUrl, updateUser, myUser, point, updateUserPoint, updateProfile };
 };
 
 export default useAuth;
