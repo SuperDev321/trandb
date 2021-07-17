@@ -3,7 +3,8 @@
     "save": "שמירה",
     "cancel": "ביטול",
     "logout": "להתנתק",
-    "profile": "פרופיל וניהול"
+    "profile": "פרופיל וניהול",
+    "edit_profile": "Edit Profile"
   },
   "ChatApp": {
     "rooms": "חדרים",

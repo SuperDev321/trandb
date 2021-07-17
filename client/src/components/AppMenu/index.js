@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useState, useContext } from 'react';
 import {
     Button,
     Popper,
@@ -6,7 +6,7 @@ import {
     Paper,
     ClickAwayListener,
     MenuList,
-    SvgIcon
+    SvgIcon,
 } from '@material-ui/core';
 import UserAvatar from '../UserAvatar';
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
@@ -16,7 +16,8 @@ import axios from 'axios';
 import {UserContext} from '../../context';
 import { message } from 'antd';
 import { useTranslation } from 'react-i18next';
-import {ReactComponent as Money} from '../../icons/money.svg'
+import {ReactComponent as Money} from '../../icons/money.svg';
+import EditProfileModal from '../Modals/EditProfileModal';
 
 const useStyles = makeStyles((theme) => ({
     avatar: {
@@ -58,6 +59,7 @@ export default function AppMenu() {
     // const [anchorEl, setAnchorEl] = React.useState(null);
     const classes = useStyles();
     const {t} = useTranslation()
+    const [openEdit, setOpenEdit] = useState(false);
     // const handleClick = (event) => {
     //     setAnchorEl(event.currentTarget);
     // };
@@ -96,6 +98,17 @@ export default function AppMenu() {
             window.open('/profile/'+username);
         }
         setOpen(false);
+    }
+
+    const handleClickEditProfile = () => {
+        if (username) {
+            setOpenEdit(true)
+        }
+        setOpen(false);
+    }
+
+    const handleCloseEditProfile = () => {
+        setOpenEdit(false);
     }
 
     const logout = async () => {
@@ -148,13 +161,16 @@ export default function AppMenu() {
                             onKeyDown={handleListKeyDown}
                         >
                             <MenuItem onClick={handleClickProfile}>{t('global.profile')}</MenuItem>
+                            <MenuItem onClick={handleClickEditProfile}>{t('global.edit_profile')}</MenuItem>
                             <MenuItem onClick={logout}>{t('global.logout')}</MenuItem>
+                            
                         </MenuList>
                     </ClickAwayListener>
                 </Paper>
                 </Grow>
             )}
             </Popper>
+            <EditProfileModal open={openEdit} handleClose={handleCloseEditProfile} />
         </div>
     );
 }

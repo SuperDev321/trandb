@@ -73,7 +73,6 @@ const MyMessage = ({user, roomName, message, messageSize, role, font_size, userA
                 const element = noRepeatArr[index];
                 if(isValidHttpUrl(element)) {
                     // urlText = urlText.replace(element, urlify(element));
-                    console.log(element)
                     htmlObj.push(<a href={element} target="_blank">{element}</a>)
                 } else if(new RegExp(/([\uD800-\uDBFF][\uDC00-\uDFFF])/).test(element)) {
                     const emojiText = emoji.replace_unified(element);

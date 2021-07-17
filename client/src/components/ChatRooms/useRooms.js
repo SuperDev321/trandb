@@ -84,7 +84,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
         roomIndex: null,
         error: null,
     });
-    const { username, updateUserPoint } = useContext(UserContext);
+    const { username, updateUserPoint, updateProfile } = useContext(UserContext);
     const {enablePokeSound, enablePrivateSound, enablePublicSound, enableSysMessage,
         messageNum, showGift, showGiftMessage} = useContext(SettingContext);
     // current room state
@@ -664,6 +664,26 @@ const useRooms = ({initRoomName, ...initalState}) => {
         })
     }
 
+    const updateUserProfile = (userInfo) => {
+        if (userInfo.username === username) {
+            console.log(userInfo)
+            updateProfile(userInfo)
+        }
+        roomsRef.current.map((room) => {
+            if (room.updateUserInfo(userInfo)) {
+                if (roomNameRef.current === room.name) {
+                    dispatch({
+                        type: 'update',
+                        data: {
+                            name: room.name,
+                            users: room.users
+                        }
+                    })
+                }
+            }
+        })
+    }
+
     const receiveGift = (payload) => {
         try {
             const { gift, from, to, room, amount } = payload;
@@ -733,11 +753,12 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 updatePoints(usersWithPoints)
             })
 
-            
+            socket.on('update user info', (userInfo) => {
+                updateUserProfile(userInfo)
+            })
 
             socket.on('disconnect', (reason) => {
                 setOpenDisconnectModal(true);
-                console.log('disconnect', reason)
                 if (reason === 'io server disconnect') {
                     // the disconnection was initiated by the server, you need to reconnect manually
                     socket.connect();

@@ -134,11 +134,11 @@ const SettingModal = () => {
                         <ListItem button onClick={()=>setPage('notifications')}>
                             <ListItemText primary={t('SettingModal.notifications')}/>
                         </ListItem>
-                        {(role && (role !=='guest' || allowGuestAvatarUpload)) &&
+                        {/* {(role && (role !=='guest' || allowGuestAvatarUpload)) &&
                             <ListItem button onClick={()=>setPage('avatar')}>
                                 <ListItemText primary={t('SettingModal.avatar')}/>
                             </ListItem>
-                        }
+                        } */}
                     </List>
                 }
                 {page === 'themes' ?
@@ -172,12 +172,11 @@ const SettingModal = () => {
                         setEnablePublicSound={setEnablePublicSound}
                     />: null
                 }
-                {page === 'avatar' ?
+                {/* {page === 'avatar' ?
                     <AvatarSetting
                         avatarOption={avatarOption}
                     />: null
-                }
-                
+                } */}
             </DialogContent>
         </StyledDialog>
         </>

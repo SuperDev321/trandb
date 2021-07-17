@@ -6,6 +6,8 @@ const handleUpdateProfile = async (data, successCallback, errCallback) => {
     let formData = new FormData();
     formData.append('username', data.username);
     formData.append('avatar', data.avatar);
+    formData.append('aboutMe', data.aboutMe);
+    formData.append('avatarType', data.avatarType);
     let token = window.localStorage.getItem('token');
     await axios.post(`${config.server_url}/api/profile/update`, formData, {
       headers: {
