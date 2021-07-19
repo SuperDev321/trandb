@@ -5,12 +5,12 @@ const updateSetting = async (req, res, next) => {
     try {
         const {language, theme, messageNum, allowPrivate, messageTimeInterval,
             maxUsernameLength, maxMessageLength, avatarOption, avatarColor, bypassBan, allowGuestAvatarUpload,
-            showGift, showGiftMessage, pointOption
+            showGift, showGiftMessage, pointOption, emojiOption
         } = req.body;
         await Settings.updateOne({type: 'admin'}, {language, theme,
             messageNum, allowPrivate, messageTimeInterval, maxUsernameLength, maxMessageLength,
             avatarOption, avatarColor, bypassBan, allowGuestAvatarUpload,
-            showGift, showGiftMessage, pointOption
+            showGift, showGiftMessage, pointOption, emojiOption
         });
         res
         .status(204)

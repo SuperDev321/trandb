@@ -26,7 +26,8 @@ const useSetting = () => {
   const [allowGuestAvatarUpload, setAllowGuestAvatarUpload] = useState(false)
   const [pointOption, setPointOption] = useState(false)
   const [showGift, _setShowGift] = useState(false)
-  const [showGiftMessage, _setShowGiftMessage] = useState(false)
+  const [showGiftMessage, _setShowGiftMessage] = useState(false);
+  const [emojiOption, setEmojiOption] = useState(true);
   const { t, i18n } = useTranslation();
   const setMessageSize = (messageSize) => {
     localStorage.setItem('messageSize', messageSize);
@@ -153,7 +154,7 @@ const useSetting = () => {
         let data = response.data;
         if(data) {
           const { theme, messageNum, language, allowPrivate, messageTimeInterval, maxMessageLength, avatarOption, avatarColor, 
-            allowGuestAvatarUpload, showGift, showGiftMessage, pointOption } = data;
+            allowGuestAvatarUpload, showGift, showGiftMessage, pointOption, emojiOption } = data;
           setDefaultTheme(theme);
           if(!currentLanguage)
             setLanguage(language);
@@ -177,6 +178,7 @@ const useSetting = () => {
           setAvatarColor(avatarColor);
           setAllowGuestAvatarUpload(allowGuestAvatarUpload);
           setPointOption(pointOption);
+          setEmojiOption(emojiOption)
           if (!currentShowGift) {
             setShowGift(showGift);
           } else {
@@ -216,7 +218,8 @@ const useSetting = () => {
     setDefaultTheme, setMessageSize, setEnablePokeSound, setEnablePrivateSound, setEnablePublicSound,
     language, setLanguage, messageNum, enableSysMessage, setEnableSysMessage, enableGuestPrivate,
     messageTimeInterval, maxUsernameLength, maxMessageLength, privateMutes, addPrivateMute, removePrivateMute,
-    avatarOption, avatarColor, allowGuestAvatarUpload, pointOption, showGift, showGiftMessage, setShowGift, setShowGiftMessage
+    avatarOption, avatarColor, allowGuestAvatarUpload, pointOption, showGift, showGiftMessage, setShowGift, setShowGiftMessage,
+    emojiOption
   };
 };
 

@@ -26,7 +26,7 @@ const App = () => {
         setDefaultTheme, setMessageSize, setEnablePokeSound, setEnablePrivateSound, setEnablePublicSound,
         language, setLanguage, messageNum, enableSysMessage, setEnableSysMessage,
         messageTimeInterval, maxUsernameLength, maxMessageLength, privateMutes, addPrivateMute, removePrivateMute,
-        avatarOption, avatarColor, allowGuestAvatarUpload, pointOption, showGift, showGiftMessage,
+        avatarOption, avatarColor, allowGuestAvatarUpload, pointOption, showGift, showGiftMessage, emojiOption,
         setShowGift, setShowGiftMessage
     } = useSetting();
     if (loading) {
@@ -57,7 +57,7 @@ const App = () => {
                 language, setLanguage, messageNum, enableSysMessage, setEnableSysMessage,
                 messageTimeInterval, maxUsernameLength, maxMessageLength, privateMutes, addPrivateMute, removePrivateMute,
                 avatarOption, avatarColor, allowGuestAvatarUpload, pointOption, showGift, showGiftMessage,
-                setShowGift, setShowGiftMessage
+                setShowGift, setShowGiftMessage, emojiOption
             }}
         >
         <CustomThemeProvider defaultTheme={defaultTheme}>

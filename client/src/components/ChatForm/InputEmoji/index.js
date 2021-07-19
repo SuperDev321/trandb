@@ -1,12 +1,16 @@
-import React, { useState, useImperativeHandle, useEffect, useRef, forwardRef, useCallback } from 'react'
+import React, { useState, useImperativeHandle, useEffect, useRef, forwardRef, useCallback, useContext } from 'react'
 import {
     IconButton,
+    Popper,
+    Fade
 } from '@material-ui/core';
 import SendIcon from '@material-ui/icons/Send';
 import Picker from 'emoji-picker-react';
+import CustomEmojiPicker from '../CustomEmojiPicker';
 import t from 'prop-types'
 import './styles.css'
 import useStyles from './styles';
+import { SettingContext } from '../../../context';
 
 function emojiUnicode (emoji) {
     var comp;
@@ -47,13 +51,13 @@ function InputEmoji ({
     fontWeight,
 }, ref) {
     const classes = useStyles({color});
-    const [showPicker, setShowPicker] = useState(false)
-    // const [currentSize, setCurrentSize] = useState(null)
+    const { emojiOption } = useContext(SettingContext);
 
     const textInputRef = useRef(null)
     const cleanedTextRef = useRef('')
     const placeholderRef = useRef(null);
     const [disabled, setDisabled] = useState(true);
+    const [pickerAnchorEl, setPickerAnchorEl] = React.useState(null);
 
     const onSend = () => {
         replaceAllTextEmojiToString()
@@ -350,41 +354,41 @@ function InputEmoji ({
         emitChange()
     }
 
-    function toggleShowPicker () {
-        setShowPicker(showPicker => !showPicker)
+    function toggleShowPicker (event) {
+        setPickerAnchorEl(pickerAnchorEl ? null : event.currentTarget);
     }
 
     function pasteHtmlAtCaret (html) {
         let sel, range
         if (window.getSelection) {
-        // IE9 and non-IE
-        sel = window.getSelection()
-        if (sel.getRangeAt && sel.rangeCount) {
-            range = sel.getRangeAt(0)
-            range.deleteContents()
+            // IE9 and non-IE
+            sel = window.getSelection()
+            if (sel.getRangeAt && sel.rangeCount) {
+                range = sel.getRangeAt(0)
+                range.deleteContents()
 
-            // Range.createContextualFragment() would be useful here but is
-            // non-standard and not supported in all browsers (IE9, for one)
-            const el = document.createElement('div')
-            el.innerHTML = html
-            const frag = document.createDocumentFragment(); var node; var lastNode
-            while ((node = el.firstChild)) {
-            lastNode = frag.appendChild(node)
-            }
-            range.insertNode(frag)
+                // Range.createContextualFragment() would be useful here but is
+                // non-standard and not supported in all browsers (IE9, for one)
+                const el = document.createElement('div')
+                el.innerHTML = html
+                const frag = document.createDocumentFragment(); var node; var lastNode
+                while ((node = el.firstChild)) {
+                    lastNode = frag.appendChild(node)
+                }
+                range.insertNode(frag)
 
-            // Preserve the selection
-            if (lastNode) {
-            range = range.cloneRange()
-            range.setStartAfter(lastNode)
-            range.collapse(true)
-            sel.removeAllRanges()
-            sel.addRange(range)
+                // Preserve the selection
+                if (lastNode) {
+                    range = range.cloneRange()
+                    range.setStartAfter(lastNode)
+                    range.collapse(true)
+                    sel.removeAllRanges()
+                    sel.addRange(range)
+                }
             }
-        }
         } else if (document.selection && document.selection.type !== 'Control') {
-        // IE < 9
-        document.selection.createRange().pasteHTML(html)
+            // IE < 9
+            document.selection.createRange().pasteHTML(html)
         }
     }
 
@@ -396,16 +400,35 @@ function InputEmoji ({
         return `<img data-emoji="${emoji.emoji}" src="https://cdn.jsdelivr.net/gh/iamcal/emoji-data@master/img-apple-64/${emoji.unified}.png" />`
     }
 
+    function getCustomEmojiCode (emoji) {
+        const { name } = emoji;
+        if (name) {
+            return `>${name}<`;
+        } else {
+            return '';
+        }
+    }
+
     function handleSelectEmoji (event, emojiObject) {
+        if (!keepOpenend) {
+            setPickerAnchorEl(null)
+        }
         placeholderRef.current.style.opacity = 0
         textInputRef.current.focus()
         pasteHtmlAtCaret(getImage(emojiObject))
         textInputRef.current.focus()
         
         // emitChange()
+    }
 
+    function handleSelectCustomEmoji (emojiObj) {
+        placeholderRef.current.style.opacity = 0
+        textInputRef.current.focus()
+        pasteHtmlAtCaret(getCustomEmojiCode(emojiObj));
+        textInputRef.current.focus()
+        
         if (!keepOpenend) {
-            toggleShowPicker()
+            setPickerAnchorEl(null)
         }
     }
 
@@ -421,6 +444,9 @@ function InputEmoji ({
         }
     }
 
+    const showPicker = Boolean(pickerAnchorEl);
+    const id = showPicker ? 'picker-popper' : undefined;
+
     return (
         <div className={classes.emoji}>
         <div
@@ -431,12 +457,21 @@ function InputEmoji ({
                 showPicker ? ` ${classes.emojiPickerWrapperShow}` : ''
             }`
             }>
-            <div
-                className={`${classes.emojiPicker}` +(showPicker ? ` ${classes.emojiPickerShow}` : '')}
-            >{
-                showPicker && <Picker onEmojiClick={handleSelectEmoji} preload={true} />
-            }
-            </div>
+                <div
+                    className={`${classes.emojiPicker}` +(showPicker ? ` ${classes.emojiPickerShow}` : '')}
+                >
+                    <Popper id={id} open={showPicker} anchorEl={pickerAnchorEl} transition style={{zIndex: 1000}}>
+                    {({ TransitionProps }) => (
+                        <Fade {...TransitionProps}>
+                        { emojiOption ?
+                            <Picker onEmojiClick={handleSelectEmoji} preload={true} />
+                            :
+                            <CustomEmojiPicker onEmojiClick={handleSelectCustomEmoji} />
+                        }
+                        </Fade>
+                    )}
+                    </Popper>
+                </div>
             </div>
         </div>
         <button
@@ -445,6 +480,7 @@ function InputEmoji ({
                 showPicker ? ` ${classes.inputEmojiButtonShow}` : ''
             }`
             }
+            aria-describedby={id} type="button"
             onClick={toggleShowPicker}
             >
             <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='24' height='24'><path d='M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0m0 22C6.486 22 2 17.514 2 12S6.486 2 12 2s10 4.486 10 10-4.486 10-10 10' /><path d='M8 7a2 2 0 1 0-.001 3.999A2 2 0 0 0 8 7M16 7a2 2 0 1 0-.001 3.999A2 2 0 0 0 16 7M15.232 15c-.693 1.195-1.87 2-3.349 2-1.477 0-2.655-.805-3.347-2H15m3-2H6a6 6 0 1 0 12 0' /></svg>

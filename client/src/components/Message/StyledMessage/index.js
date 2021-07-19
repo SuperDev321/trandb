@@ -1,8 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
+import { SettingContext } from '../../../context';
 import { makeStyles } from '@material-ui/core/styles';
 import {EmojiConvertor} from 'emoji-js';
 import moment from 'moment';
-import {grey} from '@material-ui/core/colors'
+import {grey} from '@material-ui/core/colors';
+import emojis from '../../../utils/objects/emoji';
+import config from '../../../config';
+
 const useStyles = makeStyles((theme) => ({
     root: {
         display: 'flex',
@@ -112,9 +116,16 @@ const isValidHttpUrl = (string) => {
   
     return url.protocol === "http:" || url.protocol === "https:";
 }
+
+function getValidCustomEmoji(value) {
+    return emojis.find(({ name }) => (name === value));
+}
+
 const StyledMessage = ({message, mine}) => {
     const [checked, setChecked] = useState(false);
     const classes = useStyles({mine, color: message.color, bold: message.bold});
+    const { emojiOption } = useContext(SettingContext);
+
     const emojiConverter = (text) => {
         let emojiText =  emoji.replace_unified(text);
         return emojiText;
@@ -158,92 +169,56 @@ const StyledMessage = ({message, mine}) => {
         }
         return htmlObj
     }
-    // const urlify = (text) => {
-    
-    //     let urlRegex = /(https?:\/\/[^\s]+)/g;
-    //     let arr = text.split(urlRegex);
-    //     let noRepeatArr = [...new Set(arr)];
-    //     for (let index = 0; index < noRepeatArr.length; index++) {
-    //       const element = noRepeatArr[index];
-          
-    //       if(new RegExp("([a-zA-Z0-9]+://)?([a-zA-Z0-9_]+:[a-zA-Z0-9_]+@)?([a-zA-Z0-9.-]+\\.[A-Za-z]{2,4})(:[0-9]+)?(/.*)?").test(element)) {
-    //         text = text.replace(element, `<a href="${element}" target="_blank"></a>`);
-    //       } else {
-    //         text = text.replace(element, `<span>${element}</span>`);
-    //       }
-    //     }
-    //     return text;
-    //     // or alternatively
-    //     // return text.replace(urlRegex, '<a href="$1">$1</a>')
-    //   }
-    //   const makeTag = (emojiText) => {
-    //     let arr = emojiText.split(/<img .*?>/g);
-    //     let noRepeatArr = [...new Set(arr)];
-    //     let urlText = emojiText;
-    //     if(noRepeatArr && noRepeatArr.length) {
-    //       for (let index = 0; index < noRepeatArr.length; index++) {
-    //         const element = noRepeatArr[index];
-    //         if(new RegExp("([a-zA-Z0-9]+://)?([a-zA-Z0-9_]+:[a-zA-Z0-9_]+@)?([a-zA-Z0-9.-]+\\.[A-Za-z]{2,4})(:[0-9]+)?(/.*)?").test(element)) {
-    //           urlText = urlText.replace(element, urlify(element));
-    //         }
-    //         else {
-    //           urlText = urlText.replace(element, `<span>${element}</span>`);
-    //         }
-    //       }
-    //     }
-    //     return urlText
-    //   }
-    
-    //   const emojiConverter = (text) => {
-    //     let emojiText =  emoji.replace_unified(text);
-    //     return emojiText;
-        
-    //   }
-    
-    //   const convertHTML = (text) => {
-    //     //   console.log('convertHTML',text)
-    //     // console.log(text) 
-    //     text = text.split('\" />').join('\">');
-    //     let result = [];
-    //     var html = parseHTML(text);
-    //     // console.log(text)
-
-    //     if (html.children.length > 0) {
-    //         for (let k = 0; k < html.children.length; k++) {
-    //         const element = html.children[k];
-    //         let key = randomstring.generate(8);
-    //         if (element.tagName === "IMG") {
-    //             key = randomstring.generate(8)
-    //             result.push(<img key={key} src={element.attributes[0].nodeValue}
-    //                             className={element.attributes[1].nodeValue}
-    //                             data-codepoints={element.attributes[2].nodeValue}
-    //                             alt="emoji"
-    //                             />)
-    //         } else if (element.tagName === "A") {
-    //             let url = element.href
-    //             result.push(<span key={key} className={classes.url_underline}
-    //                             onClick={() => {window.open(url, '_blank');}}>{url}</span>)
-    //         } else{
-    //             element.setAttribute('key', key);
-    //             result.push(<span key={key}>{element.innerHTML}</span>)
-    //         }
-    //         }
-    //     } else {
-    //         let key = randomstring.generate(8);
-    //         if (html.tagName === "IMG") {
-    //             result.push(<img key={key} src={html.attributes[0].nodeValue}
-    //                             className={html.attributes[1].nodeValue}
-    //                             data-codepoints={html.attributes[2].nodeValue} alt="emoji"/>)
-    //         } else if (html.tagName === "A") {
-    //             let url = html.href
-    //             result.push(<span key={key} className={classes.url_underline}
-    //                             onClick={() =>{window.open(url, '_blank');} }>{url}</span>)
-    //         } else{
-    //             result.push(<span key={key}>{html.innerHTML}</span>)
-    //         }
-    //     }
-    //     return result
-    // }
+    const makeTagWithCustom = (text) => {
+        const arr = text.split(/(['>','<'])/)
+        let tmp = '';
+        const newArr = [];
+        arr.forEach((item) => {
+            if (item === '>') {
+                if (tmp !== '') {
+                    newArr.push(tmp);
+                }
+                tmp = '>';
+            } else if (item === '<') {
+                tmp += '<';
+                newArr.push(tmp);
+                tmp = ''
+            } else {
+                tmp += item;
+            }
+        })
+        if (tmp !== '') {
+            if (tmp !== '') {
+                newArr.push(tmp);
+            }
+        }
+        if (newArr[0] === '') {
+            newArr.slice(0, 1)
+        }
+        let htmlObj = [];
+        if (newArr && newArr.length) {
+            for (let index = 0; index < newArr.length; index++) {
+                const element = newArr[index];
+                console.log(element[-1])
+                if(isValidHttpUrl(element)) {
+                    // urlText = urlText.replace(element, urlify(element));
+                    htmlObj.push(<a href={element} target="_blank">{element}</a>)
+                } else if(element.charAt(0) === '>' && element.charAt(element.length - 1) === '<') {
+                    const name = element.slice(1, element.length - 1);
+                    const emoji = getValidCustomEmoji(name);
+                    if (emoji) {
+                        htmlObj.push(<img src={`${config.emoji_path}/${emoji.path}`}/>)
+                    } else {
+                        htmlObj.push(<span>{element}</span>)
+                    }
+                } else {
+                    // urlText = urlText.replace(element, `<span>${element}</span>`);
+                    htmlObj.push(<span>{element}</span>)
+                }
+            }
+        }
+        return htmlObj
+    }
 
     return (
         <div className={classes.root}>
@@ -264,8 +239,10 @@ const StyledMessage = ({message, mine}) => {
             :
                 <div  className={classes.message}
                 >
-                {
+                { emojiOption ?
                     makeTag(message.msg)
+                    :
+                    makeTagWithCustom(message.msg)
                 }
                 </div>
             }
