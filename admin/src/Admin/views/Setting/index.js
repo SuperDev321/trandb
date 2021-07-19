@@ -96,7 +96,7 @@ export default function Setting() {
         let token = window.localStorage.getItem('token');
         Axios.post(`${config.server_url}/api/setting`, {theme, language, messageNum, allowPrivate,
             messageTimeInterval, maxUsernameLength, maxMessageLength, avatarOption, avatarColor, bypassBan, allowGuestAvatarUpload,
-            showGift, showGiftMessage, pointOption
+            showGift, showGiftMessage, pointOption, emojiOption
         }, {
             headers: {
                 authorization: token
