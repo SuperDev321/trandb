@@ -113,7 +113,7 @@ const MyMessage = ({user, roomName, message, messageSize, role, font_size, userA
                     const name = element.slice(1, element.length - 1);
                     const emoji = getValidCustomEmoji(name);
                     if (emoji) {
-                        htmlObj.push(<img src={`${config.emoji_path}/${emoji.path}`}/>)
+                        htmlObj.push(<img src={`${config.emoji_path}/${emoji.path}`} className="emoji"/>)
                     } else {
                         htmlObj.push(<span>{element}</span>)
                     }

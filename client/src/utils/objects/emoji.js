@@ -38,6 +38,102 @@ const emojis = [
     {
       "name": "happy",
       "path": "/happy.gif"
+    },
+    {
+        "name": "happy",
+        "path": "/happy.gif"
+    },
+    {
+        "name": "happy",
+        "path": "/happy.gif"
+    },
+    {
+        "name": "happy",
+        "path": "/happy.gif"
+    },
+    {
+        "name": "happy",
+        "path": "/happy.gif"
+    },
+    {
+        "name": "happy",
+        "path": "/happy.gif"
+    },
+    {
+        "name": "happy",
+        "path": "/happy.gif"
+    },
+    {
+        "name": "happy",
+        "path": "/happy.gif"
+    },
+    {
+        "name": "happy",
+        "path": "/happy.gif"
+    },
+    {
+        "name": "happy",
+        "path": "/happy.gif"
+    },
+    {
+        "name": "happy",
+        "path": "/happy.gif"
+    },
+    {
+        "name": "happy",
+        "path": "/happy.gif"
+    },
+    {
+        "name": "happy",
+        "path": "/happy.gif"
+    },
+    {
+        "name": "happy",
+        "path": "/happy.gif"
+    },
+    {
+        "name": "happy",
+        "path": "/happy.gif"
+    },
+    {
+        "name": "happy",
+        "path": "/happy.gif"
+    },
+    {
+        "name": "happy",
+        "path": "/happy.gif"
+    },
+    {
+        "name": "happy",
+        "path": "/happy.gif"
+    },
+    {
+        "name": "happy",
+        "path": "/happy.gif"
+    },
+    {
+        "name": "happy",
+        "path": "/happy.gif"
+    },
+    {
+        "name": "happy",
+        "path": "/happy.gif"
+    },
+    {
+        "name": "happy",
+        "path": "/happy.gif"
+    },
+    {
+        "name": "happy",
+        "path": "/happy.gif"
+    },
+    {
+        "name": "happy",
+        "path": "/happy.gif"
+    },
+    {
+        "name": "happy",
+        "path": "/happy.gif"
     }
 ]
 
