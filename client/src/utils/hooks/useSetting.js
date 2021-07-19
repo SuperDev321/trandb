@@ -28,6 +28,7 @@ const useSetting = () => {
   const [showGift, _setShowGift] = useState(false)
   const [showGiftMessage, _setShowGiftMessage] = useState(false);
   const [emojiOption, setEmojiOption] = useState(true);
+  const [showEmoji, _setShowEmoji] = useState(true);
   const { t, i18n } = useTranslation();
   const setMessageSize = (messageSize) => {
     localStorage.setItem('messageSize', messageSize);
@@ -86,6 +87,16 @@ const useSetting = () => {
     }
   }
 
+  const setShowEmoji = (setting) => {
+    if(setting) {
+      localStorage.setItem('show-emoji', 'on');
+      _setShowEmoji(true);
+    } else {
+      localStorage.setItem('show-emoji', 'off');
+      _setShowEmoji(false);
+    }
+  }
+
   const addPrivateMute = (mute) => {
     if (mute && mute.username && mute.ip) {
       let oldOne = privateMutes?.find((item) => (item.username===mute.username && item.ip === mute.ip))
@@ -108,6 +119,7 @@ const useSetting = () => {
     const currentPrivateSound = localStorage.getItem('private-sound');
     const currentShowGift = localStorage.getItem('gift-movie');
     const currentShowGiftMessage = localStorage.getItem('gift-message');
+    const currentShowEmoji = localStorage.getItem('show-emoji');
     if(!currentPokeSound) {
       setEnablePokeSound(true);
     } else {
@@ -154,7 +166,7 @@ const useSetting = () => {
         let data = response.data;
         if(data) {
           const { theme, messageNum, language, allowPrivate, messageTimeInterval, maxMessageLength, avatarOption, avatarColor, 
-            allowGuestAvatarUpload, showGift, showGiftMessage, pointOption, emojiOption } = data;
+            allowGuestAvatarUpload, showGift, showGiftMessage, pointOption, emojiOption, showEmoji } = data;
           setDefaultTheme(theme);
           if(!currentLanguage)
             setLanguage(language);
@@ -198,6 +210,15 @@ const useSetting = () => {
               _setShowGiftMessage(false);
             }
           }
+          if (!currentShowEmoji) {
+            setShowEmoji(showEmoji);
+          } else {
+            if (currentShowEmoji === 'on') {
+              _setShowEmoji(true);
+            } else {
+              _setShowEmoji(false);
+            }
+          }
         }
       }
     })
@@ -219,7 +240,7 @@ const useSetting = () => {
     language, setLanguage, messageNum, enableSysMessage, setEnableSysMessage, enableGuestPrivate,
     messageTimeInterval, maxUsernameLength, maxMessageLength, privateMutes, addPrivateMute, removePrivateMute,
     avatarOption, avatarColor, allowGuestAvatarUpload, pointOption, showGift, showGiftMessage, setShowGift, setShowGiftMessage,
-    emojiOption
+    emojiOption, showEmoji, setShowEmoji
   };
 };
 

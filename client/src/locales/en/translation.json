@@ -209,7 +209,8 @@
     "upload": "Upload",
     "from_main_site": "From Main Site",
     "gift_messages": "Gift Messages",
-    "gift_for_me": "Gift For Me"
+    "gift_for_me": "Gift For Me",
+    "emoji": "Emoji"
   },
   "BanModal": {
     "ban_user": "Ban User",
