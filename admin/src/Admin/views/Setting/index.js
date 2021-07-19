@@ -41,6 +41,7 @@ export default function Setting() {
     const [showGift, setShowGift] = useState(true)
     const [showGiftMessage, setShowGiftMessage] = useState(true)
     const [pointOption, setPointOption] = useState(false)
+    const [emojiOption, setEmojiOption] = useState(true);
     const { addToast } = useToasts();
 
     useEffect(() => {
@@ -54,7 +55,7 @@ export default function Setting() {
             if(response.status === 200) {
                 const {theme, language, messageNum, allowPrivate, messageTimeInterval,
                     maxUsernameLength, maxMessageLength, avatarOption, avatarColor, bypassBan, allowGuestAvatarUpload,
-                    showGift, showGiftMessage, pointOption
+                    showGift, showGiftMessage, pointOption, emojiOption
                 } = response.data;
                 if(theme) {
                     setTheme(theme);
@@ -86,6 +87,7 @@ export default function Setting() {
                 setShowGift(showGift);
                 setShowGiftMessage(showGiftMessage)
                 setPointOption(pointOption)
+                setEmojiOption(emojiOption)
             }
         })
     }, [])
@@ -390,20 +392,20 @@ export default function Setting() {
                         <Grid item sm={1}>
                         </Grid>
                         <Grid item sm={2} style={{textAlign: 'right'}}>
-                            <p className={classes.cardCategory}>Point Option</p>
+                            <p className={classes.cardCategory}>Emoji Option</p>
                         </Grid>
                         <Grid item>
                             <Grid component="label" container alignItems="center" spacing={1}>
-                                <Grid item>Hide points on nicklist</Grid>
+                                <Grid item>Use custom system</Grid>
                                 <Grid item>
                                 <Switch
-                                    checked={pointOption}
-                                    onChange={(e) => setPointOption(e.target.checked)}
-                                    name="pointOption"
-                                    inputProps={{ 'aria-label': 'point option' }}
+                                    checked={emojiOption}
+                                    onChange={(e) => setEmojiOption(e.target.checked)}
+                                    name="emojiOption"
+                                    inputProps={{ 'aria-label': 'emoji option' }}
                                 />
                                 </Grid>
-                                <Grid item>Show points on nicklist</Grid>
+                                <Grid item>Use default system</Grid>
                             </Grid>
                         </Grid>
                     </Grid>

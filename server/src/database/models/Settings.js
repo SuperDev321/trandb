@@ -36,7 +36,8 @@ const settingSchema = new Schema({
   bypassBan: Boolean,
   showGiftMessage: Boolean,
   showGift: Boolean,
-  pointOption: Boolean
+  pointOption: Boolean,
+  emojiOption: Boolean
 });
 
 const Settings = model('Settings', settingSchema);

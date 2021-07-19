@@ -6,7 +6,7 @@ const getSetting = async (req, res, next) => {
         if(setting) {
             const { theme, language, messageNum, allowPrivate, messageTimeInterval,
                 maxUsernameLength, maxMessageLength, avatarOption, avatarColor, bypassBan, allowGuestAvatarUpload,
-                showGift, showGiftMessage, pointOption
+                showGift, showGiftMessage, pointOption, emojiOption
             } = setting;
             res
             .status(200)
@@ -24,7 +24,8 @@ const getSetting = async (req, res, next) => {
                 allowGuestAvatarUpload,
                 showGift,
                 showGiftMessage,
-                pointOption // show point on nicklist
+                pointOption, // show point on nicklist
+                emojiOption // custom or default emoji
             })
         }
     } catch(err) {
