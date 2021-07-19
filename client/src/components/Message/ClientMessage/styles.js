@@ -71,6 +71,13 @@ const useStyles = makeStyles((theme) => ({
             height: (props) =>
             props.messageSize? props.messageSize + 7 : 28,
         },
+        '& img.custom-emoji': {
+            verticalAlign: 'bottom',
+            width: (props) =>
+            props.messageSize? props.messageSize + 31 : 28,
+            height: (props) =>
+            props.messageSize? props.messageSize + 31 : 28,
+        },
         '& img': {
             width: 28,
             height: 28
