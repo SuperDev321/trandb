@@ -53,7 +53,7 @@ const useStyles = makeStyles((theme) => ({
     },
     text: {
         display: 'flex',
-        alignItems: 'center',
+        // alignItems: 'center',
         flexWrap: 'wrap',
         margin: 0,
         fontSize: '1em',

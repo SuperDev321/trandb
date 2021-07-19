@@ -37,7 +37,8 @@ const settingSchema = new Schema({
   showGiftMessage: Boolean,
   showGift: Boolean,
   pointOption: Boolean,
-  emojiOption: Boolean
+  emojiOption: Boolean,
+  showEmoji: Boolean
 });
 
 const Settings = model('Settings', settingSchema);

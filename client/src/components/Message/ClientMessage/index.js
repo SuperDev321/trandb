@@ -51,7 +51,7 @@ const MyMessage = ({user, roomName, message, messageSize, role, font_size, userA
     kickUser, banUser, addOrOpenPrivate, scrollEvent, ...props}) => {
     const classes = useStyles({color: message.color, bold: message.bold, messageSize});
     const { username } = useContext(UserContext);
-    const { emojiOption } = useContext(SettingContext);
+    const { emojiOption, showEmoji } = useContext(SettingContext);
 
     const makeTag = (text) => {
         let arr = emojiStringToArray(text);
@@ -109,7 +109,7 @@ const MyMessage = ({user, roomName, message, messageSize, role, font_size, userA
                 if(isValidHttpUrl(element)) {
                     // urlText = urlText.replace(element, urlify(element));
                     htmlObj.push(<a href={element} target="_blank">{element}</a>)
-                } else if(element.charAt(0) === '>' && element.charAt(element.length - 1) === '<') {
+                } else if(showEmoji && element.charAt(0) === '>' && element.charAt(element.length - 1) === '<') {
                     const name = element.slice(1, element.length - 1);
                     const emoji = getValidCustomEmoji(name);
                     if (emoji) {

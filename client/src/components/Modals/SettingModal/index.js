@@ -81,7 +81,7 @@ const useStyles = makeStyles((theme) => ({
 const SettingModal = () => {
     const {messageSize, setMessageSize, enablePokeSound, setEnablePokeSound, enablePrivateSound, setEnablePrivateSound,
         enablePublicSound, setEnablePublicSound, language, setLanguage, enableSysMessage, setEnableSysMessage, avatarOption, allowGuestAvatarUpload,
-        showGift, showGiftMessage, setShowGift, setShowGiftMessage
+        showGift, showGiftMessage, setShowGift, setShowGiftMessage, showEmoji, setShowEmoji
     } = useContext(SettingContext);
     const {myUser} = useContext(UserContext);
     const [open, setOpen] = useState(false);
@@ -160,6 +160,8 @@ const SettingModal = () => {
                         showGiftMessage={showGiftMessage}
                         setShowGift={setShowGift}
                         setShowGiftMessage={setShowGiftMessage}
+                        showEmoji={showEmoji}
+                        setShowEmoji={setShowEmoji}
                     />: null
                 }
                 {page === 'notifications' ?

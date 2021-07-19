@@ -44,7 +44,7 @@ const PrettoSlider = withStyles({
 })(Slider);
 const MessageSetting = ({
     messageSize, setMessageSize, enableSysMessage, setEnableSysMessage,
-    showGift, showGiftMessage, setShowGift, setShowGiftMessage
+    showGift, showGiftMessage, setShowGift, setShowGiftMessage, showEmoji, setShowEmoji
 }) => {
     const classes = useStyles();
     const [value, setValue] = React.useState(30);
@@ -118,6 +118,26 @@ const MessageSetting = ({
                           onChange={(e) => {setShowGift(e.target.checked)}}
                           color="secondary"
                           name="gift_movie"
+                          inputProps={{ 'aria-label': 'gift checkbox' }}
+                      />
+                    </Grid>
+                    <Grid item>{t('SettingModal.show')}</Grid>
+                  </Grid>
+                </Grid>
+            </Grid>
+            <Grid container alignItems="center" spacing={0}>
+                <Grid item xs={12} spacing={5}>
+                    <span>{t('SettingModal.emoji')}</span>
+                </Grid>
+                <Grid item xs={12} spacing={5}>
+                  <Grid container alignItems="center">
+                    <Grid item>{t('SettingModal.hide')}</Grid>
+                    <Grid item>
+                      <Switch
+                          checked={showEmoji}
+                          onChange={(e) => {setShowEmoji(e.target.checked)}}
+                          color="secondary"
+                          name="show_emoji"
                           inputProps={{ 'aria-label': 'gift checkbox' }}
                       />
                     </Grid>

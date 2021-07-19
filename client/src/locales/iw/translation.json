@@ -206,8 +206,9 @@
     "avatar_option": "אפשרויות תמונה",
     "upload": "העלאה",
     "from_main_site": "מהפרופיל באתר",
-    "gift_messages": "Gift Messages",
-    "gift_for_me": "Gift For Me"
+    "gift_messages": "הצג או הסתר הודעות על מתנות בכלל",
+    "gift_for_me": "הצג או הסתר מתנות ששולחים לי",
+    "emoji": "Emoji"
   },
   "BanModal": {
     "ban_user": "חסימת משתמש",

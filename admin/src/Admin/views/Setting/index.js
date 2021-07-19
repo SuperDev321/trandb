@@ -42,6 +42,7 @@ export default function Setting() {
     const [showGiftMessage, setShowGiftMessage] = useState(true)
     const [pointOption, setPointOption] = useState(false)
     const [emojiOption, setEmojiOption] = useState(true);
+    const [showEmoji, setShowEmoji] = useState(true);
     const { addToast } = useToasts();
 
     useEffect(() => {
@@ -55,7 +56,7 @@ export default function Setting() {
             if(response.status === 200) {
                 const {theme, language, messageNum, allowPrivate, messageTimeInterval,
                     maxUsernameLength, maxMessageLength, avatarOption, avatarColor, bypassBan, allowGuestAvatarUpload,
-                    showGift, showGiftMessage, pointOption, emojiOption
+                    showGift, showGiftMessage, pointOption, emojiOption, showEmoji
                 } = response.data;
                 if(theme) {
                     setTheme(theme);
@@ -88,6 +89,7 @@ export default function Setting() {
                 setShowGiftMessage(showGiftMessage)
                 setPointOption(pointOption)
                 setEmojiOption(emojiOption)
+                setShowEmoji(showEmoji)
             }
         })
     }, [])
@@ -96,7 +98,7 @@ export default function Setting() {
         let token = window.localStorage.getItem('token');
         Axios.post(`${config.server_url}/api/setting`, {theme, language, messageNum, allowPrivate,
             messageTimeInterval, maxUsernameLength, maxMessageLength, avatarOption, avatarColor, bypassBan, allowGuestAvatarUpload,
-            showGift, showGiftMessage, pointOption, emojiOption
+            showGift, showGiftMessage, pointOption, emojiOption, showEmoji
         }, {
             headers: {
                 authorization: token
@@ -406,6 +408,27 @@ export default function Setting() {
                                 />
                                 </Grid>
                                 <Grid item>Use default system</Grid>
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                    <Grid container spacing={2} style={{marginTop:'20px'}}>
+                        <Grid item sm={1}>
+                        </Grid>
+                        <Grid item sm={2} style={{textAlign: 'right'}}>
+                            <p className={classes.cardCategory}>Custom Emoji(default setting)</p>
+                        </Grid>
+                        <Grid item>
+                            <Grid component="label" container alignItems="center" spacing={1}>
+                                <Grid item>Hide</Grid>
+                                <Grid item>
+                                <Switch
+                                    checked={showEmoji}
+                                    onChange={(e) => setShowEmoji(e.target.checked)}
+                                    name="showEmoji"
+                                    inputProps={{ 'aria-label': 'emoji option' }}
+                                />
+                                </Grid>
+                                <Grid item>Show</Grid>
                             </Grid>
                         </Grid>
                     </Grid>
