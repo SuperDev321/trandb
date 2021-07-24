@@ -11,6 +11,7 @@ const joinRoom = (io, socket) => async ({ room, password }, callback) => {
                 return callback(false, 'Wrong password');
             }
         }
+        await Users.updateOne({ _id }, { video: null });
         let user = await Users.findOne({_id});
         let {isBan, banType} = await checkBan(room, user.username, user.ip);
         const {bypassBan} = await Settings.findOne({type: 'admin'});
@@ -67,20 +68,10 @@ const rejoinRoom = (io, socket) => async ({ room, type }, callback) => {
     try {
         const { _id, role } = socket.decoded;
         let ip = socket.client.request.headers['cf-connecting-ip'] || socket.client.request.headers['x-forwarded-for'] || socket.client.request.connection.remoteAddress
-        // if(isIp(ip)) {
-        //     if(!isIp.v4(ip)) {
-        //         var address = new Address6(ip);
-        //         var teredo = address.inspectTeredo();
-        //         ip = teredo.client4;
-        //     }
-        //     if (ip.substr(0, 7) === '::ffff:') {
-        //         ip = ip.substr(7);
-        //     }
-        // } else {
-        //     ip = '10.10.10.10';
-        // }
         
+        await Users.updateOne({ _id }, { video: null });
         if(type === 'public') {
+            
             let user = await Users.findOne({_id});
             let {isBan, banType} = await checkBan(room, user.username, user.ip);
             const {bypassBan} = await Settings.findOne({type: 'admin'});
@@ -119,15 +110,6 @@ const rejoinRoom = (io, socket) => async ({ room, type }, callback) => {
                         room,
                         joinedUser,
                         onlineUsers,
-                        // joinedUser: {
-                        //     _id: user._id,
-                        //     username: user.username,
-                        //     role: user.role,
-                        //     gender: user.gender,
-                        //     ip: ipInt(user.ip).toIP(),
-                        //     blocked,
-                        //     avatar: user.avatar
-                        // }});
                     });
                 }
             });

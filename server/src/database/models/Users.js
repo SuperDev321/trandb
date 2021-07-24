@@ -26,7 +26,14 @@ const userSchema = new Schema({
   isMobile: Boolean,
   avatar: String,
   created_at: Date,
-  point: Number
+  point: Number,
+  status: {
+    type: Boolean
+  },
+  video: {
+    room: String,
+    producers: Object
+  }
 });
 
 const Users = model('Users', userSchema);

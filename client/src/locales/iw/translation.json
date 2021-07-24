@@ -144,9 +144,10 @@
      "unknown_error": "הכניסה נכשלה, אנא נסה שוב מאוחר יותר"
   },
   "UserActionArea": {
-     "sent_broadcast_request": "שלחת בקשת צפיה ל- {{owner}}, נא להמתין לתגובה",
+    "sent_broadcast_request": "שלחת בקשת צפיה ל- {{owner}}, נא להמתין לתגובה",
     "error_not_broadcast_video": "משתמש זה אינו משדר",
     "error_not_ready_broadcast": "התקן השידור לא נקלט",
+    "error_already_broadcasting": "You are already broadcasting in {{roomName}}. Please stop broadcast there and start here.",
     "error_guest_dont_have_permission": "אורחים אינם מורשים להתחיל שיחה פרטית",
     "you_are_already_watching_the_broadcasting": "אתם כבר צופים במצלמה  זו",
     "error_user_report": "אין לנו מי שיטפל בדיווח שלכם  בבקשה פנו למנהל החדר",
@@ -208,7 +209,11 @@
     "from_main_site": "מהפרופיל באתר",
     "gift_messages": "הצג או הסתר הודעות על מתנות בכלל",
     "gift_for_me": "הצג או הסתר מתנות ששולחים לי",
-    "emoji": "Emoji"
+    "emoji": "Emoji",
+    "camera": "Camera",
+    "auto_broadcast": "Auto Broadcast",
+    "on": "on",
+    "off": "off"
   },
   "BanModal": {
     "ban_user": "חסימת משתמש",

@@ -3,7 +3,14 @@ import { makeStyles } from '@material-ui/core/styles';
 import {
     IconButton
 } from '@material-ui/core';
-import CloseIcon from '@material-ui/icons/Close';
+import {
+    Close,
+    Visibility,
+    Mic,
+    MicOff,
+    Videocam,
+    VideocamOff
+} from '@material-ui/icons';
 import { UserContext } from '../../context';
 import useAnalysis from './useAnalysis';
 import SoundMeter from './SoundMeter';
@@ -11,8 +18,18 @@ import VolumnControl from './VolumnControl';
 import ZoomInIcon from '@material-ui/icons/ZoomIn';
 import ZoomOutIcon from '@material-ui/icons/ZoomOut';
 import Loading from '../Loading';
+import { HashLoader } from 'react-spinners';
 
 const VideoFieldWidth = 380;
+const VideoFieldHeight = 280;
+
+const override = {
+    display: 'block !important',
+    marginTop: 0,
+    marginRight: 'auto',
+    marginBottom: 0,
+    marginLeft: 'auto',
+};
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -72,8 +89,34 @@ const useVideoStyles = makeStyles((theme) => ({
                 return VideoFieldWidth - 2
             }
         },
+        height: props => {
+            if(props.zoom) {
+                return VideoFieldHeight - 2;
+            }
+            if(props.total && props.num) {
+                switch(props.total) {
+                    case 1:
+                    case 2:
+                        return VideoFieldHeight - 2;
+                    case 3:
+                    case 4:
+                    case 5:
+                    case 6:
+                    case 7:
+                    case 8:
+                        return VideoFieldHeight /2 - 2;
+                    default:
+                        return VideoFieldHeight/3 - 2;
+                }
+            } else {
+                return VideoFieldHeight - 2
+            }
+        },
+        overflow: 'hidden'
     },
     mediaContent: {
+        width: '100%',
+        height: '100%',
         position: 'relative',
         border: '1px solid',
         borderColor: theme.palette.separate.main
@@ -90,7 +133,6 @@ const useVideoStyles = makeStyles((theme) => ({
         '&:hover': {
             opacity: 1,
         },
-        
     },
     overlayHeader: {
         direction: 'rtl',
@@ -102,7 +144,8 @@ const useVideoStyles = makeStyles((theme) => ({
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        direction: 'ltr'
+        direction: 'ltr',
+        flexWrap: 'wrap'
     },
     content: {
         width: '100%',
@@ -110,6 +153,19 @@ const useVideoStyles = makeStyles((theme) => ({
         display: 'flex',
         position: 'relative',
         overflow: 'hidden'
+    },
+    loading: {
+        position: 'absolute',
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        zIndex: 5,
+        '&:hover': {
+            opacity: 1,
+        },
+        background: 'black',
+        justifyContent: 'center'
     },
     flexGrower: {
         flexGrow: 1
@@ -125,7 +181,19 @@ const useVideoStyles = makeStyles((theme) => ({
         color: '#f5f5f5',
         zIndex: 11,
         background: 'rgba(71, 71, 71, 0.329)',
-        
+    },
+    counts: {
+        position: 'absolute',
+        top: 25,
+        left: 5,
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        fontSize: '1rem',
+        fontWeight: 500,
+        color: '#f5f5f5',
+        zIndex: 11,
+        background: 'rgba(71, 71, 71, 0.329)',
     },
     iconButton: {
         color: '#f5f5f5'
@@ -152,7 +220,7 @@ const useVideoStyles = makeStyles((theme) => ({
 //                     <div className={classes.overlayHeader}>
 //                         <div>
 //                             <IconButton aria-label="delete" color="secondary" >
-//                                 <CloseIcon />
+//                                 <Close />
 //                             </IconButton>
 //                         </div>
 //                         <div className={classes.streamInfos}>
@@ -185,14 +253,18 @@ const useVideoStyles = makeStyles((theme) => ({
 //     )
 // }
 
-const UserVideo = ({stream, locked, name, controlVideo, muted, total, streamNum, zoom}) => {
+const UserVideo = ({ stream, locked, name, controlVideo, muted, total,
+    streamNum, zoom, viewerCounts, isLocal, videoState, audioState
+}) => {
     const userVideo = useRef();
-    // const userAudio = useRef();
     const classes = useVideoStyles({total, num: streamNum, zoom});
     const [playing, setPlaying] = useState(false);
     const {data} = useAnalysis({stream});
     const [volume, setVolume] = useState(0);
     const audioTrackRef = useRef(null);
+    const [loading, setLoading] = useState(true);
+    // const [audioState, setAudioState] = useState(true);
+    // const [videoState, setVideoState] = useState(true);
 
     const echo = data*volume/100;
  
@@ -224,6 +296,16 @@ const UserVideo = ({stream, locked, name, controlVideo, muted, total, streamNum,
             })
         }
     }
+
+    const changeMute = (kind, state) => {
+        let data = {
+            type: state? 'resume' : 'pause',
+            kind,
+            name
+        }
+        controlVideo(data)
+    }
+
     const handleClose = () => {
         let data = {
             type: 'close',
@@ -240,6 +322,7 @@ const UserVideo = ({stream, locked, name, controlVideo, muted, total, streamNum,
     }
 
     useEffect(() => {
+        const videoObj = userVideo.current;
         if(stream && userVideo.current) {
             let audioTrack = stream.getAudioTracks()[0];
             let initVolume = null
@@ -264,6 +347,9 @@ const UserVideo = ({stream, locked, name, controlVideo, muted, total, streamNum,
 
             userVideo.current.onplay = () => {
                 setPlaying(true);
+                if (loading) {
+                    setLoading(false);
+                }
             }
 
 
@@ -274,6 +360,9 @@ const UserVideo = ({stream, locked, name, controlVideo, muted, total, streamNum,
                     playPromise
                     .then(_ => {
                         changeVolume(initVolume);
+                        if (loading) {
+                            setLoading(false);
+                        }
                         // Automatic playback started!
                         // Show playing UI.
                     })
@@ -301,7 +390,7 @@ const UserVideo = ({stream, locked, name, controlVideo, muted, total, streamNum,
                     <div className={classes.overlayHeader}>
                         <div>
                             <IconButton aria-label="delete" className={classes.iconButton} onClick={handleClose}>
-                                <CloseIcon />
+                                <Close />
                             </IconButton>
                         </div>
                         <div className={classes.streamInfos}>
@@ -317,17 +406,50 @@ const UserVideo = ({stream, locked, name, controlVideo, muted, total, streamNum,
                     <div className={classes.flexGrower}></div>
                     <div className={classes.overlayFooter}>
                     { zoom?
-                        <IconButton aria-label="pause" className={classes.iconButton} onClick={() => handleZoom(false)}>
+                        <IconButton aria-label="zoomIn" className={classes.iconButton} onClick={() => handleZoom(false)}>
                             <ZoomOutIcon font="small" />
                         </IconButton>
                         :
-                        <IconButton aria-label="play" className={classes.iconButton} onClick={() => handleZoom(true)}>
+                        <IconButton aria-label="zoomOut" className={classes.iconButton} onClick={() => handleZoom(true)}>
                             <ZoomInIcon />
                         </IconButton>
+                    }
+                    { isLocal &&
+                    <>
+                        { audioState ?
+                            <IconButton aria-label="micOn" className={classes.iconButton} onClick={() => changeMute('audio', false)}>
+                                <Mic />
+                            </IconButton>
+                            :
+                            <IconButton aria-label="micOff" className={classes.iconButton} onClick={() => changeMute('audio', true)}>
+                                <MicOff />
+                            </IconButton>
+                        }
+                        { videoState ?
+                            <IconButton aria-label="cameraOn" className={classes.iconButton} onClick={() => changeMute('video', false)}>
+                                <Videocam />
+                            </IconButton>
+                            :
+                            <IconButton aria-label="cameraOff" className={classes.iconButton} onClick={() => changeMute('video', true)}>
+                                <VideocamOff />
+                            </IconButton>
+                        }
+                    </>
                     }
                         <VolumnControl value={volume} handleChange={(value) => changeVolume(value)} />
                     </div>
                 </div>
+                { loading &&
+                    <div className={classes.loading}>
+                    <HashLoader
+                        css={override}
+                        sizeUnit={"px"}
+                        size={50}
+                        color={'#c5c5c5'}
+                        loading={true}
+                    />
+                    </div>
+                }
                 <div className={classes.content}>
                     <video ref={userVideo} autoPlay style={{width: '100%'}} muted={muted}>
                     </video>
@@ -337,6 +459,13 @@ const UserVideo = ({stream, locked, name, controlVideo, muted, total, streamNum,
                 <div className={classes.username}>
                     {name}
                 </div>
+                { isLocal && viewerCounts &&
+                    <div className={classes.counts}>
+                        <span style={{padding: 3}}>{viewerCounts}</span>
+                        <Visibility />
+                    </div>
+                }
+                
             </div>
             
         </div>
@@ -362,9 +491,8 @@ function asyncReducer(state, action) {
     }
 }
 
-const VideoList = ({streams: remoteStreams, localStream, controlVideo, roomName}) => {
+const VideoList = ({streams: remoteStreams, localStream, controlVideo, roomName, viewerCounts}) => {
     const classes = useStyles();
-
     // const locked = localStream?.locked;
     // const stream = localStream?.stream;
     const {username} = useContext(UserContext);
@@ -379,9 +507,10 @@ const VideoList = ({streams: remoteStreams, localStream, controlVideo, roomName}
     useEffect(() => {
         let streams = [];
         if(localStream || remoteStreams) {
+            console.log(localStream)
             if(localStream) {
                 dispatch({type: 'pending'})
-                streams = [{...localStream, name: username, muted: true}];
+                streams = [{...localStream, name: username, muted: true, viewerCounts: viewerCounts, isLocal: true }];
             } else {
 
             }
@@ -403,7 +532,7 @@ const VideoList = ({streams: remoteStreams, localStream, controlVideo, roomName}
         } else {
             dispatch({type: 'resolved', data: null});
         }
-    }, [username, localStream, remoteStreams, zoom])
+    }, [username, localStream, remoteStreams, zoom, viewerCounts])
 
     const handleVideo = (payload) => {
         let {type, name} = payload;
@@ -418,6 +547,16 @@ const VideoList = ({streams: remoteStreams, localStream, controlVideo, roomName}
                 if(name) {
                     if(zoom !== name)
                         setZoom(name);
+                }
+                break;
+            case 'pause':
+                if(name) {
+                    controlVideo({...payload, roomName});
+                }
+                break;
+            case 'resume':
+                if(name) {
+                    controlVideo({...payload, roomName});
                 }
                 break;
             case 'close':
@@ -443,14 +582,18 @@ const VideoList = ({streams: remoteStreams, localStream, controlVideo, roomName}
         { status === 'pending' ?
             <Loading/>
         :
-            streams?.map(({stream, name, locked, zoom, muted}, index) => (
+            streams?.map(({ stream, name, audioState, videoState, locked, zoom, muted, viewerCounts, isLocal }, index) => (
                 <UserVideoMemo
-                    stream={stream} key={stream.id} locked={locked} name={name}
+                    stream={stream} key={stream? stream.id: index} locked={locked} name={name}
                     controlVideo={handleVideo}
                     total={streams.length}
                     zoom={zoom}
                     muted={muted}
                     streamNum = {1+index}
+                    viewerCounts={viewerCounts}
+                    isLocal={isLocal}
+                    audioState={audioState}
+                    videoState={videoState}
                 />
             ))
         }

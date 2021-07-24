@@ -147,6 +147,7 @@
   "UserActionArea": {
     "sent_broadcast_request": "Your request to view was sent to {{owner}}, Please wait for response",
     "error_not_broadcast_video": "This user didn't create broadcast video",
+    "error_already_broadcasting": "You are already broadcasting in {{roomName}}. Please stop broadcast there and start here.",
     "error_not_ready_broadcast": "You are not ready to broadcast",
     "you_are_already_watching_the_broadcasting": "You are already watching the broadcasting video",
     "error_guest_dont_have_permission": "Guest user can't send private message",
@@ -210,7 +211,11 @@
     "from_main_site": "From Main Site",
     "gift_messages": "Gift Messages",
     "gift_for_me": "Gift For Me",
-    "emoji": "Emoji"
+    "emoji": "Emoji",
+    "camera": "Camera",
+    "auto_broadcast": "Auto Broadcast",
+    "on": "on",
+    "off": "off"
   },
   "BanModal": {
     "ban_user": "Ban User",

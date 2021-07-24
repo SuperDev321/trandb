@@ -27,7 +27,7 @@ const App = () => {
         language, setLanguage, messageNum, enableSysMessage, setEnableSysMessage,
         messageTimeInterval, maxUsernameLength, maxMessageLength, privateMutes, addPrivateMute, removePrivateMute,
         avatarOption, avatarColor, allowGuestAvatarUpload, pointOption, showGift, showGiftMessage, emojiOption,
-        setShowGift, setShowGiftMessage, showEmoji, setShowEmoji
+        setShowGift, setShowGiftMessage, showEmoji, setShowEmoji, autoBroadcast, setAutoBroadcast
     } = useSetting();
     if (loading) {
         return <Loading />;
@@ -57,7 +57,7 @@ const App = () => {
                 language, setLanguage, messageNum, enableSysMessage, setEnableSysMessage,
                 messageTimeInterval, maxUsernameLength, maxMessageLength, privateMutes, addPrivateMute, removePrivateMute,
                 avatarOption, avatarColor, allowGuestAvatarUpload, pointOption, showGift, showGiftMessage,
-                setShowGift, setShowGiftMessage, emojiOption, showEmoji, setShowEmoji
+                setShowGift, setShowGiftMessage, emojiOption, showEmoji, setShowEmoji, autoBroadcast, setAutoBroadcast
             }}
         >
         <CustomThemeProvider defaultTheme={defaultTheme}>

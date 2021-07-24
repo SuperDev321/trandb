@@ -19,7 +19,6 @@ const useAuth = () => {
         if (data === 'un-auth') {
           setLoading(false);
         } else {
-          console.log(data)
           if (data.role === 'super_admin') setRole('super_admin');
           else if (data.role === 'admin') setRole('admin');
           else if (data.role === 'guest') setRole('guest');
@@ -62,7 +61,6 @@ const useAuth = () => {
         setLoading(false);
       }
     } catch (err) {
-      console.log(err)
       setLoading(false);
     }
   }

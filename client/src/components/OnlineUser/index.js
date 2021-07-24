@@ -153,7 +153,12 @@ const OnlineUser = ({roomName, username, user, role, isMuted, isPrivateMuted, is
     }
 
     const handleDoubleClickVideo = () => {
-        viewBroadcast(roomName, user._id, user.username);
+        const { video } = user;
+        if (video) {
+            const { locked, producers } = video;
+            viewBroadcast(roomName, user._id, user.username, producers, locked);
+        }
+        
     }
 
     useEffect(() => {

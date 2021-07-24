@@ -1,34 +1,49 @@
+const { Users } = require('../database/models');
 const { findRoomUsers, findUserByName } = require('../utils');
 
-const sendSignal = (io) => async ({ from, to, room, signal }) => {
+const startVideo = (io, socket) => async ({ room, producers, locked }) => {
     try {
-        console.log(from, to)
-        const toUser = await findUserByName(to);
+        const { _id, role } = socket.decoded;
+        const user = await Users.findById(_id);
+        if (user) {
+            await Users.updateOne({ _id }, {
+                video: {
+                    room,
+                    producers,
+                    locked
+                }
+            });
+            io.to(room).emit('start video', {
+                room,
+                producers,
+                userId: user._id,
+                locked,
+                username: user.username
+            });
+        }
         
-        io.to(toUser._id).emit('video signal', {
-            signal,
-            from,
-            room
-        });
     } catch (err) {
       console.log(err);
     }
 };
 
-const returnSignal = (io) => async ({ from, to, room, signal }) => {
+const stopVideo = (io, socket) => async ({ room }) => {
     try {
-        console.log(from, to)
-        const toUser = await findUserByName(to);
-        
-        io.to(toUser._id).emit('return video signal', {
-            signal,
-            to,
-            from,
-            room
-        });
+        const { _id, role } = socket.decoded;
+        const user = await Users.findById(_id);
+        if (user) {
+            await Users.updateOne({ _id }, {
+                video: null
+            });
+            io.to(room).emit('stop video', {
+                room,
+                userId: user._id,
+                username: user.username
+            });
+        }
     } catch (err) {
       console.log(err);
     }
 };
 
-module.exports = {sendSignal, returnSignal};
+module.exports = { startVideo, stopVideo };

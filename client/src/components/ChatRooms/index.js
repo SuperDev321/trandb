@@ -81,26 +81,12 @@ const ChatRooms = ({room}, ref) => {
         gift,
         setGift,
         roomNameForGift,
-        setRoomNameForGift
+        setRoomNameForGift,
+        startBroadcast,
+        stopBroadcast,
+        controlVideo,
+        viewBroadcast
     } = useRooms({initRoomName: room});
-
-    const controlVideo = (data) => {
-        let {type, name, roomName} = data;
-        if(mediaClientRef.current) {
-            switch(type) {
-                case 'close':
-                    if(name === username) {
-                        mediaClientRef.current.closeProducer(null, roomName);
-                    } else {
-                        mediaClientRef.current.removeRemoteStream(name, null, roomName);
-                    }
-                    break;
-                default:
-                    break;
-            }
-            
-        }
-    }
 
     const { enqueueSnackbar, closeSnackbar } = useSnackbar();
     
@@ -193,27 +179,6 @@ const ChatRooms = ({room}, ref) => {
         socket.emit('leave private', roomName);
     }
 
-    const viewBroadcast = (roomName, userId, username) => {
-        if(mediaClientRef.current) {
-            mediaClientRef.current.requestView(roomName, userId, username,
-            (result) => {
-                if(result) {
-                    enqueueSnackbar(t('ChatApp.pending_permission_request', {username}), {variant: 'info'});
-                } else {
-                    enqueueSnackbar(t('UserActionArea.you_are_already_watching_the_broadcasting', {username}), {variant: 'info'});
-                }
-            },
-            (result) => {
-                if(result) {
-                    enqueueSnackbar(t('ChatApp.owner_permission_granted', {username}), {variant: 'info'});
-                } else {
-                    enqueueSnackbar(t('ChatApp.owner_permission_denied', {username}), {variant: 'info'});
-                }
-            });
-            
-        }
-    }
-
     const stopBroadcastTo = (roomName, userId, name) => {
         if(mediaClientRef.current) {
             mediaClientRef.current.stopView(roomName, userId, name);
@@ -288,19 +253,19 @@ const ChatRooms = ({room}, ref) => {
             }
         });
     }
-    const startBroadcast = (roomName, lock, videoDeviceId, audioDeviceId) => {
-        if(mediaClientRef.current && mediaClientRef.current._isOpen && (mediaClientRef.current.rooms.has(roomName))) {
-            mediaClientRef.current.produce(roomName, lock, videoDeviceId, audioDeviceId);
-        } else {
-            enqueueSnackbar(t('UserActionArea.error_not_ready_broadcast'), {variant: 'error'});
-        }
+    // const startBroadcast = (roomName, lock, videoDeviceId, audioDeviceId) => {
+    //     if(mediaClientRef.current && mediaClientRef.current._isOpen) {
+    //         mediaClientRef.current.produce(roomName, lock, videoDeviceId, audioDeviceId);
+    //     } else {
+    //         enqueueSnackbar(t('UserActionArea.error_not_ready_broadcast'), {variant: 'error'});
+    //     }
         
-    }
-    const stopBroadcast = (roomName) => {
-        if(mediaClientRef.current) {
-            mediaClientRef.current.closeProducer(null, roomName);
-        }
-     }
+    // }
+    // const stopBroadcast = (roomName) => {
+    //     if(mediaClientRef.current) {
+    //         mediaClientRef.current.closeProducer(null, roomName);
+    //     }
+    // }
 /*************************************************************** */
     // leave room by you
     const leaveRoomByUser = (room) => {
@@ -395,7 +360,7 @@ const ChatRooms = ({room}, ref) => {
                             { (status === 'resolved' && currentRoomData) ?
                                 <SideBarLeft
                                     users={currentRoomData.users}
-                                    broadcastingUsers={currentRoomData.liveUsers}
+                                    // broadcastingUsers={currentRoomData.liveUsers}
                                     viewers={currentRoomData.viewers}
                                     changeMuteState={changeMuteState}
                                     sendPokeMessage={sendPokeMessage}
@@ -453,7 +418,11 @@ const ChatRooms = ({room}, ref) => {
                 {
                     (status === 'resolved' && currentRoomData) ?
                     <VideoList roomName={currentRoomData.name}
-                        streams={currentRoomData.remoteStreams} localStream={currentRoomData.localStream} controlVideo={controlVideo}/>
+                        streams={currentRoomData.remoteStreams}
+                        localStream={currentRoomData.localStream}
+                        controlVideo={controlVideo}
+                        viewerCounts={currentRoomData.viewers?.length}
+                    />
                     : null
                 }
                 </>
