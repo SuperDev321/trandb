@@ -107,7 +107,7 @@ const useStyles = makeStyles((theme) => ({
 
 
 const SideBarLeft = ({ roomName, username, mutes, blocks, globalBlocks, changeMuteState, sendPokeMessage, kickUser, banUser,
-    users, broadcastingUsers, viewers, viewBroadcast, stopBroadcastTo,
+    users, viewers, viewBroadcast, stopBroadcastTo,
     addOrOpenPrivate, startBroadcast, stopBroadcast,
     cameraState, openCamera, closeCamera }) => {
     const classes = useStyles();
@@ -133,7 +133,7 @@ const SideBarLeft = ({ roomName, username, mutes, blocks, globalBlocks, changeMu
     }, [users, username])
 
     useEffect(() => {
-        const liveUserNames = broadcastingUsers?.map((user) => (user.name))
+        // const liveUserNames = broadcastingUsers?.map((user) => (user.name))
         const blockedNames = blocks?.map((item) => (item.username? item.username: null))
         const globalBlockedNames = globalBlocks?.map((item) => (item.username? item.username: null))
         const globalBlockedIps = globalBlocks?.map((item) => (item.ip? item.ip: null))
@@ -155,11 +155,12 @@ const SideBarLeft = ({ roomName, username, mutes, blocks, globalBlocks, changeMu
                 isBroadcasting = cameraState
                 isViewer = true
             } else {
-                if (liveUserNames && liveUserNames.includes(user.username)) {
-                    isBroadcasting = true
-                    const broadcastUser = broadcastingUsers.find(({name}) => (name === user.username))
-                    if(broadcastUser && broadcastUser.locked) {
-                        isBroadcasting = 'locked'
+                if (user.video && user.video.room === roomName) {
+                    const { locked } = user.video;
+                    if (locked) {
+                        isBroadcasting = 'locked';
+                    } else {
+                        isBroadcasting = true;
                     }
                 }
                 if (viewers && viewers.includes(user.username)) {
@@ -201,7 +202,7 @@ const SideBarLeft = ({ roomName, username, mutes, blocks, globalBlocks, changeMu
             }
         })
         setSideUsers(newUsers)
-    }, [users, broadcastingUsers, blocks, globalBlocks, mutes, privateMutes, viewers, username, cameraState, pointOption])
+    }, [users, blocks, globalBlocks, mutes, privateMutes, viewers, username, cameraState, pointOption])
 
 
     useEffect(() => {

@@ -152,7 +152,31 @@ class RoomObject  {
         if (result) {
             this.users = newUsers;
         }
-        return true;
+        return result;
+    }
+    updateUserVideo (userId, producers, locked) {
+        let result = false
+
+        const newUsers = this.users?.map((user) => {
+            if (user._id === userId) {
+                result = true;
+                if (producers) {
+                    return { ... user, video: {
+                        producers,
+                        room: this.name,
+                        locked
+                    }}
+                } else {
+                    return { ...user, video: null };
+                }
+            } else {
+                return user;
+            }
+        });
+        if (result) {
+            this.users = newUsers;
+        }
+        return result;
     }
 }
 

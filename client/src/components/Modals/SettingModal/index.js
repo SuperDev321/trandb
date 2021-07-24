@@ -23,6 +23,7 @@ import LanguageSetting from './LanguageSetting';
 import AvatarSetting from './AvatarSetting';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import CloseIcon from '@material-ui/icons/Close';
+import CameraSetting from './CameraSetting';
 
 const StyledDialog = withStyles((theme) => ({
     root: {
@@ -81,7 +82,7 @@ const useStyles = makeStyles((theme) => ({
 const SettingModal = () => {
     const {messageSize, setMessageSize, enablePokeSound, setEnablePokeSound, enablePrivateSound, setEnablePrivateSound,
         enablePublicSound, setEnablePublicSound, language, setLanguage, enableSysMessage, setEnableSysMessage, avatarOption, allowGuestAvatarUpload,
-        showGift, showGiftMessage, setShowGift, setShowGiftMessage, showEmoji, setShowEmoji
+        showGift, showGiftMessage, setShowGift, setShowGiftMessage, showEmoji, setShowEmoji, autoBroadcast, setAutoBroadcast
     } = useContext(SettingContext);
     const {myUser} = useContext(UserContext);
     const [open, setOpen] = useState(false);
@@ -134,6 +135,9 @@ const SettingModal = () => {
                         <ListItem button onClick={()=>setPage('notifications')}>
                             <ListItemText primary={t('SettingModal.notifications')}/>
                         </ListItem>
+                        <ListItem button onClick={()=>setPage('camera')}>
+                            <ListItemText primary={t('SettingModal.camera')}/>
+                        </ListItem>
                         {/* {(role && (role !=='guest' || allowGuestAvatarUpload)) &&
                             <ListItem button onClick={()=>setPage('avatar')}>
                                 <ListItemText primary={t('SettingModal.avatar')}/>
@@ -174,11 +178,12 @@ const SettingModal = () => {
                         setEnablePublicSound={setEnablePublicSound}
                     />: null
                 }
-                {/* {page === 'avatar' ?
-                    <AvatarSetting
-                        avatarOption={avatarOption}
+                {page === 'camera' ?
+                    <CameraSetting
+                        autoBroadcast={autoBroadcast}
+                        setAutoBroadcast={setAutoBroadcast}
                     />: null
-                } */}
+                }
             </DialogContent>
         </StyledDialog>
         </>

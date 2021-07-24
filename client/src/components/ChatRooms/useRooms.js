@@ -85,8 +85,8 @@ const useRooms = ({initRoomName, ...initalState}) => {
         error: null,
     });
     const { username, updateUserPoint, updateProfile } = useContext(UserContext);
-    const {enablePokeSound, enablePrivateSound, enablePublicSound, enableSysMessage,
-        messageNum, showGift, showGiftMessage} = useContext(SettingContext);
+    const { enablePokeSound, enablePrivateSound, enablePublicSound, enableSysMessage,
+        messageNum, showGift, showGiftMessage, autoBroadcast } = useContext(SettingContext);
     // current room state
     const [state, dispatch] = useReducer(roomReducer, {
         status: 'idle',
@@ -196,6 +196,14 @@ const useRooms = ({initRoomName, ...initalState}) => {
                         unReadMessages: newRoomObject.unReadMessages
                     }
                 })
+                if (autoBroadcast) {
+                    onlineUsers.forEach(({ _id, username, video }) => {
+                        if (video) {
+                            const { producers, locked, room } = video;
+                            autoStartRemoteVideo(room, producers, _id, locked, username);
+                        }
+                    })
+                }
                 // setRoomIndex(roomsRef.current.length-1);
             } else {
                 if(blocks) {
@@ -209,11 +217,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
                     sameRoom.setMessages(messages);
                 }
             }
-            if(mediaClientRef.current) {
-                // await mediaClientRef.current?.init();
-                await mediaClientRef.current?.createRoom(room.name);
-                await mediaClientRef.current?.join(room.name);
-            }
+
         }
     }, [dispatch, roomsDispatch, messageNum]);
 
@@ -666,7 +670,6 @@ const useRooms = ({initRoomName, ...initalState}) => {
 
     const updateUserProfile = (userInfo) => {
         if (userInfo.username === username) {
-            console.log(userInfo)
             updateProfile(userInfo)
         }
         roomsRef.current.map((room) => {
@@ -716,7 +719,159 @@ const useRooms = ({initRoomName, ...initalState}) => {
         } catch (err) {
             // console.log(err)
         }
+    }
 
+    const startBroadcast = async (room, lock, videoDeviceId, audioDeviceId) => {
+        // mediaSocket.open();
+        // if (mediaClientRef.current) {
+        //     await mediaClientRef.current.createRoom(room);
+        //     await mediaClientRef.current.join(room);
+        // }
+        if (mediaClientRef.current) {
+            let result = mediaClientRef.current.startStream(room, null, null);
+            if (result !== true) {
+                console.log('roomName', result)
+                enqueueSnackbar(t('UserActionArea.error_already_broadcasting', {
+                    roomName: result
+                }), { variant: 'error'});
+                return false;
+            }
+            if (!mediaClientRef.current._isOpen) {
+                await mediaClientRef.current.init();
+            }
+            if (!mediaClientRef.current.rooms.has(room)) {
+                await mediaClientRef.current.createRoom(room);
+                await mediaClientRef.current.join(room);
+            }
+            if(mediaClientRef.current._isOpen && mediaClientRef.current.rooms.has(room)) {
+                let result = await mediaClientRef.current.produce(room, lock, videoDeviceId, audioDeviceId);
+                if (result) {
+                    const { producers, locked } = result;
+                    socket.emit('start video', {
+                        room,
+                        producers,
+                        locked
+                    })
+                }
+            } else {
+                enqueueSnackbar(t('UserActionArea.error_not_ready_broadcast'), {variant: 'error'});
+            }
+        }
+        
+    }
+
+    const stopBroadcast = async (roomName) => {
+        if(mediaClientRef.current) {
+            mediaClientRef.current.closeProducer(null, roomName);
+        }
+        socket.emit('stop video', {
+            room: roomName
+        })
+    }
+
+    const viewBroadcast = async (roomName, userId, targetUsername, producers, locked) => {
+        if (mediaClientRef.current && targetUsername !== username) {
+            if (!mediaClientRef.current._isOpen) {
+                await mediaClientRef.current.init();
+            }
+            if (!mediaClientRef.current.rooms.has(roomName)) {
+                await mediaClientRef.current.createRoom(roomName);
+                await mediaClientRef.current.join(roomName);
+            }
+            mediaClientRef.current.requestView(roomName, userId, targetUsername, producers, locked,
+            (result) => {
+                if (result) {
+                    enqueueSnackbar(t('ChatApp.pending_permission_request', { username: targetUsername }), {variant: 'info'});
+                } else {
+                    enqueueSnackbar(t('UserActionArea.you_are_already_watching_the_broadcasting', { username: targetUsername }), {variant: 'info'});
+                }
+            },
+            (result) => {
+                if(result) {
+                    enqueueSnackbar(t('ChatApp.owner_permission_granted', { username: targetUsername }), {variant: 'info'});
+                } else {
+                    enqueueSnackbar(t('ChatApp.owner_permission_denied', { username: targetUsername }), {variant: 'info'});
+                }
+            });
+            
+        }
+    }
+
+    const controlVideo = (data) => {
+        let { type, name, roomName, kind } = data;
+        if(mediaClientRef.current) {
+            switch(type) {
+                case 'close':
+                    if(name === username) {
+                        mediaClientRef.current.closeProducer(null, roomName);
+                        socket.emit('stop video', {
+                            room: roomName
+                        })
+                    } else {
+                        mediaClientRef.current.removeRemoteStream(name, null, roomName);
+                    }
+                    break;
+                case 'pause':
+                    if (name === username) {
+                        mediaClientRef.current.pauseProducer(roomName, kind);
+                    }
+                    break;
+                case 'resume':
+                    if (name === username) {
+                        mediaClientRef.current.resumeProducer(roomName, kind);
+                    }
+                    break;
+                default:
+                    break;
+            }
+            
+        }
+    }
+
+    const startRemoteVideo = async (room, producers, userId, locked, remoteUsername) => {
+        const roomObj = roomsRef.current.find((item) => (item.name === room));
+        if (roomObj.updateUserVideo(userId, producers, locked)) {
+            if (roomNameRef.current === room) {
+                dispatch({
+                    type: 'update',
+                    data: {
+                        name: room,
+                        users: roomObj.users
+                    }
+                })
+            }
+            if (autoBroadcast) {
+                autoStartRemoteVideo(room, producers, userId, locked, remoteUsername);
+            }
+        }
+    }
+
+    const autoStartRemoteVideo = async (room, producers, userId, locked, remoteUsername) => {
+        if (username !== remoteUsername && !locked && mediaClientRef.current) {
+            if (!mediaClientRef.current._isOpen) {
+                await mediaClientRef.current.init();
+            }
+            if (!mediaClientRef.current.rooms.has(room)) {
+                await mediaClientRef.current.createRoom(room);
+                await mediaClientRef.current.join(room);
+            }
+            mediaClientRef.current.requestView(room, userId, remoteUsername, producers, false, null, null);
+        }
+    }
+
+    const stopRemoteVideo = (room, userId) => {
+        const roomObj = roomsRef.current.find((item) => (item.name === room));
+        if (roomObj.updateUserVideo(userId, null, null)) {
+            if (roomNameRef.current === room) {
+                dispatch({
+                    type: 'update',
+                    data: {
+                        name: room,
+                        users: roomObj.users
+                    }
+                })
+            }
+        }
     }
 
     useEffect(() => {
@@ -801,7 +956,13 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 history.push('/');
             })
 
-            mediaSocket.on('view request', ({username, roomName}, callback) => {
+
+
+            socket.on('stop video', ({ room, userId }) => {
+                stopRemoteVideo(room, userId)
+            })
+
+            mediaSocket.on('view request', ({ username, roomName }, callback) => {
                 requestAudioControls.seek(0);
                 requestAudioControls.play();
                 permissionRequest(username, roomName, (result) => {
@@ -889,23 +1050,21 @@ const useRooms = ({initRoomName, ...initalState}) => {
     }, [showGift, showGiftMessage])
 
     useEffect(() => {
-        let mediaObj = new MediaClient(username);
-        mediaObj.init();
-        mediaObj.on(mediaEvents.onChangeConsume, (data) => {
-            let {room_id} = data;
-            let liveUsers = mediaClientRef.current.getLiveUsers(room_id);
-            dispatch({
-                type: 'update',
-                data: {
-                    name: room_id,
-                    liveUsers
-                }
-            })
-            // setMediaEvent({room_id, event: 'consume'});
+        socket.on('start video', ({ room, producers, userId, username, locked }) => {
+            startRemoteVideo(room, producers, userId, locked, username)
         })
+
+        return () => {
+            socket.off('start video');
+        }
+    }, [autoBroadcast, username])
+
+    useEffect(() => {
+        let mediaObj = new MediaClient(username);
         mediaObj.on(mediaEvents.onChangeRemoteStreams, (data) => {
             let {room_id} = data;
             let remoteStreams = mediaClientRef.current.getRemoteStreams(room_id);
+            console.log('change remote streams', room_id, remoteStreams)
             dispatch({
                 type: 'update',
                 data: {
@@ -923,7 +1082,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 type: 'update',
                 data: {
                     name: room_id,
-                    localStream: stream
+                    localStream: { ...stream }
                 }
             })
         })
@@ -936,6 +1095,9 @@ const useRooms = ({initRoomName, ...initalState}) => {
                     name: room_id,
                     localStream: null
                 }
+            });
+            socket.emit('stop video', {
+                room: room_id
             })
         })
 
@@ -965,7 +1127,6 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 mediaObj.exit(true);
                 mediaObj = null;
             }
-            
         }
     }, [username])
 
@@ -1009,7 +1170,6 @@ const useRooms = ({initRoomName, ...initalState}) => {
     }, [roomEvent, removeRoom])
 
     useEffect(() => {
-
         if(enablePokeSound) {
             pokeAudioControls1.unmute();
             pokeAudioControls2.unmute();
@@ -1022,16 +1182,16 @@ const useRooms = ({initRoomName, ...initalState}) => {
             pokeAudioControls4.mute();
         }
     }, [enablePokeSound, pokeAudioControls1, pokeAudioControls2, pokeAudioControls3, pokeAudioControls4])
-    useEffect(() => {
 
+    useEffect(() => {
         if(enablePublicSound) {
             publicAudioControls.unmute();
         } else {
             publicAudioControls.mute();
         }
     }, [enablePublicSound, publicAudioControls]);
-    useEffect(() => {
 
+    useEffect(() => {
         if(enablePrivateSound) {
             privateAudioControls.unmute();
         } else {
@@ -1074,7 +1234,11 @@ const useRooms = ({initRoomName, ...initalState}) => {
         gift,
         setGift,
         roomNameForGift,
-        setRoomNameForGift
+        setRoomNameForGift,
+        startBroadcast,
+        stopBroadcast,
+        controlVideo,
+        viewBroadcast
     }
 
 }

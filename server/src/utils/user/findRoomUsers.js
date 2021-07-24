@@ -7,7 +7,7 @@ const findRoomUsers = async (room, myRole) => {
         const moderators = roomInfo.moderators;
         let liveUserIds = roomInfo.users;
         const roomUsers = await Users.find({ _id: { $in: liveUserIds? liveUserIds: []  } });
-        const usersInfo = roomUsers.map(({ _id, username, gender, role, avatar, ip, aboutMe, isMobile, avatarObj, currentAvatar, point }) => {
+        const usersInfo = roomUsers.map(({ _id, username, gender, role, avatar, ip, aboutMe, isMobile, avatarObj, currentAvatar, point, video }) => {
             // let ip;
             // // if(myRole === 'admin') {
             //     let result = roomInfo.users.find((item)=>(item._id.equals(_id)));
@@ -24,9 +24,9 @@ const findRoomUsers = async (room, myRole) => {
             }
             // if it don't show guest's about me field, it will return null on aboutMe field
             if (userRole === 'guest') {
-                return { _id, username, gender, role: userRole, ip, avatar, aboutMe: null, isMobile, avatarObj, currentAvatar, point };    
+                return { _id, username, gender, role: userRole, ip, avatar, aboutMe: null, isMobile, avatarObj, currentAvatar, point, video };    
             } else {
-                return { _id, username, gender, role: userRole, ip, avatar, aboutMe, isMobile, avatarObj, currentAvatar, point };    
+                return { _id, username, gender, role: userRole, ip, avatar, aboutMe, isMobile, avatarObj, currentAvatar, point, video };    
             }
         });
         return usersInfo;

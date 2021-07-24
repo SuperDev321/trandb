@@ -29,6 +29,8 @@ const useSetting = () => {
   const [showGiftMessage, _setShowGiftMessage] = useState(false);
   const [emojiOption, setEmojiOption] = useState(true);
   const [showEmoji, _setShowEmoji] = useState(true);
+  const [autoBroadcast, _setAutoBroadcast] = useState(false);
+
   const { t, i18n } = useTranslation();
   const setMessageSize = (messageSize) => {
     localStorage.setItem('messageSize', messageSize);
@@ -97,6 +99,16 @@ const useSetting = () => {
     }
   }
 
+  const setAutoBroadcast = (setting) => {
+    if(setting) {
+      localStorage.setItem('auto-broadcast', 'on');
+      _setAutoBroadcast(true);
+    } else {
+      localStorage.setItem('auto-broadcast', 'off');
+      _setAutoBroadcast(false);
+    }
+  }
+
   const addPrivateMute = (mute) => {
     if (mute && mute.username && mute.ip) {
       let oldOne = privateMutes?.find((item) => (item.username===mute.username && item.ip === mute.ip))
@@ -120,6 +132,7 @@ const useSetting = () => {
     const currentShowGift = localStorage.getItem('gift-movie');
     const currentShowGiftMessage = localStorage.getItem('gift-message');
     const currentShowEmoji = localStorage.getItem('show-emoji');
+    const currentAutoBroadcast = localStorage.getItem('auto-broadcast');
     if(!currentPokeSound) {
       setEnablePokeSound(true);
     } else {
@@ -166,7 +179,7 @@ const useSetting = () => {
         let data = response.data;
         if(data) {
           const { theme, messageNum, language, allowPrivate, messageTimeInterval, maxMessageLength, avatarOption, avatarColor, 
-            allowGuestAvatarUpload, showGift, showGiftMessage, pointOption, emojiOption, showEmoji } = data;
+            allowGuestAvatarUpload, showGift, showGiftMessage, pointOption, emojiOption, showEmoji, autoBroadcast } = data;
           setDefaultTheme(theme);
           if(!currentLanguage)
             setLanguage(language);
@@ -219,6 +232,15 @@ const useSetting = () => {
               _setShowEmoji(false);
             }
           }
+          if (!currentAutoBroadcast) {
+            setAutoBroadcast(autoBroadcast);
+          } else {
+            if (currentAutoBroadcast === 'on') {
+              _setAutoBroadcast(true);
+            } else {
+              _setAutoBroadcast(false);
+            }
+          }
         }
       }
     })
@@ -240,7 +262,7 @@ const useSetting = () => {
     language, setLanguage, messageNum, enableSysMessage, setEnableSysMessage, enableGuestPrivate,
     messageTimeInterval, maxUsernameLength, maxMessageLength, privateMutes, addPrivateMute, removePrivateMute,
     avatarOption, avatarColor, allowGuestAvatarUpload, pointOption, showGift, showGiftMessage, setShowGift, setShowGiftMessage,
-    emojiOption, showEmoji, setShowEmoji
+    emojiOption, showEmoji, setShowEmoji, autoBroadcast, setAutoBroadcast
   };
 };
 
