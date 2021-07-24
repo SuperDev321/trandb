@@ -4,7 +4,7 @@ const addPrivate = require('./addPrivate');
 const leavePrivate = require('./leavePrivate');
 const { publicMessage, privateMessage, pokeMessage } = require('./msgHandler');
 const { kickUser, banUser, banUserByAdmin, blockUser, unBlockUser } = require('./userHandler');
-const {sendSignal, returnSignal} = require('./videoHandler');
+const { startVideo, stopVideo } = require('./videoHandler');
 const socketDisconnect = require('./disconnect');
 const { sendGift } = require('./gift')
 const { Users } = require('../database/models');
@@ -68,21 +68,10 @@ const ioHandler = (io) => async (socket) => {
     socket.on('block user', blockUser(io, socket));
     socket.on('unblock user', unBlockUser(io, socket));
     socket.on('send gift', sendGift(io, socket));
+    
     // video events
-    // socket.on('joinMedia', joinMedia(io, socket));
-    // socket.on('getProducers', getProducers(io, socket));
-    // socket.on('getRouterRtpCapabilities', getRouterRtpCapabilities(io, socket));
-    // socket.on('createWebRtcTransport', createWebRtcTransport(io, socket));
-    // socket.on('connectTransport', connectTransport(io, socket));
-    // socket.on('produce', produce(io, socket));
-    // socket.on('consume', consume(io, socket));
-    // socket.on('resume', resume());
-    // socket.on('producerClosed', producerClosed());
-    // socket.on('roomProducersClosed', roomProducersClosed(socket));
-    // socket.on('start view', startView(io, socket));
-    // socket.on('stop view', stopView(io, socket));
-    // socket.on('view request', viewRequest(io, socket));
-    // socket.on('stop broadcast', stopBroadcastTo(io, socket));
+    socket.on('start video', startVideo(io, socket));
+    socket.on('stop video', stopVideo(io, socket));
 
     socket.on('error', (err) => {
       console.log(err);
