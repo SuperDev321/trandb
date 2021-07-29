@@ -20,8 +20,7 @@ const getGlobalBlocksWithIp = async () => {
         let realIp = ip? ipInt(ip).toIP(): null;
 
         return {ip: realIp, username};
-    })
-    console.log('blocks', blocks);
+    });
     return blocks;
 }
 

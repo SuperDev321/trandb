@@ -34,6 +34,10 @@ const useStyles = makeStyles((theme) => ({
         paddingBottom: theme.spacing(1)
     },
     ipField: {
+        paddingBottom: theme.spacing(1)
+    },
+    banSelect: {
+        paddingBottom: theme.spacing(1)
     }
 }));
 

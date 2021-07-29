@@ -55,6 +55,7 @@ const ChatRooms = ({room}, ref) => {
         roomIndex,
         roomsError,
         globalBlocks,
+        globalCameraBans,
         privateListRef,
         changeRoom,
         addRoom,
@@ -185,54 +186,6 @@ const ChatRooms = ({room}, ref) => {
         }
     }
 
-    
-
-    // useEffect(() => {
-    //     if(currentRoomName && mediaClientRef.current) {
-    //        let localStream = mediaClientRef.current.getLocalStream(currentRoomName);
-    //        let remoteStreams = mediaClientRef.current.getRemoteStreams(currentRoomName);
-    //        let viewers = mediaClientRef.current.getViewers(currentRoomName);
-    //        setCurrentLocalStream(localStream);
-    //        setCurrentRemoteStreams([...remoteStreams]);
-    //        setCurrentViewers([...viewers]);
-    //     }
-    // }, [currentRoomName]);
-
-    // useEffect(() => {
-    //     if(localStreamTmp) {
-    //        let {room_id, stream} = localStreamTmp;
-    //         if(room_id === currentRoomName) {
-    //             setCurrentLocalStream(stream);
-    //         } 
-    //     }
-    // }, [localStreamTmp]);
-
-    // useEffect(() => {
-    //     if(mediaEvent && mediaClientRef.current) {
-    //         let {room_id, event} = mediaEvent;
-    //         switch(event) {
-    //             case 'remote streams':
-    //                 if(room_id === currentRoomName) {
-    //                     let remoteStreams = mediaClientRef.current.getRemoteStreams(currentRoomName);
-    //                     setCurrentRemoteStreams([...remoteStreams]);
-    //                 }
-    //                 break;
-    //             case 'consume':
-    //                 if(room_id === currentRoomName) {
-    //                     let liveUsers = mediaClientRef.current.getLiveUsers(room_id);
-    //                     setCurrentBroadcastingUsers(liveUsers);
-    //                 }
-    //                 break;
-    //             case 'view':
-    //                 let viewers = mediaClientRef.current.getViewers(room_id);
-    //                 setCurrentViewers([...viewers]);
-    //                 break;
-    //             default:
-    //                 break;
-    //         }
-    //     }
-    // }, [mediaEvent]);
-
     // send poke message
     const sendPokeMessage = (roomName, userToSend, pokeType) => {
         socket.emit('poke message', {from: username, to: userToSend, room: roomName, pokeType}, (response) => {
@@ -253,19 +206,6 @@ const ChatRooms = ({room}, ref) => {
             }
         });
     }
-    // const startBroadcast = (roomName, lock, videoDeviceId, audioDeviceId) => {
-    //     if(mediaClientRef.current && mediaClientRef.current._isOpen) {
-    //         mediaClientRef.current.produce(roomName, lock, videoDeviceId, audioDeviceId);
-    //     } else {
-    //         enqueueSnackbar(t('UserActionArea.error_not_ready_broadcast'), {variant: 'error'});
-    //     }
-        
-    // }
-    // const stopBroadcast = (roomName) => {
-    //     if(mediaClientRef.current) {
-    //         mediaClientRef.current.closeProducer(null, roomName);
-    //     }
-    // }
 /*************************************************************** */
     // leave room by you
     const leaveRoomByUser = (room) => {
@@ -294,13 +234,12 @@ const ChatRooms = ({room}, ref) => {
                             sendPokeMessage={sendPokeMessage}
                             kickUser={kickUser}
                             banUser={banUser}
-                            // unReadInfo={currentRoom && currentRoom.private}
                             roomName={currentRoomData.name}
                             mutes={currentRoomData.mutes}
                             blocks={currentRoomData.blocks}
                             globalBlocks={globalBlocks}
-                            // setOpenPrivate={setOpenPrivate}
-                            // setPrivateTo={setPrivateTo}
+                            cameraBans={currentRoomData.cameraBans}
+                            globalCameraBans={globalCameraBans}
                             addOrOpenPrivate={addOrOpenPrivate}
                             cameraState={currentRoomData.localStream? (currentRoomData.localStream.locked? 'locked': true): false}
                             startBroadcast={startBroadcast}
@@ -360,19 +299,17 @@ const ChatRooms = ({room}, ref) => {
                             { (status === 'resolved' && currentRoomData) ?
                                 <SideBarLeft
                                     users={currentRoomData.users}
-                                    // broadcastingUsers={currentRoomData.liveUsers}
                                     viewers={currentRoomData.viewers}
                                     changeMuteState={changeMuteState}
                                     sendPokeMessage={sendPokeMessage}
                                     kickUser={kickUser}
                                     banUser={banUser}
-                                    // unReadInfo={currentRoom && currentRoom.private}
                                     roomName={currentRoomData.name}
                                     mutes={currentRoomData.mutes}
                                     blocks={currentRoomData.blocks}
                                     globalBlocks={globalBlocks}
-                                    // setOpenPrivate={setOpenPrivate}
-                                    // setPrivateTo={setPrivateTo}
+                                    cameraBans={currentRoomData.cameraBans}
+                                    globalCameraBans={globalCameraBans}
                                     addOrOpenPrivate={addOrOpenPrivate}
                                     cameraState={currentRoomData.localStream? (currentRoomData.localStream.locked? 'locked': true): false}
                                     startBroadcast={startBroadcast}
@@ -403,9 +340,6 @@ const ChatRooms = ({room}, ref) => {
                                 sendPokeMessage={sendPokeMessage}
                                 kickUser={kickUser}
                                 banUser={banUser}
-                                // unReadInfo={currentRoom && currentRoom.private}
-                                // setOpenPrivate={setOpenPrivate}
-                                // setPrivateTo={setPrivateTo}
                                 addOrOpenPrivate={addOrOpenPrivate}
                             />
                             :

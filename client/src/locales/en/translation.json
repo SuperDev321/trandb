@@ -65,6 +65,8 @@
     "admin": "admin",
     "gift_send": "{{sender}} send {{receiver}} {{amount}} {{giftName}}",
     "gift_send_to_you": "{{sender}} send you {{amount}} {{giftName}}",
+    "error_camera_banned": "You are banned to broadcast in this room.",
+    "error_camera_view_banned": "You are banned to view this camera in this room.",
     "default": "default"
   },
   "AddRoomModal": {
@@ -172,6 +174,7 @@
     "where_are_you": "Where are you",
     "nock": "Nock",
     "gift": "Gift",
+    "unban_camera": "Unban camera",
     "default": "default"
   },
   "SettingModal": {
@@ -225,6 +228,8 @@
     "all_rooms": "All rooms",
     "this_room": "This room",
     "ban": "Ban",
+    "chat": "Chat",
+    "camera": "Camera",
     "cancel": "Cancel",
     "default": "default"
   },

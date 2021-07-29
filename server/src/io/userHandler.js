@@ -1,7 +1,12 @@
 const ipToInt = require('ip-to-int');
 const { Rooms, Users } = require('../database/models');
-const { getRoomPermission, findUserByName, banByUser, banByNameAndIp, checkBan, findRoomUsers, getBlocks, getGlobalBlocks, getGlobalBlocksWithIp } = require("../utils");
-const {addBlock, removeBlock, removeBlockAdmin, getUserIp, getRoomBlocks, checkBlock} = require('../utils');
+const { getRoomPermission, findUserByName, banByUser, banByNameAndIp, checkBan,
+    findRoomUsers, getBlocks, getGlobalBlocks,
+    getGlobalBlocksWithIp, getRoomCameraBans, getGlobalCameraBans,
+    addBlock, removeBlock, removeBlockAdmin, getUserIp,
+    getRoomBlocks, cameraBanByUser, removeCameraBan
+} = require('../utils');
+const cameraBanByNameAndIp = require('../utils/cameraBan/cameraBanByNameAndIp');
 const kickUser = (io, socket) => async ({room, to}) => {
     try {
         const { _id } = socket.decoded;
@@ -30,7 +35,7 @@ const kickUser = (io, socket) => async ({room, to}) => {
     }
 }
 
-const banUser = (io, socket) => async ({room , ip, to, role, reason}) => {
+const banUser = (io, socket) => async ({room , ip, to, role, reason, kind}) => {
     try {
         const { _id } = socket.decoded;
         const userData = await getRoomPermission(room, _id);
@@ -38,10 +43,10 @@ const banUser = (io, socket) => async ({room , ip, to, role, reason}) => {
             role = userData.role;
         }
         const userToBan = await findUserByName(to);
-        if(role) {
+        if(role && kind === 'chat') {
             let res = null;
             let userIp = userToBan.ip? ipToInt(userToBan.ip).toIP(): null;
-            if(role === 'admin' && ip) {
+            if((role === 'super_admin' || role === 'admin') && ip) {
                 res = await banByNameAndIp(room, to, ip, null, null, reason);
             } else {
                 res = await banByUser(room, to, userIp, reason);
@@ -88,6 +93,22 @@ const banUser = (io, socket) => async ({room , ip, to, role, reason}) => {
                 }
             }
         }
+        if (role && kind === 'camera') {
+            let res = null;
+            const userIp = userToBan.ip? ipToInt(userToBan.ip).toIP(): null;
+            if((role === 'super_admin' || role === 'admin') && ip) {
+                res = await cameraBanByNameAndIp(room, to, ip);
+            } else {
+                res = await cameraBanByUser(room, to, userIp);
+            }
+            if (room) {
+                const cameraBans = await getRoomCameraBans(room);
+                io.to(room).emit('update camera bans', { room, cameraBans });
+            } else {
+                const globalCameraBans = await getGlobalCameraBans();
+                io.emit('update global camera bans', { globalCameraBans });
+            }
+        }
     } catch(err) {
         socket.emit('ban error');
     }
@@ -116,7 +137,6 @@ const banUserByAdmin = (io, socket) => async ({ room , ip, fromIp, toIp, to, rea
                 username: userData.username,
                 reason
             });
-            
         }
     } catch(err) {
         console.log(err)
@@ -185,4 +205,42 @@ const unBlockUser = (io, socket) => async ({room, username}, callback) => {
         callback(false, 'Permission denied')
     }
 }
-module.exports = { kickUser, banUser, banUserByAdmin, blockUser, unBlockUser };
+
+const unBanCamera = (io, socket) => async ({room, username}, callback) => {
+    const {_id} = socket.decoded;
+    const { role: myRole } = await getRoomPermission(room, _id);
+    if(myRole === 'super_admin' || myRole === 'admin' || myRole === 'owner' || myRole === 'moderator') {
+        let userToBlock = await findUserByName(username);
+        console.log(userToBlock)
+        let userIp = ipToInt(userToBlock.ip).toIP();
+        console.log(userIp)
+        try {
+            if(myRole === 'admin' || myRole === 'super_admin') {
+                let result = await removeCameraBan(null, userToBlock.username, userIp, true);
+                if(!result) {
+                    return callback(false, 'Can not unban this camera');
+                }
+                const globalCameraBans = await getGlobalCameraBans();
+                const cameraBans = await getRoomCameraBans(room);
+                io.emit('update global camera bans', {blocks: globalCameraBans});
+                io.to(room).emit('update camera bans', {room, cameraBans});
+            } else {
+                let result = await removeCameraBan(room, userToBlock.username, userIp);
+                if(!result) {
+                    return callback(false, 'Can not unban this user');
+                }
+                const cameraBans = await getCameraBans(room);
+                io.to(room).emit('update camera bans', {room, cameraBans});
+            }
+            callback(true);
+        } catch(err) {
+            console.log(err)
+            callback(false, 'Can not unban this user')
+        }
+
+    } else {
+        callback(false, 'Permission denied')
+    }
+}
+
+module.exports = { kickUser, banUser, banUserByAdmin, blockUser, unBlockUser, unBanCamera };
