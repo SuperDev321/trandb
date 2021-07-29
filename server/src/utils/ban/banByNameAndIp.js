@@ -5,7 +5,7 @@ const banByNameAndIp = async (room=null, username, ip=null, fromIp=null, toIp=nu
     let ban = null;
     try{
         if(room) { // room ban
-            if(ip) {
+            if (ip) {
                 let ipNum = ipInt(ip).toInt();
                 ban = await Bans.findOne({room, username, ip: ipNum, type: 'ip'});
                 if(!ban)
@@ -20,13 +20,13 @@ const banByNameAndIp = async (room=null, username, ip=null, fromIp=null, toIp=nu
                 return false;
             }
         } else { // global ban
-            if(ip) {
+            if (ip) {
                 let ipNum = ipInt(ip).toInt();
                 ban = await Bans.findOne({ username, ip: ipNum, room: undefined, type: 'ip'});
                 console.log('global ban find', ban)
                 if(!ban)
                     ban = await Bans.create({ username, ip: ipNum, type: 'ip', reason});
-            } else if(fromIp && toIp) {
+            } else if (fromIp && toIp) {
                 let ipFromNum = ipInt(fromIp).toInt();
                 let ipToNum = ipInt(toIp).toInt();
                 ban = await Bans.findOne({ username, fromIp: ipFromNum, toIp: ipToNum, room: undefined, type: 'range'});

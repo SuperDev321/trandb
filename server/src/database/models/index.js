@@ -7,6 +7,7 @@ const ForbiddenWords = require('./ForbiddenWords');
 const Settings = require('./Settings');
 const Boots = require('./Boots');
 const Gifts = require('./Gifts');
+const CameraBans = require('./CameraBans');
 
 module.exports = {
   Users,
@@ -17,5 +18,6 @@ module.exports = {
   ForbiddenWords,
   Settings,
   Boots,
-  Gifts
+  Gifts,
+  CameraBans
 };

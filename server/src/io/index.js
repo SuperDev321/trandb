@@ -3,8 +3,8 @@ const leaveRoom = require('./leaveRoom');
 const addPrivate = require('./addPrivate');
 const leavePrivate = require('./leavePrivate');
 const { publicMessage, privateMessage, pokeMessage } = require('./msgHandler');
-const { kickUser, banUser, banUserByAdmin, blockUser, unBlockUser } = require('./userHandler');
-const { startVideo, stopVideo } = require('./videoHandler');
+const { kickUser, banUser, banUserByAdmin, blockUser, unBlockUser, unBanCamera } = require('./userHandler');
+const { startVideo, stopVideo, isAvailableToBroadcast, isAvailableToView } = require('./videoHandler');
 const socketDisconnect = require('./disconnect');
 const { sendGift } = require('./gift')
 const { Users } = require('../database/models');
@@ -67,11 +67,14 @@ const ioHandler = (io) => async (socket) => {
     socket.on('ban user', banUser(io, socket));
     socket.on('block user', blockUser(io, socket));
     socket.on('unblock user', unBlockUser(io, socket));
+    socket.on('unban camera', unBanCamera(io, socket));
     socket.on('send gift', sendGift(io, socket));
     
     // video events
     socket.on('start video', startVideo(io, socket));
     socket.on('stop video', stopVideo(io, socket));
+    socket.on('check camera broadcast', isAvailableToBroadcast(io, socket));
+    socket.on('check camera view', isAvailableToView(io, socket));
 
     socket.on('error', (err) => {
       console.log(err);

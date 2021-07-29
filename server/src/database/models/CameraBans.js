@@ -7,13 +7,12 @@ const banSchema = new Schema({
   ip: Number,
   fromIp: Number,
   toIp: Number,
-  reason: String
 }, {
   timestamps: {
     createdAt: 'created_at'
   }
 });
 
-const Bans = model('Bans', banSchema);
+const CameraBans = model('CameraBans', banSchema);
 
-module.exports = Bans;
+module.exports = CameraBans;

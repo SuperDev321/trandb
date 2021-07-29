@@ -167,10 +167,6 @@ function useDoubleClick({oneClick, doubleClick}) {
 const RoomUserName = ({user, role, roomName,
     changeMuteState, sendPokeMessage, kickUser, banUser, addOrOpenPrivate, viewBroadcast, stopBroadcastTo,
     isMine, displayYou, isMuted, isBlocked, isPrivateMuted, changePrivateMute, showAboutMe, showPoint = false
-    // open,
-    // anchorEl,
-    // setAnchorEl,
-    // handleClose
 }) => { 
     const classes = useStyles();
     const {t} = useTranslation();
@@ -223,7 +219,6 @@ const RoomUserName = ({user, role, roomName,
         })
     } 
     const unBlockUser = (roomName, username) => {
-
         socket.emit('unblock user', {room: roomName, username: user.username},
             (result, message) => {
                 if(!result) {
@@ -231,7 +226,6 @@ const RoomUserName = ({user, role, roomName,
                 }
             }
         );
-        
     }
     const handleBlock = () => {
         if(!isBlocked) {
@@ -303,6 +297,13 @@ const RoomUserName = ({user, role, roomName,
     const handleClosePokeContent = () => {
         setAnchorPokeEl(null);
     };
+
+    const unbanCamera = () => {
+        setAnchorEl(null);
+        socket.emit('unban camera', {room: roomName, username: user.username}, (result, message) => {
+
+        });
+    }
 
     useEffect(() => {
         const setRealAvatar = () => {    
@@ -489,6 +490,17 @@ const RoomUserName = ({user, role, roomName,
                                 : t('UserActionArea.block_this_person')
                             }
                             </Button>
+                            {user.isCameraBanned ? 
+                                <Button size="small"
+                                    className={`${classes.cardButton} ${classes.mute}`}
+                                    fullWidth onClick={unbanCamera}
+                                >
+                                { t('UserActionArea.unban_camera')}
+                                </Button>
+                            :
+                            null
+                            }
+                            
                             </>
                         :
                             <>

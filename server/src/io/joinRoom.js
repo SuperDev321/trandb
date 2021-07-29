@@ -1,6 +1,7 @@
 const { Rooms, Chats, Users, Settings } = require('../database/models');
 
-const { findRoomUsers, checkBan, getRoomBlocks, getGlobalBlocksWithIp, checkBlock } = require('../utils');
+const { findRoomUsers, checkBan, getRoomBlocks, getGlobalBlocksWithIp, checkBlock,
+    getGlobalCameraBans, getRoomCameraBans } = require('../utils');
 const ipInt = require('ip-to-int');
 const joinRoom = (io, socket) => async ({ room, password }, callback) => {
     try {
@@ -44,9 +45,14 @@ const joinRoom = (io, socket) => async ({ room, password }, callback) => {
         }));
         const globalBlocks = await getGlobalBlocksWithIp();
         const blocks = await getRoomBlocks(room);
+        const globalCameraBans = await getGlobalCameraBans();
+        const cameraBans = await getRoomCameraBans(room);
         // let blocked = await checkBlock(room, user.username, user.ip);
         socket.emit('init room',
-            {messages, onlineUsers, room: {name: room, welcomeMessage: roomInfo.welcomeMessage}, blocks, globalBlocks},
+            {
+                messages, onlineUsers, room: { name: room, welcomeMessage: roomInfo.welcomeMessage },
+                blocks, globalBlocks, cameraBans, globalCameraBans
+            },
             (data)=> {
                 if(data === 'success' && result && result.nModified) {
                     let joinedUser = onlineUsers.find((item) => (item._id.equals(_id)));
@@ -101,9 +107,14 @@ const rejoinRoom = (io, socket) => async ({ room, type }, callback) => {
             
             let globalBlocks = await getGlobalBlocksWithIp();
             let blocks = await getRoomBlocks(room);
+            const globalCameraBans = await getGlobalCameraBans();
+            const cameraBans = await getRoomCameraBans(room);
             // let blocked = await checkBlock(room, user.username, user.ip);
             
-            socket.emit('init room', {messages, onlineUsers, room: {name: room}, globalBlocks, blocks}, (data)=> {
+            socket.emit('init room', {
+                messages, onlineUsers, room: {name: room},
+                globalBlocks, blocks, cameraBans, globalCameraBans
+            }, (data)=> {
                 if(data === 'success' && result && result.nModified) {
                     let joinedUser = onlineUsers.find((item) => (item._id.equals(_id)));
                     io.to(room).emit('joined room', {

@@ -1,5 +1,5 @@
 class RoomObject  {
-    constructor(name, messages, users, blocks, messageNum = 30) {
+    constructor(name, messages, users, blocks, cameraBans, messageNum = 30) {
         this.name = name;
         if(Array.isArray(messages)) {
             this.messages = messages;
@@ -16,22 +16,18 @@ class RoomObject  {
         this.unReadMessages = null;
         this.private = {};
         this.mutes = [];
+        this.cameraMutes = [];
         this.messageNum = messageNum
-        // let mutes = null;
-        // let item = window.localStorage.getItem('mutes');
-        // if(item) mutes = JSON.parse(item);
-        // if(!Array.isArray(mutes)) mutes = null;
-        // if(mutes) {
-        //     let myMutes = mutes.filter((value) => (value.room === this.name));
-        //     this.mutes = myMutes.map(({user})=> (user));
-        // } else {
-        //     this.mutes = [];
-        // }
         this.initMutes();
         if(Array.isArray(blocks)) {
             this.blocks = blocks;
         } else {
             this.blocks = [];
+        }
+        if(Array.isArray(cameraBans)) {
+            this.cameraBans = cameraBans;
+        } else {
+            this.cameraBans = [];
         }
         this.cameraState = false;
     }
@@ -49,6 +45,19 @@ class RoomObject  {
         this.mutes = mutes;
     }
 
+    initCameraMutes() {
+        let mutes = null;
+        let item = window.localStorage.getItem('camera-mutes');
+        if(item) mutes = JSON.parse(item);
+        if(!Array.isArray(mutes)) mutes = [];
+        if(mutes) {
+            mutes = mutes.filter((value) => (value.room === this.name));
+        } else {
+            mutes = [];
+        }
+        this.cameraMutes = mutes;
+    }
+
     checkMuteByName (name) {
         const muteItem = this.mutes?.find((item) => (item.username === name))
         if (muteItem) {
@@ -61,6 +70,12 @@ class RoomObject  {
     updateBlocks(blocks) {
         if(Array.isArray(blocks)) {
             this.blocks = blocks;
+        }
+    }
+
+    updateCameraBans(cameraBans) {
+        if(Array.isArray(cameraBans)) {
+            this.cameraBans = cameraBans;
         }
     }
     
@@ -177,6 +192,15 @@ class RoomObject  {
             this.users = newUsers;
         }
         return result;
+    }
+    checkCameraState(userId) {
+        const user = this.users.find(({_id}) => (_id === userId));
+        const mute = this.cameraMutes.find(({ username, ip }) => (username === user.username || ip === user.ip));
+        if (mute) {
+            return false;
+        } else {
+            return true;
+        }
     }
 }
 

@@ -106,10 +106,11 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 
-const SideBarLeft = ({ roomName, username, mutes, blocks, globalBlocks, changeMuteState, sendPokeMessage, kickUser, banUser,
+const SideBarLeft = ({ roomName, username, mutes, blocks, globalBlocks, cameraBans, globalCameraBans,
+    changeMuteState, sendPokeMessage, kickUser, banUser,
     users, viewers, viewBroadcast, stopBroadcastTo,
     addOrOpenPrivate, startBroadcast, stopBroadcast,
-    cameraState, openCamera, closeCamera }) => {
+    cameraState }) => {
     const classes = useStyles();
     const [searchText, setSearchText] = useState('');
     const [sideUsers, setSideUsers] = useState([]);
@@ -145,6 +146,7 @@ const SideBarLeft = ({ roomName, username, mutes, blocks, globalBlocks, changeMu
             let isMuted = false
             let isViewer = false
             let isPrivateMuted = false
+            let isCameraBanned = false
             
             if (globalBlockedNames && globalBlockedNames.includes(user.username)) isBlocked = true
             if (globalBlockedIps && globalBlockedIps.includes(user.ip)) isBlocked = true
@@ -171,12 +173,39 @@ const SideBarLeft = ({ roomName, username, mutes, blocks, globalBlocks, changeMu
             if (privateMutes?.find((item) => (item.username === user.username || item.ip === user.ip))) {
                 isPrivateMuted = true
             }
+            if (globalCameraBans) {
+                for (const { username, ip, fromIp, toIp } of globalCameraBans) {
+                    if (username === user.username || user.ip === ip) {
+                        isCameraBanned = true;
+                        break;
+                    }
+                    if (user.ip > fromIp && user.ip < toIp) {
+                        isCameraBanned = true;
+                        break;
+                    }
+                }
+            }
+            if (!isCameraBanned && cameraBans) {
+                for (const { username, ip, fromIp, toIp } of cameraBans) {
+                    if (username === user.username || user.ip === ip) {
+                        isCameraBanned = true;
+                        break;
+                    }
+                    if (user.ip > fromIp && user.ip < toIp) {
+                        isCameraBanned = true;
+                        break;
+                    }
+                }
+            }
+            
+
             return {
                 isBroadcasting,
                 isBlocked,
                 isMuted,
                 isViewer,
                 isPrivateMuted,
+                isCameraBanned,
                 ...user
             }
         })
@@ -202,7 +231,7 @@ const SideBarLeft = ({ roomName, username, mutes, blocks, globalBlocks, changeMu
             }
         })
         setSideUsers(newUsers)
-    }, [users, blocks, globalBlocks, mutes, privateMutes, viewers, username, cameraState, pointOption])
+    }, [users, blocks, globalBlocks, mutes, cameraBans, globalCameraBans, privateMutes, viewers, username, cameraState, pointOption])
 
 
     useEffect(() => {

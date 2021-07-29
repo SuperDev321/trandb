@@ -63,6 +63,8 @@
     "admin": "אדמין",
     "gift_send": "נשלחה מתנה {{amount}} {{giftName}} מאת {{sender}} אל {{receiver}} ",
     "gift_send_to_you": "קיבלת מ {{sender}} מתנה של {{amount}} {{giftName}}",
+    "error_camera_banned": "You are banned to broadcast in this room.",
+    "error_camera_view_banned": "You are banned to view this camera in this room.",
     "default": "default"
   },
  "AddRoomModal": {
@@ -171,6 +173,7 @@
     "where_are_you": "מג'נונה",
     "nock": "הקש בדלת",
     "gift": "מ ת נ ו ת",
+    "unban_camera": "Unban camera",
     "default": "ניג'וס"
   },
   "SettingModal": {
@@ -178,7 +181,7 @@
     "my_profile": "הפרופיל/חדר שלי",
     "languages": "שפות",
     "select_lan": "בחר שפה",
-    "messages": "גודל הטקסט",
+    "messages": "תצוגת הודעות ",
     "message_size": "גודל ההודעה",
     "themes": "ממשק יום/לילה",
     "dark": "לילה",
@@ -223,6 +226,8 @@
     "all_rooms": "כל החדרים",
     "this_room": "חדר זה",
     "ban": "באן",
+    "chat": "Chat",
+    "camera": "Camera",
     "cancel": "ביטול",
     "default": "default"
   },

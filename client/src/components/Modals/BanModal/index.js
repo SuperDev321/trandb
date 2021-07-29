@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { withStyles } from '@material-ui/core/styles';
 import {
     Dialog,
     DialogActions,
@@ -6,7 +7,12 @@ import {
     DialogTitle,
     MenuItem,
     Grid,
+    FormControl,
+    RadioGroup,
+    FormControlLabel,
+    Radio
 } from '@material-ui/core';
+import { green } from '@material-ui/core/colors'
 import CustomTextField from '../../CustomTextField';
 import OutlinedButton from '../../OutlinedButton';
 import useStyles from './styles';
@@ -16,6 +22,15 @@ import Axios from 'axios';
 import config from '../../../config';
 import { useTranslation } from 'react-i18next';
 
+const GreenRadio = withStyles({
+    root: {
+      color: green[400],
+      '&$checked': {
+        color: green[600],
+      },
+    },
+    checked: {},
+})((props) => <Radio color="default" {...props} />);
 
 export default function BanModal({open, setOpen, initVal, roomName, isAdmin}) {
     const classes = useStyles();
@@ -23,6 +38,7 @@ export default function BanModal({open, setOpen, initVal, roomName, isAdmin}) {
     const name = initVal.name || '';
     const [type, setType] = useState('all');
     const [ip, setIp] = useState(initVal.ip?initVal.ip: '');
+    const [kind, setKind] = useState('chat');
     const [reason, setReason] = useState('');
     const { t } = useTranslation();
 
@@ -41,6 +57,7 @@ export default function BanModal({open, setOpen, initVal, roomName, isAdmin}) {
             })
         }
     }, [open, initVal])
+
     const handleClose = () => {
         setOpen(false);
     };
@@ -63,10 +80,14 @@ export default function BanModal({open, setOpen, initVal, roomName, isAdmin}) {
         }
         payload.reason = reason;
         payload.to = name;
+        payload.kind = kind;
         socket.emit('ban user', payload);
         setOpen(false);
     }
     
+    const handleChangeKind = (e) => {
+        setKind(e.target.value);
+    }
 
     return (
         <Dialog className={classes.dialog} fullWidth={true} maxWidth="xs"
@@ -109,23 +130,26 @@ export default function BanModal({open, setOpen, initVal, roomName, isAdmin}) {
                     {t('BanModal.this_room')}
                 </MenuItem>
             </CustomTextField>
-            <Grid component="label" container alignItems="center" spacing={1}>
-                <Grid  item xs={12} sm={12} >
-                    <CustomTextField className={classes.ipField}
-                        label={t('BanModal.ip')}
-                        value={ip}
-                        fullWidth
-                        onChange={handleIpChange}
-                        name="ipInput"
-                        id="ip-input"
-                        InputProps={{
-                            inputComponent: IpMaskInput,
-                        }}
-                />
-                </Grid>
-            </Grid>
+            <CustomTextField
+                className={classes.ipField}
+                label={t('BanModal.ip')}
+                value={ip}
+                fullWidth
+                onChange={handleIpChange}
+                name="ipInput"
+                id="ip-input"
+                InputProps={{
+                    inputComponent: IpMaskInput,
+                }}
+            />
             </>
             }
+            <FormControl component="fieldset">
+                <RadioGroup row aria-label="ban-select" name="ban-select" className={classes.banSelect} value={kind} onChange={handleChangeKind}>
+                    <FormControlLabel value="chat" control={<GreenRadio />} label={t('BanModal.chat')} />
+                    <FormControlLabel value="camera" control={<GreenRadio />} label={t('BanModal.camera')} />
+                </RadioGroup>
+            </FormControl>
             <CustomTextField
                 margin="dense"
                 id="ban reason"

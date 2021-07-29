@@ -36,7 +36,16 @@ const removeBlock = require('./block/removeBlock');
 const removeBlockAdmin = require('./block/removeBlockAdmin');
 const {isForbidden, hasFobiddenWord} = require('./forbiddenWord/isForbidden');
 const createAdminUser = require('./user/createAdminUser');
-const initSetting = require('./setting/initSetting')
+const initSetting = require('./setting/initSetting');
+const cameraBanByUser = require('./cameraBan/cameraBanByUser');
+const checkCameraBan = require('./cameraBan/checkCameraBan');
+const removeCameraBan = require('./cameraBan/removeCameraBan');
+const {
+  getAllCameraBans,
+  getRoomCameraBans,
+  getGlobalCameraBans
+} = require('./cameraBan/getCameraBans');
+
 module.exports = {
   createError,
   validateSignUpData,
@@ -80,5 +89,11 @@ module.exports = {
   isForbidden,
   hasFobiddenWord,
   createAdminUser,
-  initSetting
+  initSetting,
+  cameraBanByUser,
+  checkCameraBan,
+  getAllCameraBans,
+  getRoomCameraBans,
+  getGlobalCameraBans,
+  removeCameraBan
 };

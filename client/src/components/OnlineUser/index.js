@@ -4,9 +4,10 @@ import {
     Avatar,
     Badge,
 } from '@material-ui/core';
-import { deepOrange, pink, blue, green, yellow } from '@material-ui/core/colors';
+import { deepOrange, pink, blue, green, yellow, grey } from '@material-ui/core/colors';
 import {
     Videocam,
+    VideocamOff,
     Block,
     Check,
     StarRounded,
@@ -220,6 +221,14 @@ const OnlineUser = ({roomName, username, user, role, isMuted, isPrivateMuted, is
                     <Videocam className={classes.icon}  onDoubleClick={handleDoubleClickVideo}
                     // color={(user && user.broadcasting)? 'primary': 'disabled'}
                         style={{ color: green[300] }}
+                    />
+                    :null
+                }
+
+                { user.isCameraBanned ?
+                    <VideocamOff className={classes.icon}  onDoubleClick={handleDoubleClickVideo}
+                    // color={(user && user.broadcasting)? 'primary': 'disabled'}
+                        style={{ color: grey[800] }}
                     />
                     :null
                 }
