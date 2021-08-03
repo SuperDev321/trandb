@@ -451,6 +451,21 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 sameRoom.updateCameraBans(cameraBans);
                 dispatch({type: 'update', data: { name: room, cameraBans}});
             }
+            const myUserData = sameRoom.getUserData(username);
+            let isCameraBanned = false;
+            for (const { username, ip, fromIp, toIp } of cameraBans) {
+                if (username === myUserData.username || myUserData.ip === ip) {
+                    isCameraBanned = true;
+                    break;
+                }
+                if (myUserData.ip > fromIp && myUserData.ip < toIp) {
+                    isCameraBanned = true;
+                    break;
+                }
+            }
+            if (isCameraBanned && mediaClientRef.current) {
+                mediaClientRef.current.closeProducer(null, room);
+            }
         }
     }, [dispatch]);
 
@@ -735,7 +750,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
     }
 
     const startBroadcast = async (room, lock, videoDeviceId, audioDeviceId) => {
-        let result = await socket.request('check camera broadcast', ({ room }));
+        let result = await socket?.request('check camera broadcast', ({ room }));
         if (!result) {
             enqueueSnackbar(t('ChatApp.error_camera_banned'), { variant: 'error'});
             return false;

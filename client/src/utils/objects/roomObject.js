@@ -202,6 +202,10 @@ class RoomObject  {
             return true;
         }
     }
+    getUserData(username) {
+        const user = this.users?.find((item) => (item.username === username));
+        return user;
+    }
 }
 
 export default RoomObject;

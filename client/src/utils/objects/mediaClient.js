@@ -395,6 +395,8 @@ class MediaClient {
                 deviceId: {
                     exact: videoDeviceId,
                 },
+                width: { ideal: 4096 },
+                height: { ideal: 2160 }
                 // width: {
                 //     min: 640,
                 //     ideal: 2000
@@ -858,6 +860,7 @@ class MediaClient {
             if (this.localStreams.has(room_id)) {
                 const { stream } = this.localStreams.get(room_id);
                 if (stream) {
+                    console.log('delete local stream')
                     stream.getTracks().forEach((track) => {
                         track.stop();
                     })
