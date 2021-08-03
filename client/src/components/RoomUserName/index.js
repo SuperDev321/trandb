@@ -270,7 +270,11 @@ const RoomUserName = ({user, role, roomName,
     const view = () => {
         setAnchorEl(null);
         setTimeout(() => {
-            viewBroadcast(roomName, user._id, user.username);
+            const { video } = user;
+            if (video) {
+                const { locked, producers } = video;
+                viewBroadcast(roomName, user._id, user.username, producers, locked);
+            }
         }, 0);
     }
 

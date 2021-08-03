@@ -159,7 +159,6 @@ const OnlineUser = ({roomName, username, user, role, isMuted, isPrivateMuted, is
             const { locked, producers } = video;
             viewBroadcast(roomName, user._id, user.username, producers, locked);
         }
-        
     }
 
     useEffect(() => {
