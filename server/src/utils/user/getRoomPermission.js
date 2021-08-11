@@ -1,8 +1,9 @@
 const { Rooms, Users } = require('../../database/models');
 
 const getRoomPermission = async (room, userId) => {
-
     const user = await Users.findOne({_id: userId});
+
+
     if(user && (user.role === 'admin'|| user.role === 'super_admin')) {
         return { username: user.username, role: 'admin'}
     }

@@ -38,7 +38,8 @@ const settingSchema = new Schema({
   showGift: Boolean,
   pointOption: Boolean,
   emojiOption: Boolean,
-  showEmoji: Boolean
+  showEmoji: Boolean,
+  autoBroadcast: Boolean
 });
 
 const Settings = model('Settings', settingSchema);

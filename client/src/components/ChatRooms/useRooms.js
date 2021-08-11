@@ -199,7 +199,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
                         name: room.name,
                         unReadMessages: newRoomObject.unReadMessages
                     }
-                })
+                });
                 if (autoBroadcast) {
                     onlineUsers.forEach(({ _id, username, video }) => {
                         if (video) {
@@ -223,7 +223,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
             }
 
         }
-    }, [dispatch, roomsDispatch, messageNum]);
+    }, [dispatch, roomsDispatch, messageNum, autoBroadcast]);
 
     const addRoom = useCallback(async (room, callback) => {
         let roomNames = await roomsRef.current.map((oneRoom) => (oneRoom.name));
@@ -925,7 +925,6 @@ const useRooms = ({initRoomName, ...initalState}) => {
             })
             socket.on('init room', async ({room, onlineUsers, messages, blocks, globalBlocks, cameraBans, globalCameraBans}, fn) => {
                 fn('success');
-                console.log(cameraBans, globalCameraBans)
                 let usernames = await onlineUsers.map((item) => (item.username));
                 if(usernames.includes(username)) {
                     initRoom({room, onlineUsers, messages, blocks, globalBlocks, cameraBans, globalCameraBans});
@@ -1063,7 +1062,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
             // socket.io.off('reconnect_attempt')
             // mediaSocket.off('view request');
         };
-    }, [initRoomName, username]);
+    }, [initRoomName, username, autoBroadcast]);
 
     useEffect(() => {
         socket.on('joined room',async ({room, onlineUsers, joinedUser}) => {
@@ -1115,7 +1114,6 @@ const useRooms = ({initRoomName, ...initalState}) => {
         mediaObj.on(mediaEvents.onChangeRemoteStreams, (data) => {
             let {room_id} = data;
             let remoteStreams = mediaClientRef.current.getRemoteStreams(room_id);
-            console.log('change remote streams', room_id, remoteStreams)
             dispatch({
                 type: 'update',
                 data: {

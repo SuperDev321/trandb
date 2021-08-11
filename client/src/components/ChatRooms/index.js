@@ -163,9 +163,7 @@ const ChatRooms = ({room}, ref) => {
                                 enqueueSnackbar(t('Message.private_blocked'), {variant: 'error'});
                             }
                             // enqueueSnackbar(to + ' was out of chat. Please close the private chat with '+ to +'.', {variant: 'error'});
-                            
                         }
-                        
                     }
                 );
             } else {

@@ -21,7 +21,7 @@ import Loading from '../Loading';
 import { HashLoader } from 'react-spinners';
 
 const VideoFieldWidth = 380;
-const VideoFieldHeight = 280;
+const VideoFieldHeight = 288;
 
 const override = {
     display: 'block !important',
@@ -325,6 +325,7 @@ const UserVideo = ({ stream, locked, name, controlVideo, muted, total,
         const videoObj = userVideo.current;
         if(stream && userVideo.current) {
             let audioTrack = stream.getAudioTracks()[0];
+            let videoTrack = stream.getVideoTracks()[0];
             let initVolume = null
             if (audioTrack) {
                 audioTrackRef.current = audioTrack
@@ -351,7 +352,6 @@ const UserVideo = ({ stream, locked, name, controlVideo, muted, total,
                     setLoading(false);
                 }
             }
-
 
             userVideo.current.oncanplay = () => {
                 var playPromise = userVideo.current?.play();
@@ -450,6 +450,11 @@ const UserVideo = ({ stream, locked, name, controlVideo, muted, total,
                     />
                     </div>
                 }
+                {/* { !loading && !videoState && 
+                    <div className={classes.loading}>
+                        <img src="/img/empty_video.jpg" alt="empty video" style={{height: 'inherit', width: 'inherit'}} />
+                    </div>
+                } */}
                 <div className={classes.content}>
                     <video ref={userVideo} autoPlay style={{width: '100%'}} muted={muted}>
                     </video>
@@ -507,7 +512,6 @@ const VideoList = ({streams: remoteStreams, localStream, controlVideo, roomName,
     useEffect(() => {
         let streams = [];
         if(localStream || remoteStreams) {
-            console.log(localStream)
             if(localStream) {
                 dispatch({type: 'pending'})
                 streams = [{...localStream, name: username, muted: true, viewerCounts: viewerCounts, isLocal: true }];

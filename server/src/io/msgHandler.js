@@ -14,7 +14,7 @@ const publicMessage = (io, socket) => async ({ msg, room, from, color, bold, typ
     if(messageType !== 'image') {
       let isForbiddenMessage = await hasFobiddenWord(msg);
       if(isForbiddenMessage) {
-        await banUser(io, socket)({ip: userIp, to: user.username, role: 'admin'});
+        await banUser(io, socket)({ip: userIp, to: user.username, role: 'admin', kind: 'chat'});
         return callback(false);
       }
     }
