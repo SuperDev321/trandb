@@ -8,7 +8,7 @@ const initSetting = async () => {
                 language: 'en', allowPrivate: true, messageTimeInterval: 200,
                 maxUsernameLength: 10, maxMessageLength: 200,
                 avatarOption: true, avatarColor: true, bypassBan: true, allowGuestAvatarUpload: false,
-                showGiftMessage: true, showGift: true, pointOption: false
+                showGiftMessage: true, showGift: true, pointOption: false, autoBroadcast: false
             });
         }
     } catch(err) {

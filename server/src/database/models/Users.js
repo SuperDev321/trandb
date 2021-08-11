@@ -32,7 +32,8 @@ const userSchema = new Schema({
   },
   video: {
     room: String,
-    producers: Object
+    producers: Object,
+    locked: Boolean
   }
 });
 

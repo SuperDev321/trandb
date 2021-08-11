@@ -43,6 +43,7 @@ export default function Setting() {
     const [pointOption, setPointOption] = useState(false)
     const [emojiOption, setEmojiOption] = useState(true);
     const [showEmoji, setShowEmoji] = useState(true);
+    const [autoBroadcast, setAutoBroadcast] = useState(false);
     const { addToast } = useToasts();
 
     useEffect(() => {
@@ -56,7 +57,7 @@ export default function Setting() {
             if(response.status === 200) {
                 const {theme, language, messageNum, allowPrivate, messageTimeInterval,
                     maxUsernameLength, maxMessageLength, avatarOption, avatarColor, bypassBan, allowGuestAvatarUpload,
-                    showGift, showGiftMessage, pointOption, emojiOption, showEmoji
+                    showGift, showGiftMessage, pointOption, emojiOption, showEmoji, autoBroadcast
                 } = response.data;
                 if(theme) {
                     setTheme(theme);
@@ -90,6 +91,7 @@ export default function Setting() {
                 setPointOption(pointOption)
                 setEmojiOption(emojiOption)
                 setShowEmoji(showEmoji)
+                setAutoBroadcast(autoBroadcast)
             }
         })
     }, [])
@@ -98,7 +100,7 @@ export default function Setting() {
         let token = window.localStorage.getItem('token');
         Axios.post(`${config.server_url}/api/setting`, {theme, language, messageNum, allowPrivate,
             messageTimeInterval, maxUsernameLength, maxMessageLength, avatarOption, avatarColor, bypassBan, allowGuestAvatarUpload,
-            showGift, showGiftMessage, pointOption, emojiOption, showEmoji
+            showGift, showGiftMessage, pointOption, emojiOption, showEmoji, autoBroadcast
         }, {
             headers: {
                 authorization: token
@@ -429,6 +431,27 @@ export default function Setting() {
                                 />
                                 </Grid>
                                 <Grid item>Show</Grid>
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                    <Grid container spacing={2} style={{marginTop:'20px'}}>
+                        <Grid item sm={1}>
+                        </Grid>
+                        <Grid item sm={2} style={{textAlign: 'right'}}>
+                            <p className={classes.cardCategory}>Auto Broadcast</p>
+                        </Grid>
+                        <Grid item>
+                            <Grid component="label" container alignItems="center" spacing={1}>
+                                <Grid item>Off</Grid>
+                                <Grid item>
+                                <Switch
+                                    checked={autoBroadcast}
+                                    onChange={(e) => setAutoBroadcast(e.target.checked)}
+                                    name="autoBroadcast"
+                                    inputProps={{ 'aria-label': 'auto broadcast' }}
+                                />
+                                </Grid>
+                                <Grid item>On</Grid>
                             </Grid>
                         </Grid>
                     </Grid>

@@ -258,26 +258,26 @@ const SideBarLeft = ({ roomName, username, mutes, blocks, globalBlocks, cameraBa
             <div  className={classes.list}>
                 { filteredUsers &&
                     filteredUsers.map((user, index)=>(
-                            <OnlineUser
-                                roomName={roomName}
-                                username={username}
-                                role={role}
-                                user={user} key={user? user._id: index}
-                                isMuted={user.isMuted}
-                                isPrivateMuted={user.isPrivateMuted}
-                                isBlocked = {user.isBlocked}
-                                isBroadcasting={user.isBroadcasting}
-                                isViewer={user.isViewer}
-                                viewBroadcast={viewBroadcast}
-                                stopBroadcastTo={stopBroadcastTo}
-                                addOrOpenPrivate={addOrOpenPrivate}
-                                changeMuteState={changeMuteState}
-                                sendPokeMessage={sendPokeMessage}
-                                kickUser={kickUser}
-                                banUser={banUser}
-                                changePrivateMute={changePrivateMute}
-                            />
-                        ))
+                        <OnlineUser
+                            roomName={roomName}
+                            username={username}
+                            role={role}
+                            user={user} key={user? user._id: index}
+                            isMuted={user.isMuted}
+                            isPrivateMuted={user.isPrivateMuted}
+                            isBlocked = {user.isBlocked}
+                            isBroadcasting={user.isBroadcasting}
+                            isViewer={user.isViewer}
+                            viewBroadcast={viewBroadcast}
+                            stopBroadcastTo={stopBroadcastTo}
+                            addOrOpenPrivate={addOrOpenPrivate}
+                            changeMuteState={changeMuteState}
+                            sendPokeMessage={sendPokeMessage}
+                            kickUser={kickUser}
+                            banUser={banUser}
+                            changePrivateMute={changePrivateMute}
+                        />
+                    ))
                 }
                 
             </div>

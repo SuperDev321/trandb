@@ -6,11 +6,11 @@ const sendGift = (io, socket) => async ({to, giftId, room, amount}, callback) =>
         const sender = await Users.findById(_id);
         const receiver = await Users.findOne({ username: to })
         const gift = await Gifts.findById(giftId);
-        if (sender && receiver && gift && amount > 0) {
+        if (sender && receiver && gift && amount >= 0 && Math.floor(amount) === +amount) {
             const { cost } = gift;
             const { point: senderPoint } = sender;
             const { point: receiverPoint } = receiver;
-            const totalCost = cost * amount;
+            const totalCost = Number(cost) * Number(amount);
             if (senderPoint && senderPoint > totalCost) {
                 let tmpPoint = 0;
                 if (receiverPoint) {

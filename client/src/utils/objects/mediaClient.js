@@ -314,7 +314,6 @@ class MediaClient {
             consumer_id,
             room_id
         }) {
-            console.log('consumer closed', consumer_id)
             this.removeConsumer(consumer_id, room_id);
         }.bind(this))
 
@@ -575,6 +574,14 @@ class MediaClient {
             console.log('remote track ended by producer')
             this.removeConsumer(consumer.id)
         })
+        consumer.on('producerpause', ()  => {
+            console.log('remote paused by producer')
+            consumer.pause();
+        })
+        consumer.on('producerresume', ()  => {
+            console.log('remote paused by producer')
+            consumer.pause();
+        })
         await this.addConsumer(room_id, producerName, kind, locked, consumer);
         // if(!locked) {
         //     this.addRemoteStream(room_id, producer_name, producer_socket_id, kind, locked, consumer);
@@ -650,6 +657,7 @@ class MediaClient {
 
         
         if (locked) {
+            fn1(true);
             mediaSocket.emit('view request', {
                 roomName: room_id,
                 username: this.name,
@@ -820,7 +828,6 @@ class MediaClient {
             this.viewers.delete(room_id);
             if (this.localStreams.has(room_id)) {
                 let item = this.localStreams.get(room_id);
-                console.log(item)
             }
             this.localStreams.delete(room_id);
             this.event(_EVENTS.stopStream, {room_id});
@@ -877,17 +884,23 @@ class MediaClient {
         }
     }
 
-    pauseProducer (room_id, kind) {
+    async pauseProducer (room_id, kind) {
         if (!this.producerLabels.has(room_id)) {
             return;
         }
+        console.log('pause producer')
         let label = this.producerLabels.get(room_id);
         if(label) {
             let {audio: audioId, video: videoId} = label;
             if((!kind || kind === 'audio') && audioId) {
                 let audioProducer = this.producers.get(audioId);
                 if(audioProducer && audioProducer.producer) {
-                    audioProducer.producer.pause();
+                    await audioProducer.producer.pause();
+                    // mediaSocket.request('pause producer', {
+                    //     room_id,
+                    //     kind,
+                    //     producerId: audioProducer.producer.id
+                    // })
                 }
                 let stream = this.localStreams.get(room_id);
                 stream.audioState = false;
@@ -896,15 +909,18 @@ class MediaClient {
             if((!kind || kind === 'video') && videoId) {
                 let videoProducer = this.producers.get(videoId);
                 if(videoProducer && videoProducer.producer) {
-                    videoProducer.producer.pause();
+                    await videoProducer.producer.pause();
+                    // mediaSocket.request('pause producer', {
+                    //     room_id,
+                    //     kind,
+                    //     producerId: videoProducer.producer.id
+                    // })
                 }
                 let stream = this.localStreams.get(room_id);
                 stream.videoState = false;
                 this.event(_EVENTS.startStream, {room_id});
             }
         }
-        
-
     }
 
     resumeProducer (room_id, kind) {
@@ -917,6 +933,11 @@ class MediaClient {
             if ((!kind || kind === 'audio') && audioId) {
                 let audioProducer = this.producers.get(audioId);
                 if(audioProducer && audioProducer.producer) {
+                    // mediaSocket.request('resume producer', {
+                    //     room_id,
+                    //     kind,
+                    //     producerId: audioProducer.producer.id
+                    // })
                     audioProducer.producer.resume();
                 }
                 let stream = this.localStreams.get(room_id);
@@ -926,6 +947,11 @@ class MediaClient {
             if ((!kind || kind === 'video') && videoId) {
                 let videoProducer = this.producers.get(videoId);
                 if(videoProducer && videoProducer.producer) {
+                    // mediaSocket.request('resume producer', {
+                    //     room_id,
+                    //     kind,
+                    //     producerId: videoProducer.producer.id
+                    // })
                     videoProducer.producer.resume();
                 }
                 let stream = this.localStreams.get(room_id);

@@ -23,7 +23,6 @@ const createNewSocket = (token) => {
         socket.close();
     }
     const ismobile = mobileAndTabletCheck();
-    console.log(ismobile)
     socket = io(`${config.server_url}`,{
         autoConnect: false,
         transports: ['polling', 'websocket'],
@@ -36,6 +35,17 @@ const createNewSocket = (token) => {
             ismobile
         },
     });
+    socket.request = function request(type, data = {}) {
+        return new Promise((resolve, reject) => {
+            socket.emit(type, data, (data) => {
+            if (data.error) {
+                reject(data.error)
+            } else {
+                resolve(data)
+            }
+            })
+        })
+    }
     return;
 }
 
@@ -56,7 +66,7 @@ const mediaSocket = io(`${config.media_server_url}`,{
 socket.request = function request(type, data = {}) {
     return new Promise((resolve, reject) => {
         socket.emit(type, data, (data) => {
-        if (data.error) {
+        if (data && data.error) {
             reject(data.error)
         } else {
             resolve(data)
@@ -68,7 +78,7 @@ socket.request = function request(type, data = {}) {
 mediaSocket.request = function request(type, data = {}) {
     return new Promise((resolve, reject) => {
         mediaSocket.emit(type, data, (data) => {
-        if (data.error) {
+        if (data && data.error) {
             reject(data.error)
         } else {
             resolve(data)

@@ -38,10 +38,18 @@ const kickUser = (io, socket) => async ({room, to}) => {
 const banUser = (io, socket) => async ({room , ip, to, role, reason, kind}) => {
     try {
         const { _id } = socket.decoded;
-        const userData = await getRoomPermission(room, _id);
+        let userData = null;
+        if (room) {
+            userData = await getRoomPermission(room, _id);
+        } else {
+            userData = {
+                username: process.env.SUPER_ADMIN_NAME
+            }
+        }
         if(!role) {
             role = userData.role;
         }
+
         const userToBan = await findUserByName(to);
         if(role && kind === 'chat') {
             let res = null;
@@ -64,7 +72,7 @@ const banUser = (io, socket) => async ({room , ip, to, role, reason, kind}) => {
                         room,
                         kickedUserName: to,
                         role,
-                        username: userData.username, // admin or moderator's name,
+                        username: userData ? userData.username: null, // admin or moderator's name,
                         reason
                     });
                     if(socketToBan) {
@@ -77,10 +85,11 @@ const banUser = (io, socket) => async ({room , ip, to, role, reason, kind}) => {
                     let first = it.next();
                     let id = first.value;
                     let socketToBan = io.sockets.sockets.get(id);
+                    console.log('global ban')
                     io.emit('global banned user', {
                         kickedUserName: to,
                         role,
-                        username: userData.username, // admin or moderator's name
+                        username: userData ? userData.username: null, // admin or moderator's name
                         reason
                     });
                     if(socketToBan) {
@@ -110,6 +119,7 @@ const banUser = (io, socket) => async ({room , ip, to, role, reason, kind}) => {
             }
         }
     } catch(err) {
+        console.log(err)
         socket.emit('ban error');
     }
 }
@@ -117,7 +127,15 @@ const banUser = (io, socket) => async ({room , ip, to, role, reason, kind}) => {
 const banUserByAdmin = (io, socket) => async ({ room , ip, fromIp, toIp, to, reason }) => {
     try {
         const { _id } = socket.decoded;
-        const userData = await getRoomPermission(room, _id);
+        let userData = null
+        if (room) {
+            userData = await getRoomPermission(room, _id);
+        } else {
+            userData = {
+                username: process.env.SUPER_ADMIN_NAME
+            }
+        }
+        
         const userToBan = await findUserByName(to);
         let res = await banByNameAndIp(room , to, ip, fromIp, toIp, reason);
         if(res) {
