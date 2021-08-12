@@ -880,6 +880,10 @@ const useRooms = ({initRoomName, ...initalState}) => {
     }
 
     const autoStartRemoteVideo = async (room, producers, userId, locked, remoteUsername) => {
+        let result = await socket.request('check camera view', ({ room, targetUserId: userId }));
+        if (!result) {
+            return false;
+        }
         if (username !== remoteUsername && !locked && mediaClientRef.current) {
             if (!mediaClientRef.current._isOpen) {
                 await mediaClientRef.current.init();
