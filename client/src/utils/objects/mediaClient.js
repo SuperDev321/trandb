@@ -189,7 +189,6 @@ class MediaClient {
     }
 
     async initTransports(device, room_id) {
-
         // init producerTransport
         {
             const data = await mediaSocket.request('createWebRtcTransport', {
@@ -310,6 +309,9 @@ class MediaClient {
     }
 
     async initSockets() {
+        if (!mediaSocket.connected) {
+            mediaSocket.open();
+        }
         mediaSocket.on('consumerClosed', function ({
             consumer_id,
             room_id
@@ -1045,12 +1047,14 @@ class MediaClient {
                     transport.close();
                 })
             }
+            this.consumerTransports.clear();
                 
             if(this.producerTransports.size > 0) {
                 this.producerTransports.forEach((transport) => {
                     transport.close();
                 })
             }
+            this.producerTransports.clear();
 
             if(this.producers.size > 0) {
                 this.producers.forEach((producerInfo) => {
@@ -1059,7 +1063,11 @@ class MediaClient {
                     }
                 })
             }
-            mediaSocket.removeAllListeners();
+            this.rooms.clear();
+            this.producers.clear();
+            this.producerLabels.clear();
+
+            // mediaSocket.removeAllListeners();
             // mediaSocket.off('disconnect')
             // mediaSocket.off('newProducers')
             // mediaSocket.off('consumerClosed')
