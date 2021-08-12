@@ -464,10 +464,10 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 }
             }
             if (isCameraBanned && mediaClientRef.current) {
-                mediaClientRef.current.closeProducer(null, room);
+                mediaClientRef.current.exitRoom(room);
             }
         }
-    }, [dispatch]);
+    }, [dispatch, username]);
 
     const removeRoom = React.useCallback(async (room, callback) => {
         if(status === 'resolved' && roomsStatus === 'resolved') {
@@ -917,6 +917,27 @@ const useRooms = ({initRoomName, ...initalState}) => {
     }
 
     useEffect(() => {
+        if (username && roomsRef.current && roomsRef.current.length && globalCameraBans && globalCameraBans.length) {
+            const room = roomsRef.current[0];
+            const myUserData = room.getUserData(username);
+            let isCameraBanned = false;
+            for (const { username, ip, fromIp, toIp } of globalCameraBans) {
+                if (username === myUserData.username || myUserData.ip === ip) {
+                    isCameraBanned = true;
+                    break;
+                }
+                if (myUserData.ip > fromIp && myUserData.ip < toIp) {
+                    isCameraBanned = true;
+                    break;
+                }
+            }
+            if (isCameraBanned && mediaClientRef.current) {
+                mediaClientRef.current.exit();
+            }
+        }
+    }, [roomsRef, username, globalCameraBans, mediaClientRef])
+
+    useEffect(() => {
         if(initRoomName && username) {
             socket.open();
             mediaSocket.open();
@@ -1085,11 +1106,9 @@ const useRooms = ({initRoomName, ...initalState}) => {
             removeUser({room, leavedUser});
         });
         socket.on('kicked user', async ({room, kickedUserName, role, username, reason}) => {
-            console.log('user kick')
             kickUser({room, kickedUserName, type: 'kick', role, username, reason});
         });
         socket.on('banned user', async ({room, kickedUserName, role, username, reason}) => {
-            console.log('user ban')
             kickUser({room, kickedUserName, type: 'ban', role, username, reason}); 
         });
         socket.on('global banned user', async ({kickedUserName, role, username, reason}) => {
