@@ -13,6 +13,7 @@ import { useTranslation } from 'react-i18next';
 import { FileUploader } from '../../../components'
 import { handleUpdateProfile } from '../../../apis';
 import { SettingContext, UserContext } from '../../../context';
+import config from '../../../config';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -109,7 +110,7 @@ const EditProfileModal = ({ open, handleClose }) => {
                                 value={aboutMe}
                                 className={classes.textField}
                                 onChange={(e) => setAboutMe(e.target.value)}
-                                inputProps={{ maxLength: 16 }}
+                                inputProps={{ maxLength: config.aboutMe_length }}
                             />
                         </Grid>
                         }
