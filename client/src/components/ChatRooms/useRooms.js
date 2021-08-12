@@ -923,13 +923,13 @@ const useRooms = ({initRoomName, ...initalState}) => {
             socket.on('connect_error', (err) => {
                 console.log(err)
             })
-            socket.on('init room', async ({room, onlineUsers, messages, blocks, globalBlocks, cameraBans, globalCameraBans}, fn) => {
-                fn('success');
-                let usernames = await onlineUsers.map((item) => (item.username));
-                if(usernames.includes(username)) {
-                    initRoom({room, onlineUsers, messages, blocks, globalBlocks, cameraBans, globalCameraBans});
-                }
-            });
+            // socket.on('init room', async ({room, onlineUsers, messages, blocks, globalBlocks, cameraBans, globalCameraBans}, fn) => {
+            //     fn('success');
+            //     let usernames = await onlineUsers.map((item) => (item.username));
+            //     if(usernames.includes(username)) {
+            //         initRoom({room, onlineUsers, messages, blocks, globalBlocks, cameraBans, globalCameraBans});
+            //     }
+            // });
             
             socket.on('update block', ({room, blocks}) => {
                 updateBlocks({room, blocks});
@@ -1062,7 +1062,20 @@ const useRooms = ({initRoomName, ...initalState}) => {
             // socket.io.off('reconnect_attempt')
             // mediaSocket.off('view request');
         };
-    }, [initRoomName, username, autoBroadcast]);
+    }, [initRoomName, username]);
+
+    useEffect(() => {
+        socket.on('init room', async ({room, onlineUsers, messages, blocks, globalBlocks, cameraBans, globalCameraBans}, fn) => {
+            fn('success');
+            let usernames = await onlineUsers.map((item) => (item.username));
+            if(usernames.includes(username)) {
+                initRoom({room, onlineUsers, messages, blocks, globalBlocks, cameraBans, globalCameraBans});
+            }
+        });
+        return () => {
+            socket.off('init room');
+        };
+    }, [username, autoBroadcast])
 
     useEffect(() => {
         socket.on('joined room',async ({room, onlineUsers, joinedUser}) => {
@@ -1072,12 +1085,15 @@ const useRooms = ({initRoomName, ...initalState}) => {
             removeUser({room, leavedUser});
         });
         socket.on('kicked user', async ({room, kickedUserName, role, username, reason}) => {
+            console.log('user kick')
             kickUser({room, kickedUserName, type: 'kick', role, username, reason});
         });
         socket.on('banned user', async ({room, kickedUserName, role, username, reason}) => {
+            console.log('user ban')
             kickUser({room, kickedUserName, type: 'ban', role, username, reason}); 
         });
         socket.on('global banned user', async ({kickedUserName, role, username, reason}) => {
+            console.log('user ban')
             kickUser({kickedUserName, type: 'global ban', role, username, reason});
         });
 
