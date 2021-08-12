@@ -141,7 +141,7 @@ export default function AppMenu() {
                     </span>
                     <div className={classes.point}>
                         <SvgIcon style={{fontSize: '1.3em'}} component={Money} viewBox="0 0 600 476.6" />
-                        <span>{point ? point: 0}</span>
+                        <span>{point ? Math.round(point*100)/100: 0}</span>
                     </div>
                 </div>
                 <ArrowDropDownIcon className={classes.dropIcon} />

@@ -43,7 +43,8 @@ const useStyles = makeStyles((theme) => ({
     aboutMe: {
         fontSize: '0.7rem',
         color: theme.palette.textColor.sub,
-        textAlign: 'center'
+        textAlign: 'center',
+        wordBreak: 'break-all'
     },
     cardRoot: {
         width: 200,
