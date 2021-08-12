@@ -109,6 +109,7 @@ const EditProfileModal = ({ open, handleClose }) => {
                                 value={aboutMe}
                                 className={classes.textField}
                                 onChange={(e) => setAboutMe(e.target.value)}
+                                inputProps={{ maxLength: 16 }}
                             />
                         </Grid>
                         }

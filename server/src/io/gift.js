@@ -18,8 +18,8 @@ const sendGift = (io, socket) => async ({to, giftId, room, amount}, callback) =>
                 } else {
                     tmpPoint = totalCost/2;
                 }
-                await Users.updateOne({ username: to }, { point: tmpPoint });
-                await Users.updateOne({ _id }, { point: senderPoint - totalCost });
+                await Users.updateOne({ username: to }, { point: tmpPoint.toFixed(2) });
+                await Users.updateOne({ _id }, { point: (senderPoint - totalCost).toFixed(2) });
 
                 io.to(room).emit('received gift', {
                     gift,
