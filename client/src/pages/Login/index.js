@@ -117,7 +117,7 @@ const Login = () => {
         .required(t('LoginPage.error_password')),
         aboutMe: yup
         .string('About me')
-        .max(16, 'It should be of maxium 16 characters length')
+        .max(config.aboutMe_length, `It should be of maxium ${config.aboutMe_length} characters length`)
     });
     const guestValidationSchema = yup.object({
         nickname: yup
@@ -126,7 +126,7 @@ const Login = () => {
         .max(maxUsernameLength, t('LoginPage.error_long_username')),
         aboutMe: yup
         .string('About me')
-        .max(16, 'It should be of maxium 16 characters length')
+        .max(config.aboutMe_length, `It should be of maxium ${config.aboutMe_length} characters length`)
     });
 
     const handleSelectMode = (isGuest) => {
