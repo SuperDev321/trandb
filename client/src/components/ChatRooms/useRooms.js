@@ -866,20 +866,24 @@ const useRooms = ({initRoomName, ...initalState}) => {
     }
 
     const startRemoteVideo = async (room, producers, userId, locked, remoteUsername) => {
-        const roomObj = roomsRef.current.find((item) => (item.name === room));
-        if (roomObj.updateUserVideo(userId, producers, locked)) {
-            if (roomNameRef.current === room) {
-                dispatch({
-                    type: 'update',
-                    data: {
-                        name: room,
-                        users: roomObj.users
-                    }
-                })
+        try {
+            const roomObj = roomsRef.current.find((item) => (item.name === room));
+            if (roomObj.updateUserVideo(userId, producers, locked)) {
+                if (roomNameRef.current === room) {
+                    dispatch({
+                        type: 'update',
+                        data: {
+                            name: room,
+                            users: roomObj.users
+                        }
+                    })
+                }
+                if (autoBroadcast) {
+                    autoStartRemoteVideo(room, producers, userId, locked, remoteUsername);
+                }
             }
-            if (autoBroadcast) {
-                autoStartRemoteVideo(room, producers, userId, locked, remoteUsername);
-            }
+        } catch (err) {
+            console.log(err);
         }
     }
 
@@ -1144,7 +1148,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
 
     useEffect(() => {
         socket.on('start video', ({ room, producers, userId, username, locked }) => {
-            startRemoteVideo(room, producers, userId, locked, username)
+            startRemoteVideo(room, producers, userId, locked, username);
         })
 
         return () => {
