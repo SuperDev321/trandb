@@ -23,6 +23,7 @@ import { socket } from '../../utils';
 import { useTranslation } from 'react-i18next';
 import useRooms from './useRooms';
 import {SettingContext, ChatContext} from '../../context';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
 
 import Loading from '../Loading';
 
@@ -47,7 +48,8 @@ const ChatRooms = ({room}, ref) => {
         setMobileOpen(!mobileOpen);
     };
     const {messageTimeInterval, maxMessageLength} = useContext(SettingContext);
-    const messageTimeRef = useRef(null)
+    const messageTimeRef = useRef(null);
+    const matches = useMediaQuery('(min-width:1000px)');
 
     const {status, data: currentRoomData, error,
         roomsStatus,
@@ -250,6 +252,17 @@ const ChatRooms = ({room}, ref) => {
                     }
                     </div>
                 </Hidden>
+                <div className={matches? classes.chatWrapper: classes.mobileChatWrapper}>
+                {
+                    (status === 'resolved' && currentRoomData) ?
+                    <VideoList roomName={currentRoomData.name}
+                        streams={currentRoomData.remoteStreams}
+                        localStream={currentRoomData.localStream}
+                        controlVideo={controlVideo}
+                        viewerCounts={currentRoomData.viewers?.length}
+                    />
+                    : null
+                }
                 
                 <div className={classes.mainWrapper}>
                     <AppBar className={classes.chatBar} position="static">
@@ -346,7 +359,7 @@ const ChatRooms = ({room}, ref) => {
                         </div>
                     </main>
                 </div>
-                <>
+                {/* <>
                 {
                     (status === 'resolved' && currentRoomData) ?
                     <VideoList roomName={currentRoomData.name}
@@ -357,7 +370,8 @@ const ChatRooms = ({room}, ref) => {
                     />
                     : null
                 }
-                </>
+                </> */}
+            </div>
             </div>
             <PrivateChatList ref={privateListRef}
                 sendMessage={sendMessage}

@@ -42,9 +42,17 @@ const banUser = (io, socket) => async ({room , ip, to, role, reason, kind}) => {
         if (room) {
             userData = await getRoomPermission(room, _id);
         } else {
-            userData = {
-                username: process.env.SUPER_ADMIN_NAME,
-                role: 'super_admin'
+            const user = await Users.findById(_id);
+            if (user) {
+                userData = {
+                    username: user.username,
+                    role: user.role
+                }
+            } else {
+                userData = {
+                    username: process.env.SUPER_ADMIN_NAME,
+                    role: 'super_admin'
+                }
             }
         }
         if(!role) {
@@ -132,8 +140,17 @@ const banUserByAdmin = (io, socket) => async ({ room , ip, fromIp, toIp, to, rea
         if (room) {
             userData = await getRoomPermission(room, _id);
         } else {
-            userData = {
-                username: process.env.SUPER_ADMIN_NAME
+            const user = await Users.findById(_id);
+            if (user) {
+                userData = {
+                    username: user.username,
+                    role: user.role
+                }
+            } else {
+                userData = {
+                    username: process.env.SUPER_ADMIN_NAME,
+                    role: 'super_admin'
+                }
             }
         }
         

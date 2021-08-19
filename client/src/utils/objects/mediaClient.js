@@ -396,8 +396,8 @@ class MediaClient {
                 deviceId: {
                     exact: videoDeviceId,
                 },
-                width: { ideal: 4096 },
-                height: { ideal: 2160 }
+                width: { ideal: 3200 },
+                height: { ideal: 2000 }
                 // width: {
                 //     min: 640,
                 //     ideal: 2000
@@ -421,10 +421,10 @@ class MediaClient {
         try {
             let audioState = false;
             let videoState = true;
-            navigator.getUserMedia = (navigator.getUserMedia ||
-                navigator.webkitGetUserMedia ||
-                navigator.mozGetUserMedia ||
-                navigator.msGetUserMedia);
+            // navigator.getUserMedia = (navigator.getUserMedia ||
+            //     navigator.webkitGetUserMedia ||
+            //     navigator.mozGetUserMedia ||
+            //     navigator.msGetUserMedia);
             stream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
 
             const videoTrack = stream.getVideoTracks()[0];
@@ -458,8 +458,6 @@ class MediaClient {
 
             let producerTransport = this.producerTransports.get(room_id);
             if(!producerTransport) return false;
-
-            
 
             const videoProducer = await producerTransport.produce(videoParams)
 
