@@ -20,6 +20,7 @@ const socketIO = require('socket.io');
 
 const ipInt = require('ip-to-int');
 const isIp = require('is-ip');
+const Address6 = require('ip-address').Address6;
 
 let io = null
 
@@ -36,14 +37,14 @@ const ioHandler = (io) => async (socket) => {
   const isMobile = socket.handshake.query.ismobile;
   let ip = socket.client.request.headers['cf-connecting-ip'] || socket.client.request.headers['x-forwarded-for'] || socket.client.request.connection.remoteAddress
   if(isIp(ip)) {
-      if(!isIp.v4(ip)) {
-          var address = new Address6(ip);
-          var teredo = address.inspectTeredo();
-          ip = teredo.client4;
-      }
-      if (ip.substr(0, 7) === '::ffff:') {
-          ip = ip.substr(7);
-      }
+    if (ip.substr(0, 7) === '::ffff:') {
+      ip = ip.substr(7);
+    }
+    if(!isIp.v4(ip)) {
+        var address = new Address6(ip);
+        var teredo = address.inspectTeredo();
+        ip = teredo.client4;
+    }
   } else {
       ip = '0.0.0.0';
   }

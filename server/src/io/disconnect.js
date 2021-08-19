@@ -2,7 +2,7 @@ const { Rooms, Users } = require('../database/models');
 const { findRoomUsers } = require('../utils');
 const LogManager = require('../constructors/logManager');
 const ipInt = require('ip-to-int');
-const disconnectSocket = async (io, socket) => {
+const disconnectSocket = async (io, socket, reason) => {
     const rooms = [...socket.rooms];
     
     // socket.rooms returns an object where key and value are the same
@@ -22,7 +22,7 @@ const disconnectSocket = async (io, socket) => {
             io.to(room).emit('leave room', {room, onlineUsers: usersInfo, leavedUser: _id});
         }
     }
-    LogManager.saveLogInfo(ipInt(user.ip).toIP(), user.username, user.role, 'disconnect');
+    LogManager.saveLogInfo(ipInt(user.ip).toIP(), user.username, user.role, 'disconnect', reason);
 }
 
 const socketDisconnect = (io, socket) => async (reason) => {
@@ -43,7 +43,7 @@ const socketDisconnect = (io, socket) => async (reason) => {
         //         }
         //     }, 1000)
         // } else {
-            disconnectSocket(io, socket);
+            disconnectSocket(io, socket, reason);
         // }
         // if(reason === 'client namespace disconnect' || reason === 'transport error' || reason === 'transport close') {
             

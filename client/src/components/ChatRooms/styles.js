@@ -15,6 +15,16 @@ const useStyles = makeStyles((theme) => ({
         overflow: 'hidden',
         position: 'relative',
     },
+    chatWrapper: {
+        display: 'flex',
+        flexDirection: 'row-reverse',
+        width: '100%'
+    },
+    mobileChatWrapper: {
+        display: 'flex',
+        flexDirection: 'column',
+        width: '100%'
+    },
     main: {
         flexGrow: 1,
         // height: `calc(100vh - 102px)`,

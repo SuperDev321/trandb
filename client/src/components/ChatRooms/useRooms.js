@@ -750,40 +750,44 @@ const useRooms = ({initRoomName, ...initalState}) => {
     }
 
     const startBroadcast = async (room, lock, videoDeviceId, audioDeviceId) => {
-        let result = await socket?.request('check camera broadcast', ({ room }));
-        if (!result) {
-            enqueueSnackbar(t('ChatApp.error_camera_banned'), { variant: 'error'});
-            return false;
-        }
-        if (mediaClientRef.current) {
-            let result = mediaClientRef.current.startStream(room, null, null);
-            if (result !== true) {
-                console.log('roomName', result)
-                enqueueSnackbar(t('UserActionArea.error_already_broadcasting', {
-                    roomName: result
-                }), { variant: 'error'});
+        try {
+            let result = await socket?.request('check camera broadcast', ({ room }));
+            if (!result) {
+                enqueueSnackbar(t('ChatApp.error_camera_banned'), { variant: 'error'});
                 return false;
             }
-            if (!mediaClientRef.current._isOpen) {
-                await mediaClientRef.current.init();
-            }
-            if (!mediaClientRef.current.rooms.has(room)) {
-                await mediaClientRef.current.createRoom(room);
-                await mediaClientRef.current.join(room);
-            }
-            if(mediaClientRef.current._isOpen && mediaClientRef.current.rooms.has(room)) {
-                let result = await mediaClientRef.current.produce(room, lock, videoDeviceId, audioDeviceId);
-                if (result) {
-                    const { producers, locked } = result;
-                    socket.emit('start video', {
-                        room,
-                        producers,
-                        locked
-                    })
+            if (mediaClientRef.current) {
+                let result = mediaClientRef.current.startStream(room, null, null);
+                if (result !== true) {
+                    console.log('roomName', result)
+                    enqueueSnackbar(t('UserActionArea.error_already_broadcasting', {
+                        roomName: result
+                    }), { variant: 'error'});
+                    return false;
                 }
-            } else {
-                enqueueSnackbar(t('UserActionArea.error_not_ready_broadcast'), {variant: 'error'});
+                if (!mediaClientRef.current._isOpen) {
+                    await mediaClientRef.current.init();
+                }
+                if (!mediaClientRef.current.rooms.has(room)) {
+                    await mediaClientRef.current.createRoom(room);
+                    await mediaClientRef.current.join(room);
+                }
+                if(mediaClientRef.current._isOpen && mediaClientRef.current.rooms.has(room)) {
+                    let result = await mediaClientRef.current.produce(room, lock, videoDeviceId, audioDeviceId);
+                    if (result) {
+                        const { producers, locked } = result;
+                        socket.emit('start video', {
+                            room,
+                            producers,
+                            locked
+                        })
+                    }
+                } else {
+                    enqueueSnackbar(t('UserActionArea.error_not_ready_broadcast'), {variant: 'error'});
+                }
             }
+        } catch (err) {
+            console.log(err);
         }
         
     }

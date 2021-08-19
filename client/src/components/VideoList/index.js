@@ -19,8 +19,9 @@ import ZoomInIcon from '@material-ui/icons/ZoomIn';
 import ZoomOutIcon from '@material-ui/icons/ZoomOut';
 import Loading from '../Loading';
 import { HashLoader } from 'react-spinners';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
 
-const VideoFieldWidth = 380;
+const VideoFieldWidth = window.innerWidth > 380 ? 380 : window.innerWidth;
 const VideoFieldHeight = 288;
 
 const override = {
@@ -36,12 +37,12 @@ const useStyles = makeStyles((theme) => ({
         display: 'flex',
         flexWrap: 'wrap',
         alignContent: 'flex-start',
-        height: 'calc(100vh - 49px)',
         // alignItems: 'center',
         // flexDirection: 'column',
+        height: 'calc(100vh - 49px)',
+        width: `${VideoFieldWidth+2}px !important`,
         scrollbarWidth: 0,
         minWidth: `${VideoFieldWidth+2}px !important`,
-        width: `${VideoFieldWidth+2}px !important`,
         scrollbarColor: `#585B5E #ecdbdb00`,
         '&::-webkit-scrollbar': {
             width: 0,
@@ -57,7 +58,34 @@ const useStyles = makeStyles((theme) => ({
         background: theme.palette.background.default,
         boxShadow: '1px 1px 6px 0px rgb(0 0 0 / 20%)',
         color: theme.palette.textColor.main,
-        overflowY: 'auto',
+        // overflowY: 'auto',
+        border: '1px solid',
+        borderColor: theme.palette.separate.main
+    },
+    mobileRoot: {
+        display: 'flex',
+        flexWrap: 'wrap',
+        alignContent: 'flex-start',
+        height: `${VideoFieldHeight+2}px !important`,
+        width: '100%',
+        scrollbarWidth: 0,
+        minWidth: `${VideoFieldWidth+2}px !important`,
+        scrollbarColor: `#585B5E #ecdbdb00`,
+        '&::-webkit-scrollbar': {
+            width: 0,
+        },
+        // '&::-webkit-scrollbar-track': {
+        //     '-webkit-box-shadow': 'inset 0 0 6px rgba(0,0,0,0.00)'
+        // },
+        // '&:hover::-webkit-scrollbar-thumb': {
+        //     backgroundColor: '#00000017',
+        //     outline: 'none',
+        //     borderRadius: '5px',
+        // },
+        background: theme.palette.background.default,
+        boxShadow: '1px 1px 6px 0px rgb(0 0 0 / 20%)',
+        color: theme.palette.textColor.main,
+        // overflowY: 'auto',
         border: '1px solid',
         borderColor: theme.palette.separate.main
     }
@@ -464,11 +492,12 @@ const UserVideo = ({ stream, locked, name, controlVideo, muted, total,
                 <div className={classes.username}>
                     {name}
                 </div>
-                { isLocal && viewerCounts &&
+                { (isLocal && viewerCounts) ?
                     <div className={classes.counts}>
                         <span style={{padding: 3}}>{viewerCounts}</span>
                         <Visibility />
                     </div>
+                    : null
                 }
                 
             </div>
@@ -502,6 +531,7 @@ const VideoList = ({streams: remoteStreams, localStream, controlVideo, roomName,
     // const stream = localStream?.stream;
     const {username} = useContext(UserContext);
     const [zoom, setZoom] = useState(null);
+    const matches = useMediaQuery('(min-width:1000px)');
 
     const [state, dispatch] = React.useReducer(asyncReducer, {
         status: 'idle',
@@ -582,7 +612,7 @@ const VideoList = ({streams: remoteStreams, localStream, controlVideo, roomName,
     if((!streams)||streams.length === 0 ) return null;
     
     return (
-        <div className={classes.root}>
+        <div className={matches? classes.root: classes.mobileRoot}>
         { status === 'pending' ?
             <Loading/>
         :
