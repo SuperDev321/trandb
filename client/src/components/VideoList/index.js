@@ -21,8 +21,8 @@ import Loading from '../Loading';
 import { HashLoader } from 'react-spinners';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 
-const VideoFieldWidth = window.innerWidth > 380 ? 380 : window.innerWidth;
-const VideoFieldHeight = 288;
+const VideoFieldWidth = window.innerWidth > 380 ? (window.innerWidth > 1000? 380: 190) : window.innerWidth / 2;
+const VideoFieldHeight = VideoFieldWidth * 3 / 4;
 
 const override = {
     display: 'block !important',
@@ -65,8 +65,10 @@ const useStyles = makeStyles((theme) => ({
     mobileRoot: {
         display: 'flex',
         flexWrap: 'wrap',
+        flexDirection: 'column',
         alignContent: 'flex-start',
         height: `${VideoFieldHeight+2}px !important`,
+        minHeight: `${VideoFieldHeight+2}px !important`,
         width: '100%',
         scrollbarWidth: 0,
         minWidth: `${VideoFieldWidth+2}px !important`,
@@ -87,7 +89,9 @@ const useStyles = makeStyles((theme) => ({
         color: theme.palette.textColor.main,
         // overflowY: 'auto',
         border: '1px solid',
-        borderColor: theme.palette.separate.main
+        borderColor: theme.palette.separate.main,
+        overflowY: 'hidden',
+        overflowX: 'auto'
     }
 }));
 
@@ -417,7 +421,11 @@ const UserVideo = ({ stream, locked, name, controlVideo, muted, total,
                 <div className={classes.overlay}>
                     <div className={classes.overlayHeader}>
                         <div>
-                            <IconButton aria-label="delete" className={classes.iconButton} onClick={handleClose}>
+                            <IconButton
+                                aria-label="delete" className={classes.iconButton}
+                                onClick={handleClose}
+                                size="small"
+                            >
                                 <Close />
                             </IconButton>
                         </div>
@@ -434,31 +442,31 @@ const UserVideo = ({ stream, locked, name, controlVideo, muted, total,
                     <div className={classes.flexGrower}></div>
                     <div className={classes.overlayFooter}>
                     { zoom?
-                        <IconButton aria-label="zoomIn" className={classes.iconButton} onClick={() => handleZoom(false)}>
+                        <IconButton aria-label="zoomIn" className={classes.iconButton} size="small" onClick={() => handleZoom(false)}>
                             <ZoomOutIcon font="small" />
                         </IconButton>
                         :
-                        <IconButton aria-label="zoomOut" className={classes.iconButton} onClick={() => handleZoom(true)}>
+                        <IconButton aria-label="zoomOut" className={classes.iconButton} size="small" onClick={() => handleZoom(true)}>
                             <ZoomInIcon />
                         </IconButton>
                     }
                     { isLocal &&
                     <>
                         { audioState ?
-                            <IconButton aria-label="micOn" className={classes.iconButton} onClick={() => changeMute('audio', false)}>
+                            <IconButton aria-label="micOn" className={classes.iconButton} size="small" onClick={() => changeMute('audio', false)}>
                                 <Mic />
                             </IconButton>
                             :
-                            <IconButton aria-label="micOff" className={classes.iconButton} onClick={() => changeMute('audio', true)}>
+                            <IconButton aria-label="micOff" className={classes.iconButton} size="small" onClick={() => changeMute('audio', true)}>
                                 <MicOff />
                             </IconButton>
                         }
                         { videoState ?
-                            <IconButton aria-label="cameraOn" className={classes.iconButton} onClick={() => changeMute('video', false)}>
+                            <IconButton aria-label="cameraOn" className={classes.iconButton} size="small" onClick={() => changeMute('video', false)}>
                                 <Videocam />
                             </IconButton>
                             :
-                            <IconButton aria-label="cameraOff" className={classes.iconButton} onClick={() => changeMute('video', true)}>
+                            <IconButton aria-label="cameraOff" className={classes.iconButton} size="small" onClick={() => changeMute('video', true)}>
                                 <VideocamOff />
                             </IconButton>
                         }
