@@ -58,6 +58,10 @@ const useStyles = makeStyles((theme) => ({
         width: 200,
         backgroundImage: '/img/public_chat.png',
     },
+    cardAvatar: {
+        width: theme.spacing(5),
+        height: theme.spacing(5),
+    },
     cardButton: {
         borderRadius: '0',
         height: 40,
@@ -395,7 +399,7 @@ const RoomUserName = ({user, role, roomName,
                 <CardMedia
                     className={classes.cardHeader}
                 >
-                    <Avatar alt="User Avatar" src={avatarUrl} />
+                    <Avatar alt="User Avatar" src={avatarUrl} className={classes.cardAvatar} />
                     <span>{user.username}</span>
                 </CardMedia>
                 <Divider />
