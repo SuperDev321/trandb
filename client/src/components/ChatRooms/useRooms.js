@@ -143,7 +143,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
     const {status, data, error} = state;
     const {status: roomsStatus, data: roomsData, roomIndex, error: roomsError} = roomsState;
 
-    const changeRoom = (newRoomIndex) => {
+    const changeRoom = async (newRoomIndex) => {
         let room = roomsRef.current[newRoomIndex];
         room.mergeUnreadMessages();
         data.name = room.name;
@@ -154,8 +154,8 @@ const useRooms = ({initRoomName, ...initalState}) => {
         data.unReadMessages = room.unReadMessages;
         data.users = room.users;
         data.cameraBans = room.cameraBans;
-        data.localStream = mediaClientRef.current.getLocalStream(room.name);
-        data.remoteStreams = mediaClientRef.current.getRemoteStreams(room.name);
+        data.localStream = await mediaClientRef.current.getLocalStream(room.name);
+        data.remoteStreams = await mediaClientRef.current.getRemoteStreams(room.name);
         dispatch({type: 'init', data});
         roomNameRef.current = room.name;
         let newRoomsData = roomsRef.current.map(({name, unReadMessages}) => ({name, unReadMessages}));
@@ -245,7 +245,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
             }, (err) => {
                 console.log(err);
             })
-        // socket.emit('join room', { room });
+            // socket.emit('join room', { room });
             callback(true);
         } else {
             callback(false, 'already_entered');
@@ -497,8 +497,8 @@ const useRooms = ({initRoomName, ...initalState}) => {
                     data.mutes = newRoom.mutes
                     data.unReadMessages = newRoom.unReadMessages;
                     data.users = newRoom.users;
-                    data.localStream = mediaClientRef.current.getLocalStream(newRoom.name);
-                    data.remoteStreams = mediaClientRef.current.getRemoteStreams(newRoom.name);
+                    data.localStream = await mediaClientRef.current.getLocalStream(newRoom.name);
+                    data.remoteStreams = await mediaClientRef.current.getRemoteStreams(newRoom.name);
                     dispatch({type: 'init', data});
                     roomNameRef.current = newRoom.name;
                 }
@@ -757,7 +757,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 return false;
             }
             if (mediaClientRef.current) {
-                let result = mediaClientRef.current.startStream(room, null, null);
+                let result = await mediaClientRef.current.startStream(room, null, null);
                 if (result !== true) {
                     console.log('roomName', result)
                     enqueueSnackbar(t('UserActionArea.error_already_broadcasting', {
@@ -1076,24 +1076,24 @@ const useRooms = ({initRoomName, ...initalState}) => {
         }
 
         return () => {
-            socket.removeAllListeners();
-            socket.io.removeAllListeners();
+            // socket.removeAllListeners();
+            // socket.io.removeAllListeners();
             mediaSocket.removeAllListeners();
             mediaSocket.io.removeAllListeners();
             socket.close();
             mediaSocket.close();
-            // socket.off('connect_error');
-            // socket.off('init room');
-            // socket.off('update block');
-            // socket.off('update global block');
-            // socket.off('room message');
-            // socket.off('private message');
-            // socket.off('poke message');
-            // socket.off('disconnect');
-            // socket.off('repeat connection');
-            // socket.io.off('reconnect');
-            // socket.io.off('reconnect_attempt')
-            // mediaSocket.off('view request');
+            socket.off('connect_error');
+            socket.off('init room');
+            socket.off('update block');
+            socket.off('update global block');
+            socket.off('room message');
+            socket.off('private message');
+            socket.off('poke message');
+            socket.off('disconnect');
+            socket.off('repeat connection');
+            socket.io.off('reconnect');
+            socket.io.off('reconnect_attempt')
+            mediaSocket.off('view request');
         };
     }, [initRoomName, username]);
 
@@ -1121,7 +1121,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
             kickUser({room, kickedUserName, type: 'kick', role, username, reason});
         });
         socket.on('banned user', async ({room, kickedUserName, role, username, reason}) => {
-            kickUser({room, kickedUserName, type: 'ban', role, username, reason}); 
+            kickUser({room, kickedUserName, type: 'ban', role, username, reason});
         });
         socket.on('global banned user', async ({kickedUserName, role, username, reason}) => {
             console.log('user ban')
@@ -1158,9 +1158,9 @@ const useRooms = ({initRoomName, ...initalState}) => {
 
     useEffect(() => {
         let mediaObj = new MediaClient(username);
-        mediaObj.on(mediaEvents.onChangeRemoteStreams, (data) => {
+        mediaObj.on(mediaEvents.onChangeRemoteStreams, async (data) => {
             let {room_id} = data;
-            let remoteStreams = mediaClientRef.current.getRemoteStreams(room_id);
+            let remoteStreams = await mediaClientRef.current.getRemoteStreams(room_id);
             dispatch({
                 type: 'update',
                 data: {
@@ -1171,9 +1171,9 @@ const useRooms = ({initRoomName, ...initalState}) => {
             // setMediaEvent({room_id, event: 'remote streams'});
         })
 
-        mediaObj.on(mediaEvents.startStream, (data) => {
+        mediaObj.on(mediaEvents.startStream, async (data) => {
             let {room_id} = data;
-            let stream = mediaObj.getLocalStream(room_id);
+            let stream = await mediaObj.getLocalStream(room_id);
             dispatch({
                 type: 'update',
                 data: {
@@ -1183,7 +1183,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
             })
         })
 
-        mediaObj.on(mediaEvents.stopStream, (data) => {
+        mediaObj.on(mediaEvents.stopStream, async (data) => {
             let {room_id} = data;
             dispatch({
                 type: 'update',
@@ -1197,9 +1197,9 @@ const useRooms = ({initRoomName, ...initalState}) => {
             })
         })
 
-        mediaObj.on(mediaEvents.changeViewers, (data) => {
+        mediaObj.on(mediaEvents.changeViewers, async (data) => {
             let {room_id} = data;
-            let viewers = mediaClientRef.current.getViewers(room_id);
+            let viewers = await mediaClientRef.current.getViewers(room_id);
             dispatch({
                 type: 'update',
                 data: {
@@ -1208,8 +1208,6 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 }
             })
         })
-
-        let old = mediaClientRef.current;
 
         if(mediaClientRef.current) {
             mediaClientRef.current = null;
