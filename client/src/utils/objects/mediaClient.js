@@ -92,7 +92,7 @@ class MediaClient {
         }
     }
 
-    clearRoom(room_id) {
+    async clearRoom(room_id) {
         this.devices.delete(room_id);
         let consumerTransport = this.consumerTransports.get(room_id);
         if(consumerTransport) {
@@ -131,7 +131,7 @@ class MediaClient {
         this.event(_EVENTS.onChangeRemoteStreams, {room_id});
     }
 
-    exitRoom(room_id) {
+    async exitRoom(room_id) {
         this.rooms.delete(room_id);
         this.devices.delete(room_id);
         let consumerTransport = this.consumerTransports.get(room_id);
@@ -338,24 +338,24 @@ class MediaClient {
         //     }
         // }.bind(this))
 
-        mediaSocket.on('start view', (data) => {
+        mediaSocket.on('start view', async (data) => {
             console.log('start view', data)
             let {name, room_id} = data;
             this.addViewer(room_id, name);
         })
 
-        mediaSocket.on('stop view', (data) => {
+        mediaSocket.on('stop view', async (data) => {
             let {name, room_id} = data;
             this.deleteViewer(room_id, name);
         })
 
-        mediaSocket.on('stop broadcast', (data) => {
+        mediaSocket.on('stop broadcast', async (data) => {
             let {name, room_id} = data;
             this.removeRemoteStream(name, null, room_id);
             this.removeConsumers(room_id, name);
         })
 
-        mediaSocket.on('disconnect' ,function (reason) {
+        mediaSocket.on('disconnect' , async (reason) => {
             this.rooms.forEach((room) => {
                 this.clearRoom(room);
             })
@@ -363,22 +363,21 @@ class MediaClient {
                 // the disconnection was initiated by the server, you need to reconnect manually
                 mediaSocket.connect();
             }
-        }.bind(this))
-
-        mediaSocket.on('connect_error' ,function () {
-            console.log('media socket error')
         })
+
+        // mediaSocket.on('connect_error' ,function () {
+        //     console.log('media socket error')
+        // })
 
         mediaSocket.io.on('reconnect', async () => {
             this.rooms.forEach(async (room) => {
-                console.log('reconnect', room, this.id)
                 await this.createRoom(room);
                 await this.join(room);
             })
         })
 
-        mediaSocket.io.on('reconnect_attempt', () => {
-        })
+        // mediaSocket.io.on('reconnect_attempt', () => {
+        // })
     }
 
     //////// MAIN FUNCTIONS /////////////
@@ -529,7 +528,7 @@ class MediaClient {
     }
 
     // add remote producer info
-    addRemoteProducer(producer_id, name, room_id) {
+    async addRemoteProducer(producer_id, name, room_id) {
         if(!this.remoteProducers.has(room_id)) {
             const roomProducers = new Map();
             this.remoteProducers.set(room_id, roomProducers);
@@ -543,7 +542,7 @@ class MediaClient {
         producers.add(producer_id);
     }
     // remote remote producer info
-    deleteRemoteProducer(producer_id, name, room_id) {
+    async deleteRemoteProducer(producer_id, name, room_id) {
         if(this.remoteProducers.has(room_id)) {
             const roomProducers = this.remoteProducers.get(room_id);
             if(roomProducers.has(name)) {
@@ -638,7 +637,7 @@ class MediaClient {
         // this.event(_EVENTS.onChangeConsume, {room_id});
     }
 
-    requestView(room_id, user_id, name, producers, locked, fn1, fn2) {
+    async requestView(room_id, user_id, name, producers, locked, fn1, fn2) {
         if (name === this.name) {
             return false;
         }
@@ -766,7 +765,7 @@ class MediaClient {
         }
     }
 
-    removeOldRemoteStream(room_id) {
+    async removeOldRemoteStream(room_id) {
         let roomStreams = this.remoteStreams.get(room_id);
         if(roomStreams) {
             if(roomStreams.size >= maxStream) {
@@ -794,7 +793,7 @@ class MediaClient {
         }
     }
 
-    removeRoomProducers(room_id) {
+    async removeRoomProducers(room_id) {
         let label = this.producerLabels.get(room_id);
         if(!label) {
             console.log('there is no room ', room_id);
@@ -821,7 +820,7 @@ class MediaClient {
         this.event(_EVENTS.changeViewers, {room_id});
     }
 
-    closeProducer(type, room_id) {
+    async closeProducer(type, room_id) {
         let label = this.producerLabels.get(room_id)
         if(!label) {
             this.producerLabels.delete(room_id);
@@ -923,7 +922,7 @@ class MediaClient {
         }
     }
 
-    resumeProducer (room_id, kind) {
+    async resumeProducer (room_id, kind) {
         if (!this.producerLabels.has(room_id)) {
             return;
         }
@@ -965,7 +964,7 @@ class MediaClient {
 
     }
 
-    closeConsumer(consumer_id, room_id) {
+    async closeConsumer(consumer_id, room_id) {
         let consumerInfo = this.consumers.get(consumer_id);
         if(consumerInfo) {
             let {kind, room_id, name, consumer} = consumerInfo;
@@ -976,7 +975,7 @@ class MediaClient {
         }
     }
 
-    removeConsumer(consumer_id, room_id) {
+    async removeConsumer(consumer_id, room_id) {
         let consumerInfo = this.consumers.get(consumer_id);
         if(consumerInfo) {
             let { kind, room_id, name } = consumerInfo;
@@ -987,7 +986,7 @@ class MediaClient {
         // this.event(_EVENTS.onChangeConsume, {room_id})
     }
 
-    removeConsumers (room_id, name) {
+    async removeConsumers (room_id, name) {
         let consumersArr = Array.from(this.consumers.values());
         let roomConsumers = consumersArr.filter((item) => (item.room_id === room_id && item.name === name));
         roomConsumers.forEach((item) => {
@@ -1001,7 +1000,7 @@ class MediaClient {
         })
     }
 
-    removeRemoteStream(name, kind, room_id) {
+    async removeRemoteStream(name, kind, room_id) {
         const roomStreams = this.remoteStreams.get(room_id);
         if(roomStreams && roomStreams.has(name)) {
             let { stream } = roomStreams.get(name);
@@ -1028,7 +1027,7 @@ class MediaClient {
        
     }
 
-    stopView(room_id, targetId, name) {
+    async stopView(room_id, targetId, name) {
         // let roomStreams = this.remoteStreams.get(room_id);
         mediaSocket.request('stop broadcast', {
             room_id,
@@ -1037,7 +1036,7 @@ class MediaClient {
         })
     }
  
-    exit(offline = false) {
+    async exit(offline = false) {
         let clean = function () {
             this._isOpen = false
             if(this.consumerTransports.size > 0) {
@@ -1104,7 +1103,7 @@ class MediaClient {
         this.eventListeners.clear();
     }
 
-    startStream(room_id, stream, locked, audioState, videoState) {
+    async startStream(room_id, stream, locked, audioState, videoState) {
         if (this.localStreams.size > 0) {
             let keys = this.localStreams.keys();
             const key = keys.next().value;
@@ -1135,7 +1134,7 @@ class MediaClient {
 
     // send request to view
     // add my viewers to room
-    addViewer(room_id, name) {
+    async addViewer(room_id, name) {
         if(!this.viewers.has(room_id)) {
             const roomViewers = new Set();
             this.viewers.set(room_id, roomViewers);
@@ -1146,7 +1145,7 @@ class MediaClient {
         this.event(_EVENTS.changeViewers, {room_id});
     }
     // delete my viewer of room
-    deleteViewer(room_id, name) {
+    async deleteViewer(room_id, name) {
         let roomViewers = this.viewers.get(room_id);
         if(roomViewers) {
             roomViewers.delete(name);
@@ -1154,7 +1153,7 @@ class MediaClient {
         }
     }
     // get viewers
-    getViewers(room_id) {
+    async getViewers(room_id) {
         if(this.viewers.get(room_id)) {
             const roomViewers = this.viewers.get(room_id);
             if(roomViewers) {
@@ -1165,14 +1164,14 @@ class MediaClient {
         return [];
     }
     // get all live users
-    getLiveUsers(room_id) {
+    async getLiveUsers(room_id) {
         let consumersArr = Array.from(this.consumers.values());
         let roomConsmers = consumersArr.filter((item) => (item.room_id === room_id));
         let liveUsers = roomConsmers.map(({name, locked}) => ({name, locked}));
         return liveUsers;
     }
 
-    getRemoteStreams(room_id) {
+    async getRemoteStreams(room_id) {
         if(this.remoteStreams.has(room_id)) {
             let roomStreams = this.remoteStreams.get(room_id);
             let streams = Array.from(roomStreams.values());
@@ -1182,7 +1181,7 @@ class MediaClient {
         }
     }
 
-    getLocalStream (room_id) {
+    async getLocalStream (room_id) {
         if(this.localStreams.has(room_id)) {
             return this.localStreams.get(room_id);
         } else {
