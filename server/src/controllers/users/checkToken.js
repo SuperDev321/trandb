@@ -6,7 +6,7 @@ const checkToken = async (req, res, next) => {
     const {token} = req.body;
     const { _id } = await verifyToken(token);
     const { username, role, gender, avatarObj, currentAvatar, point } = await Users.findOne({ _id });
-    return res.json({ username, role, gender, avatarObj, currentAvatar, point });
+    return res.json({ _id, username, role, gender, avatarObj, currentAvatar, point });
   } catch (err) {
     // if (err.message === 'jwt must be provided')
     return res.send('un-auth');

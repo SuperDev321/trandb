@@ -84,7 +84,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
         roomIndex: null,
         error: null,
     });
-    const { username, updateUserPoint, updateProfile } = useContext(UserContext);
+    const { username, updateUserPoint, updateProfile, myUser } = useContext(UserContext);
     const { enablePokeSound, enablePrivateSound, enablePublicSound, enableSysMessage,
         messageNum, showGift, showGiftMessage, autoBroadcast } = useContext(SettingContext);
     // current room state
@@ -295,14 +295,17 @@ const useRooms = ({initRoomName, ...initalState}) => {
                         let message = {
                             _id: makeid(10),
                             type: 'joinLeave',
-                            msg: t('ChatApp.sys_leave_room', {username: leavedUserInfo.username}) 
+                            msg: t('ChatApp.sys_leave_room', {username: leavedUserInfo.username})
                         }
                         sameRoom.addMessages([message]);
                         newData.messages = sameRoom.messages;
                     }
                     dispatch({type: 'update',
                         data: newData
-                    })
+                    });
+                    if (mediaClientRef.current) {
+                        mediaClientRef.current.deleteViewer(room, leavedUserInfo.username)
+                    }
                 } else {
                     //you leaved from room by server
                 }
@@ -765,14 +768,13 @@ const useRooms = ({initRoomName, ...initalState}) => {
                     }), { variant: 'error'});
                     return false;
                 }
-                if (!mediaClientRef.current._isOpen) {
-                    await mediaClientRef.current.init();
+                await mediaClientRef.current.createRoom(room);
+                await mediaClientRef.current.join(room);
+                await mediaClientRef.current.initDevice(room);
+                if (!mediaClientRef.current.checkProduceState(room)) {
+                    await mediaClientRef.current.initTransports(room, true, false)
                 }
-                if (!mediaClientRef.current.rooms.has(room)) {
-                    await mediaClientRef.current.createRoom(room);
-                    await mediaClientRef.current.join(room);
-                }
-                if(mediaClientRef.current._isOpen && mediaClientRef.current.rooms.has(room)) {
+                if(mediaClientRef.current.rooms.has(room)) {
                     let result = await mediaClientRef.current.produce(room, lock, videoDeviceId, audioDeviceId);
                     if (result) {
                         const { producers, locked } = result;
@@ -784,10 +786,13 @@ const useRooms = ({initRoomName, ...initalState}) => {
                     }
                 } else {
                     enqueueSnackbar(t('UserActionArea.error_not_ready_broadcast'), {variant: 'error'});
+                    mediaClientRef.current.stopStream(room);
                 }
             }
         } catch (err) {
             console.log(err);
+            enqueueSnackbar(t('UserActionArea.error_not_ready_broadcast'), {variant: 'error'});
+            mediaClientRef.current.stopStream(room);
         }
         
     }
@@ -808,12 +813,12 @@ const useRooms = ({initRoomName, ...initalState}) => {
             return false;
         }
         if (mediaClientRef.current && targetUsername !== username) {
-            if (!mediaClientRef.current._isOpen) {
-                await mediaClientRef.current.init();
-            }
-            if (!mediaClientRef.current.rooms.has(roomName)) {
-                await mediaClientRef.current.createRoom(roomName);
-                await mediaClientRef.current.join(roomName);
+            
+            await mediaClientRef.current.createRoom(roomName);
+            await mediaClientRef.current.join(roomName);
+            await mediaClientRef.current.initDevice(roomName);
+            if (!mediaClientRef.current.checkConsumeState(roomName)) {
+                await mediaClientRef.current.initTransports(roomName, false, true)
             }
             mediaClientRef.current.requestView(roomName, userId, targetUsername, producers, locked,
             (result) => {
@@ -893,12 +898,11 @@ const useRooms = ({initRoomName, ...initalState}) => {
             return false;
         }
         if (username !== remoteUsername && !locked && mediaClientRef.current) {
-            if (!mediaClientRef.current._isOpen) {
-                await mediaClientRef.current.init();
-            }
-            if (!mediaClientRef.current.rooms.has(room)) {
-                await mediaClientRef.current.createRoom(room);
-                await mediaClientRef.current.join(room);
+            await mediaClientRef.current.createRoom(room);
+            await mediaClientRef.current.join(room);
+            await mediaClientRef.current.initDevice(room);
+            if (!mediaClientRef.current.checkConsumeState(room)) {
+                await mediaClientRef.current.initTransports(room, false, true)
             }
             mediaClientRef.current.requestView(room, userId, remoteUsername, producers, false, null, null);
         }
@@ -906,7 +910,8 @@ const useRooms = ({initRoomName, ...initalState}) => {
 
     const stopRemoteVideo = (room, userId) => {
         const roomObj = roomsRef.current.find((item) => (item.name === room));
-        if (roomObj.updateUserVideo(userId, null, null)) {
+        const user = roomObj.updateUserVideo(userId, null, null);
+        if (user) {
             if (roomNameRef.current === room) {
                 dispatch({
                     type: 'update',
@@ -915,6 +920,9 @@ const useRooms = ({initRoomName, ...initalState}) => {
                         users: roomObj.users
                     }
                 })
+            }
+            if (mediaClientRef.current) {
+                mediaClientRef.current.removeRemoteStream(user.username, null, room);
             }
         }
     }
@@ -952,7 +960,6 @@ const useRooms = ({initRoomName, ...initalState}) => {
     useEffect(() => {
         if(initRoomName && username) {
             socket.open();
-            mediaSocket.open();
             socket.on('connect_error', (err) => {
                 console.log(err)
             })
@@ -995,6 +1002,10 @@ const useRooms = ({initRoomName, ...initalState}) => {
 
             socket.on('disconnect', (reason) => {
                 setOpenDisconnectModal(true);
+                if (mediaClientRef.current) {
+                    console.log('exit')
+                    mediaClientRef.current.exit(true);
+                }
                 if (reason === 'io server disconnect') {
                     // the disconnection was initiated by the server, you need to reconnect manually
                     socket.connect();
@@ -1045,7 +1056,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 checkCameraState(room, userId, callback);
             })
 
-            mediaSocket.on('view request', ({ username, roomName }, callback) => {
+            socket.on('view request', ({ username, roomName }, callback) => {
                 requestAudioControls.seek(0);
                 requestAudioControls.play();
                 permissionRequest(username, roomName, (result) => {
@@ -1078,10 +1089,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
         return () => {
             // socket.removeAllListeners();
             // socket.io.removeAllListeners();
-            mediaSocket.removeAllListeners();
-            mediaSocket.io.removeAllListeners();
             socket.close();
-            mediaSocket.close();
             socket.off('connect_error');
             socket.off('init room');
             socket.off('update block');
@@ -1093,7 +1101,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
             socket.off('repeat connection');
             socket.io.off('reconnect');
             socket.io.off('reconnect_attempt')
-            mediaSocket.off('view request');
+            socket.off('view request');
         };
     }, [initRoomName, username]);
 
@@ -1109,6 +1117,34 @@ const useRooms = ({initRoomName, ...initalState}) => {
             socket.off('init room');
         };
     }, [username, autoBroadcast])
+
+    useEffect(() => {
+        socket.on('start view', ({ room_id, name}) => {
+            if (mediaClientRef.current) {
+                mediaClientRef.current.addViewer(room_id, name);
+            }
+        });
+
+        socket.on('stop view', async (data) => {
+            let {name, room_id} = data;
+            if (mediaClientRef.current) {
+                mediaClientRef.current.deleteViewer(room_id, name);
+            }
+        })
+
+        socket.on('stop view from', async (data) => {
+            let {name, room_id} = data;
+            if (mediaClientRef.current) {
+                mediaClientRef.current.removeRemoteStream(name, null, room_id);
+                mediaClientRef.current.removeConsumers(room_id, name);
+            }
+        })
+
+        return () => {
+            socket.off('start view');
+            socket.off('stop view');
+        }
+    }, [username, mediaClientRef])
 
     useEffect(() => {
         socket.on('joined room',async ({room, onlineUsers, joinedUser}) => {
@@ -1157,63 +1193,81 @@ const useRooms = ({initRoomName, ...initalState}) => {
     }, [autoBroadcast, username])
 
     useEffect(() => {
-        let mediaObj = new MediaClient(username);
-        mediaObj.on(mediaEvents.onChangeRemoteStreams, async (data) => {
-            let {room_id} = data;
-            let remoteStreams = await mediaClientRef.current.getRemoteStreams(room_id);
-            dispatch({
-                type: 'update',
-                data: {
-                    name: room_id,
-                    remoteStreams
+        let mediaObj = null;
+        if (myUser) {
+            mediaObj = new MediaClient(myUser.username, myUser._id);
+            mediaObj.on(mediaEvents.onChangeRemoteStreams, async (data) => {
+                let {room_id} = data;
+                if (room_id) {
+                    let remoteStreams = await mediaClientRef.current.getRemoteStreams(room_id);
+                    dispatch({
+                        type: 'update',
+                        data: {
+                            name: room_id,
+                            remoteStreams
+                        }
+                    })
+                } else {
+                    let remoteStreams = await mediaClientRef.current.getRemoteStreams(roomNameRef.current);
+                    dispatch({
+                        type: 'update',
+                        data: {
+                            name: roomNameRef.current,
+                            remoteStreams
+                        }
+                    })
                 }
             })
-            // setMediaEvent({room_id, event: 'remote streams'});
-        })
 
-        mediaObj.on(mediaEvents.startStream, async (data) => {
-            let {room_id} = data;
-            let stream = await mediaObj.getLocalStream(room_id);
-            dispatch({
-                type: 'update',
-                data: {
-                    name: room_id,
-                    localStream: { ...stream }
+            mediaObj.on(mediaEvents.startStream, async (data) => {
+                let {room_id} = data;
+                let stream = await mediaObj.getLocalStream(room_id);
+                dispatch({
+                    type: 'update',
+                    data: {
+                        name: room_id,
+                        localStream: { ...stream }
+                    }
+                })
+            })
+
+            mediaObj.on(mediaEvents.stopStream, async (data) => {
+                let {room_id} = data;
+                if (room_id) {
+                    dispatch({
+                        type: 'update',
+                        data: {
+                            name: room_id,
+                            localStream: null
+                        }
+                    });
+                    socket.emit('stop video', {
+                        room: room_id
+                    })
+                }
+                
+            })
+
+            mediaObj.on(mediaEvents.changeViewers, async (data) => {
+                let {room_id} = data;
+                if (room_id) {
+                    let viewers = await mediaClientRef.current.getViewers(room_id);
+                    dispatch({
+                        type: 'update',
+                        data: {
+                            name: room_id,
+                            viewers
+                        }
+                    })
                 }
             })
-        })
 
-        mediaObj.on(mediaEvents.stopStream, async (data) => {
-            let {room_id} = data;
-            dispatch({
-                type: 'update',
-                data: {
-                    name: room_id,
-                    localStream: null
-                }
-            });
-            socket.emit('stop video', {
-                room: room_id
-            })
-        })
+            if(mediaClientRef.current) {
+                mediaClientRef.current = null;
+            }
 
-        mediaObj.on(mediaEvents.changeViewers, async (data) => {
-            let {room_id} = data;
-            let viewers = await mediaClientRef.current.getViewers(room_id);
-            dispatch({
-                type: 'update',
-                data: {
-                    name: room_id,
-                    viewers
-                }
-            })
-        })
-
-        if(mediaClientRef.current) {
-            mediaClientRef.current = null;
+            mediaClientRef.current = mediaObj;
         }
-
-        mediaClientRef.current = mediaObj;
 
         return () => {
             if(mediaObj) {
@@ -1222,7 +1276,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 mediaObj = null;
             }
         }
-    }, [username])
+    }, [myUser])
 
     useEffect(() => {
         if(status === 'rejected') {
@@ -1254,7 +1308,6 @@ const useRooms = ({initRoomName, ...initalState}) => {
                         } else {
                             console.log(result, message)
                         }
-                        
                     })
                     break;
                 default:

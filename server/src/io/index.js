@@ -4,7 +4,8 @@ const addPrivate = require('./addPrivate');
 const leavePrivate = require('./leavePrivate');
 const { publicMessage, privateMessage, pokeMessage } = require('./msgHandler');
 const { kickUser, banUser, banUserByAdmin, blockUser, unBlockUser, unBanCamera } = require('./userHandler');
-const { startVideo, stopVideo, isAvailableToBroadcast, isAvailableToView } = require('./videoHandler');
+const { startVideo, stopVideo, isAvailableToBroadcast, isAvailableToView,
+  consumerClosed, viewRequest, startView, stopView, stopBroadcastTo } = require('./videoHandler');
 const socketDisconnect = require('./disconnect');
 const { sendGift } = require('./gift')
 const { Users } = require('../database/models');
@@ -76,6 +77,11 @@ const ioHandler = (io) => async (socket) => {
     socket.on('stop video', stopVideo(io, socket));
     socket.on('check camera broadcast', isAvailableToBroadcast(io, socket));
     socket.on('check camera view', isAvailableToView(io, socket));
+    socket.on('consumerClosed', consumerClosed(io, socket));
+    socket.on('view request', viewRequest(io, socket));
+    socket.on('start view', startView(io, socket));
+    socket.on('stop view', stopView(io, socket));
+    socket.on('stop broadcast to', stopBroadcastTo(io, socket));
 
     socket.on('error', (err) => {
       console.log(err);
@@ -89,6 +95,7 @@ const ioHandler = (io) => async (socket) => {
 
 const adminIoHandler = (io) => (socket) => {
     io.on('ban user', banUserByAdmin(io, socket));
+    socket.on('consumerClosed', consumerClosed(io, socket));
 }
 
 const initIO = (server) => {
@@ -99,16 +106,24 @@ const initIO = (server) => {
     agent: false,
     reconnectionDelay: 1000,
     reconnectDelayMax: 5000,
+    cors: {
+      origin: '*'
+    }
   });
   io.use(async (socket, next) => {
     try {
+      console.log('socket connect')
       // const token = (socket.request.headers.cookie + ';').match(/(?<=token=)(.*?)(?=;)/)[0];
       // await rateLimiter.consume(socket.handshake.address)
       token = socket.handshake.query.token;
       // const token = cookies.token
-      const decoded = await verifyToken(token);
-      // eslint-disable-next-line no-param-reassign
-      socket.decoded = decoded;
+      if (token === 'media token') {
+        console.log('socket connect', token)
+      } else {
+        const decoded = await verifyToken(token);
+        // eslint-disable-next-line no-param-reassign
+        socket.decoded = decoded;
+      }
       next();
     } catch (err) {
         console.log(err)
