@@ -170,11 +170,11 @@ class RoomObject  {
         return result;
     }
     updateUserVideo (userId, producers, locked) {
-        let result = false
+        let result = null
 
         const newUsers = this.users?.map((user) => {
             if (user._id === userId) {
-                result = true;
+                result = user;
                 if (producers) {
                     return { ... user, video: {
                         producers,

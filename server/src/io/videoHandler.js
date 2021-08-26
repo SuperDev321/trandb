@@ -57,6 +57,7 @@ const isAvailableToBroadcast = (io, socket) => async ({ room }, callback) => {
             callback(false);
         }
     } catch (err) {
+        console.log(err.message)
         callback(false)
     }
 }
@@ -74,7 +75,6 @@ const isAvailableToView = (io, socket) => async ({ room, targetUserId }, callbac
             const first = it.next();
             const id = first.value;
             const targetSocket = io.sockets.sockets.get(id);
-            
             if (targetSocket) {
                 targetSocket.emit('check camera state', { room, username: user.username, userId: user._id }, (result) => {
                     if (result) {
@@ -88,8 +88,110 @@ const isAvailableToView = (io, socket) => async ({ room, targetUserId }, callbac
             }
         }
     } catch (err) {
+        console.log(err.message)
         callback(false)
     }
 }
 
-module.exports = { startVideo, stopVideo, isAvailableToBroadcast, isAvailableToView };
+const viewRequest = (io, socket) => async ({
+    roomName, userId, targetName
+}, callback) => {
+    const requestUser = await Users.findById(userId);
+    const targetUser = await Users.findOne({ username: targetName });
+    if (!targetUser || !requestUser) {
+        return callback(false);
+    }
+    const { video } = targetUser;
+    if (!video) {
+        return callback(false);
+    }
+    const { blocks } = video;
+    console.log(blocks)
+    if (blocks && blocks.includes(requestUser.username)) {
+        return callback(false);
+    }
+    let socketIds = await io.of('/').in(targetUser._id.toString()).allSockets();
+    let it = socketIds.values();
+    let first = it.next();
+    let id = first.value;
+    let targetSocket = io.sockets.sockets.get(id);
+    if(targetSocket) {
+        targetSocket.emit('view request', {
+            roomName,
+            username: requestUser.username,
+        }, (result) => {
+            if(!result) {
+                blocks.push(requestUser.username);
+                targetUser.save();
+            }
+            callback(result);
+        });
+    } else {
+        return callback(false)
+    }
+}
+
+const startView = (io, socket) => async ({ room_id, name, targetName }) => {
+    const requestUser = await Users.findOne({ username: name });
+    const targetUser = await Users.findOne({ username: targetName });
+    if (!targetUser || !requestUser) {
+        return;
+    }
+    let socketIds = await io.of('/').in(targetUser._id.toString()).allSockets();
+    let it = socketIds.values();
+    let first = it.next();
+    let id = first.value;
+    let targetSocket = io.sockets.sockets.get(id);
+    if(targetSocket) {
+        targetSocket.emit('start view', {
+            room_id,
+            name
+        });
+    }
+}
+
+const stopView = (io, socket) => async ({ room_id, name, targetName }) => {
+    const requestUser = await Users.findOne({ username: name });
+    const targetUser = await Users.findOne({ username: targetName });
+    if (!targetUser || !requestUser) {
+        return;
+    }
+    let socketIds = await io.of('/').in(targetUser._id.toString()).allSockets();
+    let it = socketIds.values();
+    let first = it.next();
+    let id = first.value;
+    let targetSocket = io.sockets.sockets.get(id);
+    if(targetSocket) {
+        targetSocket.emit('stop view', {
+            room_id,
+            name
+        });
+    }
+}
+
+const stopBroadcastTo = (io, socket) => async ({ room_id, name, targetName }) => {
+    const requestUser = await Users.findOne({ username: name });
+    const targetUser = await Users.findOne({ username: targetName });
+    if (!targetUser || !requestUser) {
+        return;
+    }
+    let socketIds = await io.of('/').in(targetUser._id.toString()).allSockets();
+    let it = socketIds.values();
+    let first = it.next();
+    let id = first.value;
+    let targetSocket = io.sockets.sockets.get(id);
+    if(targetSocket) {
+        targetSocket.emit('stop view from', {
+            room_id,
+            name
+        });
+    }
+}
+
+const consumerClosed = (io, socket) => async ({ consumer_id, room_id, userId }) => {
+    console.log('consumer closed');
+}
+
+module.exports = { startVideo, stopVideo, isAvailableToBroadcast, isAvailableToView,
+    consumerClosed, viewRequest, startView, stopView, stopBroadcastTo
+};
