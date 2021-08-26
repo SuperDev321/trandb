@@ -952,7 +952,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 }
             }
             if (isCameraBanned && mediaClientRef.current) {
-                mediaClientRef.current.exit();
+                mediaClientRef.current.exit(true);
             }
         }
     }, [roomsRef, username, globalCameraBans, mediaClientRef])
