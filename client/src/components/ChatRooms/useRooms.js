@@ -243,7 +243,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
                     });
                 }
             }, (err) => {
-                console.log(err);
+                // console.log(err);
             })
             // socket.emit('join room', { room });
             callback(true);
@@ -304,7 +304,8 @@ const useRooms = ({initRoomName, ...initalState}) => {
                         data: newData
                     });
                     if (mediaClientRef.current) {
-                        mediaClientRef.current.deleteViewer(room, leavedUserInfo.username)
+                        mediaClientRef.current.deleteViewer(room, leavedUserInfo.username);
+                        mediaClientRef.current.removeRemoteStream(leavedUserInfo.username, null, room);
                     }
                 } else {
                     //you leaved from room by server
@@ -418,7 +419,6 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 history.push('/');
                 let alertText = null;
                 if (reason && reason !== '') {
-                    console.log('ban1')
                     alertText = t('ChatApp.error_ban_with_reason', {
                         roomName: t(`ChatApp.all_rooms`),
                         userRole: t(`ChatApp.admin`),
@@ -762,7 +762,6 @@ const useRooms = ({initRoomName, ...initalState}) => {
             if (mediaClientRef.current) {
                 let result = await mediaClientRef.current.startStream(room, null, null);
                 if (result !== true) {
-                    console.log('roomName', result)
                     enqueueSnackbar(t('UserActionArea.error_already_broadcasting', {
                         roomName: result
                     }), { variant: 'error'});
@@ -790,7 +789,6 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 }
             }
         } catch (err) {
-            console.log(err);
             enqueueSnackbar(t('UserActionArea.error_not_ready_broadcast'), {variant: 'error'});
             mediaClientRef.current.stopStream(room);
         }
@@ -888,7 +886,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 }
             }
         } catch (err) {
-            console.log(err);
+            // console.log(err);
         }
     }
 
@@ -929,7 +927,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
 
     const checkCameraState = (room, userId, callback) => {
         const roomObj = roomsRef.current.find((item) => (item.name === room));
-        if (roomObj.checkCameraState(userId)) {
+        if (roomObj && roomObj.checkCameraState(userId)) {
            callback(true);
         } else {
             callback(false);
@@ -961,7 +959,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
         if(initRoomName && username) {
             socket.open();
             socket.on('connect_error', (err) => {
-                console.log(err)
+                // console.log(err)
             })
             // socket.on('init room', async ({room, onlineUsers, messages, blocks, globalBlocks, cameraBans, globalCameraBans}, fn) => {
             //     fn('success');
@@ -1003,7 +1001,6 @@ const useRooms = ({initRoomName, ...initalState}) => {
             socket.on('disconnect', (reason) => {
                 setOpenDisconnectModal(true);
                 if (mediaClientRef.current) {
-                    console.log('exit')
                     mediaClientRef.current.exit(true);
                 }
                 if (reason === 'io server disconnect') {
@@ -1082,7 +1079,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
                     });
                 }
             }, (err) => {
-                console.log(err);
+                // console.log(err);
             })
         }
 
@@ -1144,7 +1141,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
             socket.off('start view');
             socket.off('stop view');
         }
-    }, [username, mediaClientRef])
+    }, [username])
 
     useEffect(() => {
         socket.on('joined room',async ({room, onlineUsers, joinedUser}) => {
@@ -1160,7 +1157,6 @@ const useRooms = ({initRoomName, ...initalState}) => {
             kickUser({room, kickedUserName, type: 'ban', role, username, reason});
         });
         socket.on('global banned user', async ({kickedUserName, role, username, reason}) => {
-            console.log('user ban')
             kickUser({kickedUserName, type: 'global ban', role, username, reason});
         });
 
@@ -1306,7 +1302,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
                             }
                             enqueueSnackbar(alertText, {variant: 'error'});
                         } else {
-                            console.log(result, message)
+                            // console.log(result, message)
                         }
                     })
                     break;
@@ -1388,8 +1384,6 @@ const useRooms = ({initRoomName, ...initalState}) => {
         controlVideo,
         viewBroadcast
     }
-
 }
-
 
 export default useRooms;

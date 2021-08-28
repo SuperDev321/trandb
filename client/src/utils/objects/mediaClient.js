@@ -89,7 +89,7 @@ class MediaClient {
         try {
             await createMediaRoom(room_id);
         } catch (err) {
-            console.error(err);
+            // console.error(err);
         }
     }
 
@@ -100,7 +100,7 @@ class MediaClient {
             this.rooms.add(room_id);
             // mediaSocket.request('getProducers', room_id);
         } catch (e) {
-            console.log(e);
+            // console.log(e);
         }
     }
 
@@ -190,9 +190,9 @@ class MediaClient {
            
         } catch (error) {
             if (error.name === 'UnsupportedError') {
-                console.error('browser not supported');
+                // console.error('browser not supported');
             }
-            console.error(error)
+            // console.error(error)
         }
         await device.load({
             routerRtpCapabilities
@@ -203,7 +203,7 @@ class MediaClient {
     async initTransports(room_id, produceInit, consumeInit) {
         const device = this.devices.get(room_id);
         if (!device) {
-            console.log('no device for transport')
+            // console.log('no device for transport')
             return false;
         }
         // init producerTransport
@@ -217,7 +217,6 @@ class MediaClient {
                 producerTransport.on('connect', async ({
                     dtlsParameters
                 }, callback, errback) => {
-                    console.log(this.userId)
                     connectTransport(dtlsParameters, data.id, room_id, this.userId)
                     .then(callback)
                     .catch(errback)
@@ -271,7 +270,7 @@ class MediaClient {
                     }
                 });
             } catch (err) {
-                console.log(err)
+                // console.log(err)
             }
         }
 
@@ -286,13 +285,11 @@ class MediaClient {
                 consumerTransport.on('connect', ({
                     dtlsParameters
                 }, callback, errback) => {
-                    console.log(this.userId)
                     connectTransport(dtlsParameters, consumerTransport.id, room_id, this.userId)
                     .then(callback)
                     .catch(errback);
                 });
                 consumerTransport.on('connectionstatechange', async (state) => {
-                    console.log('connectionstatechange', state)
                     switch (state) {
                         case 'connecting':
                             break;
@@ -315,7 +312,7 @@ class MediaClient {
                 });
                 this.consumerTransports.set(room_id, consumerTransport);
             } catch (err) {
-                console.error(err);
+                // console.error(err);
             }
         }
     }
@@ -421,11 +418,11 @@ class MediaClient {
         }
         let device = this.devices.get(room_id);
         if(!device) {
-            console.error('cannot find device for produce');
+            // console.error('cannot find device for produce');
             return false;
         }
         if (!device.canProduce('video')) {
-            console.error('cannot produce video');
+            // console.error('cannot produce video');
             return false;
         }
         let stream;
@@ -472,17 +469,14 @@ class MediaClient {
             const videoProducer = await producerTransport.produce(videoParams)
 
             videoProducer.on('trackended', () => {
-                console.log('producer end')
                 this.closeProducer(videoProducer.id, room_id)
             })
 
             videoProducer.on('transportclose', () => {
-                console.log('producer close');
                 this.removeRoomProducers(room_id);
             })
 
             videoProducer.on('close', () => {
-                console.log('producer close')
                 this.removeRoomProducers(room_id);
             })
             this.producers.set(videoProducer.id, {
@@ -538,7 +532,7 @@ class MediaClient {
                 locked
             };
         } catch (err) {
-            console.log('produce error: ', err)
+            // console.log('produce error: ', err)
         }
     }
 
@@ -577,23 +571,18 @@ class MediaClient {
             name
         } = data;
         consumer.on('trackended', ()  => {
-            console.log('remote track ended')
             this.removeConsumer(consumer.id)
         })
         consumer.on('transportclose', ()  => {
-            console.log('remote track ended')
             this.removeConsumer(consumer.id)
         })
         consumer.on('producerclose', ()  => {
-            console.log('remote track ended by producer')
             this.removeConsumer(consumer.id)
         })
         consumer.on('producerpause', ()  => {
-            console.log('remote paused by producer')
             consumer.pause();
         })
         consumer.on('producerresume', ()  => {
-            console.log('remote paused by producer')
             consumer.pause();
         })
         await this.addConsumer(room_id, producerName, kind, locked, consumer);
@@ -686,7 +675,7 @@ class MediaClient {
                 if(result) {
                     this.addRemoteStream(room_id, name, user_id, producers, true);
                 } else {
-                    console.log('deney view request');
+                    // console.log('deney view request');
                 }
                 if (fn2) {
                     fn2(result);
@@ -817,7 +806,7 @@ class MediaClient {
         if (room_id) {
             let label = this.producerLabels.get(room_id);
             if(!label) {
-                console.log('there is no room ', room_id);
+                // console.log('there is no room ', room_id);
             }
             if(label.audio) {
                 this.producers.delete(label.audio);
@@ -938,7 +927,6 @@ class MediaClient {
         if (!this.producerLabels.has(room_id)) {
             return;
         }
-        console.log('pause producer')
         let label = this.producerLabels.get(room_id);
         if(label) {
             let {audio: audioId, video: videoId} = label;
