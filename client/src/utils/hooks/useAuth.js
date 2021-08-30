@@ -4,6 +4,7 @@ import config from '../../config'
 const useAuth = () => {
   const [auth, setAuth] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [myId, setMyId] = useState(null);
   const [username, setUsername] = useState('');
   const [gender, setGender] = useState(null);
   const [avatar, setAvatar] = useState(null);
@@ -27,6 +28,7 @@ const useAuth = () => {
           else setGender('female');
           if(data.avatar) setAvatar(data.avatar);
           else setAvatar(null);
+          setMyId(data._id);
           setUsername(data.username);
           setPoint(data.point);
           setMyUser(data)
@@ -56,7 +58,7 @@ const useAuth = () => {
         else setAvatar(null);
         setPoint(data.point);
         // setUsername(data.username);
-        setMyUser(data)
+        setMyUser(data);
         setAuth(true);
         setLoading(false);
       }
@@ -80,12 +82,13 @@ const useAuth = () => {
   const removeCurrentUser = () => {
     window.localStorage.removeItem('token');
     setAuth(false);
+    setMyId(null);
     setUsername('');
     setRole('user');
     setAvatar(null);
   };
 
-  return { auth, setAuth, gender, avatar, username, role, loading, setLoading, removeCurrentUser, prevUrl, setPrevUrl, updateUser, myUser, point, updateUserPoint, updateProfile };
+  return { auth, setAuth, gender, avatar, myId, username, role, loading, setLoading, removeCurrentUser, prevUrl, setPrevUrl, updateUser, myUser, point, updateUserPoint, updateProfile };
 };
 
 export default useAuth;

@@ -66,7 +66,6 @@ const ChatRoom = ({roomName, users, messages, mutes, blocks, globalBlocks, sendM
     }
     const userAction = (type, payload) => {
         if(type === 'show_link') {
-            console.log('youtub')
             let url = payload.url;
             if(url) {
                 if(payload.host === 'youtube.com' || payload.host === 'www.youtube.com' ) {

@@ -84,7 +84,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
         roomIndex: null,
         error: null,
     });
-    const { username, updateUserPoint, updateProfile, myUser } = useContext(UserContext);
+    const { myId, username, updateUserPoint, updateProfile } = useContext(UserContext);
     const { enablePokeSound, enablePrivateSound, enablePublicSound, enableSysMessage,
         messageNum, showGift, showGiftMessage, autoBroadcast } = useContext(SettingContext);
     // current room state
@@ -935,6 +935,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
     }
 
     useEffect(() => {
+        console.log('render')
         if (username && roomsRef.current && roomsRef.current.length && globalCameraBans && globalCameraBans.length) {
             const room = roomsRef.current[0];
             const myUserData = room.getUserData(username);
@@ -1190,8 +1191,8 @@ const useRooms = ({initRoomName, ...initalState}) => {
 
     useEffect(() => {
         let mediaObj = null;
-        if (myUser) {
-            mediaObj = new MediaClient(myUser.username, myUser._id);
+        if (username && myId) {
+            mediaObj = new MediaClient(username, myId);
             mediaObj.on(mediaEvents.onChangeRemoteStreams, async (data) => {
                 let {room_id} = data;
                 if (room_id) {
@@ -1272,7 +1273,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 mediaObj = null;
             }
         }
-    }, [myUser])
+    }, [myId, username])
 
     useEffect(() => {
         if(status === 'rejected') {
