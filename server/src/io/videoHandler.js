@@ -70,22 +70,23 @@ const isAvailableToView = (io, socket) => async ({ room, targetUserId }, callbac
         if (result && result.isBan) {
             callback(false);
         } else {
-            const socketIds = await io.of('/').in(targetUserId).allSockets();
-            const it = socketIds.values();
-            const first = it.next();
-            const id = first.value;
-            const targetSocket = io.sockets.sockets.get(id);
-            if (targetSocket) {
-                targetSocket.emit('check camera state', { room, username: user.username, userId: user._id }, (result) => {
-                    if (result) {
-                        callback(true);
-                    } else {
-                        callback(false);
-                    }
-                })
-            } else {
-                callback(false);
-            }
+            // const socketIds = await io.of('/').in(targetUserId).allSockets();
+            // const it = socketIds.values();
+            // const first = it.next();
+            // const id = first.value;
+            // const targetSocket = io.sockets.sockets.get(id);
+            // if (targetSocket) {
+            //     targetSocket.emit('check camera state', { room, username: user.username, userId: user._id }, (result) => {
+            //         if (result) {
+            //             callback(true);
+            //         } else {
+            //             callback(false);
+            //         }
+            //     })
+            // } else {
+            //     callback(false);
+            // }
+            callback(true);
         }
     } catch (err) {
         console.log(err.message)
@@ -106,7 +107,6 @@ const viewRequest = (io, socket) => async ({
         return callback(false);
     }
     const { blocks } = video;
-    console.log(blocks)
     if (blocks && blocks.includes(requestUser.username)) {
         return callback(false);
     }

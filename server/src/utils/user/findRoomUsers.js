@@ -6,7 +6,7 @@ const findRoomUsers = async (room, myRole) => {
         const owner = roomInfo.owner;
         const moderators = roomInfo.moderators;
         let liveUserIds = roomInfo.users;
-        const roomUsers = await Users.find({ _id: { $in: liveUserIds? liveUserIds: []  } });
+        const roomUsers = await Users.find({ _id: { $in: liveUserIds? liveUserIds: []  } }).lean();
         const usersInfo = roomUsers.map(({ _id, username, gender, role, avatar, ip, aboutMe, isMobile, avatarObj, currentAvatar, point, video }) => {
             // let ip;
             // // if(myRole === 'admin') {
@@ -29,6 +29,7 @@ const findRoomUsers = async (room, myRole) => {
                 return { _id, username, gender, role: userRole, ip, avatar, aboutMe, isMobile, avatarObj, currentAvatar, point, video };    
             }
         });
+        console.log(usersInfo)
         return usersInfo;
     }
     return [];

@@ -41,7 +41,7 @@ const settingSchema = new Schema({
   showEmoji: Boolean,
   autoBroadcast: Boolean
 });
-
+settingSchema.index({type: 1});
 const Settings = model('Settings', settingSchema);
 
 module.exports = Settings;

@@ -178,7 +178,7 @@ const OnlineUser = ({roomName, username, user, role, isMuted, isPrivateMuted, is
                     }
                 } else {
                     // joomula avatar
-                    if (avatarObj.joomula) {
+                    if (avatarObj && avatarObj.joomula) {
                         return setAvatarUrl(config.main_site_url+avatarObj.joomula)
                     }
                 }

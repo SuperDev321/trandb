@@ -13,7 +13,7 @@ const joinRoom = (io, socket) => async ({ room, password }, callback) => {
             }
         }
         await Users.updateOne({ _id }, { video: null });
-        let user = await Users.findOne({_id});
+        let user = await Users.findOne({_id}).lean();
         let {isBan, banType} = await checkBan(room, user.username, user.ip);
         const {bypassBan} = await Settings.findOne({type: 'admin'});
         if (isBan && !bypassBan) {
