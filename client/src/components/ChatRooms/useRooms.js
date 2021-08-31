@@ -144,6 +144,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
     const {status: roomsStatus, data: roomsData, roomIndex, error: roomsError} = roomsState;
 
     const changeRoom = useCallback(async (newRoomIndex) => {
+        const data = {};
         let room = roomsRef.current[newRoomIndex];
         room.mergeUnreadMessages();
         data.name = room.name;
@@ -250,7 +251,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
         } else {
             callback(false, 'already_entered');
         }
-    }, [])
+    }, [roomsRef])
 
     const addUser = useCallback(({room, joinedUser, onlineUsers}) => {
         if(roomsRef.current) {
@@ -280,7 +281,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 }
             }
         }
-    }, [enableSysMessage, username]);
+    }, [enableSysMessage, username, dispatch]);
 
     const removeUser = useCallback(async ({room, leavedUser}) => {
         if(roomsRef.current) {
@@ -312,7 +313,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 }
             }
         }
-    }, [enableSysMessage]);
+    }, [enableSysMessage, dispatch]);
 
     const kickUser = useCallback(async ({room, kickedUserName, type, role, username: adminName, reason}) => {
         if(roomsRef.current && room) {
@@ -435,7 +436,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 enqueueSnackbar(alertText, {variant: 'error'});
             }
         }
-    }, [username])
+    }, [username, dispatch])
 
     const updateBlocks = useCallback(async ({room, blocks}) => {
         if(roomsRef.current && room) {
@@ -523,7 +524,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
         if(mediaClientRef.current) {
             mediaClientRef.current.exitRoom(room);
         }
-    }, [status, roomsStatus, roomIndex, data])
+    }, [status, roomsStatus, roomIndex, data, dispatch, roomsDispatch])
 
     const changeMuteState = useCallback(async (roomName, userToMute, isMuted) => {
         let room = roomsRef.current.find((item) => (item.name === roomName));
@@ -562,7 +563,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 })
             }
         }
-    }, [data, mutes])
+    }, [data, mutes, roomsRef, dispatch, setMutes])
 
     const receiveMessage = useCallback(async ({message}, callback) => {
         if(message) {
@@ -609,7 +610,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
             let infos = roomsRef.current.map(({name, unReadMessages}) => ({name, unReadMessages}));
             roomsDispatch({type: 'set', data: infos});
         }
-    }, []);
+    }, [dispatch, roomsDispatch]);
 
     const receivePoke = useCallback(async (pokeMessage, callback) => {
         let {room} = pokeMessage;
@@ -664,7 +665,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 }
             }
         }
-    }, [username]);
+    }, [username, roomsRef, dispatch]);
 
     const addMessage = useCallback(async ({message, room}) => {
         let sameRoom = roomsRef.current.find((item) => (item.name) === room);
@@ -678,7 +679,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 }
             })
         }
-    }, [])
+    }, [roomsRef])
 
     const updatePoints = useCallback(async (usersWithPoints) => {
         const userToUpdate = usersWithPoints.find(({ username: usernameToUpdate }) => (username === usernameToUpdate));
@@ -698,7 +699,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 }
             }
         })
-    }, [roomsRef, updateUserPoint, dispatch]);
+    }, [roomsRef, updateUserPoint, dispatch, username]);
 
     const updateUserProfile = useCallback(async (userInfo) => {
         if (userInfo.username === username) {
@@ -717,7 +718,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 }
             }
         })
-    }, [roomsRef, roomNameRef, dispatch]);
+    }, [roomsRef, roomNameRef, dispatch, username]);
 
     const receiveGift = useCallback(async (payload) => {
         try {
@@ -751,7 +752,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
         } catch (err) {
             // console.log(err)
         }
-    }, [addMessage]);
+    }, [addMessage, showGift, showGiftMessage, username]);
 
     const startBroadcast = useCallback(async (room, lock, videoDeviceId, audioDeviceId) => {
         try {
@@ -836,7 +837,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
             });
             
         }
-    }, [mediaClientRef]);
+    }, [mediaClientRef, username]);
 
     const controlVideo = useCallback(async (data) => {
         let { type, name, roomName, kind } = data;
@@ -867,7 +868,23 @@ const useRooms = ({initRoomName, ...initalState}) => {
             }
             
         }
-    }, [mediaClientRef]);
+    }, [mediaClientRef, username]);
+
+    const autoStartRemoteVideo = useCallback(async (room, producers, userId, locked, remoteUsername) => {
+        let result = await socket.request('check camera view', ({ room, targetUserId: userId }));
+        if (!result) {
+            return false;
+        }
+        if (username !== remoteUsername && !locked && mediaClientRef.current) {
+            await mediaClientRef.current.createRoom(room);
+            await mediaClientRef.current.join(room);
+            await mediaClientRef.current.initDevice(room);
+            if (!mediaClientRef.current.checkConsumeState(room)) {
+                await mediaClientRef.current.initTransports(room, false, true)
+            }
+            mediaClientRef.current.requestView(room, userId, remoteUsername, producers, false, null, null);
+        }
+    }, [mediaClientRef, username]);
 
     const startRemoteVideo = useCallback(async (room, producers, userId, locked, remoteUsername) => {
         try {
@@ -889,23 +906,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
         } catch (err) {
             // console.log(err);
         }
-    }, [roomsRef, dispatch]);
-
-    const autoStartRemoteVideo = useCallback(async (room, producers, userId, locked, remoteUsername) => {
-        let result = await socket.request('check camera view', ({ room, targetUserId: userId }));
-        if (!result) {
-            return false;
-        }
-        if (username !== remoteUsername && !locked && mediaClientRef.current) {
-            await mediaClientRef.current.createRoom(room);
-            await mediaClientRef.current.join(room);
-            await mediaClientRef.current.initDevice(room);
-            if (!mediaClientRef.current.checkConsumeState(room)) {
-                await mediaClientRef.current.initTransports(room, false, true)
-            }
-            mediaClientRef.current.requestView(room, userId, remoteUsername, producers, false, null, null);
-        }
-    }, [mediaClientRef]);
+    }, [roomsRef, dispatch, autoBroadcast, autoStartRemoteVideo]);
 
     const stopRemoteVideo = useCallback(async (room, userId) => {
         const roomObj = roomsRef.current.find((item) => (item.name === room));
@@ -1153,7 +1154,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
         return () => {
             socket.off('received gift');
         }
-    }, [showGift, showGiftMessage])
+    }, [receiveGift])
 
     useEffect(() => {
         socket.on('start video', ({ room, producers, userId, username, locked }) => {
@@ -1163,7 +1164,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
         return () => {
             socket.off('start video');
         }
-    }, [autoBroadcast, username])
+    }, [startRemoteVideo])
 
     useEffect(() => {
         let mediaObj = null;
