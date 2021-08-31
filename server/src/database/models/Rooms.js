@@ -43,7 +43,7 @@ const roomSchema = new Schema({
         updatedAt: 'updated_at'
     }
 });
-
+roomSchema.index({type: 1, name: 1, owner: 1});
 const Rooms = model('Rooms', roomSchema);
 
 module.exports = Rooms;

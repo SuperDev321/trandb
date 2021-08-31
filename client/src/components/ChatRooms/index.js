@@ -120,14 +120,14 @@ const ChatRooms = ({room}, ref) => {
     }
     
     // kick a user from room
-    const kickUser = (roomName, usernameToKick) => {
+    const kickUser = async (roomName, usernameToKick) => {
         socket.emit('kick user', {room: roomName, to: usernameToKick});
     }
-    const banUser = (roomName, usernameToBan) => {
+    const banUser = async (roomName, usernameToBan) => {
         socket.emit('ban user', {room: roomName, to: usernameToBan});
     }
     // remove a room
-    const sendMessage = (roomName, to, color, msg, bold, type, messageType) => {
+    const sendMessage = async (roomName, to, color, msg, bold, type, messageType) => {
         if (msg) {
             const date = Date.now()
             let offset = 2000
@@ -176,18 +176,18 @@ const ChatRooms = ({room}, ref) => {
             }
         }
     };
-    const leaveFromPrivate = (roomName) => {
+    const leaveFromPrivate = async (roomName) => {
         socket.emit('leave private', roomName);
     }
 
-    const stopBroadcastTo = (roomName, userId, name) => {
+    const stopBroadcastTo = async (roomName, userId, name) => {
         if(mediaClientRef.current) {
             mediaClientRef.current.stopView(roomName, userId, name);
         }
     }
 
     // send poke message
-    const sendPokeMessage = (roomName, userToSend, pokeType) => {
+    const sendPokeMessage = async (roomName, userToSend, pokeType) => {
         socket.emit('poke message', {from: username, to: userToSend, room: roomName, pokeType}, (response) => {
             // this is callback function that can excute on server side
             if(response === 'muted') {
@@ -208,7 +208,7 @@ const ChatRooms = ({room}, ref) => {
     }
 /*************************************************************** */
     // leave room by you
-    const leaveRoomByUser = (room) => {
+    const leaveRoomByUser = async (room) => {
         removeRoom(room, (result) => {
             if(result) {
                 socket.emit('leave room', {room});

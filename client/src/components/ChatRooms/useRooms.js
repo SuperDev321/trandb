@@ -143,7 +143,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
     const {status, data, error} = state;
     const {status: roomsStatus, data: roomsData, roomIndex, error: roomsError} = roomsState;
 
-    const changeRoom = async (newRoomIndex) => {
+    const changeRoom = useCallback(async (newRoomIndex) => {
         let room = roomsRef.current[newRoomIndex];
         room.mergeUnreadMessages();
         data.name = room.name;
@@ -160,7 +160,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
         roomNameRef.current = room.name;
         let newRoomsData = roomsRef.current.map(({name, unReadMessages}) => ({name, unReadMessages}));
         roomsDispatch({type: 'set', data: newRoomsData, roomIndex: newRoomIndex});
-    }
+    }, [roomsRef]);
 
     const initRoom = useCallback(async ({room, globalBlocks, onlineUsers, messages, blocks, cameraBans, globalCameraBans}) => {
         let data = {};
@@ -282,7 +282,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
         }
     }, [enableSysMessage, username]);
 
-    const removeUser = useCallback(({room, leavedUser}) => {
+    const removeUser = useCallback(async ({room, leavedUser}) => {
         if(roomsRef.current) {
             let sameRoom = roomsRef.current.find((item) => (item.name === room));
             if(sameRoom) {
@@ -314,7 +314,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
         }
     }, [enableSysMessage]);
 
-    const kickUser = useCallback(({room, kickedUserName, type, role, username: adminName, reason}) => {
+    const kickUser = useCallback(async ({room, kickedUserName, type, role, username: adminName, reason}) => {
         if(roomsRef.current && room) {
             let sameRoom = roomsRef.current.find((item) => (item.name === room));
             if(sameRoom) {
@@ -437,7 +437,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
         }
     }, [username])
 
-    const updateBlocks = useCallback(({room, blocks}) => {
+    const updateBlocks = useCallback(async ({room, blocks}) => {
         if(roomsRef.current && room) {
             let sameRoom = roomsRef.current.find((item) => (item.name === room));
             if(sameRoom && Array.isArray(blocks)) {
@@ -450,6 +450,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
     const updateCameraBans = useCallback(({room, cameraBans}) => {
         if(roomsRef.current && room) {
             let sameRoom = roomsRef.current.find((item) => (item.name === room));
+            if (!sameRoom) return;
             if(sameRoom && Array.isArray(cameraBans)) {
                 sameRoom.updateCameraBans(cameraBans);
                 dispatch({type: 'update', data: { name: room, cameraBans}});
@@ -472,7 +473,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
         }
     }, [dispatch, username]);
 
-    const removeRoom = React.useCallback(async (room, callback) => {
+    const removeRoom = useCallback(async (room, callback) => {
         if(status === 'resolved' && roomsStatus === 'resolved') {
             let {name: currentRoomName} = data;
             let roomIndexToRemove = roomsRef.current.findIndex((item) => (item.name === room));
@@ -524,7 +525,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
         }
     }, [status, roomsStatus, roomIndex, data])
 
-    const changeMuteState = useCallback((roomName, userToMute, isMuted) => {
+    const changeMuteState = useCallback(async (roomName, userToMute, isMuted) => {
         let room = roomsRef.current.find((item) => (item.name === roomName));
         if(room) {
             if(isMuted) {
@@ -563,7 +564,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
         }
     }, [data, mutes])
 
-    const receiveMessage = useCallback(({message}, callback) => {
+    const receiveMessage = useCallback(async ({message}, callback) => {
         if(message) {
             if(message.type === 'public') {
                 let room = roomsRef.current.find((item) => (item.name === message.room))
@@ -610,7 +611,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
         }
     }, []);
 
-    const receivePoke = useCallback((pokeMessage, callback) => {
+    const receivePoke = useCallback(async (pokeMessage, callback) => {
         let {room} = pokeMessage;
         if(roomsRef.current && room) {
             let sameRoom = roomsRef.current.find((item) => (item.name === room));
@@ -665,7 +666,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
         }
     }, [username]);
 
-    const addMessage = useCallback(({message, room}) => {
+    const addMessage = useCallback(async ({message, room}) => {
         let sameRoom = roomsRef.current.find((item) => (item.name) === room);
         if(sameRoom) {
             sameRoom.addMessages([message]);
@@ -679,7 +680,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
         }
     }, [])
 
-    const updatePoints = (usersWithPoints) => {
+    const updatePoints = useCallback(async (usersWithPoints) => {
         const userToUpdate = usersWithPoints.find(({ username: usernameToUpdate }) => (username === usernameToUpdate));
         if (userToUpdate) {
             updateUserPoint(userToUpdate.point)
@@ -697,9 +698,9 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 }
             }
         })
-    }
+    }, [roomsRef, updateUserPoint, dispatch]);
 
-    const updateUserProfile = (userInfo) => {
+    const updateUserProfile = useCallback(async (userInfo) => {
         if (userInfo.username === username) {
             updateProfile(userInfo)
         }
@@ -716,9 +717,9 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 }
             }
         })
-    }
+    }, [roomsRef, roomNameRef, dispatch]);
 
-    const receiveGift = (payload) => {
+    const receiveGift = useCallback(async (payload) => {
         try {
             const { gift, from, to, room, amount } = payload;
             if (gift && from && to && room) {
@@ -750,9 +751,9 @@ const useRooms = ({initRoomName, ...initalState}) => {
         } catch (err) {
             // console.log(err)
         }
-    }
+    }, [addMessage]);
 
-    const startBroadcast = async (room, lock, videoDeviceId, audioDeviceId) => {
+    const startBroadcast = useCallback(async (room, lock, videoDeviceId, audioDeviceId) => {
         try {
             let result = await socket?.request('check camera broadcast', ({ room }));
             if (!result) {
@@ -793,18 +794,18 @@ const useRooms = ({initRoomName, ...initalState}) => {
             mediaClientRef.current.stopStream(room);
         }
         
-    }
+    }, [mediaClientRef]);
 
-    const stopBroadcast = async (roomName) => {
+    const stopBroadcast = useCallback(async (roomName) => {
         if(mediaClientRef.current) {
             mediaClientRef.current.closeProducer(null, roomName);
         }
         socket.emit('stop video', {
             room: roomName
         })
-    }
+    }, [mediaClientRef]);
 
-    const viewBroadcast = async (roomName, userId, targetUsername, producers, locked) => {
+    const viewBroadcast = useCallback(async (roomName, userId, targetUsername, producers, locked) => {
         let result = await socket.request('check camera view', ({ room: roomName, targetUserId: userId }));
         if (!result) {
             enqueueSnackbar(t('ChatApp.error_camera_view_banned'), { variant: 'error'});
@@ -835,9 +836,9 @@ const useRooms = ({initRoomName, ...initalState}) => {
             });
             
         }
-    }
+    }, [mediaClientRef]);
 
-    const controlVideo = (data) => {
+    const controlVideo = useCallback(async (data) => {
         let { type, name, roomName, kind } = data;
         if(mediaClientRef.current) {
             switch(type) {
@@ -866,12 +867,12 @@ const useRooms = ({initRoomName, ...initalState}) => {
             }
             
         }
-    }
+    }, [mediaClientRef]);
 
-    const startRemoteVideo = async (room, producers, userId, locked, remoteUsername) => {
+    const startRemoteVideo = useCallback(async (room, producers, userId, locked, remoteUsername) => {
         try {
             const roomObj = roomsRef.current.find((item) => (item.name === room));
-            if (roomObj.updateUserVideo(userId, producers, locked)) {
+            if (roomObj && roomObj.updateUserVideo(userId, producers, locked)) {
                 if (roomNameRef.current === room) {
                     dispatch({
                         type: 'update',
@@ -888,9 +889,9 @@ const useRooms = ({initRoomName, ...initalState}) => {
         } catch (err) {
             // console.log(err);
         }
-    }
+    }, [roomsRef, dispatch]);
 
-    const autoStartRemoteVideo = async (room, producers, userId, locked, remoteUsername) => {
+    const autoStartRemoteVideo = useCallback(async (room, producers, userId, locked, remoteUsername) => {
         let result = await socket.request('check camera view', ({ room, targetUserId: userId }));
         if (!result) {
             return false;
@@ -904,10 +905,11 @@ const useRooms = ({initRoomName, ...initalState}) => {
             }
             mediaClientRef.current.requestView(room, userId, remoteUsername, producers, false, null, null);
         }
-    }
+    }, [mediaClientRef]);
 
-    const stopRemoteVideo = (room, userId) => {
+    const stopRemoteVideo = useCallback(async (room, userId) => {
         const roomObj = roomsRef.current.find((item) => (item.name === room));
+        if (!roomObj) return;
         const user = roomObj.updateUserVideo(userId, null, null);
         if (user) {
             if (roomNameRef.current === room) {
@@ -923,21 +925,21 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 mediaClientRef.current.removeRemoteStream(user.username, null, room);
             }
         }
-    }
+    }, [roomsRef, roomNameRef, dispatch, mediaClientRef]);
 
-    const checkCameraState = (room, userId, callback) => {
+    const checkCameraState = useCallback(async (room, userId, callback) => {
         const roomObj = roomsRef.current.find((item) => (item.name === room));
         if (roomObj && roomObj.checkCameraState(userId)) {
            callback(true);
         } else {
             callback(false);
         }
-    }
+    }, [roomsRef]);
 
     useEffect(() => {
-        console.log('render')
         if (username && roomsRef.current && roomsRef.current.length && globalCameraBans && globalCameraBans.length) {
             const room = roomsRef.current[0];
+            if (!room) return;
             const myUserData = room.getUserData(username);
             let isCameraBanned = false;
             for (const { username, ip, fromIp, toIp } of globalCameraBans) {
@@ -959,16 +961,6 @@ const useRooms = ({initRoomName, ...initalState}) => {
     useEffect(() => {
         if(initRoomName && username) {
             socket.open();
-            socket.on('connect_error', (err) => {
-                // console.log(err)
-            })
-            // socket.on('init room', async ({room, onlineUsers, messages, blocks, globalBlocks, cameraBans, globalCameraBans}, fn) => {
-            //     fn('success');
-            //     let usernames = await onlineUsers.map((item) => (item.username));
-            //     if(usernames.includes(username)) {
-            //         initRoom({room, onlineUsers, messages, blocks, globalBlocks, cameraBans, globalCameraBans});
-            //     }
-            // });
             
             socket.on('update block', ({room, blocks}) => {
                 updateBlocks({room, blocks});
@@ -990,15 +982,12 @@ const useRooms = ({initRoomName, ...initalState}) => {
             socket.on('poke message', (payload, callback) => {
                 receivePoke(payload, callback)
             })
-
             socket.on('update points', (usersWithPoints) => {
                 updatePoints(usersWithPoints)
             })
-
             socket.on('update user info', (userInfo) => {
                 updateUserProfile(userInfo)
             })
-
             socket.on('disconnect', (reason) => {
                 setOpenDisconnectModal(true);
                 if (mediaClientRef.current) {
@@ -1009,7 +998,6 @@ const useRooms = ({initRoomName, ...initalState}) => {
                     socket.connect();
                 }
             })
-
             socket.io.on('reconnect', async () => {
                 let roomNames = roomsRef.current.map((room) => (room.name));
                 let privateRooms = privateListRef.current ? privateListRef.current.getPrivateRooms(): [];
@@ -1036,24 +1024,16 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 })
                 setOpenDisconnectModal(false)
             })
-
-            socket.io.on('reconnect_attempt', () => {
-                // console.log('reconnect_attempt');
-            })
-
             socket.on('repeat connection', () => {
                 enqueueSnackbar(t('ChatApp.already_in_chat'), {variant: 'error'});
                 history.push('/');
             })
-
             socket.on('stop video', ({ room, userId }) => {
                 stopRemoteVideo(room, userId)
             })
-
-            socket.on('check camera state', ({ room, userId }, callback) => {
-                checkCameraState(room, userId, callback);
-            })
-
+            // socket.on('check camera state', ({ room, userId }, callback) => {
+            //     checkCameraState(room, userId, callback);
+            // })
             socket.on('view request', ({ username, roomName }, callback) => {
                 requestAudioControls.seek(0);
                 requestAudioControls.play();
@@ -1061,7 +1041,6 @@ const useRooms = ({initRoomName, ...initalState}) => {
                     callback(result);
                 });
             })
-
             isPrivateRoom(initRoomName, ({isPrivate}) => {
                 if(isPrivate) {
                     setRoomNameForPassword(initRoomName);
@@ -1083,12 +1062,10 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 // console.log(err);
             })
         }
-
         return () => {
             // socket.removeAllListeners();
             // socket.io.removeAllListeners();
             socket.close();
-            socket.off('connect_error');
             socket.off('init room');
             socket.off('update block');
             socket.off('update global block');
@@ -1098,7 +1075,6 @@ const useRooms = ({initRoomName, ...initalState}) => {
             socket.off('disconnect');
             socket.off('repeat connection');
             socket.io.off('reconnect');
-            socket.io.off('reconnect_attempt')
             socket.off('view request');
         };
     }, [initRoomName, username]);

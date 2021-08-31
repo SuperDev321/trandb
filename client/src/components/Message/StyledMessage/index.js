@@ -199,7 +199,6 @@ const StyledMessage = ({message, mine}) => {
         if (newArr && newArr.length) {
             for (let index = 0; index < newArr.length; index++) {
                 const element = newArr[index];
-                console.log(element[-1])
                 if(isValidHttpUrl(element)) {
                     // urlText = urlText.replace(element, urlify(element));
                     htmlObj.push(<a href={element} target="_blank">{element}</a>)

@@ -36,6 +36,8 @@ const chatSchema = new Schema({
   },
 });
 
+chatSchema.index({type: 1, room: 1, from: 1, to: 1, date: 1});
+
 const Chats = model('Chats', chatSchema);
 
 module.exports = Chats;
