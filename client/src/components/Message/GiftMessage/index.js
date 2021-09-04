@@ -11,7 +11,6 @@ const useStyles = makeStyles((theme) => ({
         display: 'flex',
         justifyContent: 'space-between',
         width: 'fit-content',
-        padding: '0.1rem 1rem',
         background: orange[500],
         alignItems: 'center',
         padding: 5

@@ -126,28 +126,6 @@ const StyledMessage = ({message, mine}) => {
     const classes = useStyles({mine, color: message.color, bold: message.bold});
     const { emojiOption } = useContext(SettingContext);
 
-    const emojiConverter = (text) => {
-        let emojiText =  emoji.replace_unified(text);
-        return emojiText;
-    }
-    const urlify = (text) => {
-    
-      let urlRegex = /(https?:\/\/[^\s]+)/g;
-      let arr = text.split(urlRegex);
-      let noRepeatArr = [...new Set(arr)];
-      for (let index = 0; index < noRepeatArr.length; index++) {
-      const element = noRepeatArr[index];
-      
-      if(new RegExp("([a-zA-Z0-9]+://)?([a-zA-Z0-9_]+:[a-zA-Z0-9_]+@)?([a-zA-Z0-9.-]+\\.[A-Za-z]{2,4})(:[0-9]+)?(/.*)?").test(element)) {
-          text = text.replace(element, `<a href="${element}" target="_blank">${element}</a>`);
-      } else {
-          text = text.replace(element, `<span>${element}</span>`);
-      }
-      }
-      return text;
-      // or alternatively
-      // return text.replace(urlRegex, '<a href="$1">$1</a>')
-    }
     const makeTag = (text) => {
         let arr = emojiStringToArray(text);
         let noRepeatArr = [...new Set(arr)];
@@ -155,15 +133,16 @@ const StyledMessage = ({message, mine}) => {
         if (noRepeatArr && noRepeatArr.length) {
             for (let index = 0; index < noRepeatArr.length; index++) {
                 const element = noRepeatArr[index];
+                const key= message._id? `${message._id}-private-${index}`: `${Date.now()}private-${index}`;
                 if(isValidHttpUrl(element)) {
                     // urlText = urlText.replace(element, urlify(element));
-                    htmlObj.push(<a href={element} target="_blank">{element}</a>)
+                    htmlObj.push(<a href={element} key={key} target="_blank" rel="noopener noreferrer">{element}</a>)
                 } else if(new RegExp(/([\uD800-\uDBFF][\uDC00-\uDFFF])/).test(element)) {
                     const emojiText = emoji.replace_unified(element);
-                    htmlObj.push(<div dangerouslySetInnerHTML={{ __html: emojiText }}></div>)
+                    htmlObj.push(<div key={key} dangerouslySetInnerHTML={{ __html: emojiText }}></div>)
                 } else {
                     // urlText = urlText.replace(element, `<span>${element}</span>`);
-                    htmlObj.push(<span>{element}</span>)
+                    htmlObj.push(<span key={key}>{element}</span>)
                 }
             }
         }
@@ -199,20 +178,21 @@ const StyledMessage = ({message, mine}) => {
         if (newArr && newArr.length) {
             for (let index = 0; index < newArr.length; index++) {
                 const element = newArr[index];
+                const key= message._id? `${message._id}-private-${index}`: `${Date.now()}private-${index}`;
                 if(isValidHttpUrl(element)) {
                     // urlText = urlText.replace(element, urlify(element));
-                    htmlObj.push(<a href={element} target="_blank">{element}</a>)
+                    htmlObj.push(<a key={key} href={element} target="_blank" rel="noopener noreferrer">{element}</a>)
                 } else if(element.charAt(0) === '>' && element.charAt(element.length - 1) === '<') {
                     const name = element.slice(1, element.length - 1);
                     const emoji = getValidCustomEmoji(name);
                     if (emoji) {
-                        htmlObj.push(<img src={`${config.emoji_path}/${emoji.path}`}/>)
+                        htmlObj.push(<img key={key} src={`${config.emoji_path}/${emoji.path}`} alt="emoji-icon"/>)
                     } else {
-                        htmlObj.push(<span>{element}</span>)
+                        htmlObj.push(<span key={key}>{element}</span>)
                     }
                 } else {
                     // urlText = urlText.replace(element, `<span>${element}</span>`);
-                    htmlObj.push(<span>{element}</span>)
+                    htmlObj.push(<span key={key}>{element}</span>)
                 }
             }
         }
@@ -229,7 +209,7 @@ const StyledMessage = ({message, mine}) => {
             <>
             { (message.messageType === 'image') ?
             <span className={classes.text + ' ' + classes.size10}>
-            {!checked ? <a href="javascript:void(0)" style={{color: '#046eb9'}}>
+            {!checked ? <a href="javascript:void(0);" style={{color: '#046eb9'}}>
               <strong
                 onClick={() => {setChecked(true)}}
                 style={{cursor: "pointer"}}>click to view</strong></a> :

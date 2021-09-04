@@ -299,19 +299,6 @@ const UserVideo = ({ stream, locked, name, controlVideo, muted, total,
     // const [videoState, setVideoState] = useState(true);
 
     const echo = data*volume/100;
- 
-    const handlePlay = () => {
-        if(userVideo.current) {
-            userVideo.current.play();
-            setVolume(userVideo.current.volume*100)
-        }
-    }
-
-    const handlePause = () => {
-        if(userVideo.current) {
-            userVideo.current.pause();
-        }
-    }
 
     const handleZoom = (type) => {
         if(type) {
@@ -405,7 +392,7 @@ const UserVideo = ({ stream, locked, name, controlVideo, muted, total,
                 }
             }
         }
-    }, [stream])
+    }, [stream, userVideo])
 
     useEffect(() => {
         return () => {
@@ -413,7 +400,7 @@ const UserVideo = ({ stream, locked, name, controlVideo, muted, total,
                 audioTrackRef.current.volume = volume;
             }
         }
-    }, [volume])
+    }, [volume, audioTrackRef])
     
     return (
         <div className={classes.root}>
@@ -492,7 +479,7 @@ const UserVideo = ({ stream, locked, name, controlVideo, muted, total,
                     </div>
                 } */}
                 <div className={classes.content}>
-                    <video ref={userVideo} autoPlay style={{width: '100%'}} muted={muted}>
+                    <video ref={userVideo} autoPlay playsInline style={{width: '100%'}} muted={muted}>
                     </video>
                     {/* <audio ref={userAudio} autoPlay /> */}
                     <SoundMeter size={echo} />

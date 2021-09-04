@@ -156,12 +156,12 @@ class RoomObject  {
         let result = false
 
         const newUsers = this.users?.map((user) => {
-            const userToUpdate = usersWithPoints.find(({ _id, point }) => (_id === user._id))
+            const userToUpdate = usersWithPoints.find(({ _id }) => (_id === user._id))
             if (userToUpdate) {
                 result = true;
-                return { ... user, point: userToUpdate.point}
+                return { ...user, point: userToUpdate.point}
             } else {
-                return user
+                return user;
             }
         });
         if (result) {
@@ -176,7 +176,7 @@ class RoomObject  {
             if (user._id === userId) {
                 result = user;
                 if (producers) {
-                    return { ... user, video: {
+                    return { ...user, video: {
                         producers,
                         room: this.name,
                         locked

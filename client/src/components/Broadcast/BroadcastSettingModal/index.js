@@ -125,15 +125,15 @@ const BroadcastSetting = ({users, startBroadcast, stopBroadcast, cameraState, ro
     return (
         <div>
             <Button fullWidth
-                            color="primary"
-                            variant="contained"
-                            onClick={handleClickOpen}
-                            className={classes.cameraBtn}
-                        >{ cameraState ? t('SidebarLeft.stop_broadcasting'):
-                            t('SidebarLeft.start_broadcasting')
-                        }
-                            &nbsp;
-                    <VideocamIcon />
+                    color="primary"
+                    variant="contained"
+                    onClick={handleClickOpen}
+                    className={classes.cameraBtn}
+                >{ cameraState ? t('SidebarLeft.stop_broadcasting'):
+                    t('SidebarLeft.start_broadcasting')
+                }
+                    &nbsp;
+            <VideocamIcon />
             </Button>
             { open
                 ?
