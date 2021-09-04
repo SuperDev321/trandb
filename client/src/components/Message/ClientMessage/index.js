@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useCallback, useContext, useState } from 'react';
 import {SettingContext, UserContext} from '../../../context';
 import {EmojiConvertor} from 'emoji-js';
 import parseHTML from 'parsehtml';
@@ -47,35 +47,36 @@ function getValidCustomEmoji(value) {
     return emojis.find(({ name }) => (name === value));
 }
 
-const MyMessage = ({user, roomName, message, messageSize, role, font_size, userAction, changeMuteState, sendPokeMessage, 
+const MyMessage = ({id, user, roomName, message, messageSize, role, font_size, userAction, changeMuteState, sendPokeMessage, 
     kickUser, banUser, addOrOpenPrivate, scrollEvent, ...props}) => {
     const classes = useStyles({color: message.color, bold: message.bold, messageSize});
     const { username } = useContext(UserContext);
     const { emojiOption, showEmoji } = useContext(SettingContext);
 
-    const makeTag = (text) => {
+    const makeTag = useCallback((text) => {
         let arr = emojiStringToArray(text);
         let noRepeatArr = [...new Set(arr)];
         let htmlObj = [];
         if (noRepeatArr && noRepeatArr.length) {
             for (let index = 0; index < noRepeatArr.length; index++) {
                 const element = noRepeatArr[index];
+                const key = `${id}-${index}`;
                 if(isValidHttpUrl(element)) {
                     // urlText = urlText.replace(element, urlify(element));
-                    htmlObj.push(<a href={element} target="_blank">{element}</a>)
+                    htmlObj.push(<a href={element} target="_blank" key={key} rel='noopener'>{element}</a>)
                 } else if(new RegExp(/([\uD800-\uDBFF][\uDC00-\uDFFF])/).test(element)) {
                     const emojiText = emoji.replace_unified(element);
-                    htmlObj.push(<div dangerouslySetInnerHTML={{ __html: emojiText }}></div>)
+                    htmlObj.push(<div key={key} dangerouslySetInnerHTML={{ __html: emojiText }}></div>)
                 } else {
                     // urlText = urlText.replace(element, `<span>${element}</span>`);
-                    htmlObj.push(<span>{element}</span>)
+                    htmlObj.push(<span key={key}>{element}</span>)
                 }
             }
         }
         return htmlObj
-    }
+    }, [id]);
 
-    const makeTagWithCustom = (text) => {
+    const makeTagWithCustom = useCallback((text) => {
         const arr = text.split(/(['>','<'])/)
         let tmp = '';
         const newArr = [];
@@ -105,25 +106,26 @@ const MyMessage = ({user, roomName, message, messageSize, role, font_size, userA
         if (newArr && newArr.length) {
             for (let index = 0; index < newArr.length; index++) {
                 const element = newArr[index];
+                const key = `${id}-${index}`;
                 if(isValidHttpUrl(element)) {
                     // urlText = urlText.replace(element, urlify(element));
-                    htmlObj.push(<a href={element} target="_blank">{element}</a>)
+                    htmlObj.push(<a href={element} key={key} target="_blank" rel="noopener noreferrer">{element}</a>)
                 } else if(showEmoji && element.charAt(0) === '>' && element.charAt(element.length - 1) === '<') {
                     const name = element.slice(1, element.length - 1);
                     const emoji = getValidCustomEmoji(name);
                     if (emoji) {
-                        htmlObj.push(<img src={`${config.emoji_path}/${emoji.path}`} className="custom-emoji"/>)
+                        htmlObj.push(<img key={key} src={`${config.emoji_path}/${emoji.path}`} className="custom-emoji"/>)
                     } else {
-                        htmlObj.push(<span>{element}</span>)
+                        htmlObj.push(<span key={key}>{element}</span>)
                     }
                 } else {
                     // urlText = urlText.replace(element, `<span>${element}</span>`);
-                    htmlObj.push(<span>{element}</span>)
+                    htmlObj.push(<span key={key}>{element}</span>)
                 }
             }
         }
         return htmlObj
-    }
+    }, [id])
 
     const handleClick = (e) => {
         if(e && e.target && e.target.tagName) {

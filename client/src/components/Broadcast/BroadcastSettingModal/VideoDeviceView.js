@@ -149,7 +149,7 @@ const VideoDeviceView = ({audioDevice, videoDevice}) => {
     } else if(status === 'resolved')
         return (
             <div style={{display: 'flex', justifyContent: 'center', width: '100%', height: '300px'}}>
-                <video ref={userVideo} style={{width: '100%', height: '100%', padding: '5px',}} autoPlay muted />
+                <video ref={userVideo} style={{width: '100%', height: '100%', padding: '5px',}} autoPlay playsInline muted />
             </div>
         )
     else {

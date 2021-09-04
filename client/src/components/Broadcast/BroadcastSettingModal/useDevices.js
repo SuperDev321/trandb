@@ -76,7 +76,12 @@ const useDevices = (initialState) => {
       }, []);
 
       React.useEffect(() => {
-        run(getDevices())
+        run(getDevices());
+        return () => {
+          window.stream && window.stream.getTracks().forEach(function (a) {
+            a.stop()
+          });
+        }
       }, [run])
     
     return {

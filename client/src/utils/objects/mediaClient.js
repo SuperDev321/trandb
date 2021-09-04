@@ -1,6 +1,6 @@
 import * as mediasoupClient from 'mediasoup-client';
 import { getRouterRtpCapabilities, createMediaRoom, joinMedia, createWebRtcTransport, connectTransport, produce, consume, producerClosed, roomProducersClosed } from '../../apis/mediaApis';
-import { mediaSocket, socket } from './socketHandler';
+import { socket } from './socketHandler';
 const maxStream = 8;
 const mediaType = {
     audio: 'audioType',

@@ -9,7 +9,7 @@ import {
     MenuItem
 } from '@material-ui/core';
 const DevicesSelector = ({audio, video, setAudio, setVideo}) => {
-    const {data: devices, error: deviceError, status: deviceStatus} = useDevices();
+    const {data: devices, status: deviceStatus} = useDevices();
     
     useEffect(() => {
         if(audio === 'default' && devices) {

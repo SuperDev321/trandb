@@ -1,5 +1,5 @@
 import React, { useState, useReducer, useEffect, useContext, useRef, useCallback } from 'react';
-import { socket, mediaSocket, useLocalStorage, RoomObject, MediaClient, mediaEvents } from '../../utils';
+import { socket, useLocalStorage, RoomObject, MediaClient, mediaEvents } from '../../utils';
 import { isPrivateRoom } from '../../apis';
 import { UserContext, SettingContext } from '../../context';
 import { useTranslation } from 'react-i18next';
@@ -163,6 +163,22 @@ const useRooms = ({initRoomName, ...initalState}) => {
         roomsDispatch({type: 'set', data: newRoomsData, roomIndex: newRoomIndex});
     }, [roomsRef]);
 
+    const autoStartRemoteVideo = useCallback(async (room, producers, userId, locked, remoteUsername) => {
+        let result = await socket.request('check camera view', ({ room, targetUserId: userId }));
+        if (!result) {
+            return false;
+        }
+        if (username !== remoteUsername && !locked && mediaClientRef.current) {
+            await mediaClientRef.current.createRoom(room);
+            await mediaClientRef.current.join(room);
+            await mediaClientRef.current.initDevice(room);
+            if (!mediaClientRef.current.checkConsumeState(room)) {
+                await mediaClientRef.current.initTransports(room, false, true)
+            }
+            mediaClientRef.current.requestView(room, userId, remoteUsername, producers, false, null, null);
+        }
+    }, [mediaClientRef, username]);
+
     const initRoom = useCallback(async ({room, globalBlocks, onlineUsers, messages, blocks, cameraBans, globalCameraBans}) => {
         let data = {};
         if(roomsRef.current && room) {
@@ -224,7 +240,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
             }
 
         }
-    }, [dispatch, roomsDispatch, messageNum, autoBroadcast]);
+    }, [roomsRef, dispatch, roomsDispatch, messageNum, autoBroadcast, autoStartRemoteVideo]);
 
     const addRoom = useCallback(async (room, callback) => {
         let roomNames = await roomsRef.current.map((oneRoom) => (oneRoom.name));
@@ -313,7 +329,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 }
             }
         }
-    }, [enableSysMessage, dispatch]);
+    }, [enableSysMessage, dispatch, roomsRef, mediaClientRef]);
 
     const kickUser = useCallback(async ({room, kickedUserName, type, role, username: adminName, reason}) => {
         if(roomsRef.current && room) {
@@ -436,7 +452,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 enqueueSnackbar(alertText, {variant: 'error'});
             }
         }
-    }, [username, dispatch])
+    }, [username, dispatch, roomsRef])
 
     const updateBlocks = useCallback(async ({room, blocks}) => {
         if(roomsRef.current && room) {
@@ -446,7 +462,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 dispatch({type: 'update', data: { name: room, blocks}});
             }
         }
-    }, [dispatch]);
+    }, [dispatch, roomsRef]);
 
     const updateCameraBans = useCallback(({room, cameraBans}) => {
         if(roomsRef.current && room) {
@@ -472,7 +488,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 mediaClientRef.current.exitRoom(room);
             }
         }
-    }, [dispatch, username]);
+    }, [dispatch, username, roomsRef]);
 
     const removeRoom = useCallback(async (room, callback) => {
         if(status === 'resolved' && roomsStatus === 'resolved') {
@@ -524,7 +540,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
         if(mediaClientRef.current) {
             mediaClientRef.current.exitRoom(room);
         }
-    }, [status, roomsStatus, roomIndex, data, dispatch, roomsDispatch])
+    }, [status, roomsStatus, roomIndex, data, dispatch, roomsDispatch, roomsRef, roomNameRef])
 
     const changeMuteState = useCallback(async (roomName, userToMute, isMuted) => {
         let room = roomsRef.current.find((item) => (item.name === roomName));
@@ -610,7 +626,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
             let infos = roomsRef.current.map(({name, unReadMessages}) => ({name, unReadMessages}));
             roomsDispatch({type: 'set', data: infos});
         }
-    }, [dispatch, roomsDispatch]);
+    }, [dispatch, roomsDispatch, roomsRef]);
 
     const receivePoke = useCallback(async (pokeMessage, callback) => {
         let {room} = pokeMessage;
@@ -679,7 +695,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 }
             })
         }
-    }, [roomsRef])
+    }, [roomsRef, dispatch])
 
     const updatePoints = useCallback(async (usersWithPoints) => {
         const userToUpdate = usersWithPoints.find(({ username: usernameToUpdate }) => (username === usernameToUpdate));
@@ -870,21 +886,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
         }
     }, [mediaClientRef, username]);
 
-    const autoStartRemoteVideo = useCallback(async (room, producers, userId, locked, remoteUsername) => {
-        let result = await socket.request('check camera view', ({ room, targetUserId: userId }));
-        if (!result) {
-            return false;
-        }
-        if (username !== remoteUsername && !locked && mediaClientRef.current) {
-            await mediaClientRef.current.createRoom(room);
-            await mediaClientRef.current.join(room);
-            await mediaClientRef.current.initDevice(room);
-            if (!mediaClientRef.current.checkConsumeState(room)) {
-                await mediaClientRef.current.initTransports(room, false, true)
-            }
-            mediaClientRef.current.requestView(room, userId, remoteUsername, producers, false, null, null);
-        }
-    }, [mediaClientRef, username]);
+
 
     const startRemoteVideo = useCallback(async (room, producers, userId, locked, remoteUsername) => {
         try {
@@ -928,14 +930,14 @@ const useRooms = ({initRoomName, ...initalState}) => {
         }
     }, [roomsRef, roomNameRef, dispatch, mediaClientRef]);
 
-    const checkCameraState = useCallback(async (room, userId, callback) => {
-        const roomObj = roomsRef.current.find((item) => (item.name === room));
-        if (roomObj && roomObj.checkCameraState(userId)) {
-           callback(true);
-        } else {
-            callback(false);
-        }
-    }, [roomsRef]);
+    // const checkCameraState = useCallback(async (room, userId, callback) => {
+    //     const roomObj = roomsRef.current.find((item) => (item.name === room));
+    //     if (roomObj && roomObj.checkCameraState(userId)) {
+    //        callback(true);
+    //     } else {
+    //         callback(false);
+    //     }
+    // }, [roomsRef]);
 
     useEffect(() => {
         if (username && roomsRef.current && roomsRef.current.length && globalCameraBans && globalCameraBans.length) {
@@ -961,35 +963,36 @@ const useRooms = ({initRoomName, ...initalState}) => {
 
     useEffect(() => {
         if(initRoomName && username) {
-            socket.open();
-            
-            socket.on('update block', ({room, blocks}) => {
+            if (!socket.connected) {
+                socket.open();
+            }
+            socket.on('update block', async ({room, blocks}) => {
                 updateBlocks({room, blocks});
             })
-            socket.on('update global block', ({blocks}) => {
+            socket.on('update global block', async ({blocks}) => {
                 setGlobalBlocks(blocks);
             })
-            socket.on('update camera bans', ({room, cameraBans}) => {
+            socket.on('update camera bans', async ({room, cameraBans}) => {
                 updateCameraBans({room, cameraBans});
             })
-            socket.on('update global camera bans', ({globalCameraBans}) => {
+            socket.on('update global camera bans', async ({globalCameraBans}) => {
                 setGlobalCameraBans(globalCameraBans);
             })
-            socket.on('room message', (message, callback) => {
+            socket.on('room message', async (message, callback) => {
                 receiveMessage({message}, callback);
             });
-            socket.on('private message', (message, callback) => {
+            socket.on('private message', async (message, callback) => {
             })
             socket.on('poke message', (payload, callback) => {
                 receivePoke(payload, callback)
             })
-            socket.on('update points', (usersWithPoints) => {
+            socket.on('update points', async (usersWithPoints) => {
                 updatePoints(usersWithPoints)
             })
-            socket.on('update user info', (userInfo) => {
+            socket.on('update user info', async (userInfo) => {
                 updateUserProfile(userInfo)
             })
-            socket.on('disconnect', (reason) => {
+            socket.on('disconnect', async (reason) => {
                 setOpenDisconnectModal(true);
                 if (mediaClientRef.current) {
                     mediaClientRef.current.exit(true);
@@ -1025,17 +1028,17 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 })
                 setOpenDisconnectModal(false)
             })
-            socket.on('repeat connection', () => {
+            socket.on('repeat connection', async () => {
                 enqueueSnackbar(t('ChatApp.already_in_chat'), {variant: 'error'});
                 history.push('/');
             })
-            socket.on('stop video', ({ room, userId }) => {
+            socket.on('stop video', async ({ room, userId }) => {
                 stopRemoteVideo(room, userId)
             })
             // socket.on('check camera state', ({ room, userId }, callback) => {
             //     checkCameraState(room, userId, callback);
             // })
-            socket.on('view request', ({ username, roomName }, callback) => {
+            socket.on('view request', async ({ username, roomName }, callback) => {
                 requestAudioControls.seek(0);
                 requestAudioControls.play();
                 permissionRequest(username, roomName, (result) => {
@@ -1119,7 +1122,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
             socket.off('start view');
             socket.off('stop view');
         }
-    }, [username])
+    }, [username, mediaClientRef])
 
     useEffect(() => {
         socket.on('joined room',async ({room, onlineUsers, joinedUser}) => {
@@ -1144,7 +1147,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
             socket.off('banned user');
             socket.off('global banned user');
         }
-    }, [enableSysMessage, username])
+    }, [addUser, removeUser, kickUser])
 
     useEffect(() => {
         socket.on('received gift', (payload) => {
@@ -1171,9 +1174,9 @@ const useRooms = ({initRoomName, ...initalState}) => {
         if (username && myId) {
             mediaObj = new MediaClient(username, myId);
             mediaObj.on(mediaEvents.onChangeRemoteStreams, async (data) => {
-                let {room_id} = data;
+                const {room_id} = data;
                 if (room_id) {
-                    let remoteStreams = await mediaClientRef.current.getRemoteStreams(room_id);
+                    const remoteStreams = await mediaClientRef.current.getRemoteStreams(room_id);
                     dispatch({
                         type: 'update',
                         data: {
@@ -1182,7 +1185,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
                         }
                     })
                 } else {
-                    let remoteStreams = await mediaClientRef.current.getRemoteStreams(roomNameRef.current);
+                    const remoteStreams = await mediaClientRef.current.getRemoteStreams(roomNameRef.current);
                     dispatch({
                         type: 'update',
                         data: {
@@ -1194,8 +1197,8 @@ const useRooms = ({initRoomName, ...initalState}) => {
             })
 
             mediaObj.on(mediaEvents.startStream, async (data) => {
-                let {room_id} = data;
-                let stream = await mediaObj.getLocalStream(room_id);
+                const {room_id} = data;
+                const stream = await mediaObj.getLocalStream(room_id);
                 dispatch({
                     type: 'update',
                     data: {

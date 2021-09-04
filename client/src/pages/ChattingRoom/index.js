@@ -11,15 +11,15 @@ import ChatRooms from '../../components/ChatRooms';
 const ChattingRoom = () => {
     const { room } = useParams();
     const {messageSize, setMessageSize} = useContext(SettingContext);
-    const [unReadMsgs, setUnReadMsgs] = useState([]);
+    // const [unReadMsgs, setUnReadMsgs] = useState([]) ;
     const chatRef = useRef();
-    const addUnReadMsg = ({from, msg}) => {
-        let msgInfo = {
-            from,
-            msg,
-        }
-        setUnReadMsgs([...unReadMsgs, msgInfo]);
-    }
+    // const addUnReadMsg = ({from, msg}) => {
+    //     let msgInfo = {
+    //         from,
+    //         msg,
+    //     }
+    //     setUnReadMsgs([...unReadMsgs, msgInfo]);
+    // }
     // const readMsg = (from) => {
     //     let msgs = unReadMsgs.filter((item) => (item.from !== from));
     //     setUnReadMsgs(msgs)

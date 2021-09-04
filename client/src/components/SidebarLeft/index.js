@@ -126,7 +126,7 @@ const SideBarLeft = ({ roomName, username, mutes, blocks, globalBlocks, cameraBa
         } else {
             addPrivateMute({username, ip})
         }
-    }, [privateMutes, removePrivateMute, addPrivateMute])
+    }, [removePrivateMute, addPrivateMute])
 
     useEffect(() => {
         let me = users.find((item) => (item.username === username));
@@ -231,7 +231,7 @@ const SideBarLeft = ({ roomName, username, mutes, blocks, globalBlocks, cameraBa
             }
         })
         setSideUsers(newUsers)
-    }, [users, blocks, globalBlocks, mutes, cameraBans, globalCameraBans, privateMutes, viewers, username, cameraState, pointOption])
+    }, [users, roomName, blocks, globalBlocks, mutes, cameraBans, globalCameraBans, privateMutes, viewers, username, cameraState, pointOption])
 
 
     useEffect(() => {
