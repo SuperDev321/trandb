@@ -32,7 +32,7 @@ const GreenRadio = withStyles({
     checked: {},
 })((props) => <Radio color="default" {...props} />);
 
-export default function BanModal({open, setOpen, initVal, roomName, isAdmin}) {
+export default function BanModal({open, setOpen, initVal, roomName, isAdmin, banUser}) {
     const classes = useStyles();
     // const name = initVal.name?initVal.name: '';
     const name = initVal.name || '';
@@ -81,7 +81,7 @@ export default function BanModal({open, setOpen, initVal, roomName, isAdmin}) {
         payload.reason = reason;
         payload.to = name;
         payload.kind = kind;
-        socket.emit('ban user', payload);
+        banUser(payload);
         setOpen(false);
     }
     

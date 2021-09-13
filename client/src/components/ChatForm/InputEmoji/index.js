@@ -518,7 +518,7 @@ function InputEmoji ({
             onClick={onSend}
             color="primary"
         >
-            <SendIcon fontSize="default"/>
+            <SendIcon fontSize="medium"/>
         </IconButton>
         {showPicker &&
         <div

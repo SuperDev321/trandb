@@ -11,11 +11,13 @@
     "@testing-library/user-event": "^7.2.1",
     "antd": "^4.2.3",
     "axios": "^0.21.1",
+    "clsx": "^1.1.1",
     "emoji-js": "^3.4.1",
     "emoji-picker-react": "^3.3.0",
     "formik": "^2.2.6",
     "html-react-parser": "^1.1.1",
     "i18next": "^19.8.8",
+    "json-fn": "^1.1.1",
     "jss-rtl": "^0.3.0",
     "mediasoup-client": "^3.6.12",
     "moment": "^2.26.0",
@@ -37,8 +39,10 @@
     "react-rnd": "^10.2.4",
     "react-router-dom": "^5.2.0",
     "react-scripts": "^3.4.3",
+    "react-spinners": "^0.11.0",
     "react-text-mask": "^5.4.3",
     "react-use": "^15.3.8",
+    "react-web-workers": "^1.0.1",
     "react-window": "^1.8.6",
     "sass-loader": "^10.1.0",
     "simple-peer": "^9.9.3",
@@ -54,7 +58,14 @@
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
-    "extends": "react-app"
+    "extends": "react-app",
+    "rules": {
+      "no-restricted-globals": [
+        "error",
+        "event",
+        "self"
+      ]
+    }
   },
   "browserslist": {
     "production": [

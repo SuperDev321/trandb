@@ -59,8 +59,8 @@ const useStyles = makeStyles((theme) => ({
         backgroundImage: '/img/public_chat.png',
     },
     cardAvatar: {
-        width: theme.spacing(5),
-        height: theme.spacing(5),
+        width: theme.spacing(10),
+        height: theme.spacing(10),
     },
     cardButton: {
         borderRadius: '0',
@@ -539,9 +539,10 @@ const RoomUserName = ({user, role, roomName,
                 }
             </Card>
         </Popover>
-        {(role === 'admin' || role === 'super_admin'|| role === 'owner'|| role === 'moderator') && <BanModal open={openBan} setOpen={setOpenBan} initVal={{name: user.username}}
-            roomName={roomName} isAdmin={(role === 'admin' || role === 'super_admin')}
-        />
+        {(role === 'admin' || role === 'super_admin'|| role === 'owner'|| role === 'moderator') &&
+            <BanModal open={openBan} setOpen={setOpenBan} initVal={{name: user.username}} banUser={banUser}
+                roomName={roomName} isAdmin={(role === 'admin' || role === 'super_admin')}
+            />
         }
         </>
     )

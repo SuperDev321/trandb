@@ -47,8 +47,8 @@ const ChatRooms = ({room}, ref) => {
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
     };
-    const {messageTimeInterval, maxMessageLength} = useContext(SettingContext);
-    const messageTimeRef = useRef(null);
+    // const {messageTimeInterval, maxMessageLength} = useContext(SettingContext);
+    // const messageTimeRef = useRef(null);
     const matches = useMediaQuery('(min-width:1000px)');
 
     const {status, data: currentRoomData, error,
@@ -63,7 +63,12 @@ const ChatRooms = ({room}, ref) => {
         addRoom,
         removeRoom,
         addMessage,
+        sendMessage,
+        sendPokeMessage,
         changeMuteState,
+        kickUser,
+        banUser,
+        stopBroadcastTo,
         pokeAudio1,
         pokeAudio2,
         pokeAudio3,
@@ -88,7 +93,9 @@ const ChatRooms = ({room}, ref) => {
         startBroadcast,
         stopBroadcast,
         controlVideo,
-        viewBroadcast
+        viewBroadcast,
+        leaveFromPrivate,
+        addOrOpenPrivate
     } = useRooms({initRoomName: room});
 
     const { enqueueSnackbar, closeSnackbar } = useSnackbar();
@@ -105,107 +112,42 @@ const ChatRooms = ({room}, ref) => {
         }
     };
     // add a private modal to private list
-    const addOrOpenPrivate = (to) => {
-        if(!privateListRef.current.openChat(to)) {
-            socket.emit('open private', {from: username, to: to.username, role}, (roomName, err) => {
-                if(roomName) {
-                    privateListRef.current.addChat(to, roomName);
-                } else {
-                    if(err === 'private_error_guest') {
-                        enqueueSnackbar(t('UserActionArea.error_guest_dont_have_permission'), {variant: 'error'});
-                    }
-                }
-            });
-        }
-    }
+
     
     // kick a user from room
-    const kickUser = async (roomName, usernameToKick) => {
-        socket.emit('kick user', {room: roomName, to: usernameToKick});
-    }
-    const banUser = async (roomName, usernameToBan) => {
-        socket.emit('ban user', {room: roomName, to: usernameToBan});
-    }
-    // remove a room
-    const sendMessage = async (roomName, to, color, msg, bold, type, messageType) => {
-        if (msg) {
-            const date = Date.now()
-            let offset = 2000
-            if (messageTimeRef.current) {
-                offset = date - messageTimeRef.current
-                if (offset < messageTimeInterval) {
-                    enqueueSnackbar(t('Message.timeError'), {variant: 'error'});
-                    return
-                }
-            }
-            messageTimeRef.current = date
-            if (msg?.length > maxMessageLength) {
-                enqueueSnackbar(t('Message.error_long_message'), {variant: 'error'})
-                return
-            }
-            if(type === 'private') {
-                privateListRef.current.addMessage({
-                    _id: makeid(5),
-                    type, roomName, msg, from: username, to, color, bold, messageType, date
-                }, roomName);
-                socket.emit('private message',
-                    { type, roomName, msg, from: username, to, color, bold, messageType },
-                    async (data, err) => {
-                        if(data) {
-                            // let message = data;
-                            // privateListRef.current.addMessage(message, roomName);
-                        } else {
-                            if(err === 'logout') {
-                                privateListRef.current.addErrorMessage(roomName);
-                            } else if (err === 'forbidden') {
-                                enqueueSnackbar(t('Message.forbidden'), {variant: 'error'});
-                            } else if (err === 'muted') {
-                                enqueueSnackbar(t('Message.private_muted'), {variant: 'error'});
-                            } else if (err === 'blocked') {
-                                enqueueSnackbar(t('Message.private_blocked'), {variant: 'error'});
-                            }
-                            // enqueueSnackbar(to + ' was out of chat. Please close the private chat with '+ to +'.', {variant: 'error'});
-                        }
-                    }
-                );
-            } else {
-                socket.emit('public message', { type, msg, room: roomName, from: username, color, bold, messageType }, async (data) => {
-                    
-                });
-                addMessage({message: { _id: makeid(5), type, msg, room: roomName, from: username, color, bold, messageType, date }, room: roomName})
-            }
-        }
-    };
-    const leaveFromPrivate = async (roomName) => {
-        socket.emit('leave private', roomName);
-    }
+    // const kickUser = async (roomName, usernameToKick) => {
+    //     socket.emit('kick user', {room: roomName, to: usernameToKick});
+    // }
+    // const banUser = async (roomName, usernameToBan) => {
+    //     socket.emit('ban user', {room: roomName, to: usernameToBan});
+    // }
 
-    const stopBroadcastTo = async (roomName, userId, name) => {
-        if(mediaClientRef.current) {
-            mediaClientRef.current.stopView(roomName, userId, name);
-        }
-    }
+    // const stopBroadcastTo = async (roomName, userId, name) => {
+    //     if(mediaClientRef.current) {
+    //         mediaClientRef.current.stopView(roomName, userId, name);
+    //     }
+    // }
 
-    // send poke message
-    const sendPokeMessage = async (roomName, userToSend, pokeType) => {
-        socket.emit('poke message', {from: username, to: userToSend, room: roomName, pokeType}, (response) => {
-            // this is callback function that can excute on server side
-            if(response === 'muted') {
-                enqueueSnackbar(t('PokeMessage.error_muted'), {variant: 'error'});
-            } else if (response === 'success'){
-                addMessage({
-                    room: roomName,
-                    message: {
-                        type: 'poke',
-                        msg: t(`PokeMessage.poke_${pokeType}`, {
-                            sender: t('PokeMessage.you'),
-                            receiver: userToSend
-                        }),
-                    }
-                })
-            }
-        });
-    }
+    // // send poke message
+    // const sendPokeMessage = async (roomName, userToSend, pokeType) => {
+    //     socket.emit('poke message', {from: username, to: userToSend, room: roomName, pokeType}, (response) => {
+    //         // this is callback function that can excute on server side
+    //         if(response === 'muted') {
+    //             enqueueSnackbar(t('PokeMessage.error_muted'), {variant: 'error'});
+    //         } else if (response === 'success'){
+    //             addMessage({
+    //                 room: roomName,
+    //                 message: {
+    //                     type: 'poke',
+    //                     msg: t(`PokeMessage.poke_${pokeType}`, {
+    //                         sender: t('PokeMessage.you'),
+    //                         receiver: userToSend
+    //                     }),
+    //                 }
+    //             })
+    //         }
+    //     });
+    // }
 /*************************************************************** */
     // leave room by you
     const leaveRoomByUser = async (room) => {

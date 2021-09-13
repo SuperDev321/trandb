@@ -8,18 +8,23 @@ const publicMessage = (io, socket) => async ({ msg, room, from, color, bold, typ
     const date = Date.now();
     let user = await findUserById(_id);
     if(!user) {
-      return callback(false);
+      if (callback) callback(false)
+      return;
     }
     let userIp = user.ip? ipInt(user.ip).toIP(): null;
     if(messageType !== 'image') {
       let isForbiddenMessage = await hasFobiddenWord(msg);
       if(isForbiddenMessage) {
         await banUser(io, socket)({ip: userIp, to: user.username, role: 'admin', kind: 'chat'});
-        return callback(false);
+        if (callback) {
+          callback(false);
+        }
+        return;
       }
     }
     let isBlocked = await checkBlockById(room, _id);
     if(isBlocked) {
+      if (callback) callback(false, 'blocked');
       return callback(false, 'blocked');
     }
     const newChat = await Chats.create({
@@ -33,7 +38,7 @@ const publicMessage = (io, socket) => async ({ msg, room, from, color, bold, typ
       bold,
       date,
     });
-    callback(newChat);
+    if (callback) callback(newChat);
     socket.to(room).emit('room message', {
         type: 'public',
         room,
@@ -138,6 +143,7 @@ const privateMessage = (io, socket) => async ({ roomName, msg, from, to, color, 
       let socketIds = await io.of('/').in(roomName).allSockets();
       const socketIdArr = Array.from(socketIds);
       if(socketIdArr.length < 2) {
+        console.log('logout')
         callback(false, 'logout');
         socket.leave(roomName);
         return;
