@@ -92,7 +92,7 @@ const useStyles = makeStyles((theme) => ({
         flexDirection: 'column',
         width: '100%',
         overflow: 'hidden',
-        // height: 300,
+        // height: 'calc(100% - 30px)',
     },
     content: {
         width: '100%',

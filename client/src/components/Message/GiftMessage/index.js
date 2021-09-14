@@ -11,7 +11,8 @@ const useStyles = makeStyles((theme) => ({
         display: 'flex',
         justifyContent: 'space-between',
         width: 'fit-content',
-        background: orange[500],
+        background: green[500],
+        fontSize: '0.8rem',
         alignItems: 'center',
         padding: 5
     },
@@ -25,7 +26,7 @@ const GiftMessage = ({ text, image }) => {
     return (
         <div className={classes.root}>
         { image ?
-            <img src={image} width='20' height='20' alt=''/>
+            <img src={image} width='30' height='30' alt=''/>
             :
             <CardGiftcardIcon fontSize='large' className={classes.icon} />
         }

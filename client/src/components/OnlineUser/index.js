@@ -17,7 +17,7 @@ import {
 } from '@material-ui/icons';
 import RoomUserName from '../RoomUserName';
 import config from '../../config';
-import { SettingContext } from '../../context';
+import { ChatContext, SettingContext, UserContext } from '../../context';
 const useStyles = makeStyles((theme) => ({
     listItem: {
         display: 'flex',
@@ -62,14 +62,14 @@ const useStyles = makeStyles((theme) => ({
         }
     },
     avatar: {
-        width: theme.spacing(3.8),
-        height: theme.spacing(3.8),
+        width: theme.spacing(4.6),
+        height: theme.spacing(4.6),
         minWidth: 0
     },
     avatarBadge: {
         '& .MuiBadge-badge': {
-            width: theme.spacing(3.8),
-            height: theme.spacing(3.8), 
+            width: theme.spacing(4.6),
+            height: theme.spacing(4.6), 
         },
         '& .MuiSvgIcon-root': {
             fontSize: '2rem'
@@ -135,13 +135,16 @@ const StyledBadge = withStyles((theme) => ({
     />
 ))
 
-const OnlineUser = ({roomName, username, user, role, isMuted, isPrivateMuted, isBlocked, isBroadcasting, isViewer,
-        changeMuteState, sendPokeMessage, kickUser, banUser, viewBroadcast, stopBroadcastTo,
-        // , setOpenPrivate, setPrivateTo
-        addOrOpenPrivate, changePrivateMute
+const OnlineUser = ({user, role, isMuted, isPrivateMuted, isBlocked, isBroadcasting, isViewer,
+        changePrivateMute
     }) => {
     const [anchorEl, setAnchorEl] = React.useState(null);
+    const { username } = useContext(UserContext);
     const { avatarOption, avatarColor } = useContext(SettingContext);
+    const { currentRoomData, changeMuteState, sendPokeMessage,
+        kickUser, banUser, viewBroadcast, stopBroadcastTo,
+        addOrOpenPrivate } = useContext(ChatContext);
+    const { name: roomName } = currentRoomData;
     const [avatarUrl, setAvatarUrl] = useState(null);
     const classes = useStyles({role: user.role, gender: user.gender, avatarColor});
 
@@ -215,11 +218,11 @@ const OnlineUser = ({roomName, username, user, role, isMuted, isPrivateMuted, is
                 {
                     isViewer
                     ?
-                    <Visibility className={classes.icon} style={{ color: green[300] }} onDoubleClick={handleDoubleClickEye}/>:null                }
+                    <Visibility className={classes.icon} style={{ color: blue[500], fontSize: 17 }} onDoubleClick={handleDoubleClickEye}/>:null                }
                 { isBroadcasting ?
                     <Videocam className={classes.icon}  onDoubleClick={handleDoubleClickVideo}
                     // color={(user && user.broadcasting)? 'primary': 'disabled'}
-                        style={{ color: green[300] }}
+                        style={{ color: blue[700] }}
                     />
                     :null
                 }
@@ -227,7 +230,7 @@ const OnlineUser = ({roomName, username, user, role, isMuted, isPrivateMuted, is
                 { user.isCameraBanned ?
                     <VideocamOff className={classes.icon}  onDoubleClick={handleDoubleClickVideo}
                     // color={(user && user.broadcasting)? 'primary': 'disabled'}
-                        style={{ color: grey[800] }}
+                        style={{ color: grey[800], fontSize: 17 }}
                     />
                     :null
                 }
@@ -251,12 +254,6 @@ const OnlineUser = ({roomName, username, user, role, isMuted, isPrivateMuted, is
                         roomName={roomName}
                         isMine={username === user.username}
                         displayYou={true}
-                        changeMuteState={changeMuteState}
-                        sendPokeMessage={sendPokeMessage}
-                        viewBroadcast={viewBroadcast}
-                        kickUser={kickUser}
-                        banUser={banUser}
-                        addOrOpenPrivate={addOrOpenPrivate}
                         role={role}
                         anchorEl={anchorEl}
                         setAnchorEl={setAnchorEl}
@@ -265,7 +262,6 @@ const OnlineUser = ({roomName, username, user, role, isMuted, isPrivateMuted, is
                         isMuted={isMuted}
                         isPrivateMuted={isPrivateMuted}
                         isBlocked={isBlocked}
-                        stopBroadcastTo={stopBroadcastTo}
                         changePrivateMute={changePrivateMute}
                         showAboutMe={true}
                         showPoint={true}

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 import config from '../../config'
 const useAuth = () => {
@@ -41,7 +41,7 @@ const useAuth = () => {
     })();
   }, [auth]);
 
-  const updateUser = async () => {
+  const updateUser = useCallback(async () => {
     try {
       let token = window.localStorage.getItem('token');
       const { data } = await axios.post(`${config.server_url}/api/checkToken`, {token});
@@ -65,28 +65,28 @@ const useAuth = () => {
     } catch (err) {
       setLoading(false);
     }
-  }
+  }, [setLoading, setRole, setGender, setMyUser, setAvatar]);
 
-  const updateUserPoint = (point) => {
+  const updateUserPoint = useCallback((point) => {
     setPoint(point);
-  }
+  }, [setPoint]);
 
-  const updateProfile = (userInfo) => {
+  const updateProfile = useCallback((userInfo) => {
     const { avatar, aboutMe } = userInfo;
     if (avatar) {
       setAvatar(avatar)
     }
     setMyUser({ ...myUser, ...userInfo });
-  }
+  }, [setAvatar, setMyUser]);
  
-  const removeCurrentUser = () => {
+  const removeCurrentUser = useCallback(() => {
     window.localStorage.removeItem('token');
     setAuth(false);
     setMyId(null);
     setUsername('');
     setRole('user');
     setAvatar(null);
-  };
+  }, [setAuth, setMyId, setRole, setAvatar]);
 
   return { auth, setAuth, gender, avatar, myId, username, role, loading, setLoading, removeCurrentUser, prevUrl, setPrevUrl, updateUser, myUser, point, updateUserPoint, updateProfile };
 };

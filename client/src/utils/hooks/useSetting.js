@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import axios from 'axios';
 import config from '../../config';
 import { useTranslation } from 'react-i18next';
@@ -32,36 +32,36 @@ const useSetting = () => {
   const [autoBroadcast, _setAutoBroadcast] = useState(false);
 
   const { t, i18n } = useTranslation();
-  const setMessageSize = (messageSize) => {
+  const setMessageSize = useCallback((messageSize) => {
     localStorage.setItem('messageSize', messageSize);
     _setMessageSize(messageSize);
-  }
+  }, [_setMessageSize]);
 
-  const setLanguage = (language) => {
+  const setLanguage = useCallback((language) => {
     localStorage.setItem('language', language);
     _setLanguage(language);
     i18n.changeLanguage(language)
-  }
+  }, [_setLanguage]);
 
-  const setEnablePrivateSound = (setting) => {
+  const setEnablePrivateSound = useCallback((setting) => {
     if(setting)
       localStorage.setItem('private-sound', 'on');
     else localStorage.setItem('private-sound', 'off');
     _setEnablePrivateSound(setting);
-  }
-  const setEnablePublicSound = (setting) => {
+  }, [_setEnablePrivateSound]);
+  const setEnablePublicSound = useCallback((setting) => {
     if(setting)
       localStorage.setItem('public-sound', 'on');
     else localStorage.setItem('public-sound', 'off');
     _setEnablePublicSound(setting);
-  }
-  const setEnablePokeSound = (setting) => {
+  }, [_setEnablePublicSound]);
+  const setEnablePokeSound = useCallback((setting) => {
     if(setting)
       localStorage.setItem('poke-sound', 'on');
     else localStorage.setItem('poke-sound', 'off');
     _setEnablePokeSound(setting);
-  }
-  const setEnableSysMessage = (setting) => {
+  }, [_setEnablePokeSound]);
+  const setEnableSysMessage = useCallback((setting) => {
     if(setting) {
       localStorage.setItem('system-message', 'on');
       _setEnableSysMessage(true);
@@ -69,8 +69,8 @@ const useSetting = () => {
       localStorage.setItem('system-message', 'off');
       _setEnableSysMessage(false);
     }
-  }
-  const setShowGiftMessage = (setting) => {
+  }, [_setEnableSysMessage]);
+  const setShowGiftMessage = useCallback((setting) => {
     if(setting) {
       localStorage.setItem('gift-message', 'on');
       _setShowGiftMessage(true);
@@ -78,8 +78,8 @@ const useSetting = () => {
       localStorage.setItem('gift-message', 'off');
       _setShowGiftMessage(false);
     }
-  }
-  const setShowGift = (setting) => {
+  }, [_setShowGiftMessage]);
+  const setShowGift = useCallback((setting) => {
     if(setting) {
       localStorage.setItem('gift-movie', 'on');
       _setShowGift(true);
@@ -87,9 +87,9 @@ const useSetting = () => {
       localStorage.setItem('gift-movie', 'off');
       _setShowGift(false);
     }
-  }
+  }, [_setShowGift])
 
-  const setShowEmoji = (setting) => {
+  const setShowEmoji = useCallback((setting) => {
     if(setting) {
       localStorage.setItem('show-emoji', 'on');
       _setShowEmoji(true);
@@ -97,9 +97,9 @@ const useSetting = () => {
       localStorage.setItem('show-emoji', 'off');
       _setShowEmoji(false);
     }
-  }
+  }, [_setShowEmoji]);
 
-  const setAutoBroadcast = (setting) => {
+  const setAutoBroadcast = useCallback((setting) => {
     if(setting) {
       localStorage.setItem('auto-broadcast', 'on');
       _setAutoBroadcast(true);
@@ -107,23 +107,23 @@ const useSetting = () => {
       localStorage.setItem('auto-broadcast', 'off');
       _setAutoBroadcast(false);
     }
-  }
+  }, [_setAutoBroadcast]);
 
-  const addPrivateMute = (mute) => {
+  const addPrivateMute = useCallback((mute) => {
     if (mute && mute.username && mute.ip) {
       let oldOne = privateMutes?.find((item) => (item.username===mute.username && item.ip === mute.ip))
       if (!oldOne) {
         setPrivateMutes([...privateMutes, mute])
       }
     }
-  }
+  }, [privateMutes, setPrivateMutes]);
 
-  const removePrivateMute = (mute) => {
+  const removePrivateMute = useCallback((mute) => {
     if (mute && mute.username && mute.ip) {
       let newMutes = privateMutes?.filter((item) => (item.username !== mute.username && item.ip !== mute.ip))
       setPrivateMutes(newMutes)
     }
-  }
+  }, [privateMutes, setPrivateMutes]);
 
   useEffect(() => {
     const currentPokeSound = localStorage.getItem('poke-sound');

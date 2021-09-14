@@ -170,8 +170,8 @@ function useDoubleClick({oneClick, doubleClick}) {
 }
 
 const RoomUserName = ({user, role, roomName,
-    changeMuteState, sendPokeMessage, kickUser, banUser, addOrOpenPrivate, viewBroadcast, stopBroadcastTo,
-    isMine, displayYou, isMuted, isBlocked, isPrivateMuted, changePrivateMute, showAboutMe, showPoint = false
+    isMine, displayYou, isMuted, isBlocked, isPrivateMuted,
+    changePrivateMute, showAboutMe, showPoint = false
 }) => { 
     const classes = useStyles();
     const {t} = useTranslation();
@@ -180,7 +180,10 @@ const RoomUserName = ({user, role, roomName,
     const [openBan, setOpenBan] = React.useState(false);
     const [avatarUrl, setAvatarUrl] = useState(null);
     const { avatarOption, avatarColor, pointOption } = useContext(SettingContext);
-    const { setOpenGiftModal, setGiftUsername, setRoomNameForGift } = useContext(ChatContext);
+    const { setOpenGiftModal, setGiftUsername, setRoomNameForGift, changeMuteState,
+        sendPokeMessage, kickUser, banUser, addOrOpenPrivate, viewBroadcast,
+        stopBroadcastTo
+    } = useContext(ChatContext);
     const handleDbClick = (event) => {
         handleClickPrivateChat(event);
     }

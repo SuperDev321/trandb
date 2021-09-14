@@ -28,7 +28,7 @@ const _EVENTS = {
 
 class MediaClient {
 
-    constructor(name, userId = '', successCallback = null) {
+    constructor(name, userId = '', socketWorker, successCallback = null) {
         this.name = name
         this.producerTransports = new Map();
         this.consumerTransports = new Map();
@@ -52,6 +52,7 @@ class MediaClient {
          * map that contains a mediatype as key and producer_id as value
          */
         this.producerLabels = new Map()
+        this.socketWorker = socketWorker;
 
         this._isOpen = false
         this.eventListeners = new Map()
@@ -66,6 +67,15 @@ class MediaClient {
             const data = await getRouterRtpCapabilities(room_id);
             let device = await this.loadDevice(data);
             this.devices.set(room_id, device);
+        }
+    }
+
+    async sendSocketEvent (mName, mValue) {
+        if (this.socketWorker) {
+            this.socketWorker.postMessage({
+                mName,
+                mValue
+            })
         }
     }
 
