@@ -1,5 +1,4 @@
 import React, { useState, useReducer, useEffect, useContext, useRef, useCallback } from 'react';
-import useWebWorker from 'react-webworker-hook';
 import WebWorker from 'react-web-workers'
 import { socket, useLocalStorage, RoomObject, MediaClient, mediaEvents } from '../../utils';
 import { isPrivateRoom } from '../../apis';
@@ -11,7 +10,6 @@ import { useAudio } from 'react-use';
 import { permissionRequest } from './notification';
 import config from '../../config';
 import socketWorker from '../../utils/objects/socketWorker';
-import JSONfn from 'json-fn';
 
 function makeid(length) {
     var result           = [];
@@ -92,7 +90,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
         roomIndex: null,
         error: null,
     });
-    const { myId, username, updateUserPoint, updateProfile, role } = useContext(UserContext);
+    const { myId, username, updateUserPoint, updateProfile, role, updateUser } = useContext(UserContext);
     const { enablePokeSound, enablePrivateSound, enablePublicSound, enableSysMessage,
         messageNum, showGift, showGiftMessage, autoBroadcast } = useContext(SettingContext);
     // current room state
@@ -258,15 +256,30 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 if(isPrivate) {
                     callback(false, 'password');
                 } else {
-                    socket.emit('join room', { room }, (result, message) => {
-                        if(result) {
-                            if (message) {
-                                enqueueSnackbar(t(`ChatApp.${message}`, { roomName: room}), {variant: 'error'})
+                    if (socketWorkerRef.current) {
+                        // socketWorkerRef.current.postMessage({
+                        //     mName: 'join room',
+                        //     mValue: { room }
+                        // })
+                        socketWorkerRef.current.request('join room', { room })
+                        .then((result) => {
+                            if (result) {
+                                enqueueSnackbar(t(`ChatApp.${result}`, { roomName: room}), {variant: 'error'})
                             }
-                        } else {
-                            enqueueSnackbar(message, {variant: 'error'})
-                        }
-                    });
+                        })
+                        .catch((error) => {
+                            enqueueSnackbar(error, {variant: 'error'})
+                        })
+                    }
+                    // socket.emit('join room', { room }, (result, message) => {
+                    //     if(result) {
+                    //         if (message) {
+                    //             enqueueSnackbar(t(`ChatApp.${message}`, { roomName: room}), {variant: 'error'})
+                    //         }
+                    //     } else {
+                    //         enqueueSnackbar(message, {variant: 'error'})
+                    //     }
+                    // });
                 }
             }, (err) => {
                 // console.log(err);
@@ -638,6 +651,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
     }, [dispatch, roomsDispatch, roomsRef]);
 
     const receivePoke = useCallback(async (pokeMessage, callback) => {
+        
         let {room} = pokeMessage;
         if(roomsRef.current && room) {
             let sameRoom = roomsRef.current.find((item) => (item.name === room));
@@ -675,8 +689,10 @@ const useRooms = ({initRoomName, ...initalState}) => {
                             default:
                                 break;
                         }
-                        if (callback)
+                        if (callback) {
+                            console.log('receive poke')
                             callback(true)
+                        }
                     } else {
                         if (callback) callback(false)
                     }
@@ -706,7 +722,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
         }
     }, [roomsRef, dispatch])
 
-    const sendMessage = async (roomName, to, color, msg, bold, type, messageType) => {
+    const sendMessage = useCallback(async (roomName, to, color, msg, bold, type, messageType) => {
         if (msg) {
             const date = Date.now()
             let offset = 2000
@@ -727,86 +743,73 @@ const useRooms = ({initRoomName, ...initalState}) => {
                     _id: makeid(5),
                     type, roomName, msg, from: username, to, color, bold, messageType, date
                 }, roomName);
-                // socket.emit('private message',
-                //     { type, roomName, msg, from: username, to, color, bold, messageType },
-                //     async (data, err) => {
-                //         if(data) {
-                //             // let message = data;
-                //             // privateListRef.current.addMessage(message, roomName);
-                //         } else {
-                //             if(err === 'logout') {
-                //                 privateListRef.current.addErrorMessage(roomName);
-                //             } else if (err === 'forbidden') {
-                //                 enqueueSnackbar(t('Message.forbidden'), {variant: 'error'});
-                //             } else if (err === 'muted') {
-                //                 enqueueSnackbar(t('Message.private_muted'), {variant: 'error'});
-                //             } else if (err === 'blocked') {
-                //                 enqueueSnackbar(t('Message.private_blocked'), {variant: 'error'});
-                //             }
-                //             // enqueueSnackbar(to + ' was out of chat. Please close the private chat with '+ to +'.', {variant: 'error'});
-                //         }
-                //     }
-                // );
-                socketWorkerRef.current.postMessage({
-                    mName: 'private message',
-                    mValue: { type, roomName, msg, from: username, to, color, bold, messageType }
+                socketWorkerRef.current.request('private message', { type, roomName, msg, from: username, to, color, bold, messageType })
+                .catch((err) => {
+                    console.log('private error', err)
+                    if(err === 'logout') {
+                        privateListRef.current.addErrorMessage(roomName);
+                    } else if (err === 'forbidden') {
+                        enqueueSnackbar(t('Message.forbidden'), {variant: 'error'});
+                    } else if (err === 'muted') {
+                        enqueueSnackbar(t('Message.private_muted'), {variant: 'error'});
+                    } else if (err === 'blocked') {
+                        enqueueSnackbar(t('Message.private_blocked'), {variant: 'error'});
+                    }
                 })
             } else {
-                // socket.emit('public message', { type, msg, room: roomName, from: username, color, bold, messageType }, async (data) => {
-                    
-                // });
-                socketWorkerRef.current.postMessage({
-                    mName: 'public message',
-                    mValue: { type, msg, room: roomName, from: username, color, bold, messageType }
+                socketWorkerRef.current.emit('public message', {
+                    type, msg, room: roomName, from: username, color, bold, messageType
                 })
                 addMessage({message: { _id: makeid(5), type, msg, room: roomName, from: username, color, bold, messageType, date }, room: roomName})
             }
         }
-    };
+    }, [socketWorkerRef, privateListRef, messageTimeRef, maxMessageLength, username]);
 
     // send poke message
     const sendPokeMessage = useCallback(async (roomName, userToSend, pokeType) => {
         if (socketWorkerRef.current) {
-            socketWorkerRef.current.postMessage({
-                mName: 'poke message',
-                mValue: { from: username, to: userToSend, room: roomName, pokeType }
-            }
-            // (response) => {
-            //     // this is callback function that can excute on server side
-            //     if(response === 'muted') {
-            //         enqueueSnackbar(t('PokeMessage.error_muted'), {variant: 'error'});
-            //     } else if (response === 'success'){
-            //         addMessage({
-            //             room: roomName,
-            //             message: {
-            //                 type: 'poke',
-            //                 msg: t(`PokeMessage.poke_${pokeType}`, {
-            //                     sender: t('PokeMessage.you'),
-            //                     receiver: userToSend
-            //                 }),
-            //             }
-            //         })
-            //     }
+            // socketWorkerRef.current.postMessage({
+            //     mName: 'poke message',
+            //     mValue: { from: username, to: userToSend, room: roomName, pokeType }
             // }
-            );
+            socketWorkerRef.current.request('poke message', { from: username, to: userToSend, room: roomName, pokeType })
+            .then((response) => {
+                console.log('poke success')
+                // this is callback function that can excute on server side
+                if (response === 'success'){
+                    addMessage({
+                        room: roomName,
+                        message: {
+                            type: 'poke',
+                            msg: t(`PokeMessage.poke_${pokeType}`, {
+                                sender: t('PokeMessage.you'),
+                                receiver: userToSend
+                            }),
+                        }
+                    })
+                }
+            })
+            .catch((error) => {
+                if(error === 'muted') {
+                    enqueueSnackbar(t('PokeMessage.error_muted'), {variant: 'error'});
+                }
+            })
         }
-    }, [socketWorkerRef, username])
+    }, [socketWorkerRef, username, addMessage])
 
     const kickUser = useCallback(async (roomName, usernameToKick) => {
         if (socketWorkerRef.current) {
-            socketWorkerRef.current.postMessage({
-                mName: 'kick user',
-                mValue: { room: roomName, to: usernameToKick }
-            });
+            // socketWorkerRef.current.postMessage({
+            //     mName: 'kick user',
+            //     mValue: { room: roomName, to: usernameToKick }
+            // });
+            socketWorkerRef.current.emit('kick user', { room: roomName, to: usernameToKick });
         }
     }, [socketWorkerRef])
     const banUser = useCallback(async (payload) => {
         console.log('ban user', payload)
         if (socketWorkerRef.current) {
-            socketWorkerRef.current.postMessage({
-                mName: 'ban user',
-                mValue: payload
-            });
+            socketWorkerRef.current.emit('ban user', payload)
         }
     }, [socketWorkerRef])
 
@@ -855,6 +858,23 @@ const useRooms = ({initRoomName, ...initalState}) => {
         })
     }, [roomsRef, roomNameRef, dispatch, username]);
 
+    const sendGift = useCallback((gift, amount) => {
+        if (socketWorkerRef.current && gift && amount > 0) {
+            socketWorkerRef.current.request('send gift', {
+                to: giftUsername,
+                giftId: gift._id,
+                room: roomNameForGift,
+                amount
+            })
+            .then(() => {
+                updateUser()
+            })
+            .catch((error) => {
+                console.log(error)
+            })
+        }
+    }, [updateUser, socketWorkerRef, roomNameForGift, giftUsername]);
+
     const receiveGift = useCallback(async (payload) => {
         try {
             const { gift, from, to, room, amount } = payload;
@@ -891,7 +911,8 @@ const useRooms = ({initRoomName, ...initalState}) => {
 
     const startBroadcast = useCallback(async (room, lock, videoDeviceId, audioDeviceId) => {
         try {
-            let result = await socket?.request('check camera broadcast', ({ room }));
+            // let result = await socket?.request('check camera broadcast', ({ room }));
+            let result = await socketWorkerRef.current?.request('check camera broadcast', { room });
             if (!result) {
                 enqueueSnackbar(t('ChatApp.error_camera_banned'), { variant: 'error'});
                 return false;
@@ -914,11 +935,17 @@ const useRooms = ({initRoomName, ...initalState}) => {
                     let result = await mediaClientRef.current.produce(room, lock, videoDeviceId, audioDeviceId);
                     if (result) {
                         const { producers, locked } = result;
-                        socket.emit('start video', {
-                            room,
-                            producers,
-                            locked
-                        })
+                        if (socketWorkerRef.current) {
+                            socketWorkerRef.current.postMessage({
+                                mName: 'start video', 
+                                mValue: {
+                                    room,
+                                    producers,
+                                    locked
+                                }
+                            })
+                        }
+                        
                     }
                 } else {
                     enqueueSnackbar(t('UserActionArea.error_not_ready_broadcast'), {variant: 'error'});
@@ -930,7 +957,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
             mediaClientRef.current.stopStream(room);
         }
         
-    }, [mediaClientRef]);
+    }, [mediaClientRef, socketWorkerRef]);
 
     const stopBroadcast = useCallback(async (roomName) => {
         if(mediaClientRef.current) {
@@ -1010,14 +1037,33 @@ const useRooms = ({initRoomName, ...initalState}) => {
         });
     }
 
-    const addOrOpenPrivate = (to) => {
-        if(!privateListRef.current.openChat(to)) {
-            socketWorkerRef.current.postMessage({
-                mName: 'open private',
-                mValue: { from: username, to, role }
-            });
+    const addOrOpenPrivate = useCallback((to) => {
+        if(to && !privateListRef.current.openChat(to)) {
+            if (socketWorkerRef.current) {
+                socketWorkerRef.current.request('open private', { from: username, to: to.username, role })
+                .then((roomName) => {
+                    if(roomName) {
+                        privateListRef.current.addChat(to, roomName);
+                    }
+                })
+                .catch((error) => {
+                    if(error === 'private_error_guest') {
+                        enqueueSnackbar(t('UserActionArea.error_guest_dont_have_permission'), {variant: 'error'});
+                    }
+                })
+            }
+            // .postMessage({
+            //     mName: 'open private',
+            //     mValue: { from: username, to, role }
+            // });if(roomName) {
+            //     privateListRef.current.addChat(to, roomName);
+            // } else {
+            //     if(err === 'private_error_guest') {
+            //         enqueueSnackbar(t('UserActionArea.error_guest_dont_have_permission'), {variant: 'error'});
+            //     }
+            // }
         }
-    }
+    }, [privateListRef, socketWorkerRef, enqueueSnackbar]);
 
     const startRemoteVideo = useCallback(async (room, producers, userId, locked, remoteUsername) => {
         try {
@@ -1061,19 +1107,178 @@ const useRooms = ({initRoomName, ...initalState}) => {
         }
     }, [roomsRef, roomNameRef, dispatch, mediaClientRef]);
 
+    const receiveSocketMessage = useCallback((event) => {
+        console.log(event)
+        const { type, mName, mData } = event.data;
+        let callback = null;
+        if (type === 'emit') {
+
+        } else if (type === 'request') {
+            callback = (result, error) => {
+                if (!result) {
+                    event.ports[0].postMessage({error});
+                } else {
+                    event.ports[0].postMessage({result});
+                }
+            }
+        }
+        switch (mName) {
+            case 'init room':
+                const {
+                    room, onlineUsers, messages, blocks, globalBlocks, cameraBans,
+                    globalCameraBans
+                } = mData
+                let usernames = onlineUsers.map((item) => (item.username));
+                if(usernames.includes(username)) {
+                    initRoom({room, onlineUsers, messages, blocks, globalBlocks, cameraBans, globalCameraBans});
+                }
+                break;
+            case 'room message':
+                receiveMessage(mData);
+                break;
+            case 'disconnect':
+                const { reason } = mData;
+                setOpenDisconnectModal(true);
+                if (mediaClientRef.current) {
+                    mediaClientRef.current.exit(true);
+                }
+                if (reason === 'io server disconnect') {
+                    // the disconnection was initiated by the server, you need to reconnect manually
+                    socketWorkerRef.current.emit('connect');
+                }
+            case 'joined room':
+                addUser(mData);
+                break;
+            case 'leave room':
+                removeUser(mData);
+                break;
+            case 'kicked user':
+                kickedUser({ ...mData, type: 'kick' });
+                break;
+            case 'banned user':
+                kickedUser({ ...mData, type: 'ban' });
+                break;
+            case 'global banned user':
+                kickedUser({ ...mData, type: 'global ban' });
+                break
+            case 'reconnect':
+                let roomNames = roomsRef.current?.map((room) => (room.name));
+                let privateRooms = privateListRef.current ? privateListRef.current.getPrivateRooms(): [];
+                roomNames.map(async (roomName) => {
+                    socketWorkerRef.current.request('rejoin room', { room: roomName, type: 'public' })
+                    .catch((error) => {
+                        removeRoom(roomName)
+                    })
+                    // socketWorkerRef.current.postMessage({
+                    //     mName: 'rejoin room',
+                    //     mValue: { room: roomName, type: 'public' }
+                    // });
+                });
+                privateRooms.forEach((roomName) => {
+                    socketWorkerRef.current.request('rejoin room', { room: roomName, type: 'private' })
+                })
+                setOpenDisconnectModal(false)
+                break;
+            case 'update block':
+                updateBlocks({room, blocks});
+                break;
+            case 'update global block':
+                setGlobalBlocks(mData);
+                break;
+            case 'update camera bans':
+                updateCameraBans(mData);
+                break;
+            case 'update global camera bans':
+                setGlobalCameraBans(mData);
+                break;
+            case 'poke message':
+                receivePoke(mData, callback);
+                break;
+            case 'update points':
+                updatePoints(mData)
+                break;
+            case 'update user info':
+                updateUserProfile(mData)
+                break;
+            case 'received gift':
+                receiveGift(mData);
+            case 'private_error_logout':
+                const { roomName: logoutRoomName } = mData;
+                privateListRef.current.addErrorMessage(logoutRoomName);
+                break;
+            case 'private_error_forbbiden':
+                enqueueSnackbar(t('Message.forbidden'), {variant: 'error'});
+                break;
+            case 'private_error_muted':
+                enqueueSnackbar(t('Message.private_muted'), {variant: 'error'});
+                break;
+            case 'private_error_blocked':
+                enqueueSnackbar(t('Message.private_blocked'), {variant: 'error'});
+                break
+            case 'repeat connection':
+                enqueueSnackbar(t('ChatApp.already_in_chat'), {variant: 'error'});
+                history.push('/');
+                break;
+            default:
+                break;
+        }
+
+
+
+    }, [initRoom, receiveMessage, setOpenDisconnectModal, addUser,
+        kickUser, removeUser, receivePoke, enqueueSnackbar, updateBlocks,
+        setGlobalBlocks, updateCameraBans, setGlobalCameraBans,
+        updatePoints,
+        updateUserProfile,
+        receiveGift
+    ])
+
     useEffect(() => {
         const [workerObj] = WebWorker([socketWorker]);
         socketWorkerRef.current = workerObj;
-        workerObj.onmessage = (event) => {
-            setSocketEvent(event.data);
+        
+        workerObj.request = (mName, mValue) => {
+            return new Promise((resolve, reject) => {
+                const channel = new MessageChannel(); 
+
+                channel.port1.onmessage = ({data}) => {
+                    channel.port1.close();
+                    if (data.error) {
+                        reject(data.error);
+                    }else {
+                        resolve(data.result);
+                    }
+                };
+
+                workerObj.postMessage({
+                    type: 'request',
+                    mName,
+                    mValue
+                }, [channel.port2]);
+            })
+        }
+        workerObj.emit = (mName, mValue) => {
+            workerObj.postMessage({
+                type: 'emit',
+                mName,
+                mValue
+            });
         }
         const token = window.localStorage.getItem('token');
-        workerObj.postMessage({ mName: 'init', mValue: token });
+        workerObj.postMessage({ type: 'init', mValue: { token } });
 
         return () => {
             workerObj.postMessage({ mName: 'close' });
         }
     }, [])
+
+    useEffect(() => {
+        console.log('set message on 1')
+        if (socketWorkerRef.current) {
+            console.log('set message on')
+            socketWorkerRef.current.onmessage = receiveSocketMessage;
+        }
+    }, [receiveSocketMessage])
 
     useEffect(() => {
         if (username && roomsRef.current && roomsRef.current.length && globalCameraBans && globalCameraBans.length) {
@@ -1100,9 +1305,9 @@ const useRooms = ({initRoomName, ...initalState}) => {
 
     useEffect(() => {
         if(initRoomName && username) {
-            if (!socket.connected) {
-                // socket.open();
-            }
+            // if (!socket.connected) {
+            //     // socket.open();
+            // }
             // socket.on('update block', async ({room, blocks}) => {
             //     updateBlocks({room, blocks});
             // })
@@ -1165,10 +1370,10 @@ const useRooms = ({initRoomName, ...initalState}) => {
             //     })
             //     setOpenDisconnectModal(false)
             // })
-            socket.on('repeat connection', async () => {
-                enqueueSnackbar(t('ChatApp.already_in_chat'), {variant: 'error'});
-                history.push('/');
-            })
+            // socket.on('repeat connection', async () => {
+            //     enqueueSnackbar(t('ChatApp.already_in_chat'), {variant: 'error'});
+            //     history.push('/');
+            // })
             socket.on('stop video', async ({ room, userId }) => {
                 stopRemoteVideo(room, userId)
             })
@@ -1187,65 +1392,72 @@ const useRooms = ({initRoomName, ...initalState}) => {
                     setRoomNameForPassword(initRoomName);
                     setOpenPasswordModal(true);
                 } else {
-                    function joinCallback (result) {
-                        console.log('callback', result);
-                    }
                     if (socketWorkerRef.current) {
-                        socketWorkerRef.current.postMessage({ mName: 'join', mValue: { room: initRoomName }, callback:
-                        JSONfn.stringify({
-                            joinFunction: (result) => {
-                                console.log('ok', result)
-                                return true
-                            },
-                            enqueueSnackbar
-                        })
-                    });
-                    }
-                    socket.emit('join room', { room: initRoomName }, (result, message) => {
-                        if(!result) {
-                            if(message)
-                                enqueueSnackbar(t('ChatApp.'+message, {roomName: initRoomName}), {variant: 'error'});
-                            dispatch({type: 'rejected', error: 'joine error'});
-                        } else {
-                            if (message) {
-                                enqueueSnackbar(t('ChatApp.'+message, {roomName: initRoomName}), {variant: 'info'});
+                        socketWorkerRef.current.request('join room', { room: initRoomName })
+                        .then((result) => {
+                            if (result) {
+                                enqueueSnackbar(t('ChatApp.'+result, {roomName: initRoomName}), {variant: 'info'});
                             }
-                        }
-                    });
+                        })
+                        .catch((error) => {
+                            if(error)
+                                enqueueSnackbar(t('ChatApp.'+error, {roomName: initRoomName}), {variant: 'error'});
+                            dispatch({type: 'rejected', error: 'join error'});
+                        })
+                        // socketWorkerRef.current.postMessage({ mName: 'join', mValue: { room: initRoomName }});
+                            // JSONfn.stringify({
+                            //     joinFunction: (result) => {
+                            //         console.log('ok', result)
+                            //         return true
+                            //     },
+                            //     enqueueSnackbar
+                            // })
+                    }
+                    // socket.emit('join room', { room: initRoomName }, (result, message) => {
+                    //     if(!result) {
+                    //         if(message)
+                    //             enqueueSnackbar(t('ChatApp.'+message, {roomName: initRoomName}), {variant: 'error'});
+                    //         dispatch({type: 'rejected', error: 'joine error'});
+                    //     } else {
+                    //         if (message) {
+                    //             enqueueSnackbar(t('ChatApp.'+message, {roomName: initRoomName}), {variant: 'info'});
+                    //         }
+                    //     }
+                    // });
                 }
             }, (err) => {
                 console.log(err.message);
             })
         }
-        return () => {
-            // socket.removeAllListeners();
-            // socket.io.removeAllListeners();
-            socket.close();
-            socket.off('init room');
-            socket.off('update block');
-            socket.off('update global block');
-            socket.off('room message');
-            socket.off('private message');
-            socket.off('poke message');
-            socket.off('disconnect');
-            socket.off('repeat connection');
-            socket.io.off('reconnect');
-            socket.off('view request');
-        };
+        // return () => {
+        //     // socket.removeAllListeners();
+        //     // socket.io.removeAllListeners();
+        //     socket.close();
+        //     socket.off('init room');
+        //     socket.off('update block');
+        //     socket.off('update global block');
+        //     socket.off('room message');
+        //     socket.off('private message');
+        //     socket.off('poke message');
+        //     socket.off('disconnect');
+        //     socket.off('repeat connection');
+        //     socket.io.off('reconnect');
+        //     socket.off('view request');
+        // };
     }, [initRoomName, username]);
 
-    useEffect(() => {
-        socket.on('init room', async ({room, onlineUsers, messages, blocks, globalBlocks, cameraBans, globalCameraBans}, fn) => {
-            fn('success');
-            let usernames = await onlineUsers.map((item) => (item.username));
-            if(usernames.includes(username)) {
-                initRoom({room, onlineUsers, messages, blocks, globalBlocks, cameraBans, globalCameraBans});
-            }
-        });
-        return () => {
-            socket.off('init room');
-        };
-    }, [username, autoBroadcast])
+    // useEffect(() => {
+    //     socket.on('init room', async ({room, onlineUsers, messages, blocks, globalBlocks, cameraBans, globalCameraBans}, fn) => {
+    //         fn('success');
+    //         let usernames = await onlineUsers.map((item) => (item.username));
+    //         if(usernames.includes(username)) {
+    //             initRoom({room, onlineUsers, messages, blocks, globalBlocks, cameraBans, globalCameraBans});
+    //         }
+    //     });
+    //     return () => {
+    //         socket.off('init room');
+    //     };
+    // }, [username, autoBroadcast])
 
     useEffect(() => {
         socket.on('start view', ({ room_id, name}) => {
@@ -1300,15 +1512,15 @@ const useRooms = ({initRoomName, ...initalState}) => {
     //     }
     // }, [addUser, removeUser, kickedUser])
 
-    useEffect(() => {
-        socket.on('received gift', (payload) => {
-            receiveGift(payload);
-        })
+    // useEffect(() => {
+    //     socket.on('received gift', (payload) => {
+    //         receiveGift(payload);
+    //     })
 
-        return () => {
-            socket.off('received gift');
-        }
-    }, [receiveGift])
+    //     return () => {
+    //         socket.off('received gift');
+    //     }
+    // }, [receiveGift])
 
     useEffect(() => {
         socket.on('start video', ({ room, producers, userId, username, locked }) => {
@@ -1322,117 +1534,122 @@ const useRooms = ({initRoomName, ...initalState}) => {
 
 
 
-    useEffect(() => {
-        if (username && socketEvent) {
-            const { type, data } = socketEvent;
-            switch (type ) {
-                case 'init room':
-                    const {
-                        room, onlineUsers, messages, blocks, globalBlocks, cameraBans,
-                        globalCameraBans
-                    } = data
-                    let usernames = onlineUsers.map((item) => (item.username));
-                    if(usernames.includes(username)) {
-                        initRoom({room, onlineUsers, messages, blocks, globalBlocks, cameraBans, globalCameraBans});
-                    }
-                    break;
-                case 'room message':
-                    receiveMessage(data);
-                    break;
-                case 'disconnect':
-                    const { reason } = data;
-                    setOpenDisconnectModal(true);
-                    if (mediaClientRef.current) {
-                        mediaClientRef.current.exit(true);
-                    }
-                    if (reason === 'io server disconnect') {
-                        // the disconnection was initiated by the server, you need to reconnect manually
-                        socketWorkerRef.current.postMessage({ mName: 'connect' });
-                    }
-                case 'joined room':
-                    addUser(data);
-                    break;
-                case 'leave room':
-                    removeUser(data);
-                    break;
-                case 'kicked user':
-                    kickedUser({ ...data, type: 'kick' });
-                    break;
-                case 'banned user':
-                    kickedUser({ ...data, type: 'ban' });
-                    break;
-                case 'global banned user':
-                    kickedUser({ ...data, type: 'global ban' });
-                    break
-                case 'reconnect':
-                    let roomNames = roomsRef.current?.map((room) => (room.name));
-                    let privateRooms = privateListRef.current ? privateListRef.current.getPrivateRooms(): [];
-                    roomNames.map(async (roomName) => {
-                        socketWorkerRef.current.postMessage({
-                            mName: 'rejoin room',
-                            mValue: { room: roomName, type: 'public' }
-                        });
-                    });
-                    privateRooms.forEach((roomName) => {
-                        socketWorkerRef.current.postMessage({
-                            mName: 'rejoin room',
-                            mValue: { room: roomName, type: 'private' }
-                        });
-                    })
-                    setOpenDisconnectModal(false)
-                    break;
-                case 'update block':
-                    updateBlocks({room, blocks});
-                    break;
-                case 'update global block':
-                    setGlobalBlocks(data);
-                    break;
-                case 'update camera bans':
-                    updateCameraBans(data);
-                    break;
-                case 'update global camera bans':
-                    setGlobalCameraBans(data);
-                    break;
-                case 'poke message':
-                    receivePoke(data);
-                    break;
-                case 'update points':
-                    updatePoints(data)
-                    break;
-                case 'update user info':
-                    updateUserProfile(data)
-                    break;
-                case 'open private success':
-                    const { to, roomName } = data;
-                    privateListRef.current.addChat(to, roomName);
-                    break;
-                case 'private_error_guest':
-                    enqueueSnackbar(t('UserActionArea.error_guest_dont_have_permission'), {variant: 'error'});
-                    break;
-                case 'private_error_logout':
-                    const { roomName: logoutRoomName } = data;
-                    privateListRef.current.addErrorMessage(logoutRoomName);
-                    break;
-                case 'private_error_forbbiden':
-                    enqueueSnackbar(t('Message.forbidden'), {variant: 'error'});
-                    break;
-                case 'private_error_muted':
-                    enqueueSnackbar(t('Message.private_muted'), {variant: 'error'});
-                    break;
-                case 'private_error_blocked':
-                    enqueueSnackbar(t('Message.private_blocked'), {variant: 'error'});
-                    break;
-                default:
-                    break;
-            }
-        }
+    // useEffect(() => {
+    //     if (username && socketEvent) {
+    //         const { type, data } = socketEvent;
+    //         switch (type ) {
+    //             case 'init room':
+    //                 const {
+    //                     room, onlineUsers, messages, blocks, globalBlocks, cameraBans,
+    //                     globalCameraBans
+    //                 } = data
+    //                 let usernames = onlineUsers.map((item) => (item.username));
+    //                 if(usernames.includes(username)) {
+    //                     initRoom({room, onlineUsers, messages, blocks, globalBlocks, cameraBans, globalCameraBans});
+    //                 }
+    //                 break;
+    //             case 'room message':
+    //                 receiveMessage(data);
+    //                 break;
+    //             case 'disconnect':
+    //                 const { reason } = data;
+    //                 setOpenDisconnectModal(true);
+    //                 if (mediaClientRef.current) {
+    //                     mediaClientRef.current.exit(true);
+    //                 }
+    //                 if (reason === 'io server disconnect') {
+    //                     // the disconnection was initiated by the server, you need to reconnect manually
+    //                     socketWorkerRef.current.emit('connect');
+    //                 }
+    //             case 'joined room':
+    //                 addUser(data);
+    //                 break;
+    //             case 'leave room':
+    //                 removeUser(data);
+    //                 break;
+    //             case 'kicked user':
+    //                 kickedUser({ ...data, type: 'kick' });
+    //                 break;
+    //             case 'banned user':
+    //                 kickedUser({ ...data, type: 'ban' });
+    //                 break;
+    //             case 'global banned user':
+    //                 kickedUser({ ...data, type: 'global ban' });
+    //                 break
+    //             case 'reconnect':
+    //                 let roomNames = roomsRef.current?.map((room) => (room.name));
+    //                 let privateRooms = privateListRef.current ? privateListRef.current.getPrivateRooms(): [];
+    //                 roomNames.map(async (roomName) => {
+    //                     socketWorkerRef.current.request('rejoin room', { room: roomName, type: 'public' })
+    //                     .catch((error) => {
+    //                         removeRoom(roomName)
+    //                     })
+    //                     // socketWorkerRef.current.postMessage({
+    //                     //     mName: 'rejoin room',
+    //                     //     mValue: { room: roomName, type: 'public' }
+    //                     // });
+    //                 });
+    //                 privateRooms.forEach((roomName) => {
+    //                     socketWorkerRef.current.request('rejoin room', { room: roomName, type: 'private' })
+    //                 })
+    //                 setOpenDisconnectModal(false)
+    //                 break;
+    //             case 'update block':
+    //                 updateBlocks({room, blocks});
+    //                 break;
+    //             case 'update global block':
+    //                 setGlobalBlocks(data);
+    //                 break;
+    //             case 'update camera bans':
+    //                 updateCameraBans(data);
+    //                 break;
+    //             case 'update global camera bans':
+    //                 setGlobalCameraBans(data);
+    //                 break;
+    //             case 'poke message':
+    //                 receivePoke(data);
+    //                 break;
+    //             case 'update points':
+    //                 updatePoints(data)
+    //                 break;
+    //             case 'update user info':
+    //                 updateUserProfile(data)
+    //                 break;
+    //             case 'open private success':
+    //                 const { to, roomName } = data;
+    //                 privateListRef.current.addChat(to, roomName);
+    //                 break;
+    //             case 'private_error_guest':
+    //                 enqueueSnackbar(t('UserActionArea.error_guest_dont_have_permission'), {variant: 'error'});
+    //                 break;
+    //             case 'private_error_logout':
+    //                 const { roomName: logoutRoomName } = data;
+    //                 privateListRef.current.addErrorMessage(logoutRoomName);
+    //                 break;
+    //             case 'private_error_forbbiden':
+    //                 enqueueSnackbar(t('Message.forbidden'), {variant: 'error'});
+    //                 break;
+    //             case 'private_error_muted':
+    //                 enqueueSnackbar(t('Message.private_muted'), {variant: 'error'});
+    //                 break;
+    //             case 'private_error_blocked':
+    //                 enqueueSnackbar(t('Message.private_blocked'), {variant: 'error'});
+    //                 break
+    //             case 'repeat connection':
+    //                 enqueueSnackbar(t('ChatApp.already_in_chat'), {variant: 'error'});
+    //                 history.push('/');
+    //                 break;
+    //             default:
+    //                 break;
+    //         }
+    //     }
 
-    }, [socketEvent])
+    // }, [socketEvent])
 
     useEffect(() => {
         let mediaObj = null;
-        if (username && myId) {
-            mediaObj = new MediaClient(username, myId);
+        if (username && myId && socketWorkerRef.current) {
+            mediaObj = new MediaClient(username, myId, socketWorkerRef.current);
             mediaObj.on(mediaEvents.onChangeRemoteStreams, async (data) => {
                 const {room_id} = data;
                 if (room_id) {
@@ -1517,7 +1734,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 mediaObj = null;
             }
         }
-    }, [myId, username])
+    }, [myId, username, socketWorkerRef])
 
     useEffect(() => {
         if(status === 'rejected') {
@@ -1608,6 +1825,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
         kickUser,
         banUser,
         stopBroadcastTo,
+        sendGift,
         pokeAudio1,
         pokeAudio2,
         pokeAudio3,

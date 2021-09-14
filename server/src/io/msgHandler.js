@@ -94,18 +94,16 @@ const pokeMessage = (io, socket) => async ({from, to, room, pokeType}, callback)
         ip: userIp
       }, (res) => {
         if (res) {
-          console.log('poke success')
-          return callback('success')
+          return callback(true, 'success')
         } else {
-          console.log('poke fail')
-          return callback('muted')
+          return callback(false, 'muted')
         }
       });
     } else {
-      return callback('Can not find user')
+      return callback(false, 'Can not find user')
     }
   } else {
-    return callback('Can not find user')
+    return callback(false, 'Can not find user')
   }
 }
 

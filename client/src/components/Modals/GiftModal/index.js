@@ -14,11 +14,11 @@ import SeparateLine from '../../SeparateLine';
 import { socket } from '../../../utils';
 import { getGifts } from '../../../apis';
 import config from '../../../config';
-import { ChatContext, UserContext } from '../../../context';
+import { ChatContext } from '../../../context';
 // const useStyles = makeStyles((theme) => ({
 //     root: {
 //       width: '100%',
-//       minWidth: 400,
+//       minWidth: 350,
 //       padding: '0 10px',
 //       backgroundColor: theme.palette.background.paper,
 //     },
@@ -39,8 +39,8 @@ export default function GiftModal() {
     const [currentGift, setCurrentGift] = React.useState(null);
     const [gifts, setGifts] = React.useState([]);
     const [amount, setAmount] = React.useState(1);
-    const { updateUser } = React.useContext(UserContext);
-    const { openGiftModal: open, setOpenGiftModal: setOpen, giftUsername: username, roomNameForGift: room } = useContext(ChatContext)
+    const { sendGift } = React.useContext(ChatContext);
+    const { openGiftModal: open, setOpenGiftModal: setOpen, giftUsername: username } = useContext(ChatContext)
     const changeGift = (giftName) => {
         const gift = gifts.find(({name}) => (name === giftName));
         setCurrentGift(gift)
@@ -52,18 +52,7 @@ export default function GiftModal() {
 
     const handleSubmit = () => {
         if (currentGift && amount > 0) {
-            socket.emit('send gift', {
-                to: username,
-                giftId: currentGift._id,
-                room,
-                amount
-            }, (res, error) => {
-                if (res) {
-                    updateUser()
-                } else {
-                    
-                }
-            })
+            sendGift(currentGift, amount);
         }
         setOpen(false);
     }

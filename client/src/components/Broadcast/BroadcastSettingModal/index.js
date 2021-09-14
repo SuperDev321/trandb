@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import {
     Button,
@@ -16,6 +16,7 @@ import VideoDeviceView from './VideoDeviceView';
 import useDefaultMedia from './useDefaultMedia';
 import DevicesSelector from './DevicesSelector';
 import Loading from '../../Loading'
+import { ChatContext } from '../../../context';
 const drawerWidth = 260;
 const useStyles = makeStyles((theme) => ({
     cameraBtn: {
@@ -34,7 +35,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-function BroadcastSettingModal({roomName, startBroadcast, users, ...modalProps}) {
+function BroadcastSettingModal({roomName, startBroadcast, ...modalProps}) {
     
     const {error, status, data} = useDefaultMedia();
     
@@ -105,13 +106,13 @@ function BroadcastSettingModal({roomName, startBroadcast, users, ...modalProps})
 }
 
 
-const BroadcastSetting = ({users, startBroadcast, stopBroadcast, cameraState, roomName}) => {
+const BroadcastSetting = () => {
     const classes = useStyles();
     const { t } = useTranslation();
     const [open, setOpen] = useState(false);
+    const { startBroadcast, stopBroadcast, cameraState, name: roomName } = useContext(ChatContext);
     
     const handleClickOpen = () => {
-        // console.log('users', users)
         if(!cameraState) {
             setOpen(true);
         } else {
@@ -140,7 +141,7 @@ const BroadcastSetting = ({users, startBroadcast, stopBroadcast, cameraState, ro
                 <Dialog fullWidth
                     maxWidth='sm'
                     className={classes.dialog} aria-labelledby="form-dialog-title"  open={open} onClose={handleClose}>
-                    <BroadcastSettingModal roomName={roomName} users={users} startBroadcast={startBroadcast} onClose={handleClose}/>
+                    <BroadcastSettingModal roomName={roomName} startBroadcast={startBroadcast} onClose={handleClose}/>
                 </Dialog>
                 :null
             }

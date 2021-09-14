@@ -69,6 +69,7 @@ const ChatRooms = ({room}, ref) => {
         kickUser,
         banUser,
         stopBroadcastTo,
+        sendGift,
         pokeAudio1,
         pokeAudio2,
         pokeAudio3,
@@ -111,44 +112,7 @@ const ChatRooms = ({room}, ref) => {
             changeRoom(index);
         }
     };
-    // add a private modal to private list
 
-    
-    // kick a user from room
-    // const kickUser = async (roomName, usernameToKick) => {
-    //     socket.emit('kick user', {room: roomName, to: usernameToKick});
-    // }
-    // const banUser = async (roomName, usernameToBan) => {
-    //     socket.emit('ban user', {room: roomName, to: usernameToBan});
-    // }
-
-    // const stopBroadcastTo = async (roomName, userId, name) => {
-    //     if(mediaClientRef.current) {
-    //         mediaClientRef.current.stopView(roomName, userId, name);
-    //     }
-    // }
-
-    // // send poke message
-    // const sendPokeMessage = async (roomName, userToSend, pokeType) => {
-    //     socket.emit('poke message', {from: username, to: userToSend, room: roomName, pokeType}, (response) => {
-    //         // this is callback function that can excute on server side
-    //         if(response === 'muted') {
-    //             enqueueSnackbar(t('PokeMessage.error_muted'), {variant: 'error'});
-    //         } else if (response === 'success'){
-    //             addMessage({
-    //                 room: roomName,
-    //                 message: {
-    //                     type: 'poke',
-    //                     msg: t(`PokeMessage.poke_${pokeType}`, {
-    //                         sender: t('PokeMessage.you'),
-    //                         receiver: userToSend
-    //                     }),
-    //                 }
-    //             })
-    //         }
-    //     });
-    // }
-/*************************************************************** */
     // leave room by you
     const leaveRoomByUser = async (room) => {
         removeRoom(room, (result) => {
@@ -160,36 +124,20 @@ const ChatRooms = ({room}, ref) => {
 
     return (
         <ChatContext.Provider value={{openGiftModal, setOpenGiftModal,
-            giftUsername, setGiftUsername,
-            roomNameForGift, setRoomNameForGift
+                giftUsername, setGiftUsername,
+                roomNameForGift, setRoomNameForGift,
+                kickUser, banUser, currentRoomData,
+                changeMuteState, sendPokeMessage,
+                globalBlocks, globalCameraBans,
+                addOrOpenPrivate, startBroadcast, stopBroadcast, stopBroadcastTo,
+                viewBroadcast, sendGift
             }}
         >
             <div className={classes.root} color="primary">
                 <Hidden xsDown implementation="css" className={classes.drawerWrapper}>
                     <div className={classes.drawer}>
                     { (status === 'resolved' && currentRoomData) ?
-                        <SideBarLeft
-                            users={currentRoomData.users}
-                            broadcastingUsers={currentRoomData.liveUsers}
-                            viewers={currentRoomData.viewers}
-                            changeMuteState={changeMuteState}
-                            sendPokeMessage={sendPokeMessage}
-                            kickUser={kickUser}
-                            banUser={banUser}
-                            roomName={currentRoomData.name}
-                            mutes={currentRoomData.mutes}
-                            blocks={currentRoomData.blocks}
-                            globalBlocks={globalBlocks}
-                            cameraBans={currentRoomData.cameraBans}
-                            globalCameraBans={globalCameraBans}
-                            addOrOpenPrivate={addOrOpenPrivate}
-                            cameraState={currentRoomData.localStream? (currentRoomData.localStream.locked? 'locked': true): false}
-                            startBroadcast={startBroadcast}
-                            stopBroadcast={stopBroadcast}
-                            stopBroadcastTo={stopBroadcastTo}
-                            viewBroadcast={viewBroadcast}
-                            username={username}
-                        />  
+                        <SideBarLeft />  
                         : <Loading />
                     }
                     </div>
@@ -250,27 +198,7 @@ const ChatRooms = ({room}, ref) => {
                         { mobileOpen &&
                             <Card className={classes.modbileDrawer}>
                             { (status === 'resolved' && currentRoomData) ?
-                                <SideBarLeft
-                                    users={currentRoomData.users}
-                                    viewers={currentRoomData.viewers}
-                                    changeMuteState={changeMuteState}
-                                    sendPokeMessage={sendPokeMessage}
-                                    kickUser={kickUser}
-                                    banUser={banUser}
-                                    roomName={currentRoomData.name}
-                                    mutes={currentRoomData.mutes}
-                                    blocks={currentRoomData.blocks}
-                                    globalBlocks={globalBlocks}
-                                    cameraBans={currentRoomData.cameraBans}
-                                    globalCameraBans={globalCameraBans}
-                                    addOrOpenPrivate={addOrOpenPrivate}
-                                    cameraState={currentRoomData.localStream? (currentRoomData.localStream.locked? 'locked': true): false}
-                                    startBroadcast={startBroadcast}
-                                    stopBroadcast={stopBroadcast}
-                                    stopBroadcastTo={stopBroadcastTo}
-                                    viewBroadcast={viewBroadcast}
-                                    username={username}
-                                />  
+                                <SideBarLeft />  
                                 : <Loading />
                             }
                             </Card>
@@ -301,18 +229,6 @@ const ChatRooms = ({room}, ref) => {
                         </div>
                     </main>
                 </div>
-                {/* <>
-                {
-                    (status === 'resolved' && currentRoomData) ?
-                    <VideoList roomName={currentRoomData.name}
-                        streams={currentRoomData.remoteStreams}
-                        localStream={currentRoomData.localStream}
-                        controlVideo={controlVideo}
-                        viewerCounts={currentRoomData.viewers?.length}
-                    />
-                    : null
-                }
-                </> */}
             </div>
             </div>
             <PrivateChatList ref={privateListRef}

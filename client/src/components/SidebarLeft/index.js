@@ -9,7 +9,7 @@ import OnlineUser from '../OnlineUser';
 import BroadcastSetting from '../Broadcast/BroadcastSettingModal';
 import SeparateLine from '../SeparateLine';
 import { useTranslation } from 'react-i18next';
-import { SettingContext } from '../../context';
+import { ChatContext, SettingContext } from '../../context';
  
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -106,12 +106,12 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 
-const SideBarLeft = ({ roomName, username, mutes, blocks, globalBlocks, cameraBans, globalCameraBans,
-    changeMuteState, sendPokeMessage, kickUser, banUser,
-    users, viewers, viewBroadcast, stopBroadcastTo,
-    addOrOpenPrivate, startBroadcast, stopBroadcast,
-    cameraState }) => {
+const SideBarLeft = () => {
     const classes = useStyles();
+    const { username, globalBlocks,
+        globalCameraBans,
+        currentRoomData } = useContext(ChatContext);
+    const { users, viewers, blocks, mutes, cameraBans, name: roomName, cameraState } = currentRoomData;
     const [searchText, setSearchText] = useState('');
     const [sideUsers, setSideUsers] = useState([]);
     const [filteredUsers, setFilteredUsers] = useState(null);
@@ -245,10 +245,7 @@ const SideBarLeft = ({ roomName, username, mutes, blocks, globalBlocks, cameraBa
 
     return (
         <div className={classes.root}>
-            <BroadcastSetting cameraState={cameraState} users={users} roomName={roomName} className={classes.cameraBtn}
-                startBroadcast={startBroadcast}
-                stopBroadcast={stopBroadcast}
-            />
+            <BroadcastSetting />
             <SeparateLine />
             <div className={classes.roomInfo}>
                 <span className={classes.roomName}>{roomName}</span>
@@ -259,8 +256,8 @@ const SideBarLeft = ({ roomName, username, mutes, blocks, globalBlocks, cameraBa
                 { filteredUsers &&
                     filteredUsers.map((user, index)=>(
                         <OnlineUser
-                            roomName={roomName}
-                            username={username}
+                            // roomName={roomName}
+                            // username={username}
                             role={role}
                             user={user} key={user? user._id: index}
                             isMuted={user.isMuted}
@@ -268,13 +265,6 @@ const SideBarLeft = ({ roomName, username, mutes, blocks, globalBlocks, cameraBa
                             isBlocked = {user.isBlocked}
                             isBroadcasting={user.isBroadcasting}
                             isViewer={user.isViewer}
-                            viewBroadcast={viewBroadcast}
-                            stopBroadcastTo={stopBroadcastTo}
-                            addOrOpenPrivate={addOrOpenPrivate}
-                            changeMuteState={changeMuteState}
-                            sendPokeMessage={sendPokeMessage}
-                            kickUser={kickUser}
-                            banUser={banUser}
                             changePrivateMute={changePrivateMute}
                         />
                     ))
