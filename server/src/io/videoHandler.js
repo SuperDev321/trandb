@@ -57,7 +57,6 @@ const isAvailableToBroadcast = (io, socket) => async ({ room }, callback) => {
             callback(false);
         }
     } catch (err) {
-        console.log(err.message)
         callback(false)
     }
 }
@@ -124,7 +123,7 @@ const viewRequest = (io, socket) => async ({
                 blocks.push(requestUser.username);
                 targetUser.save();
             }
-            callback(result);
+            if (callback) callback(result);
         });
     } else {
         return callback(false)

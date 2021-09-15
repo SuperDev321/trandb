@@ -182,7 +182,7 @@ const RoomUserName = ({user, role, roomName,
     const { avatarOption, avatarColor, pointOption } = useContext(SettingContext);
     const { setOpenGiftModal, setGiftUsername, setRoomNameForGift, changeMuteState,
         sendPokeMessage, kickUser, banUser, addOrOpenPrivate, viewBroadcast,
-        stopBroadcastTo
+        stopBroadcastTo, blockUser, unBlockUser, unbanCamera
     } = useContext(ChatContext);
     const handleDbClick = (event) => {
         handleClickPrivateChat(event);
@@ -218,23 +218,6 @@ const RoomUserName = ({user, role, roomName,
         }, 0)
     }
     //block a user
-    const blockUser = () => {
-        socket.emit('block user', {room: roomName, username: user.username},
-        (result, message) => {
-            if(!result) {
-                // enqueueSnackbar(message, {variant: 'error'});
-            }
-        })
-    } 
-    const unBlockUser = (roomName, username) => {
-        socket.emit('unblock user', {room: roomName, username: user.username},
-            (result, message) => {
-                if(!result) {
-                    // enqueueSnackbar(message, {variant: 'error'});
-                }
-            }
-        );
-    }
     const handleBlock = () => {
         if(!isBlocked) {
             blockUser(roomName, user.username);
@@ -310,11 +293,9 @@ const RoomUserName = ({user, role, roomName,
         setAnchorPokeEl(null);
     };
 
-    const unbanCamera = () => {
+    const handleUnbanCamera = () => {
         setAnchorEl(null);
-        socket.emit('unban camera', {room: roomName, username: user.username}, (result, message) => {
-
-        });
+        unbanCamera(roomName, user.username);
     }
 
     useEffect(() => {
@@ -505,7 +486,7 @@ const RoomUserName = ({user, role, roomName,
                             {user.isCameraBanned ? 
                                 <Button size="small"
                                     className={`${classes.cardButton} ${classes.mute}`}
-                                    fullWidth onClick={unbanCamera}
+                                    fullWidth onClick={handleUnbanCamera}
                                 >
                                 { t('UserActionArea.unban_camera')}
                                 </Button>

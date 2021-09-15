@@ -70,15 +70,6 @@ class MediaClient {
         }
     }
 
-    async sendSocketEvent (mName, mValue) {
-        if (this.socketWorker) {
-            this.socketWorker.postMessage({
-                mName,
-                mValue
-            })
-        }
-    }
-
     checkProduceState(room_id) {
         if (this.producerTransports.has(room_id)) {
             return true;
@@ -160,14 +151,17 @@ class MediaClient {
         if(consumerTransport) {
             consumerTransport.close();
         }
+        this.consumerTransports.delete(room_id);
         let producerTransport = this.producerTransports.get(room_id);
         if(producerTransport) {
             producerTransport.close();
         }
+        this.producerTransports.delete(room_id);
         let producerInfo = this.producers.get(room_id);
         if(producerInfo && producerInfo.producer) {
             producerInfo.producer.close();
         }
+        this.producers.delete(room_id);
         let consumerArr = Array.from(this.consumers.values())
         consumerArr.forEach((item) => {
             if(item && (item.room_id === room_id)) {
@@ -676,19 +670,21 @@ class MediaClient {
 
         if (locked) {
             fn1(true);
-            socket.emit('view request', {
+            this.socketWorker.request('view request', {
                 roomName: room_id,
                 username: this.name,
                 userId: this.userId,
                 targetName: name,
-            }, (result) => {
-                if(result) {
-                    this.addRemoteStream(room_id, name, user_id, producers, true);
-                } else {
-                    // console.log('deney view request');
-                }
+            })
+            .then(() => {
+                this.addRemoteStream(room_id, name, user_id, producers, true);
                 if (fn2) {
-                    fn2(result);
+                    fn2(true);
+                }
+            })
+            .catch((e) => {
+                if (fn2) {
+                    fn2(false);
                 }
             })
         } else {
@@ -775,7 +771,7 @@ class MediaClient {
                 });
                 this.remoteStreams.set(room_id, newRoomStreams);
             }
-            socket.emit('start view', {
+            this.socketWorker.emit('start view', {
                 room_id,
                 name: this.name,
                 targetName: name
@@ -1074,7 +1070,7 @@ class MediaClient {
                         track.stop();
                     });
                     roomStreams.delete(name);
-                    socket.emit('stop view', {
+                    this.socketWorker.emit('stop view', {
                         room_id,
                         name: this.name,
                         targetName: name
@@ -1118,8 +1114,7 @@ class MediaClient {
     }
 
     async stopView(room_id, targetId, name) {
-        // let roomStreams = this.remoteStreams.get(room_id);
-        socket.request('stop broadcast to', {
+        this.socketWorker.emit('stop broadcast to', {
             room_id,
             name: this.name,
             targetName: name,
