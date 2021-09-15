@@ -110,7 +110,13 @@ const BroadcastSetting = () => {
     const classes = useStyles();
     const { t } = useTranslation();
     const [open, setOpen] = useState(false);
-    const { startBroadcast, stopBroadcast, cameraState, name: roomName } = useContext(ChatContext);
+    const { startBroadcast, stopBroadcast, currentRoomData } = useContext(ChatContext);
+    
+    if (!currentRoomData) {
+        return null;
+    }
+    const { name: roomName, localStream } = currentRoomData;
+    const cameraState = localStream? (localStream.locked? 'locked': true): false;
     
     const handleClickOpen = () => {
         if(!cameraState) {

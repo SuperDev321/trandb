@@ -3,7 +3,6 @@ const ipInt = require('ip-to-int');
 
 const cameraBanByNameAndIp = async (room=null, username, ip=null, fromIp=null, toIp=null) => {
     let ban = null;
-    console.log('camera ban', room, username, ip);
     try{
         if(room) { // room ban
             if (ip) {

@@ -9,7 +9,7 @@ import OnlineUser from '../OnlineUser';
 import BroadcastSetting from '../Broadcast/BroadcastSettingModal';
 import SeparateLine from '../SeparateLine';
 import { useTranslation } from 'react-i18next';
-import { ChatContext, SettingContext } from '../../context';
+import { ChatContext, SettingContext, UserContext } from '../../context';
  
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -108,17 +108,18 @@ const useStyles = makeStyles((theme) => ({
 
 const SideBarLeft = () => {
     const classes = useStyles();
-    const { username, globalBlocks,
+    const { username } = useContext(UserContext);
+    const { globalBlocks,
         globalCameraBans,
         currentRoomData } = useContext(ChatContext);
-    const { users, viewers, blocks, mutes, cameraBans, name: roomName, cameraState } = currentRoomData;
+    const { users, viewers, blocks, mutes, cameraBans, name: roomName, localStream } = currentRoomData;
     const [searchText, setSearchText] = useState('');
     const [sideUsers, setSideUsers] = useState([]);
     const [filteredUsers, setFilteredUsers] = useState(null);
     const [role, setRole] = useState(null);
     const {privateMutes, removePrivateMute, addPrivateMute, pointOption} = useContext(SettingContext)
     const {t} = useTranslation();
-
+    const cameraState = localStream? (localStream.locked? 'locked': true): false;
     const changePrivateMute = useCallback((user, isMuted) => {
         let {username, ip} = user
         if (isMuted) {
@@ -130,6 +131,7 @@ const SideBarLeft = () => {
 
     useEffect(() => {
         let me = users.find((item) => (item.username === username));
+        console.log('me', me, users, username)
         if(me) setRole(me.role);
     }, [users, username])
 

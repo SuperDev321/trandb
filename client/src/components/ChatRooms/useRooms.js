@@ -171,7 +171,14 @@ const useRooms = ({initRoomName, ...initalState}) => {
     }, [roomsRef]);
 
     const autoStartRemoteVideo = useCallback(async (room, producers, userId, locked, remoteUsername) => {
-        let result = await socket.request('check camera view', ({ room, targetUserId: userId }));
+        // let result = await socket.request('check camera view', ({ room, targetUserId: userId }));
+        let result = await socketWorkerRef.current?.request('check camera view', { room, targetUserId: userId })
+        .then(() => {
+            return true;
+        })
+        .catch(() => {
+            return false;
+        });
         if (!result) {
             return false;
         }
@@ -244,6 +251,16 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 if(messages) {
                     sameRoom.setMessages(messages);
                 }
+                data.name = sameRoom.name;
+                data.messages = sameRoom.messages;
+                data.users = sameRoom.users;
+                data.blocks = sameRoom.blocks;
+                data.mutes = sameRoom.mutes
+                data.unReadMessages = sameRoom.unReadMessages;
+                data.localStream = null;
+                data.remoteStreams = null;
+                data.cameraBans = sameRoom.cameraBans;
+                dispatch({type: 'init', data});
             }
 
         }
@@ -690,7 +707,6 @@ const useRooms = ({initRoomName, ...initalState}) => {
                                 break;
                         }
                         if (callback) {
-                            console.log('receive poke')
                             callback(true)
                         }
                     } else {
@@ -745,7 +761,6 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 }, roomName);
                 socketWorkerRef.current.request('private message', { type, roomName, msg, from: username, to, color, bold, messageType })
                 .catch((err) => {
-                    console.log('private error', err)
                     if(err === 'logout') {
                         privateListRef.current.addErrorMessage(roomName);
                     } else if (err === 'forbidden') {
@@ -774,7 +789,6 @@ const useRooms = ({initRoomName, ...initalState}) => {
             // }
             socketWorkerRef.current.request('poke message', { from: username, to: userToSend, room: roomName, pokeType })
             .then((response) => {
-                console.log('poke success')
                 // this is callback function that can excute on server side
                 if (response === 'success'){
                     addMessage({
@@ -807,11 +821,26 @@ const useRooms = ({initRoomName, ...initalState}) => {
         }
     }, [socketWorkerRef])
     const banUser = useCallback(async (payload) => {
-        console.log('ban user', payload)
         if (socketWorkerRef.current) {
             socketWorkerRef.current.emit('ban user', payload)
         }
     }, [socketWorkerRef])
+
+    const blockUser = useCallback((roomName, username) => {
+        if (socketWorkerRef.current) {
+            socketWorkerRef.current.emit('block user', { room: roomName, username })
+        }
+    }, [socketWorkerRef]);
+    const unBlockUser = useCallback((roomName, username) => {
+        if (socketWorkerRef.current) {
+            socketWorkerRef.current.emit('unblock user', { room: roomName, username })
+        }
+    }, [socketWorkerRef]);
+    const unbanCamera = useCallback((roomName, username) => {
+        if (socketWorkerRef.current) {
+            socketWorkerRef.current.emit('unban camera', { room: roomName, username })
+        }
+    }, [socketWorkerRef]);
 
     const stopBroadcastTo = useCallback(async (roomName, userId, name) => {
         if(mediaClientRef.current) {
@@ -912,7 +941,14 @@ const useRooms = ({initRoomName, ...initalState}) => {
     const startBroadcast = useCallback(async (room, lock, videoDeviceId, audioDeviceId) => {
         try {
             // let result = await socket?.request('check camera broadcast', ({ room }));
-            let result = await socketWorkerRef.current?.request('check camera broadcast', { room });
+            let result = await socketWorkerRef.current?.request('check camera broadcast', { room })
+            .then(() => {
+                return true;
+            })
+            .catch(() => {
+                return false;
+            });
+
             if (!result) {
                 enqueueSnackbar(t('ChatApp.error_camera_banned'), { variant: 'error'});
                 return false;
@@ -936,16 +972,12 @@ const useRooms = ({initRoomName, ...initalState}) => {
                     if (result) {
                         const { producers, locked } = result;
                         if (socketWorkerRef.current) {
-                            socketWorkerRef.current.postMessage({
-                                mName: 'start video', 
-                                mValue: {
-                                    room,
-                                    producers,
-                                    locked
-                                }
+                            socketWorkerRef.current.emit('start video', {
+                                room,
+                                producers,
+                                locked
                             })
                         }
-                        
                     }
                 } else {
                     enqueueSnackbar(t('UserActionArea.error_not_ready_broadcast'), {variant: 'error'});
@@ -963,13 +995,20 @@ const useRooms = ({initRoomName, ...initalState}) => {
         if(mediaClientRef.current) {
             mediaClientRef.current.closeProducer(null, roomName);
         }
-        socket.emit('stop video', {
+        socketWorkerRef.current.emit('stop video', {
             room: roomName
         })
-    }, [mediaClientRef]);
+    }, [mediaClientRef, socketWorkerRef]);
 
     const viewBroadcast = useCallback(async (roomName, userId, targetUsername, producers, locked) => {
-        let result = await socket.request('check camera view', ({ room: roomName, targetUserId: userId }));
+        // let result = await socket.request('check camera view', ({ room: roomName, targetUserId: userId }));
+        let result = await socketWorkerRef.current?.request('check camera view', { room: roomName, targetUserId: userId })
+        .then(() => {
+            return true;
+        })
+        .catch(() => {
+            return false;
+        });
         if (!result) {
             enqueueSnackbar(t('ChatApp.error_camera_view_banned'), { variant: 'error'});
             return false;
@@ -1007,7 +1046,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 case 'close':
                     if(name === username) {
                         mediaClientRef.current.closeProducer(null, roomName);
-                        socket.emit('stop video', {
+                        socketWorkerRef.current.emit('stop video', {
                             room: roomName
                         })
                     } else {
@@ -1028,7 +1067,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
                     break;
             }
         }
-    }, [mediaClientRef, username]);
+    }, [mediaClientRef, username, socketWorkerRef]);
 
     const leaveFromPrivate = async (roomName) => {
         socketWorkerRef.current.postMessage({
@@ -1108,7 +1147,6 @@ const useRooms = ({initRoomName, ...initalState}) => {
     }, [roomsRef, roomNameRef, dispatch, mediaClientRef]);
 
     const receiveSocketMessage = useCallback((event) => {
-        console.log(event)
         const { type, mName, mData } = event.data;
         let callback = null;
         if (type === 'emit') {
@@ -1146,6 +1184,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
                     // the disconnection was initiated by the server, you need to reconnect manually
                     socketWorkerRef.current.emit('connect');
                 }
+                break;
             case 'joined room':
                 addUser(mData);
                 break;
@@ -1180,16 +1219,19 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 setOpenDisconnectModal(false)
                 break;
             case 'update block':
-                updateBlocks({room, blocks});
+                const { room: roomToBlock, blocks: newBlocks }= mData;
+                updateBlocks({ room: roomToBlock, blocks: newBlocks });
                 break;
             case 'update global block':
-                setGlobalBlocks(mData);
+                const { blocks: newGlobalBlocks } = mData;
+                setGlobalBlocks(newGlobalBlocks);
                 break;
             case 'update camera bans':
                 updateCameraBans(mData);
                 break;
             case 'update global camera bans':
-                setGlobalCameraBans(mData);
+                const { globalCameraBans: newGlobalCameraBans } = mData;
+                setGlobalCameraBans(newGlobalCameraBans);
                 break;
             case 'poke message':
                 receivePoke(mData, callback);
@@ -1202,6 +1244,49 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 break;
             case 'received gift':
                 receiveGift(mData);
+                break;
+            case 'start video':
+                const {
+                    room: startVideoRoom,
+                    producers,
+                    userId: startVideoUserId,
+                    username: startVideoUsername,
+                    locked: startVideoLocked
+                } = mData;
+                startRemoteVideo(startVideoRoom, producers, startVideoUserId, startVideoLocked, startVideoUsername);
+                break;
+            case 'stop video':
+                const { room: roomToStopVideo, userId } = mData;
+                stopRemoteVideo(roomToStopVideo, userId);
+                break;
+            case 'view request':
+                const { username: viewRequestName, roomName: viewRequestRoom } = mData;
+                requestAudioControls.seek(0);
+                requestAudioControls.play();
+                permissionRequest(viewRequestName, viewRequestRoom, (result) => {
+                    if (callback) callback(result);
+                });
+                break;
+            case 'start view':
+                const { room_id: startViewRoom, name: startViewName } = mData;
+
+                if (mediaClientRef.current) {
+                    mediaClientRef.current.addViewer(startViewRoom, startViewName);
+                }
+                break;
+            case 'stop view':
+                const { name: stopViewName, room_id: stopViewRoom } = mData;
+                if (mediaClientRef.current) {
+                    mediaClientRef.current.deleteViewer(stopViewRoom, stopViewName);
+                }
+                break;
+            case 'stop view from':
+                const { name: stopViewFromName, room_id: stopViewFromRoom } = mData;
+                if (mediaClientRef.current) {
+                    mediaClientRef.current.removeRemoteStream(stopViewFromName, null, stopViewFromRoom);
+                    mediaClientRef.current.removeConsumers(stopViewFromRoom, stopViewFromName);
+                }
+                break;
             case 'private_error_logout':
                 const { roomName: logoutRoomName } = mData;
                 privateListRef.current.addErrorMessage(logoutRoomName);
@@ -1228,9 +1313,9 @@ const useRooms = ({initRoomName, ...initalState}) => {
     }, [initRoom, receiveMessage, setOpenDisconnectModal, addUser,
         kickUser, removeUser, receivePoke, enqueueSnackbar, updateBlocks,
         setGlobalBlocks, updateCameraBans, setGlobalCameraBans,
-        updatePoints,
+        updatePoints, stopRemoteVideo,
         updateUserProfile,
-        receiveGift
+        receiveGift, mediaClientRef
     ])
 
     useEffect(() => {
@@ -1268,14 +1353,12 @@ const useRooms = ({initRoomName, ...initalState}) => {
         workerObj.postMessage({ type: 'init', mValue: { token } });
 
         return () => {
-            workerObj.postMessage({ mName: 'close' });
+            workerObj.postMessage({ type: 'close' });
         }
     }, [])
 
     useEffect(() => {
-        console.log('set message on 1')
         if (socketWorkerRef.current) {
-            console.log('set message on')
             socketWorkerRef.current.onmessage = receiveSocketMessage;
         }
     }, [receiveSocketMessage])
@@ -1305,88 +1388,19 @@ const useRooms = ({initRoomName, ...initalState}) => {
 
     useEffect(() => {
         if(initRoomName && username) {
-            // if (!socket.connected) {
-            //     // socket.open();
-            // }
-            // socket.on('update block', async ({room, blocks}) => {
-            //     updateBlocks({room, blocks});
+            // socket.on('stop video', async ({ room, userId }) => {
+            //     stopRemoteVideo(room, userId)
             // })
-            // socket.on('update global block', async ({blocks}) => {
-            //     setGlobalBlocks(blocks);
-            // })
-            // socket.on('update camera bans', async ({room, cameraBans}) => {
-            //     updateCameraBans({room, cameraBans});
-            // })
-            // socket.on('update global camera bans', async ({globalCameraBans}) => {
-            //     setGlobalCameraBans(globalCameraBans);
-            // })
-            // socket.on('room message', async (message, callback) => {
-            //     receiveMessage({message}, callback);
-            // });
-            // socket.on('private message', async (message, callback) => {
-            // })
-            // socket.on('poke message', (payload, callback) => {
-            //     receivePoke(payload, callback)
-            // })
-            // socket.on('update points', async (usersWithPoints) => {
-            //     updatePoints(usersWithPoints)
-            // })
-            // socket.on('update user info', async (userInfo) => {
-            //     updateUserProfile(userInfo)
-            // })
-            // socket.on('disconnect', async (reason) => {
-            //     setOpenDisconnectModal(true);
-            //     if (mediaClientRef.current) {
-            //         mediaClientRef.current.exit(true);
-            //     }
-            //     if (reason === 'io server disconnect') {
-            //         // the disconnection was initiated by the server, you need to reconnect manually
-            //         socket.connect();
-            //     }
-            // })
-            // socket.io.on('reconnect', async () => {
-            //     let roomNames = roomsRef.current.map((room) => (room.name));
-            //     let privateRooms = privateListRef.current ? privateListRef.current.getPrivateRooms(): [];
-            //     roomNames.map(async (roomName) => {
-            //         socket.emit('rejoin room',{room: roomName, type: 'public'}, (result, error) => {
-            //             if(result) {
-            //                 // console.log('rejoin success') 
-            //             } else {
-            //                 // console.log('rejoin fail', error)
-            //                 removeRoom(roomName, null)
-            //             }
-                        
-            //         })
-            //     });
-            //     privateRooms.forEach((roomName) => {
-            //         socket.emit('rejoin room',{room: roomName, type: 'private'}, (result) => {
-            //             if(result) {
-            //                 // console.log('rejoin success')
-            //             } else {
-            //                 // console.log('rejoin fail')
-            //             }
-                        
-            //         })
-            //     })
-            //     setOpenDisconnectModal(false)
-            // })
-            // socket.on('repeat connection', async () => {
-            //     enqueueSnackbar(t('ChatApp.already_in_chat'), {variant: 'error'});
-            //     history.push('/');
-            // })
-            socket.on('stop video', async ({ room, userId }) => {
-                stopRemoteVideo(room, userId)
-            })
             // socket.on('check camera state', ({ room, userId }, callback) => {
             //     checkCameraState(room, userId, callback);
             // })
-            socket.on('view request', async ({ username, roomName }, callback) => {
-                requestAudioControls.seek(0);
-                requestAudioControls.play();
-                permissionRequest(username, roomName, (result) => {
-                    callback(result);
-                });
-            })
+            // socket.on('view request', async ({ username, roomName }, callback) => {
+            //     requestAudioControls.seek(0);
+            //     requestAudioControls.play();
+            //     permissionRequest(username, roomName, (result) => {
+            //         callback(result);
+            //     });
+            // })
             isPrivateRoom(initRoomName, ({isPrivate}) => {
                 if(isPrivate) {
                     setRoomNameForPassword(initRoomName);
@@ -1459,33 +1473,33 @@ const useRooms = ({initRoomName, ...initalState}) => {
     //     };
     // }, [username, autoBroadcast])
 
-    useEffect(() => {
-        socket.on('start view', ({ room_id, name}) => {
-            if (mediaClientRef.current) {
-                mediaClientRef.current.addViewer(room_id, name);
-            }
-        });
+    // useEffect(() => {
+    //     socket.on('start view', ({ room_id, name}) => {
+    //         if (mediaClientRef.current) {
+    //             mediaClientRef.current.addViewer(room_id, name);
+    //         }
+    //     });
 
-        socket.on('stop view', async (data) => {
-            let {name, room_id} = data;
-            if (mediaClientRef.current) {
-                mediaClientRef.current.deleteViewer(room_id, name);
-            }
-        })
+    //     socket.on('stop view', async (data) => {
+    //         let {name, room_id} = data;
+    //         if (mediaClientRef.current) {
+    //             mediaClientRef.current.deleteViewer(room_id, name);
+    //         }
+    //     })
 
-        socket.on('stop view from', async (data) => {
-            let {name, room_id} = data;
-            if (mediaClientRef.current) {
-                mediaClientRef.current.removeRemoteStream(name, null, room_id);
-                mediaClientRef.current.removeConsumers(room_id, name);
-            }
-        })
+    //     socket.on('stop view from', async (data) => {
+    //         let {name, room_id} = data;
+    //         if (mediaClientRef.current) {
+    //             mediaClientRef.current.removeRemoteStream(name, null, room_id);
+    //             mediaClientRef.current.removeConsumers(room_id, name);
+    //         }
+    //     })
 
-        return () => {
-            socket.off('start view');
-            socket.off('stop view');
-        }
-    }, [username, mediaClientRef])
+    //     return () => {
+    //         socket.off('start view');
+    //         socket.off('stop view');
+    //     }
+    // }, [username, mediaClientRef])
 
     // useEffect(() => {
     //     // socket.on('joined room',async ({room, onlineUsers, joinedUser}) => {
@@ -1522,129 +1536,15 @@ const useRooms = ({initRoomName, ...initalState}) => {
     //     }
     // }, [receiveGift])
 
-    useEffect(() => {
-        socket.on('start video', ({ room, producers, userId, username, locked }) => {
-            startRemoteVideo(room, producers, userId, locked, username);
-        })
-
-        return () => {
-            socket.off('start video');
-        }
-    }, [startRemoteVideo])
-
-
-
     // useEffect(() => {
-    //     if (username && socketEvent) {
-    //         const { type, data } = socketEvent;
-    //         switch (type ) {
-    //             case 'init room':
-    //                 const {
-    //                     room, onlineUsers, messages, blocks, globalBlocks, cameraBans,
-    //                     globalCameraBans
-    //                 } = data
-    //                 let usernames = onlineUsers.map((item) => (item.username));
-    //                 if(usernames.includes(username)) {
-    //                     initRoom({room, onlineUsers, messages, blocks, globalBlocks, cameraBans, globalCameraBans});
-    //                 }
-    //                 break;
-    //             case 'room message':
-    //                 receiveMessage(data);
-    //                 break;
-    //             case 'disconnect':
-    //                 const { reason } = data;
-    //                 setOpenDisconnectModal(true);
-    //                 if (mediaClientRef.current) {
-    //                     mediaClientRef.current.exit(true);
-    //                 }
-    //                 if (reason === 'io server disconnect') {
-    //                     // the disconnection was initiated by the server, you need to reconnect manually
-    //                     socketWorkerRef.current.emit('connect');
-    //                 }
-    //             case 'joined room':
-    //                 addUser(data);
-    //                 break;
-    //             case 'leave room':
-    //                 removeUser(data);
-    //                 break;
-    //             case 'kicked user':
-    //                 kickedUser({ ...data, type: 'kick' });
-    //                 break;
-    //             case 'banned user':
-    //                 kickedUser({ ...data, type: 'ban' });
-    //                 break;
-    //             case 'global banned user':
-    //                 kickedUser({ ...data, type: 'global ban' });
-    //                 break
-    //             case 'reconnect':
-    //                 let roomNames = roomsRef.current?.map((room) => (room.name));
-    //                 let privateRooms = privateListRef.current ? privateListRef.current.getPrivateRooms(): [];
-    //                 roomNames.map(async (roomName) => {
-    //                     socketWorkerRef.current.request('rejoin room', { room: roomName, type: 'public' })
-    //                     .catch((error) => {
-    //                         removeRoom(roomName)
-    //                     })
-    //                     // socketWorkerRef.current.postMessage({
-    //                     //     mName: 'rejoin room',
-    //                     //     mValue: { room: roomName, type: 'public' }
-    //                     // });
-    //                 });
-    //                 privateRooms.forEach((roomName) => {
-    //                     socketWorkerRef.current.request('rejoin room', { room: roomName, type: 'private' })
-    //                 })
-    //                 setOpenDisconnectModal(false)
-    //                 break;
-    //             case 'update block':
-    //                 updateBlocks({room, blocks});
-    //                 break;
-    //             case 'update global block':
-    //                 setGlobalBlocks(data);
-    //                 break;
-    //             case 'update camera bans':
-    //                 updateCameraBans(data);
-    //                 break;
-    //             case 'update global camera bans':
-    //                 setGlobalCameraBans(data);
-    //                 break;
-    //             case 'poke message':
-    //                 receivePoke(data);
-    //                 break;
-    //             case 'update points':
-    //                 updatePoints(data)
-    //                 break;
-    //             case 'update user info':
-    //                 updateUserProfile(data)
-    //                 break;
-    //             case 'open private success':
-    //                 const { to, roomName } = data;
-    //                 privateListRef.current.addChat(to, roomName);
-    //                 break;
-    //             case 'private_error_guest':
-    //                 enqueueSnackbar(t('UserActionArea.error_guest_dont_have_permission'), {variant: 'error'});
-    //                 break;
-    //             case 'private_error_logout':
-    //                 const { roomName: logoutRoomName } = data;
-    //                 privateListRef.current.addErrorMessage(logoutRoomName);
-    //                 break;
-    //             case 'private_error_forbbiden':
-    //                 enqueueSnackbar(t('Message.forbidden'), {variant: 'error'});
-    //                 break;
-    //             case 'private_error_muted':
-    //                 enqueueSnackbar(t('Message.private_muted'), {variant: 'error'});
-    //                 break;
-    //             case 'private_error_blocked':
-    //                 enqueueSnackbar(t('Message.private_blocked'), {variant: 'error'});
-    //                 break
-    //             case 'repeat connection':
-    //                 enqueueSnackbar(t('ChatApp.already_in_chat'), {variant: 'error'});
-    //                 history.push('/');
-    //                 break;
-    //             default:
-    //                 break;
-    //         }
-    //     }
+    //     socket.on('start video', ({ room, producers, userId, username, locked }) => {
+    //         startRemoteVideo(room, producers, userId, locked, username);
+    //     })
 
-    // }, [socketEvent])
+    //     return () => {
+    //         socket.off('start video');
+    //     }
+    // }, [startRemoteVideo])
 
     useEffect(() => {
         let mediaObj = null;
@@ -1699,7 +1599,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
                             localStream: null
                         }
                     });
-                    socket.emit('stop video', {
+                    socketWorkerRef.current.emit('stop video', {
                         room: room_id
                     })
                 }
@@ -1826,6 +1726,9 @@ const useRooms = ({initRoomName, ...initalState}) => {
         banUser,
         stopBroadcastTo,
         sendGift,
+        blockUser,
+        unBlockUser,
+        unbanCamera,
         pokeAudio1,
         pokeAudio2,
         pokeAudio3,

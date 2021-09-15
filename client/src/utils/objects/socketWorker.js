@@ -73,7 +73,7 @@ const socketWorker = () => {
         })
 
         socket.on('disconnect', (reason) => {
-            sendMessage('room message', { reason });
+            sendMessage('disconnect', { reason });
         })
 
         socket.on('joined room', (data) => {
@@ -106,22 +106,43 @@ const socketWorker = () => {
             sendMessage('update camera bans', data);
         });
         socket.on('update global camera bans', (data) => {
-            sendMessage('update camera bans', data);
+            sendMessage('update global camera bans', data);
         });
+        socket.on('stop video', (data) => {
+            sendMessage('stop video', data)
+        })
         socket.on('poke message', (data, callback) => {
-            postMessage({
-                type: 'poke message',
-                data
-            })
             sendRequest('poke message', data)
             .then(() => {
-                console.log('poke callback true')
                 callback(true)
             })
             .catch(() => {
                 callback(false)
             })
         });
+        socket.on('view request', async (data, callback) => {
+            sendRequest('view request', data)
+            .then(() => {
+                callback(true);
+            })
+            .catch(() => {
+                callback(false)
+            })
+        })
+        socket.on('start video', (data) => {
+            sendMessage('start video', data);
+        })
+        socket.on('start view', (data) => {
+            sendMessage('start view', data)
+        });
+
+        socket.on('stop view', (data) => {
+            sendMessage('stop view', data)
+        })
+
+        socket.on('stop view from', (data) => {
+            sendMessage('stop view from', data)
+        })
         socket.on('update points', (data) => {
             sendMessage('update points', data);
         });
@@ -150,7 +171,6 @@ const socketWorker = () => {
             if (type === 'request') {
                 if (socket) {
                     socket.emit(mName, mValue, (result, message) => {
-                        console.log('socket callback', result, message)
                         if (!result) {
                             event.ports[0].postMessage({error: message});
                         } else {
@@ -167,6 +187,11 @@ const socketWorker = () => {
             } else if (type === 'init') {
                 const { token, ismobile } = mValue;
                 initSocket(token, ismobile);
+            } else if (type === 'close') {
+                socket.removeAllListeners();
+                socket.close();
+                /* eslint-disable-next-line no-restricted-globals */
+                self.close()
             }
             // switch (mName) {
             //     case 'init':

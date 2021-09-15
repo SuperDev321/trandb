@@ -4,7 +4,6 @@ var randomString = require('random-string')
 
 const addPrivate = (io, socket) => async ({ from, to, role }, callback) => {
     try {
-        
         let rooms = Array.from(socket.rooms);
         let privateRoom = rooms.find((item) => {
             let strArr = item.split('_');
@@ -17,7 +16,7 @@ const addPrivate = (io, socket) => async ({ from, to, role }, callback) => {
         });
         if(privateRoom) {
             privateRoomName = privateRoom;
-            return callback(privateRoom);
+            return callback(true, privateRoom);
         } else {
             if(role === 'guest') {
                 let {allowPrivate} = await Settings.findOne({type: 'admin'});
@@ -44,14 +43,14 @@ const addPrivate = (io, socket) => async ({ from, to, role }, callback) => {
             if(socketToPrivate) {
                 socketToPrivate.join(newPrivateRoomName);
                 socket.join(newPrivateRoomName);
-                return callback(newPrivateRoomName);
+                return callback(true, newPrivateRoomName);
             } else {
-                return callback(null)
+                return callback(false)
             }
         }
     } catch (err) {
         console.log(err);
-        callback(null);
+        callback(false, err.message);
     }
 };
 

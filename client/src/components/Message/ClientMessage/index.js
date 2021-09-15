@@ -47,8 +47,8 @@ function getValidCustomEmoji(value) {
     return emojis.find(({ name }) => (name === value));
 }
 
-const MyMessage = ({id, user, roomName, message, messageSize, role, font_size, userAction, changeMuteState, sendPokeMessage, 
-    kickUser, banUser, addOrOpenPrivate, scrollEvent, ...props}) => {
+const MyMessage = ({id, user, roomName, message, messageSize, role, font_size, userAction,
+    scrollEvent, ...props}) => {
     const classes = useStyles({color: message.color, bold: message.bold, messageSize});
     const { username } = useContext(UserContext);
     const { emojiOption, showEmoji } = useContext(SettingContext);
@@ -147,11 +147,6 @@ const MyMessage = ({id, user, roomName, message, messageSize, role, font_size, u
                 roomName={roomName}
                 isMine={username === user.username}
                 displayYou={false}
-                changeMuteState={changeMuteState}
-                sendPokeMessage={sendPokeMessage}
-                kickUser={kickUser}
-                banUser={banUser}
-                addOrOpenPrivate={addOrOpenPrivate}
                 role={role}
                 isBlocked={false}
                 showAboutMe={false}

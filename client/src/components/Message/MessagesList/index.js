@@ -46,8 +46,7 @@ const useStyles =  makeStyles((theme) => ({
 
 const itemUnit = 50;
 
-const MessagesList = ({ users, messages, role, userAction, roomName, changeMuteState, sendPokeMessage, kickUser, banUser,
-    addOrOpenPrivate }) => {
+const MessagesList = ({ users, messages, role, userAction, roomName}) => {
     const messagesRef = useRef();
     const classes = useStyles();
     const {messageSize} = useContext(SettingContext);
@@ -90,11 +89,6 @@ const MessagesList = ({ users, messages, role, userAction, roomName, changeMuteS
                                 role={role}
                                 message={{_id, from, msg, date, color, bold, messageType}} font_size={10}
                                 messageSize={messageSize}
-                                changeMuteState={changeMuteState}
-                                sendPokeMessage={sendPokeMessage}
-                                kickUser={kickUser}
-                                banUser={banUser}
-                                addOrOpenPrivate={addOrOpenPrivate}
                                 scrollEvent={() => {scrollEvent(index)}}
                             />
                         }
