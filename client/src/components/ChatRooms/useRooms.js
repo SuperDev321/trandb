@@ -1231,7 +1231,8 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 break;
             case 'update global camera bans':
                 const { globalCameraBans: newGlobalCameraBans } = mData;
-                setGlobalCameraBans(newGlobalCameraBans);
+                if (Array.isArray(newGlobalCameraBans))
+                    setGlobalCameraBans(newGlobalCameraBans);
                 break;
             case 'poke message':
                 receivePoke(mData, callback);

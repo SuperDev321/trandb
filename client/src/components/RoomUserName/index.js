@@ -234,14 +234,7 @@ const RoomUserName = ({user, role, roomName,
     }
     const handleBan = () => {
         setAnchorEl(null);
-        // if(role === 'admin' || role === 'super_admin') {
-            setOpenBan(true);
-        // } else {
-        //     setTimeout(() => {
-        //         if(role && user && user.username)
-        //             banUser(roomName, user.username);
-        //     }, 0);
-        // }
+        setOpenBan(true);
     }
 
     const handleClickProfile = () => {

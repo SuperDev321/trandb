@@ -141,7 +141,6 @@ const privateMessage = (io, socket) => async ({ roomName, msg, from, to, color, 
       let socketIds = await io.of('/').in(roomName).allSockets();
       const socketIdArr = Array.from(socketIds);
       if(socketIdArr.length < 2) {
-        console.log('logout')
         callback(false, 'logout');
         socket.leave(roomName);
         return;

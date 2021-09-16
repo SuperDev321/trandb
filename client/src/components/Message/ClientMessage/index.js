@@ -77,11 +77,12 @@ const MyMessage = ({id, user, roomName, message, messageSize, role, font_size, u
     }, [id]);
 
     const makeTagWithCustom = useCallback((text) => {
-        const arr = text.split(/(['>','<'])/)
+        const arr = text.split(/(['>','<',' '])/)
         let tmp = '';
         const newArr = [];
         arr.forEach((item) => {
-            if (item === '>') {
+            if (item === '') {
+            } else if (item === '>') {
                 if (tmp !== '') {
                     newArr.push(tmp);
                 }
@@ -90,6 +91,16 @@ const MyMessage = ({id, user, roomName, message, messageSize, role, font_size, u
                 tmp += '<';
                 newArr.push(tmp);
                 tmp = ''
+            } else if (item === ' ') {
+                if (tmp !== '' && tmp[0] !== ' ') {
+                    newArr.push(tmp);
+                    tmp = ' ';
+                } else {
+                    tmp += ' ';
+                }
+            } else if (tmp[0] === ' ') {
+                newArr.push(tmp);
+                tmp = item;
             } else {
                 tmp += item;
             }
@@ -106,6 +117,9 @@ const MyMessage = ({id, user, roomName, message, messageSize, role, font_size, u
         if (newArr && newArr.length) {
             for (let index = 0; index < newArr.length; index++) {
                 const element = newArr[index];
+                if (!element) {
+                    continue;
+                }
                 const key = `${id}-${index}`;
                 if(isValidHttpUrl(element)) {
                     // urlText = urlText.replace(element, urlify(element));
@@ -120,7 +134,12 @@ const MyMessage = ({id, user, roomName, message, messageSize, role, font_size, u
                     }
                 } else {
                     // urlText = urlText.replace(element, `<span>${element}</span>`);
-                    htmlObj.push(<span key={key}>{element}</span>)
+                    if (element[0] === ' ') {
+                        htmlObj.push(<span key={key}>{Array(element.length).fill('\xa0').join('')}</span>)
+                    } else {
+                        htmlObj.push(<span key={key}>{element}</span>)
+                    }
+                    
                 }
             }
         }
