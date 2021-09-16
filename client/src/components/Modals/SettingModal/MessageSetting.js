@@ -50,7 +50,6 @@ const MessageSetting = ({
     const [value, setValue] = React.useState(30);
     const { t } = useTranslation();
     const handleChange = (event, newValue) => {
-        console.log(value)
         setValue(newValue);
         setMessageSize(newValue/5+10)
     };

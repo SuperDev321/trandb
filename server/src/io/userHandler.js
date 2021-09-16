@@ -260,7 +260,7 @@ const unBanCamera = (io, socket) => async ({room, username}, callback) => {
                 }
                 const globalCameraBans = await getGlobalCameraBans();
                 const cameraBans = await getRoomCameraBans(room);
-                io.emit('update global camera bans', {blocks: globalCameraBans});
+                io.emit('update global camera bans', {globalCameraBans});
                 io.to(room).emit('update camera bans', {room, cameraBans});
             } else {
                 let result = await removeCameraBan(room, userToBlock.username, userIp);

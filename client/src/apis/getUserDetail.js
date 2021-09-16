@@ -9,21 +9,15 @@ const getUserDetail = async (username, successCallback, errCallback) => {
                 authorization: token
             }
         });
-        console.log(result.data)
         const userInfo = result.data;
-        
-
         const {data: {data}} = await axios.get(`${config.server_url}/api/users/`+userInfo._id + '/rooms', {
             headers: {
                 authorization: token
             }
         })
         userInfo.rooms = data
-        // setLoading(false);
-        // setRooms(data);
         successCallback(userInfo);
     } catch (err) {
-        console.log('get room error')
         errCallback('Something went wrong, please try again later')
         // setLoading(false);
         // setError('Something went wrong, please try again later');

@@ -34,7 +34,6 @@ export default function Profile() {
 
   useEffect(() => {
     getUserDetail(username, (data) => {
-      console.log(data)
       if(data.rooms) {
         setRooms(data.rooms);
       }

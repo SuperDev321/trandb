@@ -42,7 +42,6 @@ const GiftForm = ({gift, username, amount, setAmount}) => {
     const { point: myPoint } = useContext(UserContext);
 
     useEffect(() => {
-        console.log(amount)
         if (gift) {
             const {cost} = gift;
             setNeededMoney(cost*amount);

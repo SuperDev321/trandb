@@ -22,7 +22,6 @@ const AvatarAndName = ({username}) => {
 
     useEffect(() => {
         if(username) {
-            console.log(username)
             getUser(username,
             (data) => {
                 setAvatar(data.avatar);

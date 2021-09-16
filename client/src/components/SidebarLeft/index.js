@@ -131,7 +131,6 @@ const SideBarLeft = () => {
 
     useEffect(() => {
         let me = users.find((item) => (item.username === username));
-        console.log('me', me, users, username)
         if(me) setRole(me.role);
     }, [users, username])
 
