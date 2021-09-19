@@ -1,18 +1,17 @@
 const { CameraBans } = require('../../database/models');
 const ipInt = require('ip-to-int');
 const removeCameraBan = async (room, username, ip, isAdmin = false) => {
-    console.log(ip, 'remove camera ban')
     try {
         let ipNum = ipInt(ip).toInt();
         if (isAdmin) {
-            await CameraBans.remove({
+            await CameraBans.deleteMany({
                 $or: [
                     {username},
                     {ip: ipNum},
                 ]
             });
         } else {
-            await CameraBans.remove({
+            await CameraBans.deleteMany({
                 $or: [
                     {room, username},
                     {room, ip: ipNum},

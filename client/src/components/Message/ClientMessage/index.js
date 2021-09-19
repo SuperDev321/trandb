@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import {SettingContext, UserContext} from '../../../context';
 import {EmojiConvertor} from 'emoji-js';
 import parseHTML from 'parsehtml';
@@ -48,19 +48,17 @@ function getValidCustomEmoji(value) {
 }
 
 const MyMessage = ({id, user, roomName, message, messageSize, role, font_size, userAction,
-    scrollEvent, ...props}) => {
+    scrollEvent, username, emojiOption, showEmoji, ...props}) => {
     const classes = useStyles({color: message.color, bold: message.bold, messageSize});
-    const { username } = useContext(UserContext);
-    const { emojiOption, showEmoji } = useContext(SettingContext);
 
-    const makeTag = useCallback((text) => {
+    const makeTag = useCallback((text, messageId) => {
         let arr = emojiStringToArray(text);
         let noRepeatArr = [...new Set(arr)];
         let htmlObj = [];
         if (noRepeatArr && noRepeatArr.length) {
             for (let index = 0; index < noRepeatArr.length; index++) {
                 const element = noRepeatArr[index];
-                const key = `${id}-${index}`;
+                const key = `${messageId}-${index}`;
                 if(isValidHttpUrl(element)) {
                     // urlText = urlText.replace(element, urlify(element));
                     htmlObj.push(<a href={element} target="_blank" key={key} rel='noopener'>{element}</a>)
@@ -74,9 +72,9 @@ const MyMessage = ({id, user, roomName, message, messageSize, role, font_size, u
             }
         }
         return htmlObj
-    }, [id]);
+    }, []);
 
-    const makeTagWithCustom = useCallback((text) => {
+    const makeTagWithCustom = useCallback((text, messageId) => {
         const arr = text.split(/(['>','<',' '])/)
         let tmp = '';
         const newArr = [];
@@ -104,49 +102,53 @@ const MyMessage = ({id, user, roomName, message, messageSize, role, font_size, u
             } else {
                 tmp += item;
             }
+            tmp += '';
         })
         if (tmp !== '') {
-            if (tmp !== '') {
-                newArr.push(tmp);
-            }
+            newArr.push(tmp);
         }
         if (newArr[0] === '') {
             newArr.slice(0, 1)
         }
         let htmlObj = [];
+        let preString = '';
         if (newArr && newArr.length) {
             for (let index = 0; index < newArr.length; index++) {
                 const element = newArr[index];
                 if (!element) {
                     continue;
                 }
-                const key = `${id}-${index}`;
                 if(isValidHttpUrl(element)) {
                     // urlText = urlText.replace(element, urlify(element));
-                    htmlObj.push(<a href={element} key={key} target="_blank" rel="noopener noreferrer">{element}</a>)
+                    if (preString !== '') {
+                        htmlObj.push(<span key={`${messageId}-${index-1}`} style={{whiteSpace: 'pre'}}>{preString}</span>);
+                        preString = '';
+                    }
+                    htmlObj.push(<a href={element} key={`${messageId}-${index}`} target="_blank" rel="noopener noreferrer">{element}</a>)
+                    continue;
                 } else if(showEmoji && element.charAt(0) === '>' && element.charAt(element.length - 1) === '<') {
+                    if (preString !== '') {
+                        htmlObj.push(<span key={`${messageId}-${index-1}`} style={{whiteSpace: 'pre'}}>{preString}</span>);
+                        preString = '';
+                    }
                     const name = element.slice(1, element.length - 1);
                     const emoji = getValidCustomEmoji(name);
                     if (emoji) {
-                        htmlObj.push(<img key={key} src={`${config.emoji_path}/${emoji.path}`} className="custom-emoji"/>)
-                    } else {
-                        htmlObj.push(<span key={key}>{element}</span>)
+                        htmlObj.push(<img key={`${messageId}-${index}`} src={`${config.emoji_path}/${emoji.path}`} className="custom-emoji"/>);
+                        continue;
                     }
-                } else {
-                    // urlText = urlText.replace(element, `<span>${element}</span>`);
-                    if (element[0] === ' ') {
-                        htmlObj.push(<span key={key}>{Array(element.length).fill('\xa0').join('')}</span>)
-                    } else {
-                        htmlObj.push(<span key={key}>{element}</span>)
-                    }
-                    
                 }
+                preString += element;
             }
         }
+        if (preString !== '') {
+            htmlObj.push(<span key={`${messageId}-last`} style={{whiteSpace: 'pre'}}>{preString}</span>);
+            preString = '';
+        }
         return htmlObj
-    }, [id])
+    }, [])
 
-    const handleClick = (e) => {
+    const handleClick = useCallback((e) => {
         if(e && e.target && e.target.tagName) {
             if(e.target.tagName === 'A') {
                 e.preventDefault();
@@ -155,7 +157,7 @@ const MyMessage = ({id, user, roomName, message, messageSize, role, font_size, u
                 userAction('show_link', {url, host});
             }
         }
-    }
+    }, [userAction]);
 
     return (
         <div className={classes.message} {...props}>
@@ -180,9 +182,9 @@ const MyMessage = ({id, user, roomName, message, messageSize, role, font_size, u
                     onClick={handleClick}
                 >
                     { emojiOption ?
-                        makeTag(message.msg)
+                        makeTag(message.msg, message._id)
                         :
-                        makeTagWithCustom(message.msg)
+                        makeTagWithCustom(message.msg, message._id)
                     }
                 </span>
                 }

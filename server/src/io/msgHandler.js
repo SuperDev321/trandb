@@ -1,4 +1,4 @@
-const { Chats } = require('../database/models');
+const { Chats, Rooms } = require('../database/models');
 const { findRoomUsers, findUserByName, isForbidden, hasFobiddenWord, getIp, banByUser, banByNameAndIp, findUserById, checkBlockById } = require('../utils');
 const {banUserByAdmin, banUser} = require('./userHandler');
 const ipInt = require('ip-to-int');
@@ -153,10 +153,6 @@ const privateMessage = (io, socket) => async ({ roomName, msg, from, to, color, 
           socketToPrivate = socket;
         }
       }
-      // let it = socketIds.values();
-      // let first = it.next();
-      // let id = first.value;
-      // let socketToPrivate = io.sockets.sockets.get(id);
       if(socketToPrivate) {
         socketToPrivate.emit('room message',
           {
@@ -179,6 +175,13 @@ const privateMessage = (io, socket) => async ({ roomName, msg, from, to, color, 
             }
               
         });
+        let dbRoomName = null;
+        if (from > to) {
+          dbRoomName = `${to}-${from}`
+        } else {
+          dbRoomName = `${from}-${to}`
+        }
+        Rooms.updateOne({name: dbRoomName}, {});
       } else {
         callback(false, 'logout');
       }
