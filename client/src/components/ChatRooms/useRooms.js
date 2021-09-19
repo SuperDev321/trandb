@@ -266,6 +266,26 @@ const useRooms = ({initRoomName, ...initalState}) => {
         }
     }, [roomsRef, dispatch, roomsDispatch, messageNum, autoBroadcast, autoStartRemoteVideo]);
 
+    const joinPrivateRoom = useCallback((room, password) => {
+        return new Promise((resolve, reject) => {
+            if (socketWorkerRef.current) {
+                // socketWorkerRef.current.postMessage({
+                //     mName: 'join room',
+                //     mValue: { room }
+                // })
+                socketWorkerRef.current.request('join room', { room, password })
+                .then((result) => {
+                    resolve(result);
+                })
+                .catch((error) => {
+                    reject();
+                })
+            } else {
+                reject('no_ready');
+            }
+        });
+    }, [socketWorkerRef, ])
+
     const addRoom = useCallback(async (room, callback) => {
         let roomNames = await roomsRef.current.map((oneRoom) => (oneRoom.name));
         if(room && roomNames && !roomNames.includes(room)) {
@@ -1265,7 +1285,10 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 requestAudioControls.seek(0);
                 requestAudioControls.play();
                 permissionRequest(viewRequestName, viewRequestRoom, (result) => {
-                    if (callback) callback(result);
+                    if (callback) {
+                        console.log(callback, result)
+                        callback(result);
+                    }
                 });
                 break;
             case 'start view':
@@ -1329,6 +1352,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
 
                 channel.port1.onmessage = ({data}) => {
                     channel.port1.close();
+                    console.log('socket reqeust', data)
                     if (data.error) {
                         reject(data.error);
                     }else {
@@ -1756,7 +1780,8 @@ const useRooms = ({initRoomName, ...initalState}) => {
         controlVideo,
         viewBroadcast,
         leaveFromPrivate,
-        addOrOpenPrivate
+        addOrOpenPrivate,
+        joinPrivateRoom
     }
 }
 

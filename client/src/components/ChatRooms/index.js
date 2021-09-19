@@ -99,7 +99,8 @@ const ChatRooms = ({room}, ref) => {
         addOrOpenPrivate,
         blockUser,
         unBlockUser,
-        unbanCamera
+        unbanCamera,
+        joinPrivateRoom
     } = useRooms({initRoomName: room});
 
     const { enqueueSnackbar, closeSnackbar } = useSnackbar();
@@ -133,7 +134,7 @@ const ChatRooms = ({room}, ref) => {
                 changeMuteState, sendPokeMessage,
                 globalBlocks, globalCameraBans,
                 addOrOpenPrivate, startBroadcast, stopBroadcast, stopBroadcastTo,
-                viewBroadcast, sendGift, blockUser, unBlockUser, unbanCamera
+                viewBroadcast, sendGift, blockUser, unBlockUser, unbanCamera, joinPrivateRoom
             }}
         >
             <div className={classes.root} color="primary">

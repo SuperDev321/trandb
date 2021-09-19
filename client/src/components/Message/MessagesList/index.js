@@ -1,4 +1,4 @@
-import React, { useState, useLayoutEffect, useRef, useContext } from 'react';
+import React, { useState, useLayoutEffect, useRef, useContext, useCallback } from 'react';
 import propTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
 import ClientMessage from '../ClientMessage';
@@ -6,7 +6,7 @@ import JoinLeaveMessage from '../JoinLeaveMessage';
 import SystemMessage from '../SystemMessage';
 import BootMessage from '../BootMessage';
 import {CustomThemeContext} from '../../../themes/cutomThemeProvider';
-import { SettingContext } from '../../../context';
+import { SettingContext, UserContext } from '../../../context';
 import GiftMessage from '../GiftMessage';
 
 const useStyles =  makeStyles((theme) => ({
@@ -49,26 +49,27 @@ const itemUnit = 50;
 const MessagesList = ({ users, messages, role, userAction, roomName}) => {
     const messagesRef = useRef();
     const classes = useStyles();
-    const {messageSize} = useContext(SettingContext);
+    const { messageSize, emojiOption, showEmoji } = useContext(SettingContext);
+    const { username } = useContext(UserContext);
 
-    const setScrollTop = () => {
+    const setScrollTop = useCallback(() => {
         if (messagesRef.current) {
             messagesRef.current.scrollTop = messagesRef.current.scrollHeight;
         }
-    }
+    }, [messagesRef]);
 
-    const getUserFromList = (username) => {
+    const getUserFromList = useCallback((username) => {
         let user = users.find((item) => (item.username === username));
         if(user) {
             return user;
         } else {
             return {username};
         }
-    }
+    }, [users]);
 
-    const scrollEvent = (index) => {
+    const scrollEvent = useCallback((event) => {
         setScrollTop();
-    }
+    }, [setScrollTop]);
 
     useLayoutEffect(() => {
         setScrollTop();
@@ -78,8 +79,7 @@ const MessagesList = ({ users, messages, role, userAction, roomName}) => {
         <>
         <div ref={messagesRef} className={classes.root}>
             { messages?.map(({ _id, from, msg, date, type, color, bold, messageType, size, giftImage }, index) => (
-                    // <Message key={_id} text={msg} from={from} date={date} />
-                    <span key={_id? _id: index}>
+                    <React.Fragment key={_id? _id: index}>
                         { (type==='public' && (messageType === 'general' || messageType === 'image'))  &&
                             <ClientMessage
                                 id={`message-${_id}`}
@@ -89,26 +89,29 @@ const MessagesList = ({ users, messages, role, userAction, roomName}) => {
                                 role={role}
                                 message={{_id, from, msg, date, color, bold, messageType}} font_size={10}
                                 messageSize={messageSize}
-                                scrollEvent={() => {scrollEvent(index)}}
+                                scrollEvent={scrollEvent}
+                                emojiOption={emojiOption}
+                                showEmoji={showEmoji}
+                                username={username}
                             />
                         }
                         {
                         (type ==='public' && messageType === 'boot') &&
-                            <BootMessage message={{msg, color, bold, size}}  />
+                            <BootMessage  message={{msg, color, bold, size}}  />
                         }
                         {
                         (type ==='system' || type === 'poke') &&
-                            <SystemMessage text={msg} />
+                            <SystemMessage  text={msg} />
                         }
                         {
                         (type ==='joinLeave') &&
-                            <JoinLeaveMessage text={msg} />
+                            <JoinLeaveMessage  text={msg} />
                         }
                         {
                         (type ==='gift') &&
-                            <GiftMessage text={msg} image={giftImage}/>
+                            <GiftMessage  text={msg} image={giftImage}/>
                         }
-                    </span>
+                    </React.Fragment>
                 ))
             }
             {/* { loading &&

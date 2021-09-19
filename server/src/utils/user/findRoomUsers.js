@@ -29,7 +29,6 @@ const findRoomUsers = async (room, myRole) => {
                 return { _id, username, gender, role: userRole, ip, avatar, aboutMe, isMobile, avatarObj, currentAvatar, point, video };    
             }
         });
-        console.log(usersInfo)
         return usersInfo;
     }
     return [];

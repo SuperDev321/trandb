@@ -18,10 +18,10 @@ const socketWorker = () => {
 
             channel.port1.onmessage = ({data}) => {
                 channel.port1.close();
-                if (data.error) {
-                    reject(data.error);
-                }else {
+                if (data.result) {
                     resolve(data.result);
+                }else {
+                    reject(data.error);
                 }
             };
 
@@ -122,7 +122,7 @@ const socketWorker = () => {
         });
         socket.on('view request', async (data, callback) => {
             sendRequest('view request', data)
-            .then(() => {
+            .then((result) => {
                 callback(true);
             })
             .catch(() => {
@@ -172,7 +172,7 @@ const socketWorker = () => {
                 if (socket) {
                     socket.emit(mName, mValue, (result, message) => {
                         if (!result) {
-                            event.ports[0].postMessage({error: message});
+                            event.ports[0].postMessage({error: message? message : 'error'});
                         } else {
                             event.ports[0].postMessage({result: message});
                         }

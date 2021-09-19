@@ -2,6 +2,9 @@ const { Rooms } = require('../../database/models');
 const getPrivateRoomNames = async (req, res, next) => {
     try {
         let rooms = await Rooms.aggregate([
+            {
+                $match: { type: { $eq: 'private'} }
+            },
             { $sort: { updated_at: -1 } },
             {
                 $project: {
@@ -12,7 +15,6 @@ const getPrivateRoomNames = async (req, res, next) => {
                 },
             },
         ]);
-        rooms = rooms.filter((item) => (item.type === 'private'))
         rooms = rooms.map((room) => {
             let name = room.name;
             let userNames = name.split('-');
@@ -21,7 +23,8 @@ const getPrivateRoomNames = async (req, res, next) => {
                 room.to = userNames[1]
             }
             return room
-        })
+        });
+        rooms = rooms.filter((item) => (item.from && item.to && item.from !== '' ** item.to !== ''));
         return res
             .status(200)
             .json({
