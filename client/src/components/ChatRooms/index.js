@@ -100,7 +100,8 @@ const ChatRooms = ({room}, ref) => {
         blockUser,
         unBlockUser,
         unbanCamera,
-        joinPrivateRoom
+        joinPrivateRoom,
+        leaveRoomByUser
     } = useRooms({initRoomName: room});
 
     const { enqueueSnackbar, closeSnackbar } = useSnackbar();
@@ -116,15 +117,6 @@ const ChatRooms = ({room}, ref) => {
             changeRoom(index);
         }
     };
-
-    // leave room by you
-    const leaveRoomByUser = async (room) => {
-        removeRoom(room, (result) => {
-            if(result) {
-                socket.emit('leave room', {room});
-            }
-        })
-    }
 
     return (
         <ChatContext.Provider value={{openGiftModal, setOpenGiftModal,
