@@ -1,4 +1,4 @@
-import React, {useState, useContext, useEffect} from 'react';
+import React from 'react';
 import { withStyles, makeStyles } from '@material-ui/core/styles';
 import {
     Switch,
@@ -6,7 +6,6 @@ import {
     Slider
 } from '@material-ui/core';
 import {useTranslation} from 'react-i18next';
-import {CustomThemeContext} from '../../../themes/cutomThemeProvider';
 const useStyles = makeStyles((theme) => ({
     root: {
         // width: '100%',
@@ -57,18 +56,18 @@ const MessageSetting = ({
     return (
         <div className={classes.root}>
             <Grid container alignItems="center" spacing={0}>
-                <Grid item xs={12} spacing={5}>
+                <Grid item xs={12}>
                     <span>{t('SettingModal.message_size')}</span>
                 </Grid>
-                <Grid item xs={12} spacing={5}>
+                <Grid item xs={12}>
                     <PrettoSlider value={(messageSize-10)*5} onChange={handleChange} aria-labelledby="continuous-slider" />
                 </Grid>
             </Grid>
             <Grid container alignItems="center" spacing={0}>
-                <Grid item xs={12} spacing={5}>
+                <Grid item xs={12}>
                     <span>{t('SettingModal.join_leave_messages')}</span>
                 </Grid>
-                <Grid item xs={12} spacing={5}>
+                <Grid item xs={12}>
                   <Grid container alignItems="center">
                     <Grid item>{t('SettingModal.hide')}</Grid>
                     <Grid item>
@@ -85,10 +84,10 @@ const MessageSetting = ({
                 </Grid>
             </Grid>
             <Grid container alignItems="center" spacing={0}>
-                <Grid item xs={12} spacing={5}>
+                <Grid item xs={12}>
                     <span>{t('SettingModal.gift_messages')}</span>
                 </Grid>
-                <Grid item xs={12} spacing={5}>
+                <Grid item xs={12}>
                   <Grid container alignItems="center">
                     <Grid item>{t('SettingModal.hide')}</Grid>
                     <Grid item>
@@ -105,10 +104,10 @@ const MessageSetting = ({
                 </Grid>
             </Grid>
             <Grid container alignItems="center" spacing={0}>
-                <Grid item xs={12} spacing={5}>
+                <Grid item xs={12}>
                     <span>{t('SettingModal.gift_for_me')}</span>
                 </Grid>
-                <Grid item xs={12} spacing={5}>
+                <Grid item xs={12}>
                   <Grid container alignItems="center">
                     <Grid item>{t('SettingModal.hide')}</Grid>
                     <Grid item>
@@ -125,10 +124,10 @@ const MessageSetting = ({
                 </Grid>
             </Grid>
             <Grid container alignItems="center" spacing={0}>
-                <Grid item xs={12} spacing={5}>
+                <Grid item xs={12}>
                     <span>{t('SettingModal.emoji')}</span>
                 </Grid>
-                <Grid item xs={12} spacing={5}>
+                <Grid item xs={12}>
                   <Grid container alignItems="center">
                     <Grid item>{t('SettingModal.hide')}</Grid>
                     <Grid item>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import propTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
 import StyledMessage from '../Message/StyledMessage'
@@ -36,6 +36,12 @@ const PrivateMessageList = ({messages, me, blocked, withBlocked}) => {
     const listRef = useRef();
     const [messagesToShow, setMessagesToShow] = useState([]);
 
+    const setScrollTop = useCallback(() => {
+        if (listRef.current) {
+            listRef.current.scrollTop = listRef.current.scrollHeight;
+        }
+    }, [listRef]);
+
     useEffect(() => {
         let filteredMessages = messages;
         if(blocked && !withBlocked) {
@@ -50,17 +56,17 @@ const PrivateMessageList = ({messages, me, blocked, withBlocked}) => {
 
     useEffect(() => {
         setScrollTop();
-    }, [messagesToShow]);
-    const setScrollTop = () => {
-        if (listRef.current) {
-            listRef.current.scrollTop = listRef.current.scrollHeight;
-        }
-    }
+    }, [messagesToShow, setScrollTop]);
+
+    
     return (
         <div className={classes.root} ref={listRef}>
             { messagesToShow &&
                 messagesToShow.map((message, index) => (
-                    <StyledMessage message={message} mine={Boolean(message.from === me.username)} key={message._id?message._id: index}
+                    <StyledMessage
+                        message={message}
+                        mine={Boolean(message.from === me.username)}
+                        key={message._id?message._id: index}
                     />
                 ))
             }

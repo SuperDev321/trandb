@@ -11,6 +11,7 @@ import { permissionRequest } from './notification';
 import config from '../../config';
 import socketWorker from '../../utils/objects/socketWorker';
 import mobileAndTabletCheck from '../../utils/functions/mobileCheck';
+import { mediaSocket } from '../../utils/objects/socketHandler';
 
 function makeid(length) {
     var result           = [];
@@ -985,6 +986,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 return false;
             }
             if (mediaClientRef.current) {
+                mediaSocket.open();
                 let result = await mediaClientRef.current.startStream(room, null, null);
                 if (result !== true) {
                     enqueueSnackbar(t('UserActionArea.error_already_broadcasting', {
@@ -994,10 +996,10 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 }
                 await mediaClientRef.current.createRoom(room);
                 await mediaClientRef.current.join(room);
-                await mediaClientRef.current.initDevice(room);
-                if (!mediaClientRef.current.checkProduceState(room)) {
-                    await mediaClientRef.current.initTransports(room, true, false)
-                }
+                // await mediaClientRef.current.initDevice(room);
+                // if (!mediaClientRef.current.checkProduceState(room)) {
+                //     await mediaClientRef.current.initTransports(room, true, false)
+                // }
                 if(mediaClientRef.current.rooms.has(room)) {
                     let result = await mediaClientRef.current.produce(room, lock, videoDeviceId, audioDeviceId);
                     if (result) {
@@ -1040,6 +1042,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
         .catch(() => {
             return false;
         });
+        if (!mediaSocket.connected) mediaSocket.open();
         if (!result) {
             enqueueSnackbar(t('ChatApp.error_camera_view_banned'), { variant: 'error'});
             return false;
@@ -1048,12 +1051,12 @@ const useRooms = ({initRoomName, ...initalState}) => {
             
             await mediaClientRef.current.createRoom(roomName);
             await mediaClientRef.current.join(roomName);
-            await mediaClientRef.current.initDevice(roomName);
-            if (!mediaClientRef.current.checkConsumeState(roomName)) {
-                await mediaClientRef.current.initTransports(roomName, false, true)
-            }
+            // await mediaClientRef.current.initDevice(roomName);
+            // if (!mediaClientRef.current.checkConsumeState(roomName)) {
+            //     await mediaClientRef.current.initTransports(roomName, false, true)
+            // }
             mediaClientRef.current.requestView(roomName, userId, targetUsername, producers, locked,
-            (result) => {
+            (result) => {   
                 if (result) {
                     enqueueSnackbar(t('ChatApp.pending_permission_request', { username: targetUsername }), {variant: 'info'});
                 } else {
@@ -1133,7 +1136,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
             //     }
             // }
         }
-    }, [privateListRef, socketWorkerRef, enqueueSnackbar]);
+    }, [username, privateListRef, socketWorkerRef, enqueueSnackbar]);
 
     const startRemoteVideo = useCallback(async (room, producers, userId, locked, remoteUsername) => {
         try {

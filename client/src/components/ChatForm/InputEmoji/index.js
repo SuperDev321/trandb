@@ -172,7 +172,7 @@ function InputEmoji ({
         checkPlaceholder()
         return true;
 
-    }, [cleanedTextRef, cleanedTextRef, checkPlaceholder])
+    }, []);
 
     const emitChange = useCallback(() => {
         if(textInputRef.current && textInputRef.current.innerHTML !== '') {
@@ -181,7 +181,7 @@ function InputEmoji ({
             setDisabled(true);
         }
         checkPlaceholder();
-    }, [textInputRef, checkPlaceholder])
+    }, [])
 
     useEffect(() => {
         function handleKeydown (event) {
