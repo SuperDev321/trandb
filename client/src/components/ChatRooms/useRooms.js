@@ -182,15 +182,17 @@ const useRooms = ({initRoomName, ...initalState}) => {
             return false;
         });
         if (!result) {
+
             return false;
         }
         if (username !== remoteUsername && !locked && mediaClientRef.current) {
+            if (!mediaSocket.connected) mediaSocket.open();
             await mediaClientRef.current.createRoom(room);
             await mediaClientRef.current.join(room);
-            await mediaClientRef.current.initDevice(room);
-            if (!mediaClientRef.current.checkConsumeState(room)) {
-                await mediaClientRef.current.initTransports(room, false, true)
-            }
+            // await mediaClientRef.current.initDevice(room);
+            // if (!mediaClientRef.current.checkConsumeState(room)) {
+            //     await mediaClientRef.current.initTransports(room, false, true)
+            // }
             mediaClientRef.current.requestView(room, userId, remoteUsername, producers, false, null, null);
         }
     }, [mediaClientRef, username]);
@@ -1019,7 +1021,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
             }
         } catch (err) {
             enqueueSnackbar(t('UserActionArea.error_not_ready_broadcast'), {variant: 'error'});
-            mediaClientRef.current.stopStream(room);
+            // mediaClientRef.current.stopStream(room);
         }
         
     }, [mediaClientRef, socketWorkerRef]);
