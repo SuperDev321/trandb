@@ -10,6 +10,8 @@ import { useAudio } from 'react-use';
 import { permissionRequest } from './notification';
 import config from '../../config';
 import socketWorker from '../../utils/objects/socketWorker';
+import mobileAndTabletCheck from '../../utils/functions/mobileCheck';
+import { mediaSocket } from '../../utils/objects/socketHandler';
 
 function makeid(length) {
     var result           = [];
@@ -550,7 +552,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
     }, [dispatch, username, roomsRef]);
 
     const removeRoom = useCallback(async (room, callback) => {
-        if(status === 'resolved' && roomsStatus === 'resolved') {
+        try {
             let {name: currentRoomName} = data;
             let roomIndexToRemove = roomsRef.current.findIndex((item) => (item.name === room));
             let newRoomIndex = null;
@@ -592,14 +594,14 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 roomsDispatch({type: 'set', data: newRoomsData, roomIndex: newRoomIndex});
                 
                 if(callback) callback(true);
-            } else {
-                if(callback) callback(false);
             }
+        } catch (err) {
+            callback(false);
         }
         if(mediaClientRef.current) {
             mediaClientRef.current.exitRoom(room);
         }
-    }, [status, roomsStatus, roomIndex, data, dispatch, roomsDispatch, roomsRef, roomNameRef])
+    }, [roomIndex, data, dispatch, roomsDispatch, roomsRef, roomNameRef])
 
     const changeMuteState = useCallback(async (roomName, userToMute, isMuted) => {
         let room = roomsRef.current.find((item) => (item.name === roomName));
@@ -674,18 +676,19 @@ const useRooms = ({initRoomName, ...initalState}) => {
                     privateAudioControls.seek(0);
                     privateAudioControls.play();
                     if (callback) {
-                        callback('success')
+                        callback(true, 'success')
                     }
                 } else {
                     if (callback) {
-                        callback('muted')
+                        console.log('muted error emit')
+                        callback(false, 'muted')
                     }
                 }
             }
             let infos = roomsRef.current.map(({name, unReadMessages}) => ({name, unReadMessages}));
             roomsDispatch({type: 'set', data: infos});
         }
-    }, [dispatch, roomsDispatch, roomsRef]);
+    }, [dispatch, roomsDispatch, roomsRef, privateListRef, privateAudioControls]);
 
     const receivePoke = useCallback(async (pokeMessage, callback) => {
         
@@ -831,6 +834,15 @@ const useRooms = ({initRoomName, ...initalState}) => {
         }
     }, [socketWorkerRef, username, addMessage])
 
+    // leave room by you
+    const leaveRoomByUser = useCallback(async (room) => {
+        removeRoom(room, (result) => {
+            if(result&& socketWorkerRef.current) {
+                socketWorkerRef.current.emit('leave room', { room });
+            }
+        })
+    }, [socketWorkerRef, removeRoom]);
+
     const kickUser = useCallback(async (roomName, usernameToKick) => {
         if (socketWorkerRef.current) {
             // socketWorkerRef.current.postMessage({
@@ -974,6 +986,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 return false;
             }
             if (mediaClientRef.current) {
+                mediaSocket.open();
                 let result = await mediaClientRef.current.startStream(room, null, null);
                 if (result !== true) {
                     enqueueSnackbar(t('UserActionArea.error_already_broadcasting', {
@@ -983,10 +996,10 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 }
                 await mediaClientRef.current.createRoom(room);
                 await mediaClientRef.current.join(room);
-                await mediaClientRef.current.initDevice(room);
-                if (!mediaClientRef.current.checkProduceState(room)) {
-                    await mediaClientRef.current.initTransports(room, true, false)
-                }
+                // await mediaClientRef.current.initDevice(room);
+                // if (!mediaClientRef.current.checkProduceState(room)) {
+                //     await mediaClientRef.current.initTransports(room, true, false)
+                // }
                 if(mediaClientRef.current.rooms.has(room)) {
                     let result = await mediaClientRef.current.produce(room, lock, videoDeviceId, audioDeviceId);
                     if (result) {
@@ -1029,6 +1042,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
         .catch(() => {
             return false;
         });
+        if (!mediaSocket.connected) mediaSocket.open();
         if (!result) {
             enqueueSnackbar(t('ChatApp.error_camera_view_banned'), { variant: 'error'});
             return false;
@@ -1037,12 +1051,12 @@ const useRooms = ({initRoomName, ...initalState}) => {
             
             await mediaClientRef.current.createRoom(roomName);
             await mediaClientRef.current.join(roomName);
-            await mediaClientRef.current.initDevice(roomName);
-            if (!mediaClientRef.current.checkConsumeState(roomName)) {
-                await mediaClientRef.current.initTransports(roomName, false, true)
-            }
+            // await mediaClientRef.current.initDevice(roomName);
+            // if (!mediaClientRef.current.checkConsumeState(roomName)) {
+            //     await mediaClientRef.current.initTransports(roomName, false, true)
+            // }
             mediaClientRef.current.requestView(roomName, userId, targetUsername, producers, locked,
-            (result) => {
+            (result) => {   
                 if (result) {
                     enqueueSnackbar(t('ChatApp.pending_permission_request', { username: targetUsername }), {variant: 'info'});
                 } else {
@@ -1122,7 +1136,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
             //     }
             // }
         }
-    }, [privateListRef, socketWorkerRef, enqueueSnackbar]);
+    }, [username, privateListRef, socketWorkerRef, enqueueSnackbar]);
 
     const startRemoteVideo = useCallback(async (room, producers, userId, locked, remoteUsername) => {
         try {
@@ -1192,7 +1206,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 }
                 break;
             case 'room message':
-                receiveMessage(mData);
+                receiveMessage(mData, callback);
                 break;
             case 'disconnect':
                 const { reason } = mData;
@@ -1286,7 +1300,6 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 requestAudioControls.play();
                 permissionRequest(viewRequestName, viewRequestRoom, (result) => {
                     if (callback) {
-                        console.log(callback, result)
                         callback(result);
                     }
                 });
@@ -1352,7 +1365,6 @@ const useRooms = ({initRoomName, ...initalState}) => {
 
                 channel.port1.onmessage = ({data}) => {
                     channel.port1.close();
-                    console.log('socket reqeust', data)
                     if (data.error) {
                         reject(data.error);
                     }else {
@@ -1375,7 +1387,8 @@ const useRooms = ({initRoomName, ...initalState}) => {
             });
         }
         const token = window.localStorage.getItem('token');
-        workerObj.postMessage({ type: 'init', mValue: { token } });
+        const ismobile = mobileAndTabletCheck();
+        workerObj.postMessage({ type: 'init', mValue: { token, ismobile } });
 
         return () => {
             workerObj.postMessage({ type: 'close' });
@@ -1781,7 +1794,8 @@ const useRooms = ({initRoomName, ...initalState}) => {
         viewBroadcast,
         leaveFromPrivate,
         addOrOpenPrivate,
-        joinPrivateRoom
+        joinPrivateRoom,
+        leaveRoomByUser
     }
 }
 

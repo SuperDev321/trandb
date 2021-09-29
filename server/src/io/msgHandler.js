@@ -120,7 +120,7 @@ const privateMessage = (io, socket) => async ({ roomName, msg, from, to, color, 
     if(messageType !== 'image') {
       let isForbiddenMessage = await hasFobiddenWord(msg);
       if(isForbiddenMessage) {
-        await banUser(io, socket)({ip: userIp, to: user.username, role: 'admin'});
+        await banUser(io, socket)({ip: userIp, to: user.username, role: 'admin', kind: 'chat'});
         return callback(false, 'forbidden');
       }
     }
@@ -169,9 +169,11 @@ const privateMessage = (io, socket) => async ({ roomName, msg, from, to, color, 
             ip: newChat.ip
           }, (res) => {
             if(res === 'success') {
-              callback(newChat)
+              callback(true, newChat)
             } else if(res === 'muted') {
               callback(false, 'muted')
+            } else {
+              callback(false, 'unknown error')
             }
               
         });

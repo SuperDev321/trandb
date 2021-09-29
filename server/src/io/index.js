@@ -6,7 +6,7 @@ const { publicMessage, privateMessage, pokeMessage } = require('./msgHandler');
 const { kickUser, banUser, banUserByAdmin, blockUser, unBlockUser, unBanCamera } = require('./userHandler');
 const { startVideo, stopVideo, isAvailableToBroadcast, isAvailableToView,
   consumerClosed, viewRequest, startView, stopView, stopBroadcastTo } = require('./videoHandler');
-const socketDisconnect = require('./disconnect');
+const { socketDisconnect, disconnectingList } = require('./disconnect');
 const { sendGift } = require('./gift')
 const { Users } = require('../database/models');
 const LogManager = require('../constructors/logManager');
@@ -52,7 +52,11 @@ const ioHandler = (io) => async (socket) => {
   let user = await Users.findOne({_id: socket.decoded._id});
   if(!user) return;
   let result = await Users.updateOne({_id: socket.decoded._id}, {ip: ipInt(ip).toInt(), isInChat: true, isMobile});
-  LogManager.saveLogInfo(ip, user.username, user.role, 'Connect');
+  if (disconnectingList.has(user.name)) {
+    disconnectingList.delete(user.name);
+  } else {
+    LogManager.saveLogInfo(ip, user.username, user.role, 'Connect');
+  }
 
     socket.on('join room', joinRoom(io, socket));
     socket.on('rejoin room', rejoinRoom(io, socket));
@@ -88,9 +92,9 @@ const ioHandler = (io) => async (socket) => {
     });
 
     socket.on('disconnecting', socketDisconnect(io, socket));
-    socket.on('disconnect', (reason) => {
-      console.log(reason)
-    })
+    // socket.on('disconnect', (reason) => {
+    //   console.log(reason)
+    // })
 };
 
 const adminIoHandler = (io) => (socket) => {
@@ -100,8 +104,8 @@ const adminIoHandler = (io) => (socket) => {
 
 const initIO = (server) => {
   io = socketIO(server, {
-    pingInterval: 25000,
-    pingTimeout: 60000 * 3,
+    pingInterval: 3000,
+    pingTimeout: 5000,
     upgradeTimeout: 30000,
     agent: false,
     reconnectionDelay: 1000,
@@ -112,7 +116,6 @@ const initIO = (server) => {
   });
   io.use(async (socket, next) => {
     try {
-      console.log('socket connect')
       // const token = (socket.request.headers.cookie + ';').match(/(?<=token=)(.*?)(?=;)/)[0];
       // await rateLimiter.consume(socket.handshake.address)
       token = socket.handshake.query.token;

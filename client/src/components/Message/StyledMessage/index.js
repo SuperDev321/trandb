@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useCallback } from 'react';
 import { SettingContext } from '../../../context';
 import { makeStyles } from '@material-ui/core/styles';
 import {EmojiConvertor} from 'emoji-js';
@@ -121,19 +121,19 @@ function getValidCustomEmoji(value) {
     return emojis.find(({ name }) => (name === value));
 }
 
-const StyledMessage = ({message, mine}) => {
+const StyledMessage = ({ message, mine }) => {
     const [checked, setChecked] = useState(false);
     const classes = useStyles({mine, color: message.color, bold: message.bold});
-    const { emojiOption } = useContext(SettingContext);
+    const { emojiOption, showEmoji } = useContext(SettingContext);
 
-    const makeTag = (text) => {
+    const makeTag = useCallback((text, messageId) => {
         let arr = emojiStringToArray(text);
         let noRepeatArr = [...new Set(arr)];
         let htmlObj = [];
         if (noRepeatArr && noRepeatArr.length) {
             for (let index = 0; index < noRepeatArr.length; index++) {
                 const element = noRepeatArr[index];
-                const key= message._id? `${message._id}-private-${index}`: `${Date.now()}private-${index}`;
+                const key= messageId? `${messageId}-private-${index}`: `${Date.now()}private-${index}`;
                 if(isValidHttpUrl(element)) {
                     // urlText = urlText.replace(element, urlify(element));
                     htmlObj.push(<a href={element} key={key} target="_blank" rel="noopener noreferrer">{element}</a>)
@@ -147,13 +147,14 @@ const StyledMessage = ({message, mine}) => {
             }
         }
         return htmlObj
-    }
-    const makeTagWithCustom = (text) => {
-        const arr = text.split(/(['>','<'])/)
+    }, [])
+    const makeTagWithCustom = useCallback((text, messageId) => {
+        const arr = text.split(/(['>','<',' '])/)
         let tmp = '';
         const newArr = [];
         arr.forEach((item) => {
-            if (item === '>') {
+            if (item === '') {
+            } else if (item === '>') {
                 if (tmp !== '') {
                     newArr.push(tmp);
                 }
@@ -162,42 +163,64 @@ const StyledMessage = ({message, mine}) => {
                 tmp += '<';
                 newArr.push(tmp);
                 tmp = ''
+            } else if (item === ' ') {
+                if (tmp !== '' && tmp[0] !== ' ') {
+                    newArr.push(tmp);
+                    tmp = ' ';
+                } else {
+                    tmp += ' ';
+                }
+            } else if (tmp[0] === ' ') {
+                newArr.push(tmp);
+                tmp = item;
             } else {
                 tmp += item;
             }
+            tmp += '';
         })
         if (tmp !== '') {
-            if (tmp !== '') {
-                newArr.push(tmp);
-            }
+            newArr.push(tmp);
         }
         if (newArr[0] === '') {
             newArr.slice(0, 1)
         }
         let htmlObj = [];
+        let preString = '';
         if (newArr && newArr.length) {
             for (let index = 0; index < newArr.length; index++) {
                 const element = newArr[index];
-                const key= message._id? `${message._id}-private-${index}`: `${Date.now()}private-${index}`;
+                if (!element) {
+                    continue;
+                }
                 if(isValidHttpUrl(element)) {
                     // urlText = urlText.replace(element, urlify(element));
-                    htmlObj.push(<a key={key} href={element} target="_blank" rel="noopener noreferrer">{element}</a>)
-                } else if(element.charAt(0) === '>' && element.charAt(element.length - 1) === '<') {
+                    if (preString !== '') {
+                        htmlObj.push(<span key={`${messageId}-${index-1}`} style={{whiteSpace: 'pre'}}>{preString}</span>);
+                        preString = '';
+                    }
+                    htmlObj.push(<a href={element} key={`${messageId}-${index}`} target="_blank" rel="noopener noreferrer">{element}</a>)
+                    continue;
+                } else if(showEmoji && element.charAt(0) === '>' && element.charAt(element.length - 1) === '<') {
+                    if (preString !== '') {
+                        htmlObj.push(<span key={`${messageId}-${index-1}`} style={{whiteSpace: 'pre'}}>{preString}</span>);
+                        preString = '';
+                    }
                     const name = element.slice(1, element.length - 1);
                     const emoji = getValidCustomEmoji(name);
                     if (emoji) {
-                        htmlObj.push(<img key={key} src={`${config.emoji_path}/${emoji.path}`} alt="emoji-icon"/>)
-                    } else {
-                        htmlObj.push(<span key={key}>{element}</span>)
+                        htmlObj.push(<img key={`${messageId}-${index}`} src={`${config.emoji_path}/${emoji.path}`} className="custom-emoji"/>);
+                        continue;
                     }
-                } else {
-                    // urlText = urlText.replace(element, `<span>${element}</span>`);
-                    htmlObj.push(<span key={key}>{element}</span>)
                 }
+                preString += element;
             }
         }
+        if (preString !== '') {
+            htmlObj.push(<span key={`${messageId}-last`} style={{whiteSpace: 'pre'}}>{preString}</span>);
+            preString = '';
+        }
         return htmlObj
-    }
+    }, [])
 
     return (
         <div className={classes.root}>
@@ -219,9 +242,9 @@ const StyledMessage = ({message, mine}) => {
                 <div  className={classes.message}
                 >
                 { emojiOption ?
-                    makeTag(message.msg)
+                    makeTag(message.msg, message._id)
                     :
-                    makeTagWithCustom(message.msg)
+                    makeTagWithCustom(message.msg, message._id)
                 }
                 </div>
             }
@@ -232,4 +255,4 @@ const StyledMessage = ({message, mine}) => {
     )
 }
 
-export default StyledMessage;
+export default React.memo(StyledMessage);

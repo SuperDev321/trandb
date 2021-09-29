@@ -68,8 +68,23 @@ const socketWorker = () => {
             callback('success');
         })
 
-        socket.on('room message', (data) => {
-            sendMessage('room message', data);
+        socket.on('room message', (data, callback) => {
+            if (callback) {
+                sendRequest('room message', data)
+                .then((result) => {
+                    callback('success');
+                })
+                .catch((error) => {
+                    if (error ==='muted') {
+                        callback('muted')
+                    } else {
+                        callback(false);
+                    }
+                })
+            } else {
+                sendMessage('room message', data);
+            }
+            
         })
 
         socket.on('disconnect', (reason) => {
@@ -167,7 +182,7 @@ const socketWorker = () => {
     /* eslint-disable-next-line no-restricted-globals */
     self.onmessage = (event) => {
         try {
-            const { type, mName, mValue, callback } = event.data;
+            const { type, mName, mValue } = event.data;
             if (type === 'request') {
                 if (socket) {
                     socket.emit(mName, mValue, (result, message) => {

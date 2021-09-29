@@ -5,7 +5,7 @@ var randomString = require('random-string')
 const addPrivate = (io, socket) => async ({ from, to, role }, callback) => {
     try {
         if ((!from) || (from === '') || (!to) || (to === '') || (from === to)) {
-            return callback(false);
+            return callback(false, `same name ${from} ${to}`);
         }
         let rooms = Array.from(socket.rooms);
         let privateRoom = rooms.find((item) => {

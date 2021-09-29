@@ -74,7 +74,8 @@ const rejoinRoom = (io, socket) => async ({ room, type }, callback) => {
     try {
         const { _id, role } = socket.decoded;
         let ip = socket.client.request.headers['cf-connecting-ip'] || socket.client.request.headers['x-forwarded-for'] || socket.client.request.connection.remoteAddress
-        
+        const { users: userIds } = await Rooms.findOne({ name: room });
+        const isInRoom = userIds.includes(_id);
         await Users.updateOne({ _id }, { video: null });
         if(type === 'public') {
             
@@ -92,7 +93,7 @@ const rejoinRoom = (io, socket) => async ({ room, type }, callback) => {
             } else if (isBan && banType) {
                 return callback(false, 'banned_from_room')
             }
-            let result = await Rooms.updateOne({ name: room }, { $addToSet: { users: _id} });
+            let result = await Rooms.updateOne({ name: room }, { $addToSet: { users: _id } });
             socket.join(room);
             
             // let {welcomeMessage} = await Rooms.findOne({name: room});
@@ -117,11 +118,13 @@ const rejoinRoom = (io, socket) => async ({ room, type }, callback) => {
             }, (data)=> {
                 if(data === 'success' && result && result.nModified) {
                     let joinedUser = onlineUsers.find((item) => (item._id.equals(_id)));
-                    io.to(room).emit('joined room', {
-                        room,
-                        joinedUser,
-                        onlineUsers,
-                    });
+                    if (!isInRoom) {
+                        io.to(room).emit('joined room', {
+                            room,
+                            joinedUser,
+                            onlineUsers,
+                        });
+                    }
                 }
             });
             return callback(true);
@@ -131,6 +134,7 @@ const rejoinRoom = (io, socket) => async ({ room, type }, callback) => {
         }
         return callback(false, 'type_error')
     } catch (err) {
+        console.log(err)
         callback(false, err)
     }
 };
