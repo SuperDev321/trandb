@@ -411,6 +411,8 @@ class MediaClient {
         }
         let stream;
         try {
+            let audioState = false;
+            let videoState = true;
             navigator.getUserMedia = (navigator.getUserMedia ||
                 navigator.webkitGetUserMedia ||
                 navigator.mozGetUserMedia ||
@@ -470,6 +472,7 @@ class MediaClient {
             })
             let audioProducer = null;
             if(audioDeviceId) {
+                audioState = true
                 let audioTrack = stream.getAudioTracks()[0];
                 let audioParams = {
                     track: audioTrack,
@@ -507,7 +510,7 @@ class MediaClient {
                 locked
             })
             
-            this.startStream(room_id, stream, locked);
+            this.startStream(room_id, stream, locked, audioState, videoState);
             return {
                 producers: {
                     audio: audioProducer? audioProducer.id : null,
@@ -948,48 +951,58 @@ class MediaClient {
         }
     }
 
-    pauseProducer(room_id) {
+    async pauseProducer (room_id, kind) {
         if (!this.producerLabels.has(room_id)) {
             return;
         }
         let label = this.producerLabels.get(room_id);
         if(label) {
             let {audio: audioId, video: videoId} = label;
-            if(audioId) {
+            if((!kind || kind === 'audio') && audioId) {
                 let audioProducer = this.producers.get(audioId);
                 if(audioProducer && audioProducer.producer) {
-                    audioProducer.producer.pause();
+                    await audioProducer.producer.pause();
                 }
+                let stream = this.localStreams.get(room_id);
+                stream.audioState = false;
+                this.event(_EVENTS.startStream, {room_id});
             }
-            if(videoId) {
+            if((!kind || kind === 'video') && videoId) {
                 let videoProducer = this.producers.get(videoId);
                 if(videoProducer && videoProducer.producer) {
-                    videoProducer.producer.pause();
+                    await videoProducer.producer.pause();
                 }
+                let stream = this.localStreams.get(room_id);
+                stream.videoState = false;
+                this.event(_EVENTS.startStream, {room_id});
             }
         }
-        
-
     }
 
-    resumeProducer(room_id) {
+    async resumeProducer (room_id, kind) {
         if (!this.producerLabels.has(room_id)) {
             return;
         }
         let label = this.producerLabels.get(room_id);
-        if(label) {
+        if (label) {
             let {audio: audioId, video: videoId} = label;
-            if(audioId) {
+            if ((!kind || kind === 'audio') && audioId) {
                 let audioProducer = this.producers.get(audioId);
                 if(audioProducer && audioProducer.producer) {
                     audioProducer.producer.resume();
                 }
+                let stream = this.localStreams.get(room_id);
+                stream.audioState = true;
+                this.event(_EVENTS.startStream, {room_id});
             }
-            if(videoId) {
+            if ((!kind || kind === 'video') && videoId) {
                 let videoProducer = this.producers.get(videoId);
                 if(videoProducer && videoProducer.producer) {
                     videoProducer.producer.resume();
                 }
+                let stream = this.localStreams.get(room_id);
+                stream.videoState = true;
+                this.event(_EVENTS.startStream, {room_id});
             }
         }
     }
@@ -1085,9 +1098,17 @@ class MediaClient {
     }
 
 
-    stopView(room_id, targetId, name) {
-        // let roomStreams = this.remoteStreams.get(room_id);
-        mediaSocket.request('stop broadcast', {
+    // stopView(room_id, targetId, name) {
+    //     // let roomStreams = this.remoteStreams.get(room_id);
+    //     mediaSocket.request('stop broadcast', {
+    //         room_id,
+    //         name: this.name,
+    //         targetName: name,
+    //     })
+    // }
+
+    async stopView(room_id, targetId, name) {
+        this.socketWorker.emit('stop broadcast to', {
             room_id,
             name: this.name,
             targetName: name,
@@ -1155,22 +1176,46 @@ class MediaClient {
         this.eventListeners.clear();
     }
 
-    startStream(room_id, stream, locked) {
+    async startStream(room_id, stream, locked, audioState, videoState) {
+        if (this.localStreams.size > 0) {
+            let keys = this.localStreams.keys();
+            const key = keys.next().value;
+            const value = this.localStreams.get(key);
+            const { stream } = value;
+            if (stream) {
+                return key;
+            }
+        }
         if(this.localStreams.has(room_id)) {
             const { stream } = this.localStreams.get(room_id);
             if (stream) {
                 stream.getTracks().forEach((track) => {
-                    track.stop();
+                    track.stop()
                 });
+                this.localStreams.delete(room_id);
             }
-            this.localStreams.delete(room_id);
         }
         this.localStreams.set(room_id, {
             stream,
-            locked
+            locked,
+            audioState,
+            videoState
         });
         this.event(_EVENTS.startStream, { room_id });
         return true;
+    }
+
+    async stopStream(room_id) {
+        if (this.localStreams.has(room_id)) {
+            const { stream } = this.localStreams.get(room_id);
+            if (stream) {
+                stream.getTracks().forEach((track) => {
+                    track.stop()
+                });
+                this.localStreams.delete(room_id);
+            }
+            this.event(_EVENTS.stopStream, { room_id });
+        }
     }
 
     // send request to view
