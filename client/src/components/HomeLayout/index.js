@@ -10,6 +10,9 @@ import SettingModal from '../Modals/SettingModal';
 
 const useStyles = makeStyles((theme) => ({
     root: {
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column'
     },
     appBar: {
         flexDirection: 'row',
@@ -70,7 +73,7 @@ const HomeLayout = ({children, unReadMsgs, openPrivate, messageSize, setMessageS
         resetMessageSize(messageSize);
     }, [messageSize, setMessageSize])
     return (
-    <div style={{fontSize: messageSize, height: '100%'}}>
+    <div className={classes.root} style={{ fontSize: messageSize }}>
         <AppBar position="static" className={classes.appBar}>
             <Toolbar  className={classes.title}>
                 <img

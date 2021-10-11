@@ -67,11 +67,10 @@ const useStyles = makeStyles((theme) => ({
         flexWrap: 'wrap',
         flexDirection: 'column',
         alignContent: 'flex-start',
-        height: `${VideoFieldHeight+2}px !important`,
-        minHeight: `${VideoFieldHeight+2}px !important`,
+        // height: `${VideoFieldHeight+2}px !important`,
+        // minHeight: `${VideoFieldHeight+2}px !important`,
         width: '100%',
         scrollbarWidth: 0,
-        minWidth: `${VideoFieldWidth+2}px !important`,
         scrollbarColor: `#585B5E #ecdbdb00`,
         '&::-webkit-scrollbar': {
             width: 0,
@@ -90,7 +89,6 @@ const useStyles = makeStyles((theme) => ({
         // overflowY: 'auto',
         border: '1px solid',
         borderColor: theme.palette.separate.main,
-        overflowY: 'hidden',
         overflowX: 'auto'
     }
 }));
@@ -121,7 +119,7 @@ const useVideoStyles = makeStyles((theme) => ({
                 return VideoFieldWidth - 2
             }
         },
-        height: props => {
+        minHeight: props => {
             if(props.zoom) {
                 return VideoFieldHeight - 2;
             }
