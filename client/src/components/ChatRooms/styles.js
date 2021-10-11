@@ -8,7 +8,8 @@ const useStyles = makeStyles((theme) => ({
         display: 'flex',
         flexGrow: '1',
         width: '100%',
-        height: 'calc(100% - 50px)'
+        overflow: 'hidden'
+        // height: 'calc(100% - 50px)'
     },
     mainWrapper: {
         flexGrow: 1,

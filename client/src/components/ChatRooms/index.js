@@ -141,12 +141,12 @@ const ChatRooms = ({room}, ref) => {
                 <div className={matches? classes.chatWrapper: classes.mobileChatWrapper}>
                 {
                     (status === 'resolved' && currentRoomData) ?
-                    <VideoList roomName={currentRoomData.name}
+                    <div><VideoList roomName={currentRoomData.name}
                         streams={currentRoomData.remoteStreams}
                         localStream={currentRoomData.localStream}
                         controlVideo={controlVideo}
                         viewerCounts={currentRoomData.viewers?.length}
-                    />
+                    /></div>
                     : null
                 }
                 
