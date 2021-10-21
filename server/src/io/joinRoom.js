@@ -51,7 +51,7 @@ const joinRoom = (io, socket) => async ({ room, password }, callback) => {
         socket.emit('init room',
             {
                 messages, onlineUsers, room: { name: room, welcomeMessage: roomInfo.welcomeMessage },
-                blocks, globalBlocks, cameraBans, globalCameraBans
+                blocks, globalBlocks, cameraBans, globalCameraBans, isReconnect: false
             },
             (data)=> {
                 if(data === 'success' && result && result.nModified) {
@@ -114,7 +114,7 @@ const rejoinRoom = (io, socket) => async ({ room, type }, callback) => {
             
             socket.emit('init room', {
                 messages, onlineUsers, room: {name: room},
-                globalBlocks, blocks, cameraBans, globalCameraBans
+                globalBlocks, blocks, cameraBans, globalCameraBans, isReconnect: true
             }, (data)=> {
                 if(data === 'success' && result && result.nModified) {
                     let joinedUser = onlineUsers.find((item) => (item._id.equals(_id)));
@@ -134,7 +134,6 @@ const rejoinRoom = (io, socket) => async ({ room, type }, callback) => {
         }
         return callback(false, 'type_error')
     } catch (err) {
-        console.log(err)
         callback(false, err)
     }
 };

@@ -3,6 +3,7 @@ const socketWorker = () => {
     /* eslint-disable-next-line no-restricted-globals */
     self.importScripts("https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.2/socket.io.js");
     let socket = null;
+    let connectionState = false;
 
     const sendMessage = (mName, mData) => {
         postMessage({
@@ -62,7 +63,7 @@ const socketWorker = () => {
                 })
             })
         }
-
+        connectionState = true;
         socket.on('init room', (data, callback) => {
             sendMessage('init room', data);
             callback('success');
@@ -88,7 +89,17 @@ const socketWorker = () => {
         })
 
         socket.on('disconnect', (reason) => {
-            sendMessage('disconnect', { reason });
+            connectionState = false;
+            if (reason === 'transport error' || reason === 'ping timout') {
+                const timer = setTimeout(() => {
+                    if (!connectionState) {
+                        sendMessage('disconnect', { reason });
+                    }
+                    clearTimeout(timer);
+                }, 3000);
+            } else {
+                sendMessage('disconnect', { reason });
+            }
         })
 
         socket.on('joined room', (data) => {
@@ -173,6 +184,7 @@ const socketWorker = () => {
         })
 
         socket.io.on('reconnect', () => {
+            connectionState = true;
             sendMessage('reconnect', null);
         })
 

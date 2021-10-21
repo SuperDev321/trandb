@@ -197,7 +197,7 @@ const useRooms = ({initRoomName, ...initalState}) => {
         }
     }, [mediaClientRef, username]);
 
-    const initRoom = useCallback(async ({room, globalBlocks, onlineUsers, messages, blocks, cameraBans, globalCameraBans}) => {
+    const initRoom = useCallback(async ({ room, globalBlocks, onlineUsers, messages, blocks, cameraBans, globalCameraBans, isReconnect }) => {
         let data = {};
         if(roomsRef.current && room) {
             if (Array.isArray(globalBlocks)) {
@@ -219,21 +219,23 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 
                 let newRoomObject = new RoomObject(room.name, newMessages? newMessages: messages, onlineUsers, blocks, cameraBans, messageNum);
                 roomsRef.current.push(newRoomObject);
-                data.name = room.name;
-                data.messages = newRoomObject.messages;
-                data.users = onlineUsers;
-                data.blocks = blocks;
-                data.mutes = newRoomObject.mutes
-                data.unReadMessages = newRoomObject.unReadMessages;
-                data.localStream = null;
-                data.remoteStreams = null;
-                data.cameraBans = newRoomObject.cameraBans;
-                dispatch({type: 'init', data});
-                roomNameRef.current = room.name;
+                if (!isReconnect || roomNameRef.current === room.name) {
+                    data.name = room.name;
+                    data.messages = newRoomObject.messages;
+                    data.users = onlineUsers;
+                    data.blocks = blocks;
+                    data.mutes = newRoomObject.mutes
+                    data.unReadMessages = newRoomObject.unReadMessages;
+                    data.localStream = null;
+                    data.remoteStreams = null;
+                    data.cameraBans = newRoomObject.cameraBans;
+                    dispatch({type: 'init', data});
+                    roomNameRef.current = room.name;
+                }
                 roomsDispatch({type: 'add', data: {
-                        name: room.name,
-                        unReadMessages: newRoomObject.unReadMessages
-                    }
+                    name: room.name,
+                    unReadMessages: newRoomObject.unReadMessages
+                }
                 });
                 if (autoBroadcast) {
                     onlineUsers.forEach(({ _id, username, video }) => {
@@ -255,16 +257,19 @@ const useRooms = ({initRoomName, ...initalState}) => {
                 if(messages) {
                     sameRoom.setMessages(messages);
                 }
-                data.name = sameRoom.name;
-                data.messages = sameRoom.messages;
-                data.users = sameRoom.users;
-                data.blocks = sameRoom.blocks;
-                data.mutes = sameRoom.mutes
-                data.unReadMessages = sameRoom.unReadMessages;
-                data.localStream = null;
-                data.remoteStreams = null;
-                data.cameraBans = sameRoom.cameraBans;
-                dispatch({type: 'init', data});
+                if (!isReconnect || roomNameRef.current === room.name) {
+                    data.name = sameRoom.name;
+                    data.messages = sameRoom.messages;
+                    data.users = sameRoom.users;
+                    data.blocks = sameRoom.blocks;
+                    data.mutes = sameRoom.mutes
+                    data.unReadMessages = sameRoom.unReadMessages;
+                    data.localStream = null;
+                    data.remoteStreams = null;
+                    data.cameraBans = sameRoom.cameraBans;
+                    dispatch({type: 'init', data});
+                    roomNameRef.current = room.name;
+                }
             }
 
         }
@@ -570,7 +575,8 @@ const useRooms = ({initRoomName, ...initalState}) => {
                     }
                     if(!newRoom) {
                         if(callback) callback(true);
-                        return history.push('/');
+                        // return history.push('/');
+                        return;
                     }
                     newRoom.mergeUnreadMessages();
                     let data = {};
@@ -1200,11 +1206,11 @@ const useRooms = ({initRoomName, ...initalState}) => {
             case 'init room':
                 const {
                     room, onlineUsers, messages, blocks, globalBlocks, cameraBans,
-                    globalCameraBans
+                    globalCameraBans, isReconnect
                 } = mData
                 let usernames = onlineUsers.map((item) => (item.username));
                 if(usernames.includes(username)) {
-                    initRoom({room, onlineUsers, messages, blocks, globalBlocks, cameraBans, globalCameraBans});
+                    initRoom({room, onlineUsers, messages, blocks, globalBlocks, cameraBans, globalCameraBans, isReconnect});
                 }
                 break;
             case 'room message':
@@ -1676,11 +1682,11 @@ const useRooms = ({initRoomName, ...initalState}) => {
         }
     }, [myId, username, socketWorkerRef])
 
-    useEffect(() => {
-        if(status === 'rejected') {
-            history.push('/')
-        }
-    }, [status, history])
+    // useEffect(() => {
+    //     if(status === 'rejected') {
+    //         history.push('/')
+    //     }
+    // }, [status, history])
 
     useEffect(() => {
         if(roomEvent) {

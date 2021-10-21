@@ -5,7 +5,6 @@ const deleteModerator = async (req, res, next) => {
     
   try {
     const {roomId, moderatorId} = req.body;
-    console.log('delte moderator', roomId, moderatorId)
     if(roomId && moderatorId) {
         let {nModified} = await Rooms.updateOne({ _id: roomId }, {$pull: {moderators: moderatorId}});
         if(nModified)

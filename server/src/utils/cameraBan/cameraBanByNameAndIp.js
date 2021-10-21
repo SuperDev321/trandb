@@ -8,7 +8,6 @@ const cameraBanByNameAndIp = async (room=null, username, ip=null, fromIp=null, t
             if (ip) {
                 let ipNum = ipInt(ip).toInt();
                 ban = await CameraBans.findOne({room, username, ip: ipNum, type: 'ip'});
-                console.log('ban find', ban)
                 if(!ban)
                     ban = await CameraBans.create({room, username, ip: ipNum, type: 'ip'});
             } else if(fromIp && toIp) {

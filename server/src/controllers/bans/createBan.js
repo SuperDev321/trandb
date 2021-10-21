@@ -15,7 +15,6 @@ const addBan = async (req, res, next) => {
             await validateIP(toIp);
         }
     }
-    console.log(fromIp, toIp)
     let result = await banByNameAndIp(room, username, ip, fromIp, toIp);
 
     if(result) {

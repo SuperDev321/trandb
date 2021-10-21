@@ -66,6 +66,7 @@ const isAvailableToView = (io, socket) => async ({ room, targetUserId }, callbac
         const { _id, role } = socket.decoded;
         const user = await Users.findById(_id);
         const result = await checkCameraBan(room, user.username, user.ip);
+        console.log('camera ban result', result)
         if (result && result.isBan) {
             callback(false);
         } else {

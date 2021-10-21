@@ -4,7 +4,6 @@ const edit = async (req, res, next) => {
     try {
         const {_id, content, active, color, size, bold} = req.body;
         if(_id && content) {
-            console.log(content, color, size, bold, active)
             let result = await Boots.updateOne({
                 _id
             }, {

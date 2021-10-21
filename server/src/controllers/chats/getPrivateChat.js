@@ -1,10 +1,8 @@
 const { Chats } = require('../../database/models');
 
 const getPrivateChat = async (req, res, next) => {
-    console.log('req');
     try {
         let {from, to} = req.body;
-        console.log(from, to);
         const chats = await Chats.find({
             $or: [
                 {$and: [{from} , {to}]},

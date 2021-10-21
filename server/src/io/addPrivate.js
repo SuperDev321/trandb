@@ -4,6 +4,7 @@ var randomString = require('random-string')
 
 const addPrivate = (io, socket) => async ({ from, to, role }, callback) => {
     try {
+        console.log(from, to)
         if ((!from) || (from === '') || (!to) || (to === '') || (from === to)) {
             return callback(false, `same name ${from} ${to}`);
         }

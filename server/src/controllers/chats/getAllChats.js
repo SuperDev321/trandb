@@ -1,7 +1,6 @@
 const { Chats } = require('../../database/models');
 
 const getAllChats = async (req, res, next) => {
-    console.log('req');
     try {
         const chats = await Chats.find({});
         return res.json({

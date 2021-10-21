@@ -69,7 +69,6 @@ const updateProfile = async (req, res, next) => {
             if (user && user.avatarObj) {
                 avatar = user.avatarObj;
             }
-            console.log('joomular avatar')
             io.emit('update user info', {
                 username,
                 currentAvatar: 'joomula',
