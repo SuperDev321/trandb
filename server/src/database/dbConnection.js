@@ -8,7 +8,7 @@ if (NODE_ENV === 'production') dbUrl = PRO_DB;
 else dbUrl = DEV_DB;
 
 if (!dbUrl) throw new Error('database url was not found');
-console.log(dbUrl);
+
 mongoose
   .connect(dbUrl, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('connected to database successfully'))

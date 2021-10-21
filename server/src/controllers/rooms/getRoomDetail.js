@@ -9,7 +9,6 @@ const getRoomDetail = async (req, res, next) => {
         
         if(roomName) {
             let {_id, name, owner, moderators, category, description, welcomeMessage, maxUsers, cover, icon} = await Rooms.findOne({name: roomName});
-            console.log(owner, userId)
             if(owner.equals(userId) || role === 'admin' || role === 'super_admin') {
                 let bans = await Bans.find({room: roomName, type: 'ip'});
                 owner = await Users.findOne({_id: owner});
