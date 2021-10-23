@@ -2,6 +2,7 @@ const { Rooms, Chats, Users, Settings } = require('../database/models');
 
 const { findRoomUsers, checkBan, getRoomBlocks, getGlobalBlocksWithIp, checkBlock,
     getGlobalCameraBans, getRoomCameraBans } = require('../utils');
+const { disconnectingList } = require('./disconnect');
 const ipInt = require('ip-to-int');
 const joinRoom = (io, socket) => async ({ room, password }, callback) => {
     try {
@@ -14,6 +15,7 @@ const joinRoom = (io, socket) => async ({ room, password }, callback) => {
         }
         await Users.updateOne({ _id }, { video: null });
         let user = await Users.findOne({_id}).lean();
+        disconnectingList.delete(user.username);
         let {isBan, banType} = await checkBan(room, user.username, user.ip);
         const {bypassBan} = await Settings.findOne({type: 'admin'});
         if (isBan && !bypassBan) {
@@ -74,16 +76,17 @@ const rejoinRoom = (io, socket) => async ({ room, type }, callback) => {
     try {
         const { _id, role } = socket.decoded;
         let ip = socket.client.request.headers['cf-connecting-ip'] || socket.client.request.headers['x-forwarded-for'] || socket.client.request.connection.remoteAddress
-        const { users: userIds } = await Rooms.findOne({ name: room });
-        const isInRoom = userIds.includes(_id);
-        await Users.updateOne({ _id }, { video: null });
+
         if(type === 'public') {
-            
+            const { users: userIds } = await Rooms.findOne({ name: room });
+            const isInRoom = userIds.includes(_id);
+            await Users.updateOne({ _id }, { video: null });
             let user = await Users.findOne({_id});
+            disconnectingList.delete(user.username);
             let {isBan, banType} = await checkBan(room, user.username, user.ip);
             const {bypassBan} = await Settings.findOne({type: 'admin'});
             if (isBan && !bypassBan) {
-                return callback(false, 'banned_from_room')
+                return callback(false, 'banned_from_room');
             }
 
             // baned guest user can't join to chat
@@ -95,7 +98,7 @@ const rejoinRoom = (io, socket) => async ({ room, type }, callback) => {
             }
             let result = await Rooms.updateOne({ name: room }, { $addToSet: { users: _id } });
             socket.join(room);
-            
+
             // let {welcomeMessage} = await Rooms.findOne({name: room});
             const messages = await Chats.find({ room, type: 'public' }).sort({date: -1}).limit(30);
             const usersInfo = await findRoomUsers(room, user.role);
@@ -105,7 +108,7 @@ const rejoinRoom = (io, socket) => async ({ room, type }, callback) => {
                 const ipStr = ipInt(ip).toIP();
                 return { ...item, ip: ipStr, blocked };
             }));
-            
+
             let globalBlocks = await getGlobalBlocksWithIp();
             let blocks = await getRoomBlocks(room);
             const globalCameraBans = await getGlobalCameraBans();

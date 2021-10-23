@@ -23,6 +23,8 @@ import useMediaQuery from '@material-ui/core/useMediaQuery';
 
 const VideoFieldWidth = window.innerWidth > 380 ? (window.innerWidth > 1000? 380: 190) : window.innerWidth / 2;
 const VideoFieldHeight = VideoFieldWidth * 3 / 4;
+const mobileVideoFieldWidth = 190;
+const mobileVideoFieldHeight = VideoFieldWidth * 3 / 4;
 
 const override = {
     display: 'block !important',
@@ -64,12 +66,14 @@ const useStyles = makeStyles((theme) => ({
     },
     mobileRoot: {
         display: 'flex',
-        flexWrap: 'wrap',
-        flexDirection: 'column',
+        // flexWrap: 'wrap',
+        // flexDirection: 'column',
         alignContent: 'flex-start',
+        height: `${mobileVideoFieldHeight+2}px !important`,
+        minHeight: `${mobileVideoFieldHeight+2}px !important`,
         // height: `${VideoFieldHeight+2}px !important`,
         // minHeight: `${VideoFieldHeight+2}px !important`,
-        width: '100%',
+        // width: 'fit-content',
         scrollbarWidth: 0,
         scrollbarColor: `#585B5E #ecdbdb00`,
         '&::-webkit-scrollbar': {
@@ -89,13 +93,36 @@ const useStyles = makeStyles((theme) => ({
         // overflowY: 'auto',
         border: '1px solid',
         borderColor: theme.palette.separate.main,
-        overflowX: 'auto'
+        overflowX: 'scroll'
     }
 }));
 
 const useVideoStyles = makeStyles((theme) => ({
     root: {
         padding: 2,
+        minWidth: props => {
+            if(props.zoom) {
+                return VideoFieldWidth - 2;
+            }
+            if(props.total && props.num) {
+                switch(props.total) {
+                    case 1:
+                    case 2:
+                        return VideoFieldWidth - 2;
+                    case 3:
+                    case 4:
+                    case 5:
+                    case 6:
+                    case 7:
+                    case 8:
+                        return VideoFieldWidth /2 - 2;
+                    default:
+                        return VideoFieldWidth/3 - 2;
+                }
+            } else {
+                return VideoFieldWidth - 2
+            }
+        },
         width: props => {
             if(props.zoom) {
                 return VideoFieldWidth - 2;
@@ -142,6 +169,37 @@ const useVideoStyles = makeStyles((theme) => ({
                 return VideoFieldHeight - 2
             }
         },
+        height: props => {
+            if(props.zoom) {
+                return VideoFieldHeight - 2;
+            }
+            if(props.total && props.num) {
+                switch(props.total) {
+                    case 1:
+                    case 2:
+                        return VideoFieldHeight - 2;
+                    case 3:
+                    case 4:
+                    case 5:
+                    case 6:
+                    case 7:
+                    case 8:
+                        return VideoFieldHeight /2 - 2;
+                    default:
+                        return VideoFieldHeight/3 - 2;
+                }
+            } else {
+                return VideoFieldHeight - 2
+            }
+        },
+        overflow: 'hidden'
+    },
+    mobileRoot: {
+        padding: 2,
+        minWidth: mobileVideoFieldWidth - 2,
+        minHeight: mobileVideoFieldHeight - 2,
+        width: mobileVideoFieldWidth - 2,
+        height:  mobileVideoFieldHeight - 2,
         overflow: 'hidden'
     },
     mediaContent: {
@@ -149,7 +207,61 @@ const useVideoStyles = makeStyles((theme) => ({
         height: '100%',
         position: 'relative',
         border: '1px solid',
-        borderColor: theme.palette.separate.main
+        borderColor: theme.palette.separate.main,
+        minHeight: props => {
+            if(props.zoom) {
+                return VideoFieldHeight - 2;
+            }
+            if(props.total && props.num) {
+                switch(props.total) {
+                    case 1:
+                    case 2:
+                        return VideoFieldHeight - 2;
+                    case 3:
+                    case 4:
+                    case 5:
+                    case 6:
+                    case 7:
+                    case 8:
+                        return VideoFieldHeight /2 - 2;
+                    default:
+                        return VideoFieldHeight/3 - 2;
+                }
+            } else {
+                return VideoFieldHeight - 2
+            }
+        },
+        height: props => {
+            if(props.zoom) {
+                return VideoFieldHeight - 2;
+            }
+            if(props.total && props.num) {
+                switch(props.total) {
+                    case 1:
+                    case 2:
+                        return VideoFieldHeight - 2;
+                    case 3:
+                    case 4:
+                    case 5:
+                    case 6:
+                    case 7:
+                    case 8:
+                        return VideoFieldHeight /2 - 2;
+                    default:
+                        return VideoFieldHeight/3 - 2;
+                }
+            } else {
+                return VideoFieldHeight - 2
+            }
+        },
+    },
+    mobileMediaContent: {
+        width: '100%',
+        height: '100%',
+        position: 'relative',
+        border: '1px solid',
+        borderColor: theme.palette.separate.main,
+        minHeight: mobileVideoFieldHeight - 2,
     },
     overlay: {
         position: 'absolute',
@@ -179,6 +291,13 @@ const useVideoStyles = makeStyles((theme) => ({
     },
     content: {
         width: '100%',
+        lineHeight: 0,
+        display: 'flex',
+        position: 'relative',
+        overflow: 'hidden'
+    },
+    mobileContent: {
+        height: '100%',
         lineHeight: 0,
         display: 'flex',
         position: 'relative',
@@ -293,6 +412,7 @@ const UserVideo = ({ stream, locked, name, controlVideo, muted, total,
     const [volume, setVolume] = useState(0);
     const audioTrackRef = useRef(null);
     const [loading, setLoading] = useState(true);
+    const matches = useMediaQuery('(min-width:1000px)');
     // const [audioState, setAudioState] = useState(true);
     // const [videoState, setVideoState] = useState(true);
 
@@ -401,8 +521,8 @@ const UserVideo = ({ stream, locked, name, controlVideo, muted, total,
     }, [volume, audioTrackRef])
     
     return (
-        <div className={classes.root}>
-            <div className={classes.mediaContent}>
+        <div className={matches? classes.root: classes.mobileRoot}>
+            <div className={matches? classes.mediaContent: classes.mobileMediaContent}>
                 <div className={classes.overlay}>
                     <div className={classes.overlayHeader}>
                         <div>
@@ -476,10 +596,9 @@ const UserVideo = ({ stream, locked, name, controlVideo, muted, total,
                         <img src="/img/empty_video.jpg" alt="empty video" style={{height: 'inherit', width: 'inherit'}} />
                     </div>
                 } */}
-                <div className={classes.content}>
-                    <video ref={userVideo} autoPlay playsInline style={{width: '100%'}} muted={muted}>
+                <div className={matches? classes.content: classes.mobileContent} style={loading ? {display: 'none'}: {}}>
+                    <video ref={userVideo} autoPlay playsInline style={matches? {width: '100%'}: {height: '100%'}} muted={muted} loop>
                     </video>
-                    {/* <audio ref={userAudio} autoPlay /> */}
                     <SoundMeter size={echo} />
                 </div>
                 <div className={classes.username}>
