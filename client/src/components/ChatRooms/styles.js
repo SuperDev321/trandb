@@ -14,17 +14,21 @@ const useStyles = makeStyles((theme) => ({
     mainWrapper: {
         flexGrow: 1,
         overflow: 'hidden',
-        position: 'relative',
+        position: 'relative'
     },
     chatWrapper: {
         display: 'flex',
         flexDirection: 'row-reverse',
-        width: '100%'
+        // width: '100%',
+        flexGrow: 1,
+        overflow: 'hidden',
     },
     mobileChatWrapper: {
         display: 'flex',
         flexDirection: 'column',
-        width: '100%'
+        // width: '100%'
+        flexGrow: 1,
+        overflow: 'hidden',
     },
     main: {
         flexGrow: 1,
