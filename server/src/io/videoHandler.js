@@ -42,7 +42,7 @@ const stopVideo = (io, socket) => async ({ room }) => {
             });
         }
     } catch (err) {
-      console.log(err);
+        console.log(err);
     }
 };
 
@@ -52,12 +52,12 @@ const isAvailableToBroadcast = (io, socket) => async ({ room }, callback) => {
         const user = await Users.findById(_id);
         const result = await checkCameraBan(room, user.username, user.ip);
         if (result && !result.isBan) {
-            callback(true);
+            if (callback) callback(true);
         } else {
-            callback(false);
+            if (callback) callback(false);
         }
     } catch (err) {
-        callback(false)
+        if (callback) callback(false)
     }
 }
 
@@ -68,25 +68,9 @@ const isAvailableToView = (io, socket) => async ({ room, targetUserId }, callbac
         const result = await checkCameraBan(room, user.username, user.ip);
         console.log('camera ban result', result)
         if (result && result.isBan) {
-            callback(false);
+            if (callback) callback(false);
         } else {
-            // const socketIds = await io.of('/').in(targetUserId).allSockets();
-            // const it = socketIds.values();
-            // const first = it.next();
-            // const id = first.value;
-            // const targetSocket = io.sockets.sockets.get(id);
-            // if (targetSocket) {
-            //     targetSocket.emit('check camera state', { room, username: user.username, userId: user._id }, (result) => {
-            //         if (result) {
-            //             callback(true);
-            //         } else {
-            //             callback(false);
-            //         }
-            //     })
-            // } else {
-            //     callback(false);
-            // }
-            callback(true);
+            if (callback) callback(true);
         }
     } catch (err) {
         console.log(err.message)
@@ -97,94 +81,114 @@ const isAvailableToView = (io, socket) => async ({ room, targetUserId }, callbac
 const viewRequest = (io, socket) => async ({
     roomName, userId, targetName
 }, callback) => {
-    const requestUser = await Users.findById(userId);
-    const targetUser = await Users.findOne({ username: targetName });
-    if (!targetUser || !requestUser) {
-        return callback(false);
-    }
-    const { video } = targetUser;
-    if (!video) {
-        return callback(false);
-    }
-    const { blocks } = video;
-    if (blocks && blocks.includes(requestUser.username)) {
-        return callback(false);
-    }
-    let socketIds = await io.of('/').in(targetUser._id.toString()).allSockets();
-    let it = socketIds.values();
-    let first = it.next();
-    let id = first.value;
-    let targetSocket = io.sockets.sockets.get(id);
-    if(targetSocket) {
-        targetSocket.emit('view request', {
-            roomName,
-            username: requestUser.username,
-        }, (result) => {
-            if(!result) {
-                blocks.push(requestUser.username);
-                targetUser.save();
-            }
-            if (callback) callback(result);
-        });
-    } else {
-        return callback(false)
+    try {
+        const requestUser = await Users.findById(userId);
+        const targetUser = await Users.findOne({ username: targetName });
+        if (!targetUser || !requestUser) {
+            if (callback) callback(false);
+            return;
+        }
+        const { video } = targetUser;
+        if (!video) {
+            if (callback) callback(false);
+            return;
+        }
+        const { blocks } = video;
+        if (blocks && blocks.includes(requestUser.username)) {
+            if (callback) callback(false);
+            return;
+        }
+        let socketIds = await io.of('/').in(targetUser._id.toString()).allSockets();
+        let it = socketIds.values();
+        let first = it.next();
+        let id = first.value;
+        let targetSocket = io.sockets.sockets.get(id);
+        if(targetSocket) {
+            targetSocket.emit('view request', {
+                roomName,
+                username: requestUser.username,
+            }, (result) => {
+                if(!result) {
+                    blocks.push(requestUser.username);
+                    targetUser.save();
+                }
+                if (callback) callback(result);
+            });
+        } else {
+            if (callback) callback(false);
+            return;
+        }
+    } catch (err) {
+        if (callback) callback(false);
     }
 }
 
 const startView = (io, socket) => async ({ room_id, name, targetName }) => {
-    const requestUser = await Users.findOne({ username: name });
-    const targetUser = await Users.findOne({ username: targetName });
-    if (!targetUser || !requestUser) {
-        return;
-    }
-    let socketIds = await io.of('/').in(targetUser._id.toString()).allSockets();
-    let it = socketIds.values();
-    let first = it.next();
-    let id = first.value;
-    let targetSocket = io.sockets.sockets.get(id);
-    if(targetSocket) {
-        targetSocket.emit('start view', {
-            room_id,
-            name
-        });
+    try {
+        const requestUser = await Users.findOne({ username: name });
+        const targetUser = await Users.findOne({ username: targetName });
+        if (!targetUser || !requestUser) {
+            return;
+        }
+        let socketIds = await io.of('/').in(targetUser._id.toString()).allSockets();
+        let it = socketIds.values();
+        let first = it.next();
+        let id = first.value;
+        let targetSocket = io.sockets.sockets.get(id);
+        if(targetSocket) {
+            targetSocket.emit('start view', {
+                room_id,
+                name
+            });
+        }
+    } catch(err) {
+        console.log(err.message);
     }
 }
 
 const stopView = (io, socket) => async ({ room_id, name, targetName }) => {
-    const requestUser = await Users.findOne({ username: name });
-    const targetUser = await Users.findOne({ username: targetName });
-    if (!targetUser || !requestUser) {
-        return;
-    }
-    let socketIds = await io.of('/').in(targetUser._id.toString()).allSockets();
-    let it = socketIds.values();
-    let first = it.next();
-    let id = first.value;
-    let targetSocket = io.sockets.sockets.get(id);
-    if(targetSocket) {
-        targetSocket.emit('stop view', {
-            room_id,
-            name
-        });
+    try {
+        const requestUser = await Users.findOne({ username: name });
+        const targetUser = await Users.findOne({ username: targetName });
+        if (!targetUser || !requestUser) {
+            return;
+        }
+        let socketIds = await io.of('/').in(targetUser._id.toString()).allSockets();
+        let it = socketIds.values();
+        let first = it.next();
+        let id = first.value;
+        let targetSocket = io.sockets.sockets.get(id);
+        if(targetSocket) {
+            targetSocket.emit('stop view', {
+                room_id,
+                name
+            });
+        }
+    } catch (err) {
+        console.log(err.message);
     }
 }
 
 const stopBroadcastTo = (io, socket) => async ({ room_id, name, targetName }) => {
-    const requestUser = await Users.findOne({ username: name });
-    const targetUser = await Users.findOne({ username: targetName });
-    if (!targetUser || !requestUser) {
-        return;
-    }
-    let socketIds = await io.of('/').in(targetUser._id.toString()).allSockets();
-    let it = socketIds.values();
-    let first = it.next();
-    let id = first.value;
-    let targetSocket = io.sockets.sockets.get(id);
-    if(targetSocket) {
-        targetSocket.emit('stop view from', {
-            room_id,
-            name
-        });
+    try {
+        const requestUser = await Users.findOne({ username: name });
+        const targetUser = await Users.findOne({ username: targetName });
+        if (!targetUser || !requestUser) {
+            return;
+        }
+        let socketIds = await io.of('/').in(targetUser._id.toString()).allSockets();
+        let it = socketIds.values();
+        let first = it.next();
+        let id = first.value;
+        let targetSocket = io.sockets.sockets.get(id);
+        if(targetSocket) {
+            targetSocket.emit('stop view from', {
+                room_id,
+                name
+            });
+        }
+    } catch (err) {
+        console.log(err.message);
     }
 }
 
