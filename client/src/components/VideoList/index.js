@@ -66,27 +66,29 @@ const useStyles = makeStyles((theme) => ({
     },
     mobileRoot: {
         display: 'flex',
-        // flexWrap: 'wrap',
-        // flexDirection: 'column',
+        flexWrap: 'nowrap',
+        flexDirection: 'row',
         alignContent: 'flex-start',
         height: `${mobileVideoFieldHeight+2}px !important`,
         minHeight: `${mobileVideoFieldHeight+2}px !important`,
+        width: '100%',
         // height: `${VideoFieldHeight+2}px !important`,
         // minHeight: `${VideoFieldHeight+2}px !important`,
         // width: 'fit-content',
         scrollbarWidth: 0,
         scrollbarColor: `#585B5E #ecdbdb00`,
         '&::-webkit-scrollbar': {
-            width: 0,
+            width: '5px',
+            height: '2px'
         },
-        // '&::-webkit-scrollbar-track': {
-        //     '-webkit-box-shadow': 'inset 0 0 6px rgba(0,0,0,0.00)'
-        // },
-        // '&:hover::-webkit-scrollbar-thumb': {
-        //     backgroundColor: '#00000017',
-        //     outline: 'none',
-        //     borderRadius: '5px',
-        // },
+        '&::-webkit-scrollbar-track': {
+            '-webkit-box-shadow': 'inset 0 0 6px rgba(0,0,0,0.00)'
+        },
+        '&:hover::-webkit-scrollbar-thumb': {
+            backgroundColor: '#00000017',
+            outline: 'none',
+            borderRadius: '5px',
+        },
         background: theme.palette.background.default,
         boxShadow: '1px 1px 6px 0px rgb(0 0 0 / 20%)',
         color: theme.palette.textColor.main,
@@ -469,6 +471,7 @@ const UserVideo = ({ stream, locked, name, controlVideo, muted, total,
                 if (typeof audioTrack.volume === 'number')
                     initVolume = audioTrack.volume
             }
+            userVideo.current.play();
             
             if(stream) {
                 userVideo.current.srcObject = stream;
@@ -597,7 +600,7 @@ const UserVideo = ({ stream, locked, name, controlVideo, muted, total,
                     </div>
                 } */}
                 <div className={matches? classes.content: classes.mobileContent} style={loading ? {display: 'none'}: {}}>
-                    <video ref={userVideo} autoPlay playsInline style={matches? {width: '100%'}: {height: '100%'}} muted={muted} loop>
+                    <video ref={userVideo} autoPlay playsInline style={{width: '100%'}} muted={muted}>
                     </video>
                     <SoundMeter size={echo} />
                 </div>

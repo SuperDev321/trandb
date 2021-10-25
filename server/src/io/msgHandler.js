@@ -24,8 +24,7 @@ const publicMessage = (io, socket) => async ({ msg, room, from, color, bold, typ
     }
     let isBlocked = await checkBlockById(room, _id);
     if(isBlocked) {
-      if (callback) callback(false, 'blocked');
-      return callback(false, 'blocked');
+      if (callback) return callback(false, 'blocked');
     }
     const newChat = await Chats.create({
       msg,
@@ -72,7 +71,7 @@ const pokeMessage = (io, socket) => async ({from, to, room, pokeType}, callback)
     const socketIds = await io.of('/').in(room).allSockets();
     const socketIdArr = Array.from(socketIds);
     if(socketIdArr.length < 2) {
-      callback(false, 'logout');
+      if (callback) callback(false, 'logout');
       socket.leave(room);
       return;
     }
@@ -94,16 +93,20 @@ const pokeMessage = (io, socket) => async ({from, to, room, pokeType}, callback)
         ip: userIp
       }, (res) => {
         if (res) {
-          return callback(true, 'success')
+          if (callback) callback(true, 'success');
+          return;
         } else {
-          return callback(false, 'muted')
+          if (callback) callback(false, 'muted');
+          return;
         }
       });
     } else {
-      return callback(false, 'Can not find user')
+      if (callback) callback(false, 'Can not find user');
+      return;
     }
   } else {
-    return callback(false, 'Can not find user')
+    if (callback) callback(false, 'Can not find user');
+    return;
   }
 }
 
@@ -113,7 +116,8 @@ const privateMessage = (io, socket) => async ({ roomName, msg, from, to, color, 
     const date = Date.now();
     let isBlocked = await checkBlockById(null, _id);
     if(isBlocked) {
-      return callback(false, 'blocked');
+      if (callback) callback(false, 'blocked');
+      return;
     }
     let user = await findUserById(_id);
     let userIp = user.ip? ipInt(user.ip).toIP(): null;
@@ -121,7 +125,8 @@ const privateMessage = (io, socket) => async ({ roomName, msg, from, to, color, 
       let isForbiddenMessage = await hasFobiddenWord(msg);
       if(isForbiddenMessage) {
         await banUser(io, socket)({ip: userIp, to: user.username, role: 'admin', kind: 'chat'});
-        return callback(false, 'forbidden');
+        if (callback) callback(false, 'forbidden');
+        return;
       }
     }
     
@@ -141,7 +146,7 @@ const privateMessage = (io, socket) => async ({ roomName, msg, from, to, color, 
       let socketIds = await io.of('/').in(roomName).allSockets();
       const socketIdArr = Array.from(socketIds);
       if(socketIdArr.length < 2) {
-        callback(false, 'logout');
+        if (callback) callback(false, 'logout');
         socket.leave(roomName);
         return;
       }
@@ -169,13 +174,13 @@ const privateMessage = (io, socket) => async ({ roomName, msg, from, to, color, 
             ip: newChat.ip
           }, (res) => {
             if(res === 'success') {
-              callback(true, newChat)
+              if (callback) callback(true, newChat)
             } else if(res === 'muted') {
-              callback(false, 'muted')
+              if (callback) callback(false, 'muted')
             } else {
-              callback(false, 'unknown error')
+              if (callback) callback(false, 'unknown error')
             }
-              
+            return;
         });
         let dbRoomName = null;
         if (from > to) {
@@ -185,25 +190,11 @@ const privateMessage = (io, socket) => async ({ roomName, msg, from, to, color, 
         }
         Rooms.updateOne({name: dbRoomName}, {});
       } else {
-        callback(false, 'logout');
+        if (callback) callback(false, 'logout');
+        return;
       }
     }
-    
-
-    // socket.emit('room messages', [
-    //   {
-    //     type: 'private',
-    //     room,
-    //     _id: newChat._id,
-    //     msg: newChat.msg,
-    //     from: newChat.from,
-    //     to: newChat.to,
-    //     date: newChat.date,
-    //     color: newChat.color,
-    //   }
-    // ])
   } catch (err) {
-    console.log(err);
   }
 };
 
