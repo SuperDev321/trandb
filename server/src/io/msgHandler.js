@@ -56,57 +56,61 @@ const publicMessage = (io, socket) => async ({ msg, room, from, color, bold, typ
 };
 
 const pokeMessage = (io, socket) => async ({from, to, room, pokeType}, callback) => {
-  const toUser = await findUserByName(to);
-  const { _id } = socket.decoded;
-  let user = await findUserById(_id);
-  if(!user) {
-    return callback(false);
-  }
-  let userIp = user.ip? ipInt(user.ip).toIP(): null;
-  let isBlocked = await checkBlockById(room, _id);
-    if(isBlocked) {
-      return callback(false, 'blocked');
+  try {
+    const toUser = await findUserByName(to);
+    const { _id } = socket.decoded;
+    let user = await findUserById(_id);
+    if(!user) {
+      return callback(false);
     }
-  if(toUser) {
-    const socketIds = await io.of('/').in(room).allSockets();
-    const socketIdArr = Array.from(socketIds);
-    if(socketIdArr.length < 2) {
-      if (callback) callback(false, 'logout');
-      socket.leave(room);
-      return;
-    }
-    let socketToPoke = null;
-    for (let index = 0; index < socketIdArr.length; index++) {
-      const element = socketIdArr[index];
-      let socket = io.sockets.sockets.get(element);
-      if(toUser._id.equals(socket.decoded._id)) {
-        socketToPoke = socket;
+    let userIp = user.ip? ipInt(user.ip).toIP(): null;
+    let isBlocked = await checkBlockById(room, _id);
+      if(isBlocked) {
+        return callback(false, 'blocked');
       }
-    }
-    if (socketToPoke) {
-      socketToPoke.emit('poke message', {
-        type: 'poke',
-        room,
-        from,
-        to,
-        pokeType,
-        ip: userIp
-      }, (res) => {
-        if (res) {
-          if (callback) callback(true, 'success');
-          return;
-        } else {
-          if (callback) callback(false, 'muted');
-          return;
+    if(toUser) {
+      const socketIds = await io.of('/').in(room).allSockets();
+      const socketIdArr = Array.from(socketIds);
+      if(socketIdArr.length < 2) {
+        if (callback) callback(false, 'logout');
+        socket.leave(room);
+        return;
+      }
+      let socketToPoke = null;
+      for (let index = 0; index < socketIdArr.length; index++) {
+        const element = socketIdArr[index];
+        let socket = io.sockets.sockets.get(element);
+        if(toUser._id.equals(socket.decoded._id)) {
+          socketToPoke = socket;
         }
-      });
+      }
+      if (socketToPoke) {
+        socketToPoke.emit('poke message', {
+          type: 'poke',
+          room,
+          from,
+          to,
+          pokeType,
+          ip: userIp
+        }, (res) => {
+          if (res) {
+            if (callback) callback(true, 'success');
+            return;
+          } else {
+            if (callback) callback(false, 'muted');
+            return;
+          }
+        });
+      } else {
+        if (callback) callback(false, 'Can not find user');
+        return;
+      }
     } else {
       if (callback) callback(false, 'Can not find user');
       return;
     }
-  } else {
-    if (callback) callback(false, 'Can not find user');
-    return;
+  } catch (err) {
+    console.log(err.message);
   }
 }
 
