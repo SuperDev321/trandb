@@ -121,14 +121,14 @@ const MyMessage = ({id, user, roomName, message, messageSize, role, font_size, u
                 if(isValidHttpUrl(element)) {
                     // urlText = urlText.replace(element, urlify(element));
                     if (preString !== '') {
-                        htmlObj.push(<span key={`${messageId}-${index-1}`} style={{whiteSpace: 'pre'}}>{preString}</span>);
+                        htmlObj.push(<span key={`${messageId}-${index-1}`}>{preString}</span>);
                         preString = '';
                     }
                     htmlObj.push(<a href={element} key={`${messageId}-${index}`} target="_blank" rel="noopener noreferrer">{element}</a>)
                     continue;
                 } else if(showEmoji && element.charAt(0) === '>' && element.charAt(element.length - 1) === '<') {
                     if (preString !== '') {
-                        htmlObj.push(<span key={`${messageId}-${index-1}`} style={{whiteSpace: 'pre'}}>{preString}</span>);
+                        htmlObj.push(<span key={`${messageId}-${index-1}`}>{preString}</span>);
                         preString = '';
                     }
                     const name = element.slice(1, element.length - 1);
@@ -142,7 +142,7 @@ const MyMessage = ({id, user, roomName, message, messageSize, role, font_size, u
             }
         }
         if (preString !== '') {
-            htmlObj.push(<span key={`${messageId}-last`} style={{whiteSpace: 'pre'}}>{preString}</span>);
+            htmlObj.push(<span key={`${messageId}-last`}>{preString}</span>);
             preString = '';
         }
         return htmlObj
