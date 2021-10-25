@@ -471,7 +471,23 @@ const UserVideo = ({ stream, locked, name, controlVideo, muted, total,
                 if (typeof audioTrack.volume === 'number')
                     initVolume = audioTrack.volume
             }
-            userVideo.current.play();
+            const playPromise = userVideo.current?.play();
+                
+            if (playPromise !== undefined) {
+                playPromise
+                .then(_ => {
+                    changeVolume(initVolume);
+                    if (loading) {
+                        setLoading(false);
+                    }
+                    // Automatic playback started!
+                    // Show playing UI.
+                })
+                .catch(error => {
+                    // Auto-play was prevented
+                    // Show paused UI.
+                });
+            }
             
             if(stream) {
                 userVideo.current.srcObject = stream;
