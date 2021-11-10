@@ -1,8 +1,11 @@
 import React, {useState, useReducer} from 'react';
 import { makeStyles } from '@material-ui/core/styles';
+import Button from "Admin/components/CustomButtons/Button.js";
 import Logs from './Logs';
 import RoomSelector from './Selector';
 import RoomContext from './context';
+import config from '../../../config';
+import Axios from 'axios';
 const useStyles = makeStyles((theme) => ({
   root: {
     width: '100%',
@@ -34,10 +37,20 @@ export default function PrivateLogs() {
         error: null
     });
 
+    const clearAll = () => {
+        let token = window.localStorage.getItem('token');
+        Axios.delete(`${config.server_url}/api/messages/private`, {
+            headers: {
+                authorization: token
+            }
+        });
+    }
+
     return (
         <RoomContext.Provider value={{
             state, dispatch
         }}>
+            <Button style={{float: 'right'}} variant="contained" color="primary" onClick={() => clearAll()}>Clear All</Button>
             <div className={classes.root}>
                 <RoomSelector />
                 <Logs />

@@ -5,7 +5,7 @@ const { signup, login, guestLogin, googleLogin, checkToken,
 } = require('./users');
 const { getRooms, getRoomsAdmin, addRoom, deleteRoom, getRoomDetail, getPublicRoomNames, getPrivateRoomNames,
   checkRoomPermission, getUserRooms, addModerator, deleteModerator, updateRoomGeneral, updateRoomMedia } = require('./rooms');
-const { getPrivateChat, getPublicChat, fileUploader, deleteChat } = require('./chats');
+const { getPrivateChat, getPublicChat, fileUploader, deleteChat, cleanPublicChat, cleanPrivateChat } = require('./chats');
 const {addBan, deleteBan, getBans} = require('./bans');
 const {getWords, addWord, deleteWord} = require('./forbiddenWords');
 const {getSetting, updateSetting} = require('./settings');
@@ -42,6 +42,8 @@ module.exports = {
   getPrivateChat,
   getPublicChat,
   deleteChat,
+  cleanPublicChat,
+  cleanPrivateChat,
   fileUploader,
   addBan,
   deleteBan,

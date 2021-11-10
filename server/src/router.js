@@ -19,6 +19,8 @@ const {
   getPrivateChat,
   getPublicChat,
   deleteChat,
+  cleanPublicChat,
+  cleanPrivateChat,
   fileUploader,
   getUsers,
   updateProfile,
@@ -76,15 +78,17 @@ router.put('/room/media', withAuth, updateRoomMedia);
 router.get('/rooms/:roomName', withAuth, getRoomDetail);
 router.get('/rooms/:roomName/isPrivate', checkRoomPermission);
 router.delete('/rooms/:id', withAuth, isAdmin ,deleteRoom);
-router.post('/signup', signup);
+// router.post('/signup', signup);
 router.post('/login', withIp, login);
 router.post('/login/guest', withIp, guestLogin);
 router.post('/login/google', googleLogin);
-router.post('/users/init/point', initPoints);
+router.post('/users/init/point', withAuth, isAdmin, initPoints);
 
 router.post('/messages/private', withAuth, isAdmin, getPrivateChat);
 router.get('/messages/public/:roomName', withAuth, isAdmin, getPublicChat);
 router.delete('/messages/:id', withAuth, isAdmin, deleteChat);
+router.delete('/messages/public', withAuth, isAdmin, cleanPublicChat);
+router.delete('/messages/private', withAuth, isAdmin, cleanPrivateChat);
 
 router.get('/users', getUsers);
 router.get('/user/:username', getUserByName);
@@ -93,7 +97,7 @@ router.get('/users/:userId', getUserDetail);
 router.get('/users/:username/ip', withAuth, isAdmin, getUserIp);
 router.post('/user/update/avatar', withAuth, updateAvatar)
 router.post('/user/update/point', withAuth, isAdmin, updatePoint)
-router.post('/profile/update', updateProfile)
+router.post('/profile/update', withAuth, isAdmin, updateProfile)
 
 router.delete('/bans/:banId', withAuth, deleteBan);
 router.post('/bans', withAuth, addBan);
